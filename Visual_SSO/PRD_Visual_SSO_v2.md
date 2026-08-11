@@ -86,7 +86,7 @@ This document does not recommend one over the other. It records that the cheap o
 | Median class-wide time to all-signed-in | 15 min *(est. — unverified)* | ≤ 3 min | Teacher stopwatch, 5 lessons pre/post |
 | Click → password submitted, p50 | n/a | ≤ 8 s | In-app timing, local log |
 | Click → password submitted, p95 | n/a | ≤ 15 s | Same |
-| Injection success rate on lab hardware | **unknown — T0.3 unrun** | ≥ 99% | Spike CSV, then production log |
+| Injection success rate | **unknown — T0.3 unrun** | ≥ 99% | **Measured at pilot, not at T0.3.** 50 spike runs bound the failure rate at ~6%, not 1% — they detect gross failure, they cannot certify 99%. See `T0.3_Injection_Test_Protocol.md` §5. |
 | Wrong-pupil sign-ins | 3–5 per lesson *(est.)* | 0 | Audit log + teacher tally |
 | New-school setup time, ICT coordinator, unaided | n/a | ≤ 90 min | Timed with a real coordinator at school #2 |
 | Import rejects on a real APDM export | n/a | ≤ 2% of rows, all with actionable messages | Dry-run report |
@@ -399,7 +399,7 @@ No central service means no central support. Each school owns its install. The a
 
 | Phase | Scope | Duration | Exit criteria |
 | :--- | :--- | :--- | :--- |
-| **0 — De-risk** | T0.1, T0.2, T0.3 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **injection success ≥ 99% over 50 runs on lab hardware**. Any failure stops the programme here. |
+| **0 — De-risk** | T0.1, T0.2, T0.3 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **zero unexplained injection failures across 50 runs on lab hardware, with `SendKeys` corruption reproduced as the control**, and 5/5 on the adversarial focus-steal test. Any failure stops the programme here. See `T0.3_Injection_Test_Protocol.md`. |
 | **1 — Baseline** | Time 5 real lessons | 1 week | The 15-minute estimate replaced with a measurement |
 | 2 — Credential foundation | Store format, Admin wizard, importer, provisioning | 3 weeks | A second person can import a real APDM export unaided |
 | 3 — Client | WPF shell, picture password, injection engine, failure taxonomy | 4 weeks | One class signs in end to end on lab hardware |

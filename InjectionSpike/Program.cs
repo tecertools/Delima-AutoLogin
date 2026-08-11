@@ -43,6 +43,7 @@ internal static class Program
         var runs = ParseIntArg(args, "--runs", 50);
         var method = ParseStringArg(args, "--method", "sendinput").ToLowerInvariant();
         var settleMs = ParseIntArg(args, "--settle", 400);
+        var charDelayMs = ParseIntArg(args, "--char-delay", 0);
         var hint = ParseStringArg(args, "--login-hint", "m-00000000@moe-dl.edu.my");
         var timingUrl = ParseStringArg(args, "--url", DefaultTimingUrl);
 
@@ -58,7 +59,7 @@ internal static class Program
 
         return mode switch
         {
-            "fidelity" => RunFidelity(chromePath, runs, method, settleMs),
+            "fidelity" => RunFidelity(chromePath, runs, method, settleMs, charDelayMs),
             "timing"   => RunTiming(chromePath, runs, timingUrl, hint),
             _          => PrintHelp()
         };
@@ -70,7 +71,7 @@ internal static class Program
     // account, no rate limiting. This is the run that answers the SendKeys
     // question definitively.
     // ------------------------------------------------------------------
-    private static int RunFidelity(string chromePath, int runs, string method, int settleMs)
+    private static int RunFidelity(string chromePath, int runs, string method, int settleMs, int charDelayMs)
     {
         var pagePath = Path.Combine(AppContext.BaseDirectory, "testpage.html");
         if (!File.Exists(pagePath))
@@ -85,7 +86,8 @@ internal static class Program
             }
         }
 
-        Console.WriteLine($"MODE A — fidelity   method={method}   runs={runs}   settle={settleMs}ms");
+        Console.WriteLine($"MODE A — fidelity   method={method}   runs={runs}   " +
+                          $"settle={settleMs}ms   char-delay={charDelayMs}ms");
         Console.WriteLine(new string('-', 78));
 
         var results = new List<Result>();
@@ -95,7 +97,7 @@ internal static class Program
         {
             for (var i = 0; i < perPassword && results.Count < runs; i++)
             {
-                var r = FidelityRun(chromePath, pagePath, label, value, method, settleMs);
+                var r = FidelityRun(chromePath, pagePath, label, value, method, settleMs, charDelayMs);
                 results.Add(r);
                 Console.WriteLine(
                     $"  {results.Count,3}. {label,-18} {(r.Success ? "PASS" : "FAIL"),-4}  " +
@@ -105,7 +107,7 @@ internal static class Program
 
         Console.WriteLine();
         SummariseByLabel(results);
-        var csv = WriteCsv(results, $"fidelity_{method}");
+        var csv = WriteCsv(results, $"fidelity_{method}_d{charDelayMs}");
         Console.WriteLine($"\nCSV: {csv}");
 
         var failed = results.Count(r => !r.Success);
@@ -116,7 +118,8 @@ internal static class Program
     }
 
     private static Result FidelityRun(
-        string chromePath, string pagePath, string label, string password, string method, int settleMs)
+        string chromePath, string pagePath, string label, string password, string method,
+        int settleMs, int charDelayMs)
     {
         var url = "file:///" + pagePath.Replace('\\', '/') + "#expected=" + Uri.EscapeDataString(password);
         using var session = ChromeSession.Launch(chromePath, url);
@@ -139,7 +142,7 @@ internal static class Program
             if (method == "sendkeys")
                 SendKeys.SendWait(password);      // reserved chars parsed as syntax
             else
-                NativeMethods.SendUnicodeString(password);
+                NativeMethods.SendUnicodeString(password, charDelayMs);
         }
         finally
         {
@@ -297,6 +300,10 @@ internal static class Program
               --runs N       number of runs            (default 50)
               --method M     sendinput | sendkeys      (default sendinput)
               --settle MS    pause after window ready  (default 400)
+              --char-delay MS  gap between characters  (default 0)
+                             Raise to 10-20 if fast injection drops characters
+                             on lab hardware. Whatever value produces a clean
+                             sweep becomes the production setting.
               --url U        entry URL for timing mode; {0} is replaced with
                              the encoded login hint if present
               --login-hint E address substituted into --url

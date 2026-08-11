@@ -29,7 +29,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │
 ├── Visual_SSO/                     Windows app — CURRENT SPEC (v2, multi-school)
 │   ├── PRD_Visual_SSO_v2.md        ← start here
-│   └── Technical_Architecture_Visual_SSO.md
+│   ├── Technical_Architecture_Visual_SSO.md
+│   └── T0.3_Injection_Test_Protocol.md   ← then do this
 │
 ├── InjectionSpike/                 T0.3 harness — decides whether Visual SSO is viable
 │                                   WRITTEN BUT NEVER COMPILED OR RUN
@@ -54,14 +55,17 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5 and none have b
 
 ## Next step
 
+Run T0.3. **Follow `Visual_SSO/T0.3_Injection_Test_Protocol.md`** — it covers the control run, cold-vs-warm timing, and the adversarial focus-steal test, none of which are obvious from the commands alone.
+
 ```powershell
 cd InjectionSpike
-dotnet run -- fidelity --method sendinput --runs 50
-dotnet run -- fidelity --method sendkeys  --runs 50
-dotnet run -- timing   --runs 50
+dotnet build -c Release                                    # never been compiled
+dotnet run -c Release -- fidelity --method sendkeys  --runs 50   # control, run first
+dotnet run -c Release -- fidelity --method sendinput --runs 50
+dotnet run -c Release -- timing --runs 50
 ```
 
-On a lab PC, not a developer machine. Then read `Visual_SSO/PRD_Visual_SSO_v2.md` §2.
+On a lab PC, not a developer machine, and not over Remote Desktop.
 
 ---
 

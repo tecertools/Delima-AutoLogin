@@ -70,11 +70,46 @@
         }
       }
 
-      pw.addEventListener('input', evaluate);
+      // ------------------------------------------------------------------
+      // Debounce before publishing a verdict. This is not cosmetic.
+      //
+      // `input` fires once per character. Without a settle window the title
+      // passes through SPIKE:FAIL:LEN_1_OF_19, LEN_2_OF_19 … on its way to the
+      // truth, and the harness — polling GetWindowText every 100 ms — can
+      // legitimately sample one of those and record a FAIL for a run that
+      // succeeded.
+      //
+      // The bias is the worst possible shape: longer strings spend longer in
+      // the intermediate state, and the longest strings here are precisely the
+      // reserved-character ones ("M+u^r%i~d(2){0}[26]", 19 chars). An
+      // undebounced harness therefore fails SendInput on exactly the passwords
+      // SendKeys is expected to fail on, and the run reads as "injection is
+      // impossible" rather than "SendKeys is the wrong API".
+      //
+      // SETTLE_MS must exceed the time to deliver one string, and stay well
+      // under the harness's 5 s verdict timeout.
+      var SETTLE_MS = 400;
+      var settleTimer = null;
+
+      function onInput() {
+        if (pw.value.length === 0) { evaluate(); return; }
+        document.title = 'SPIKE:TYPING';           // matches neither PASS nor FAIL
+        verdict.textContent = 'Receiving…';
+        verdict.className = 'muted';
+        if (settleTimer) clearTimeout(settleTimer);
+        settleTimer = setTimeout(evaluate, SETTLE_MS);
+      }
+
+      pw.addEventListener('input', onInput);
 
       // Enter must not navigate; the harness needs the title to persist.
+      // Enter also means "the sender is done", so publish immediately.
       pw.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); evaluate(); }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (settleTimer) clearTimeout(settleTimer);
+          evaluate();
+        }
       });
 
       // Keep focus pinned so a stray click cannot silently redirect keystrokes
