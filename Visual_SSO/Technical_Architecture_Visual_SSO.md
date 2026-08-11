@@ -133,9 +133,16 @@ DPAPI machine-scope keys are machine-specific, which is a feature: a `credential
 
 ### 3.3 Per-PC store
 
-`credentials.dat` is the same payload, re-serialised and passed through `ProtectedData.Protect(bytes, entropy, DataProtectionScope.LocalMachine)`, where `entropy` is a 32-byte value stored beside it and ACL'd identically. DPAPI alone would be readable by any process running as any user on that machine; the entropy file plus the ACL raises the bar to "local administrator", which is the realistic ceiling on a lab PC.
+`credentials.dat` is the same payload, re-serialised and passed through `ProtectedData.Protect(bytes, entropy, DataProtectionScope.LocalMachine)`, where `entropy` is a 32-byte value stored beside it and ACL'd identically.
 
 An HMAC-SHA256 over the whole blob detects tampering independently of DPAPI.
+
+**State precisely what this buys, because it is easy to overstate.** `LocalMachine` scope means the key is derived from machine state, so:
+
+- A `credentials.dat` copied to **any other machine** is undecryptable. This is the protection that matters for a stolen or decommissioned PC, and it is strong.
+- On **that** machine, any process that can read both files can call `ProtectedData.Unprotect` and recover every password. DPAPI machine scope is not a defence against a local user — it never was.
+
+Since the Launcher must read the store, the account the Launcher runs as must have read access, and on a lab PC that is the shared pupil Windows account (§3.5). The honest conclusion: **anyone who can obtain an interactive session on a lab PC and run arbitrary code gets the whole school's passwords.** Everything protecting against that is outside the crypto — execution control, kiosk lockdown, and physical access. Design accordingly, and say so to the school rather than implying the file is safe because it is encrypted.
 
 ### 3.4 Decryption discipline
 
@@ -155,16 +162,32 @@ var ok = injector.Inject(cred.PasswordSpan);         // ReadOnlySpan<char>, neve
 
 ### 3.5 File locations and ACLs
 
+The account model has to be stated before the ACLs mean anything. A lab PC runs a **shared pupil Windows account** (`Murid` or equivalent), and the Launcher runs in that account's interactive session — it must, because it draws a UI. Running it as a separate service account is not available: Session 0 isolation means a process running as another user cannot render to the pupil's desktop.
+
+So the account that must read `credentials.dat` is the same account a pupil is sitting in front of.
+
 ```
 %ProgramData%\DELIMa Launcher\
-  credentials.dat        SYSTEM:F, Administrators:F, <ServiceAccount>:R   ← Users: no access
+  credentials.dat        SYSTEM:F, Administrators:F, Murid:R   ← all other users: no access
   credentials.entropy    same
-  audit\audit-2026-08.log  SYSTEM:F, Administrators:F, <ServiceAccount>:W (append)
+  audit\audit-2026-08.log  SYSTEM:F, Administrators:F, Murid:W (append-only, no delete)
   theme\                 Users:R
   assets\avatars\        Users:R
 ```
 
-The Launcher runs as an ordinary interactive user, which means an interactive user *can* read the store — this is unavoidable without a service. Mitigations: DPAPI + entropy means reading the file yields nothing without local admin, and pupils are not local admins. The install guide recommends BitLocker.
+The ACL therefore keeps the store away from *other* accounts and from a plain file copy off the machine. It does not, and cannot, keep it away from code running as `Murid`.
+
+**The mitigations that actually apply are all outside the crypto:**
+
+| Control | Stops |
+| :--- | :--- |
+| **AppLocker / SRP** — allow execution only from `%ProgramFiles%` and `%SystemRoot%` | A pupil running PowerShell, a portable binary, or anything from USB or `%TEMP%`. **This is the single most load-bearing control on the list** and belongs in the install guide as a requirement, not a suggestion. |
+| Windows kiosk / assigned access | Reaching a shell at all |
+| Deny `Murid` write access to `%ProgramFiles%\DELIMa Launcher` | Replacing the Launcher binary with one that dumps the store |
+| BitLocker | Offline disk access; drive removal |
+| Append-only audit ACL | A pupil covering their tracks |
+
+**Residual risk, stated plainly for the school:** a person with an interactive session on a lab PC who can execute code holds every pupil's password for that school. Not a nine-year-old — but a bored teenager, a visiting contractor, or a member of staff. This risk is inherent to any product that stores replayable passwords on shared hardware; it is not a flaw in this implementation, and it does not have a technical fix. It is the strongest single argument for `../Normal_SSO/` and belongs in front of the headmaster when they ask "is it safe?".
 
 ---
 
@@ -307,6 +330,8 @@ Gap Analysis §1.6 — a curious nine-year-old finds all of these in week one.
 | `URLBlocklist` | `*` | Everything else |
 
 **Launcher:** low-level keyboard hook suppressing Alt+Tab, Win, Alt+F4 while a session is active; topmost borderless window; `Ctrl+Shift+Esc` cannot be blocked from user mode — accept it, and rely on Windows kiosk/shell replacement where the school will tolerate it.
+
+**Execution control — the one that protects the credential store.** AppLocker (or SRP on Home/Pro images without AppLocker) restricting execution for the pupil account to `%ProgramFiles%` and `%SystemRoot%`. Per §3.5 this is what stands between a lab session and the whole school's passwords, so unlike the Chrome policies it is **required, not optional**, and the install guide must say so in those words. The installer cannot apply it reliably across every school's image; it ships as a documented GPO/`Set-AppLockerPolicy` snippet that the coordinator applies and confirms in the lab checklist.
 
 **Not solvable in software:** the 👁 reveal icon on Google's own password field. A pupil who taps it sees the injected password. Mitigations are all partial — inject, submit immediately, and keep the window brief. Worth stating plainly in the install guide rather than pretending otherwise.
 

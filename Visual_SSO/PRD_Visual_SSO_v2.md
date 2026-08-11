@@ -337,6 +337,8 @@ Program files to `%ProgramFiles%\DELIMa Launcher`. Data to `%ProgramData%\DELIMa
 - Apply Chrome enterprise policy — disables the password manager, DevTools, incognito, and browser sign-in on the launcher's profile (Gap Analysis §1.6). Writes to `HKLM\SOFTWARE\Policies\Google\Chrome`. **Requires admin, affects the whole machine, and the checkbox says so.**
 - Desktop / Start Menu shortcuts
 
+**One thing the installer cannot do, and must not pretend to.** Restricting which programs the pupil account may run (AppLocker/SRP, arch §8) is what protects the credential store from anyone sitting at a lab PC. It depends on the school's Windows edition and existing group policy, so it ships as a documented snippet the coordinator applies, and as a **required** line on the lab checklist — not a checkbox in the installer that might silently fail.
+
 ### 8.4 Upgrade and uninstall
 
 - Upgrade is a reinstall over the top; `AppId` GUID fixed across versions. `credentials.dat` and settings survive; assets are replaced.
@@ -419,7 +421,8 @@ Phases 2 and 3 are the only ones that look like building the app. That ratio is 
 | MOE enables 2SV on pupil accounts | Fatal | No mitigation exists. Ask now (Gap Analysis §6 Q2). Watch for announcements. |
 | Google anti-automation (CAPTCHA, "unusual activity") on 40 near-identical logins from one IP | High | Jitter between launches; failure taxonomy surfaces it as a teacher-legible state rather than a hang. Cannot be fully solved. |
 | Passphrase lost at another school | Medium | Recovery sheet; documented re-import path. Explicitly no escrow. |
-| Lab PC stolen with `credentials.dat` | Medium | DPAPI machine scope makes the file useless elsewhere. Recommend BitLocker in the install guide. |
+| Lab PC stolen with `credentials.dat` | Medium | DPAPI machine scope makes the file useless on any other machine. BitLocker required in the install guide. |
+| **Anyone who can run code in a lab PC session recovers every password for that school** | **High — inherent, no technical fix** | DPAPI protects against moving the file, not against a local user (arch §3.3). Mitigated only by AppLocker/SRP restricting execution to `%ProgramFiles%`, kiosk lockdown, and physical access control — all of which the school must maintain. **This is the strongest argument for `Normal_SSO` and must be stated to the headmaster, not buried.** |
 | Coordinator leaves the plaintext password CSV in `Downloads` | **High, and likely** | Wizard offers secure delete and says why; both guides repeat it. Cannot be enforced. |
 | Another school's ICT coordinator less capable than assumed | High — G3 misses | Wizard-only, no CLI, dry runs everywhere, two PDF guides, timed test with a real coordinator in Phase 6. |
 | Unsigned binary → SmartScreen kills adoption | High | OV certificate budgeted (§8.5). |
