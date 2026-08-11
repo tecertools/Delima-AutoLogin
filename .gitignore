@@ -1,0 +1,81 @@
+# ---------------------------------------------------------------------------
+# Credentials and pupil data — NOTHING in these categories may ever be committed
+# ---------------------------------------------------------------------------
+*.dlmpack
+*.dat
+*.entropy
+credentials*
+roster.json
+*.csv
+*.xlsx
+*.xls
+!contoh_*.csv
+!**/fixtures/**/*.csv
+audit/
+*.log
+
+# Spike output
+fidelity_*.csv
+timing_*.csv
+
+# ---------------------------------------------------------------------------
+# .NET
+# ---------------------------------------------------------------------------
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild[Ll]og.*
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vs/
+.vscode/
+*.dbmdl
+*.pdb
+*.cache
+*.VisualState.xml
+TestResult.xml
+[Tt]est[Rr]esult*/
+artifacts/
+project.lock.json
+project.fragment.lock.json
+*.nuget.props
+*.nuget.targets
+packages/
+!packages/build/
+
+# ---------------------------------------------------------------------------
+# Installer output
+# ---------------------------------------------------------------------------
+installer/Output/
+*.msi
+*.msix
+DELIMaLauncher-Setup-*.exe
+
+# ---------------------------------------------------------------------------
+# Signing material — never commit
+# ---------------------------------------------------------------------------
+*.pfx
+*.p12
+*.snk
+*.key
+*.pem
+
+# ---------------------------------------------------------------------------
+# OS / editor
+# ---------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*~
+*.swp

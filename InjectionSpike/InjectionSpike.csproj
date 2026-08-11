@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AssemblyName>InjectionSpike</AssemblyName>
+    <RootNamespace>InjectionSpike</RootNamespace>
+    <!-- WinForms referenced solely for System.Windows.Forms.SendKeys, which is
+         one of the two injection methods under test. Production code should not
+         take this dependency. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Fidelity target must sit next to the binary so Mode A can find it. -->
+    <Content Include="testpage.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

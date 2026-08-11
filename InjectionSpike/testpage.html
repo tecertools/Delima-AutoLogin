@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--
+  Fidelity target for Mode A.
+
+  The expected password arrives in the URL *fragment*, which browsers never send
+  to a server, so nothing leaves this machine. The page compares what actually
+  lands in the password field against the expectation and reports the verdict
+  through document.title — which the harness reads with GetWindowText, giving a
+  channel that needs no local server, no WebSocket and no extension.
+
+  The title carries only PASS / FAIL plus character offsets, never the value
+  itself, so a real password would not be exposed in the window title or in any
+  screen recording. Use synthetic passwords here regardless.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SPIKE:WAITING</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 4rem auto; max-width: 40rem; }
+    input { font-size: 1.5rem; padding: .5rem; width: 100%; box-sizing: border-box; }
+    #verdict { font-size: 2rem; margin-top: 1.5rem; font-weight: 600; }
+    .pass { color: #137333; }
+    .fail { color: #c5221f; }
+    .muted { color: #5f6368; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <h1>Injection fidelity target</h1>
+  <p class="muted">Harness reads the verdict from <code>document.title</code>.</p>
+
+  <input id="pw" type="password" autofocus autocomplete="off" spellcheck="false">
+  <div id="verdict" class="muted">Waiting for input…</div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.hash.slice(1));
+      var expected = params.get('expected') || '';
+      var pw = document.getElementById('pw');
+      var verdict = document.getElementById('verdict');
+
+      function describeMismatch(actual) {
+        if (actual.length !== expected.length) {
+          return 'LEN_' + actual.length + '_OF_' + expected.length;
+        }
+        var bad = [];
+        for (var i = 0; i < expected.length; i++) {
+          if (actual[i] !== expected[i]) bad.push(i);
+        }
+        return bad.length ? 'POS_' + bad.join('.') : 'UNKNOWN';
+      }
+
+      function evaluate() {
+        var actual = pw.value;
+        if (actual.length === 0) {
+          document.title = 'SPIKE:WAITING';
+          verdict.textContent = 'Waiting for input…';
+          verdict.className = 'muted';
+          return;
+        }
+        if (actual === expected) {
+          document.title = 'SPIKE:PASS';
+          verdict.textContent = '✔ PASS — all ' + expected.length + ' characters intact';
+          verdict.className = 'pass';
+        } else {
+          var detail = describeMismatch(actual);
+          document.title = 'SPIKE:FAIL:' + detail;
+          verdict.textContent = '✘ FAIL — ' + detail;
+          verdict.className = 'fail';
+        }
+      }
+
+      pw.addEventListener('input', evaluate);
+
+      // Enter must not navigate; the harness needs the title to persist.
+      pw.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); evaluate(); }
+      });
+
+      // Keep focus pinned so a stray click cannot silently redirect keystrokes
+      // mid-run and turn a real failure into a confusing one.
+      pw.addEventListener('blur', function () { setTimeout(function () { pw.focus(); }, 0); });
+      window.addEventListener('load', function () { pw.focus(); });
+    })();
+  </script>
+</body>
+</html>
