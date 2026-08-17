@@ -355,13 +355,18 @@ Program files to `%ProgramFiles%\DELIMa Launcher`. Data to `%ProgramData%\DELIMa
 - The store carries a schema version; a newer Launcher migrates forward and refuses to open a future-versioned store.
 - **Uninstall securely deletes** `credentials.dat`, any temporary Chrome profiles, and the audit log only if the coordinator confirms — the log may be required evidence.
 
-### 8.5 Signing — a distribution blocker, not a polish item
+### 8.5 Signing — decided against, with conditions
 
-Unsigned, SmartScreen shows *"Windows protected your PC"* to every ICT coordinator who downloads it. For software that asks a school to entrust it with children's passwords, that is fatal to adoption, and correctly so.
+**Releases are unsigned.** A code-signing certificate is ~RM 900/year and the free routes require open-sourcing the project, which is the undecided licence question below. The full reasoning, costs and compensating controls are in `Build_And_Release.md` §4; the summary:
 
-**Requirement:** an OV code-signing certificate (~USD 200–400/year), applied to both executables and the installer. EV additionally bypasses SmartScreen reputation-building, at roughly double the cost. Budget for OV; treat the reputation ramp as a known first-month friction.
+- **SmartScreen is smaller than it first appears, conditionally.** Its warning is triggered by Mark-of-the-Web, which FAT32 and exFAT cannot store — so the pendrive route (already primary, §6 Step 7) avoids it, **provided the stick is not NTFS-formatted**. Distribution pendrives must be FAT32 or exFAT, and this must be tested rather than assumed.
+- **The real cost is tamper-evidence.** A school receiving a pendrive cannot verify the installer is the one that was built. For software that writes children's passwords to disk, that is a genuine residual risk, not a formality.
+- **Compensating controls are therefore mandatory, not optional:** SHA-256 checksums published through a channel separate from the installer; `Panduan_Pemasangan.pdf` teaching how to verify them; hand delivery wherever possible; and a screenshot in the guide of the amber *"Unknown Publisher"* UAC prompt so coordinators expect it.
+- **Never distribute an unsigned build by web download or email** — Mark-of-the-Web applies there and SmartScreen will warn.
 
-The installer's licence page states plainly: no warranty; the school is the data controller for its pupils' credentials; the school is responsible for obtaining its own MOE/BSTP position; no data is transmitted to the author or anyone else.
+**This is proportionate at pilot scale and does not scale.** Revisit past roughly five schools, or at any school the author does not deal with directly, or the moment the installer needs to be downloadable. [SignPath Foundation](https://signpath.org/about) then offers free OV-level signing to open-source projects — the same decision as the licence question, settled once.
+
+The installer's licence page states plainly: no warranty; the school is the data controller for its pupils' credentials; the school is responsible for obtaining its own MOE/BSTP position; no data is transmitted to the author or anyone else. **It must also state that the build is unsigned and how to verify the checksum** — a school accepting the tamper-evidence gap should be told it is accepting one.
 
 ### 8.6 What ships
 

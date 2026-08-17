@@ -113,32 +113,80 @@ Ship it as a separate archive, not as an installer option. A coordinator who pic
 
 ---
 
-## 4. Signing
+## 4. Signing — decided against, and what that costs
 
-**Sign before packaging, then sign the package.** Order matters: Inno Setup embeds the executables as payload, so signing them afterwards is impossible without rebuilding the installer.
+**Decision: releases are unsigned.** A code-signing certificate is roughly RM 900/year and the free routes all require open-sourcing the project, which is a separate decision the project has not made (PRD §8.5). This section records what that costs and what has to compensate, because the honest answer is "something", not "nothing".
+
+### 4.1 What it does *not* cost
+
+**SmartScreen usually does not appear on the pendrive route — but this depends on how the pendrive is formatted.** The *"Windows protected your PC"* dialog is triggered by **Mark-of-the-Web**, a tag Windows attaches to files arriving from the internet. That tag is stored in an NTFS alternate data stream, so:
+
+- **FAT32 / exFAT pendrive → tag is lost, no SmartScreen.** These are the default formats on virtually every USB stick sold. Copying a downloaded file onto one strips the tag.
+- **NTFS pendrive → tag survives, SmartScreen still warns.** `T0.3_Tutorial_Step_By_Step.md` Part 10 records exactly this happening with the spike binary.
+
+**So this must be verified, not assumed** — hence check 11 in §7. Format the distribution pendrive as **FAT32 or exFAT** and confirm on a test machine that no dialog appears. Do not rely on it having worked once on a different stick.
+
+This matters because **the pendrive is already the primary provisioning route** (PRD §6 Step 7, arch §10): the distribution model chosen for other reasons happens to sidestep the loudest consequence of not signing, provided the medium is right.
+
+Two cases where the warning definitely does appear:
+
+- **Network share.** Since a 2024 File Explorer change, Windows applies Mark-of-the-Web to files copied from shares it does not consider trusted. The `Rangkaian` provisioning route can therefore trip SmartScreen where a FAT32 USB does not.
+- **Any web download.** A website, Drive link, or email attachment all apply Mark-of-the-Web. **Do not distribute unsigned builds this way.**
+
+Note that SmartScreen is a warning the coordinator can click past — *More info* → *Run anyway*, as the T0.3 tutorial documents. It is a friction and adoption problem, not a hard block. The tamper-evidence gap in §4.2 is the more serious cost.
+
+### 4.2 What it does cost
+
+**The UAC prompt says "Unknown Publisher".** The installer requests administrator rights (§5, `PrivilegesRequired=admin`). Signed, Windows shows the blue elevation dialog naming the publisher. Unsigned, it shows the amber one reading *Publisher: Unknown*. This appears on every install regardless of how the file arrived — pendrive included. It cannot be suppressed and should not be; the install guide must show a screenshot of it so coordinators expect it rather than abandon the install.
+
+**There is no tamper-evidence.** This is the real cost, and it is not cosmetic. A signature proves the installer a school received is the one that was built. Without it, a coordinator handed a pendrive has no way to distinguish the genuine installer from a modified one — and this is software that writes children's passwords to disk. A malicious build would be an excellent way to collect them.
+
+**Antivirus false positives get more likely.** A large, unsigned, self-contained single-file executable is genuinely hard for heuristics to distinguish from packed malware. Expect occasional quarantines, and expect them to differ between schools' antivirus products. Do not respond by telling schools to add a permanent exclusion folder — that is worse than the problem.
+
+### 4.3 What compensates
+
+**SHA-256 checksums stop being a nicety and become the integrity control** (§6). With no signature, the checksum is the *only* way a school can verify what it received. That imposes two obligations:
+
+1. **Publish the checksum through a different channel than the installer.** A hash file sitting on the same pendrive as the installer proves nothing — anyone who can alter one can alter the other. Send it separately: a message to the coordinator, a page on the school site, a printed line on the handover sheet.
+2. **`Panduan_Pemasangan.pdf` must teach how to check it**, in Bahasa Melayu, with the exact command:
+
+   ```powershell
+   Get-FileHash .\DELIMaLauncher-Setup-2.0.0.exe -Algorithm SHA256
+   ```
+
+   Be realistic: most coordinators will not do this. It is still worth documenting, because the ones handling something sensitive on a school's behalf are exactly the ones who might.
+
+**Deliver by hand, in person, wherever possible.** Given the tamper-evidence gap, physical handover by someone the school knows is doing real work — it substitutes a human trust relationship for the cryptographic one that isn't there.
+
+### 4.4 When to revisit
+
+This decision is proportionate at pilot scale — a handful of schools, installers handed over personally by someone they know. **It does not scale.** Revisit when any of these becomes true:
+
+- distribution passes roughly five schools, or reaches any school the author does not deal with directly;
+- the installer needs to be downloadable rather than hand-delivered;
+- T0.1 comes back permitting broad deployment.
+
+At that point the cheapest route is **[SignPath Foundation](https://signpath.org/about)** — free OV-level signing for open-source projects, private key held in their HSM. It requires a public repository under a recognised open-source licence, which is the same undecided question as PRD §8.5. One decision would settle both.
+
+### 4.5 If a certificate is obtained later
+
+Sign the executables **before** packaging, then sign the installer — Inno Setup embeds the executables as payload, so signing them afterwards means rebuilding.
 
 ```powershell
 $ts = "http://timestamp.digicert.com"      # or your CA's timestamp service
 $sign = "signtool sign /fd SHA256 /td SHA256 /tr $ts /a"
 
-# 1. the three executables
 & cmd /c "$sign publish\Launcher\Delima.Launcher.exe"
 & cmd /c "$sign publish\Admin\Delima.Admin.exe"
 & cmd /c "$sign publish\Provision\Delima.Provision.exe"
+& cmd /c "$sign dist\DELIMaLauncher-Setup-2.0.0.exe"    # after §5
 
-# 2. build the installer (§5), then sign it
-& cmd /c "$sign dist\DELIMaLauncher-Setup-2.0.0.exe"
-```
-
-**`/tr` (timestamp) is not optional.** Without a timestamp, every copy of your software stops validating the day the certificate expires — including installers already sitting on a coordinator's desk. With one, the signature remains valid indefinitely because it proves the code was signed while the certificate was live. Forgetting this is the single most common code-signing mistake and it surfaces a year later, at which point every school has to re-download.
-
-Verify before releasing:
-
-```powershell
 signtool verify /pa /v dist\DELIMaLauncher-Setup-2.0.0.exe
 ```
 
-**On the certificate itself** (PRD §8.5): OV is the budget line, roughly USD 200–400/year. Unsigned, SmartScreen shows *"Windows protected your PC"* to every coordinator who downloads it — for software asking a school to entrust it with children's passwords, that is fatal to adoption, and correctly so. OV still requires building SmartScreen reputation over the first weeks; EV bypasses that at roughly double the cost. Budget OV, expect first-month friction, and do not treat the warning as a cosmetic issue to fix later.
+**`/tr` (timestamp) is not optional.** Without it, every distributed copy stops validating the day the certificate expires — including installers already on coordinators' desks. With it, the signature stays valid because it proves the code was signed while the certificate was live. This is the most common code-signing mistake and it surfaces a year later, when every school has to re-download.
+
+**Do not self-sign and ask schools to trust the certificate.** It is tempting and it is worse than shipping unsigned: it trains an ICT coordinator to install an unknown root or publisher certificate on lab machines, which is a habit with much larger consequences than this application. Unsigned is the honest state; a self-signed certificate only dresses it up.
 
 ---
 
@@ -240,7 +288,7 @@ Get-FileHash dist\DELIMaLauncher-Setup-2.0.0.exe -Algorithm SHA256 |
   Out-File dist\DELIMaLauncher-2.0.0-checksums.txt -Encoding ascii
 ```
 
-Publish the checksum somewhere other than beside the download if you can — the value of a hash sitting next to the file it describes is limited, since anyone who can replace one can replace both. A tagged release page, or the school's own site, is enough.
+**Because releases are unsigned (§4), this checksum is the only integrity control the product has.** Publish it through a channel separate from the installer — a message to the coordinator, the school's own site, a printed line on the handover sheet. A hash file sitting on the same pendrive as the installer proves nothing, since anyone who can replace one can replace both.
 
 **Release contents** (PRD §8.6):
 
@@ -264,7 +312,7 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 | # | Check | Why |
 | :-- | :--- | :--- |
 | 1 | `git status --short` empty, on a tag | Reproducibility |
-| 2 | `signtool verify /pa` passes on all four binaries | Signing order mistakes are silent |
+| 2 | Checksum generated and recorded **outside** the release folder | Unsigned, this is the only integrity control (§4.3) |
 | 3 | Installer runs on a **clean** Win10 1809 VM with no .NET installed | The entire reason for self-contained |
 | 4 | Launcher opens, class + name screens render, fonts embedded correctly | Single-file resource loading fails here first |
 | 5 | Admin opens, imports `contoh_roster.csv` end to end | Import is the feature schools adopt on |
@@ -273,6 +321,8 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 | 8 | Uninstall; confirm the store is removed only on confirmation | Audit log may be required evidence |
 | 9 | A pupil-account user cannot read `%ProgramData%\DELIMa Launcher` | The ACL in §5 |
 | 10 | Injection still passes on lab hardware, ≥ 50 runs | Never regress T0.3 |
+| 11 | Install **from a FAT32/exFAT pendrive**, not the build folder — confirm no SmartScreen dialog | The unsigned path depends on this, and NTFS sticks break it (§4.1) |
+| 12 | Scan the installer with the antivirus the target schools actually run | Unsigned single-file exes draw false positives (§4.2) |
 
 **Checks 3 and 10 need real hardware or a real VM.** Both have already bitten this project once — the .NET runtime assumption and the injection behaviour are exactly where a developer machine lies to you (arch §11: *never on a developer machine, never over RDP*).
 
@@ -285,8 +335,9 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 | `MissingMethodException` / XAML fails at runtime, fine in Debug | Trimming enabled | `PublishTrimmed=false`, §3 |
 | `.dll` files appear beside the exe after single-file publish | Missing self-extract flag | `IncludeNativeLibrariesForSelfExtract=true` |
 | Publish fails on macOS/Linux with WPF targets missing | Wrong OS | Build on Windows, §1 |
-| SmartScreen warns despite a valid signature | Reputation not yet built | Expected with OV for the first weeks, §4 |
-| Signature invalid after a year | No timestamp | `/tr`, §4 — requires re-release to fix |
+| SmartScreen warns on an unsigned build | It arrived with Mark-of-the-Web — downloaded, emailed, or copied from an untrusted share | Deliver by pendrive instead, §4.1 |
+| UAC prompt is amber, says "Unknown Publisher" | No signature | Expected and unavoidable; show it in the install guide, §4.2 |
+| Antivirus quarantines the installer at a school | Unsigned self-contained single-file exe | Submit as a false positive to the vendor; do **not** tell schools to add exclusions, §4.2 |
 | Upgrade creates a second entry in Programs & Features | `AppId` changed | Restore the original GUID, §5 |
 | App starts, no theme, default fonts | Embedded resource pack URI wrong under single-file | Arch §6.2/§6.5 |
 | `MSB1011: more than one project` | Building a folder, not a `.csproj` | Give the full `.csproj` path, as in §3 |

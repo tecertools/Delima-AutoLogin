@@ -1,8 +1,10 @@
 # Setting Up the Build Machine — Step by Step
 
-**For:** whoever compiles the release. Assumes no prior experience with .NET, code signing, or installers.
-**Result:** a Windows PC that can turn the source code into one signed `DELIMaLauncher-Setup-2.0.0.exe`.
-**Time:** about 90 minutes, most of it downloads. The certificate in Part 6 takes days and is started separately.
+**For:** whoever compiles the release. Assumes no prior experience with .NET or installers.
+**Result:** a Windows PC that can turn the source code into one `DELIMaLauncher-Setup-2.0.0.exe`.
+**Time:** about 60 minutes, most of it downloads.
+
+> **Releases are unsigned** — see `Build_And_Release.md` §4 for that decision and what compensates for it. **Parts 5 and 6 below are therefore optional**, and only apply if a code-signing certificate is obtained later. Skip them for now; everything else is required.
 
 Once this is done, the actual build is the commands in `Build_And_Release.md`. This document only gets you to the point where those commands work.
 
@@ -10,16 +12,14 @@ Once this is done, the actual build is the commands in `Build_And_Release.md`. T
 
 ## Part 0 — What you are about to install, and why
 
-Four tools. It helps to know what each is for before you install it, so that when one of them fails you know which one to blame.
+Three tools are required, and one more only if you sign later. It helps to know what each is for before you install it, so that when one of them fails you know which one to blame.
 
-| Tool | What it does | Roughly |
-| :--- | :--- | :--- |
-| **.NET 10 SDK** | Turns C# source code into a running program | The compiler |
-| **Git** | Downloads the source code and keeps versions straight | Version control |
-| **Inno Setup 6** | Wraps the finished programs into one `Setup.exe` | The installer builder |
-| **Windows SDK** | Provides `signtool`, which signs the exe so Windows trusts it | The signing tool |
-
-You also need a **code-signing certificate** (Part 6). That is not software you install in ten minutes — it is bought from a certificate authority and involves them verifying your identity. Start it early; the rest of the setup does not depend on it.
+| Tool | What it does | Roughly | Needed? |
+| :--- | :--- | :--- | :--- |
+| **.NET 10 SDK** | Turns C# source code into a running program | The compiler | Yes |
+| **Git** | Downloads the source code and keeps versions straight | Version control | Yes |
+| **Inno Setup 6** | Wraps the finished programs into one `Setup.exe` | The installer builder | Yes |
+| **Windows SDK** | Provides `signtool`, which applies a certificate | The signing tool | Only if signing |
 
 ---
 
@@ -113,9 +113,11 @@ That lasts only for the current window. To make it permanent: press `Windows key
 
 ---
 
-## Part 5 — Install the Windows SDK (for `signtool`)
+## Part 5 — Install the Windows SDK (for `signtool`) — OPTIONAL
 
-`signtool.exe` is the program that applies your certificate to the finished exe. It comes bundled inside the Windows SDK, which is a large download for one small tool — but there is no smaller supported way to get it.
+> **Skip this part.** It is only needed if a code-signing certificate is obtained later (`Build_And_Release.md` §4.4–4.5). Go to Part 7.
+
+`signtool.exe` is the program that applies a certificate to the finished exe. It comes bundled inside the Windows SDK, which is a large download for one small tool — but there is no smaller supported way to get it.
 
 1. Go to **https://developer.microsoft.com/windows/downloads/windows-sdk/**
 2. Download and run the installer.
@@ -133,31 +135,27 @@ This searches for the tool and prints where it landed. You should get at least o
 
 ---
 
-## Part 6 — Get a code-signing certificate
+## Part 6 — Get a code-signing certificate — OPTIONAL, NOT CURRENTLY PLANNED
 
-This part takes days, not minutes, and costs money. Start it before you need it.
+> **Skip this part too.** Recorded here so the option is documented if the project outgrows the unsigned decision (`Build_And_Release.md` §4.4). Go to Part 7.
 
-**What it is for.** Without a signature, when a coordinator downloads your installer Windows shows a blue box saying *"Windows protected your PC — Microsoft Defender SmartScreen prevented an unrecognised app from starting"*. Most people stop there, and they are right to. For software that asks a school to trust it with children's passwords, that warning is fatal to adoption.
+**What signing would buy.** Two things. First, the administrator prompt during install would be the blue one naming the publisher instead of the amber *"Unknown Publisher"* one. Second, and more important, a school could verify that the installer it received is the one that was built — which unsigned builds cannot offer at all.
 
-**What to buy.** An **OV (Organisation Validation) code-signing certificate**, roughly USD 200–400 per year, from any of the usual authorities (DigiCert, Sectigo, SSL.com and others). **EV** costs about double and additionally skips the reputation-building period described below; budget OV unless the extra cost is easy.
+**The free route: [SignPath Foundation](https://signpath.org/about).** Free OV-level signing for open-source projects. The private key stays in their hardware security module and you never handle it, which is safer than a certificate on a laptop. It requires a public repository under a recognised open-source licence — the same question PRD §8.5 leaves open. Approval takes days to weeks.
 
-**What to expect:**
+**The cheap paid route: [Certum's open-source certificate](https://shop.certum.eu/code-signing.html)**, from €25/year, though the first purchase needs a smartcard and reader (about €69 plus shipping, then roughly €29 to renew). It also requires the project to be open source, so SignPath is strictly better if you qualify for both.
 
-- The authority verifies the organisation exists. Expect to supply registration documents, and expect a phone call. For a school this may need someone in administration.
-- Modern code-signing certificates are usually issued on a **hardware token** (a USB device) or in a cloud signing service — the private key cannot be exported. That is inconvenient by design and it is protecting you.
-- **Even with a valid OV certificate, SmartScreen may still warn for the first few weeks** until enough installations build reputation. This is normal, it resolves on its own, and it is worth telling the first two or three schools to expect it.
+**The ordinary paid route:** an OV certificate from DigiCert, Sectigo, SSL.com and similar, roughly RM 900/year. No open-source requirement. Expect the authority to verify the organisation exists — registration documents and a phone call, which for a school means involving administration. The key usually arrives on a hardware token and cannot be exported.
 
-**Follow your certificate authority's instructions to install it.** They differ enough between providers that a generic walkthrough here would mislead you.
+> **Azure Artifact Signing** ($9.99/month) is frequently recommended and is **not currently available to individual developers outside the US and Canada**, so it is unlikely to apply here.
 
-**Verify it is installed:**
+**Verify a certificate is installed, once you have one:**
 
 ```powershell
 Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert
 ```
 
-Your certificate should be listed with a subject naming your organisation.
-
-> **While you are waiting for the certificate**, everything else in this document works. You can build unsigned installers and test them on your own machines. Just do not send one to another school — an unsigned installer teaches coordinators to click past exactly the warning that protects them.
+**Do not create a self-signed certificate as a substitute.** It looks like progress and is worse than shipping unsigned: it requires teaching an ICT coordinator to install an unknown publisher certificate on lab machines, which is a far more dangerous habit than the one it fixes.
 
 ---
 
@@ -207,7 +205,15 @@ Get-ChildItem publish\Provision
 
 If it prints its usage text, the toolchain works end to end.
 
-**5. Test signing** (only once Part 6 is complete). Using the path you wrote down in Part 5:
+**5. Record the checksum.** Since releases are unsigned, this is the only way a school can confirm the installer it receives is the one you built — so it is a required step, not an optional one:
+
+```powershell
+Get-FileHash publish\Provision\Delima.Provision.exe -Algorithm SHA256
+```
+
+Keep this value somewhere separate from the file itself. `Build_And_Release.md` §4.3 and §6 explain why that separation is the whole point.
+
+**6. Test signing** — only if you completed Parts 5 and 6, which are optional. Using the `signtool` path you noted:
 
 ```powershell
 $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe"
@@ -217,7 +223,7 @@ $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtoo
 & $signtool verify /pa /v publish\Provision\Delima.Provision.exe
 ```
 
-`Successfully verified` means you are done. **The `/tr` part is a timestamp and it is not optional** — without it your signature silently stops being valid the day the certificate expires, on every copy already distributed.
+`Successfully verified` means you are done. **The `/tr` part is a timestamp and it is not optional** — without it the signature silently stops being valid the day the certificate expires, on every copy already distributed.
 
 ---
 
@@ -251,10 +257,10 @@ Scoped to the process, so it lapses when you close the window. That is deliberat
 Almost always because a framework-dependent build was published to a machine without .NET 10. Confirm `--self-contained true` was used. See `Build_And_Release.md` §3.
 
 **Antivirus quarantines the freshly built exe**
-Common with unsigned, self-contained, single-file executables — a large opaque binary with no signature is genuinely suspicious-looking. It is a reason to sign, not a reason to add a permanent antivirus exclusion.
+Common with unsigned, self-contained, single-file executables — a large opaque binary with no signature is genuinely hard for heuristics to tell from packed malware. **Expect this, since releases are unsigned.** Submit it to the antivirus vendor as a false positive. Do not add a permanent exclusion folder on lab PCs, and do not tell schools to: an excluded folder on a machine holding children's credentials is a worse problem than the one it solves.
 
 **`signtool` is not found at the path in Part 5**
-The version number folder differs between machines. Re-run the search command in Part 5 and use whatever it actually prints.
+The version number folder differs between machines. Re-run the search command in Part 5 and use whatever it actually prints. (Only relevant if you took the optional signing route.)
 
 ---
 
@@ -266,10 +272,15 @@ Before your first real release, all of these should be true:
 - [ ] `dotnet --version` shows `10.x`
 - [ ] `git --version` works, name and email configured
 - [ ] `ISCC.exe` found; path noted
-- [ ] `signtool.exe` found; full path written down
-- [ ] Code-signing certificate installed; `Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert` lists it
 - [ ] `dotnet build -c Release` succeeds on a clean clone
 - [ ] A published single-file exe is genuinely one file, and runs
+- [ ] SHA-256 checksum recorded, stored separately from the build output
+- [ ] Installer tested **from a pendrive**, not from the build folder — no SmartScreen dialog appears
+
+Optional, only if you took the signing route:
+
+- [ ] `signtool.exe` found; full path written down
+- [ ] Certificate installed; `Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert` lists it
 - [ ] `signtool verify /pa` reports success
 
 Then go to `Build_And_Release.md` and follow it from §2.

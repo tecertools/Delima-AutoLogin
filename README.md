@@ -64,7 +64,9 @@ Start **T0.1** — a written policy position on storing and replaying pupil pass
 
 Optionally, round out T0.3's adversarial test to the full 5/5 (currently 2/5, both clean — see `Visual_SSO/T0.3_Injection_Test_Protocol.md`, "Actual results"), and take a quick look at the one anomalous `sendkeys` run before the pilot phase, though neither blocks moving forward.
 
-**On compiling a distributable `.exe`:** the procedure is fully specified in `Visual_SSO/Build_And_Release.md`, and the machine to run it on in `Visual_SSO/Build_Machine_Setup.md` — but it is the *last* of 15 build steps (arch §12) and the first fourteen produce code that does not exist yet. Two things can usefully start now regardless, because both take weeks of waiting rather than hours of work: **T0.1**, and **buying an OV code-signing certificate** (`Build_And_Release.md` §4). An unsigned installer trips SmartScreen on every coordinator's PC, which for software handling children's passwords is fatal to adoption — and correctly so.
+**On compiling a distributable `.exe`:** the procedure is fully specified in `Visual_SSO/Build_And_Release.md`, and the machine to run it on in `Visual_SSO/Build_Machine_Setup.md` — but it is the *last* of 15 build steps (arch §12) and the first fourteen produce code that does not exist yet.
+
+**Releases will be unsigned** (`Build_And_Release.md` §4, PRD §8.5). SmartScreen turns out to be a smaller obstacle than it looks: its warning depends on Mark-of-the-Web, which FAT32 and exFAT cannot store, and the pendrive is already the primary provisioning route — though an NTFS-formatted stick breaks that, so it has to be tested. The real cost is that a school cannot verify the installer it received is the one that was built, which makes **published SHA-256 checksums and hand delivery load-bearing rather than decorative**. Proportionate for a pilot; it does not scale past roughly five schools. Free OV signing via SignPath Foundation is available if the project ever goes open-source — the same undecided question as the licence.
 
 ---
 
