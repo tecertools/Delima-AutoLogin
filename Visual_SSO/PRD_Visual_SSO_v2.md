@@ -5,7 +5,7 @@
 **Date:** 11 August 2026
 **Owner:** King
 **Status:** Specification only — no implementation authorised by this document.
-**Supersedes:** `../DELIMa_Visual_SSO_PRD_TechArch.md` (v1, single-school)
+**Supersedes:** the v1 single-school spec, removed from the working tree once fully absorbed here (in git history if needed)
 **Companion:** `Technical_Architecture_Visual_SSO.md`
 **Incorporates:** `../PRD_Gap_Analysis.md` — every blocker in that review is resolved here or explicitly deferred with a reason.
 **Sibling product:** `../Normal_SSO/` — the web launcher that prefills the email and stores **no** passwords. Read §2.3 before building this one.

@@ -42,8 +42,9 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │
 ├── InjectionSpike/                 T0.3 harness — PASSED, 17 Aug 2026 (see Visual_SSO/T0.3_Injection_Test_Protocol.md)
 │
-├── PRD_Gap_Analysis.md             Review of Visual SSO v1; source of the v2 blockers
-└── DELIMa_Visual_SSO_PRD_TechArch.md   v1, SUPERSEDED by Visual_SSO/PRD_Visual_SSO_v2.md
+├── spike-results/                  T0.3 evidence — 4 CSVs from real lab hardware
+│
+└── PRD_Gap_Analysis.md             Review of Visual SSO v1; source of the v2 blockers
 ```
 
 ---

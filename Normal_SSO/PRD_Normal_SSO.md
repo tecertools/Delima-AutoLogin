@@ -4,7 +4,7 @@
 **Version:** 1.0 (Draft)
 **Date:** 6 August 2026
 **Owner:** King
-**Related:** `../DELIMa_Visual_SSO_PRD_TechArch.md` (Visual SSO desktop app — separate product, password injection)
+**Related:** `../Visual_SSO/PRD_Visual_SSO_v2.md` (Visual SSO desktop app — separate product, password injection)
 
 ---
 

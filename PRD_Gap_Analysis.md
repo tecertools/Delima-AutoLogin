@@ -1,6 +1,6 @@
 # DELIMa Smart Launcher — PRD Gap Analysis & Implementation Review
 
-Review of `DELIMa_Visual_SSO_PRD_TechArch.md`
+Review of the v1 Visual SSO spec (single-school), which has since been superseded by `Visual_SSO/PRD_Visual_SSO_v2.md` and removed from the working tree. Recoverable from git history if the original wording is ever needed.
 Date: 5 August 2026
 Revision 2 — scoped to single-school lab deployment; local credential store; picture-password auth
 
