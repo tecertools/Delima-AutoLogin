@@ -2,8 +2,12 @@
 
 **Companion to:** `PRD_Visual_SSO_v2.md`
 **Date:** 11 August 2026
-**Target:** .NET 8, C# 12, WPF, Windows 10 1809+ / Windows 11, x64
+**Target:** **.NET 10 (LTS)**, WPF, Windows 10 1809+ / Windows 11, x64
 **Status:** Specification only.
+
+> **Runtime version — corrected.** Earlier drafts said .NET 8, inherited from the spike. **.NET 8 reaches end of support on 10 November 2026** — roughly three months from this revision, and well before this product would ship. Building on it would mean a forced migration mid-project and shipping an unsupported runtime to schools, which is indefensible for software handling children's credentials.
+>
+> Target **.NET 10 LTS** (supported to November 2028). The spike may stay on .NET 8 — it is a throwaway measurement harness that runs once. The production code in §2 must not.
 
 ---
 
@@ -28,7 +32,7 @@ DelimaLauncher.sln
 │   │   ├── Store/              ICredentialStore, StoreSchema, migrations
 │   │   ├── Crypto/             Argon2id, AES-GCM, DPAPI wrapper, secure wipe
 │   │   └── Audit/              append-only log writer
-│   ├── Delima.Win32/           net8.0-windows, P/Invoke only
+│   ├── Delima.Win32/           net10.0-windows, P/Invoke only
 │   │   ├── NativeMethods.cs    ← promoted from InjectionSpike
 │   │   ├── ChromeLauncher.cs   ← promoted from InjectionSpike
 │   │   ├── InjectionEngine.cs  window verification + injection + abort

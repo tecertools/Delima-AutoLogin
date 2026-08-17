@@ -30,7 +30,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 ├── Visual_SSO/                     Windows app — CURRENT SPEC (v2, multi-school)
 │   ├── PRD_Visual_SSO_v2.md        ← start here
 │   ├── Technical_Architecture_Visual_SSO.md
-│   └── T0.3_Injection_Test_Protocol.md   ← then do this
+│   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
+│   └── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
 │
 ├── InjectionSpike/                 T0.3 harness — decides whether Visual SSO is viable
 │                                   WRITTEN BUT NEVER COMPILED OR RUN
