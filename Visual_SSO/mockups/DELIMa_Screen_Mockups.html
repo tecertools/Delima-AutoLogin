@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>DELIMa Smart Launcher — Mockup Skrin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFDF7; --surface:#FFFFFF; --soft:#FDF9DC; --text:#1A1208; --text2:#5C5344; --border:#E5DCC8;
+    --green:#056839; --orange:#F7941D; --red:#ED1B24;
+    --c1:#C41118; --c2:#9E2B0E; --c3:#A85200; --c4:#8A6100; --c5:#056839; --c6:#2F6B12; --c7:#0A6265; --c8:#7A4A21;
+    --shadow:0 2px 8px rgba(0,0,0,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#E9E5D8;font-family:'Nunito',sans-serif;color:var(--text);}
+  .toolbar{position:sticky;top:0;background:#fff;border-bottom:1px solid #ddd;padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap;z-index:50;align-items:center;}
+  .toolbar .label{font-size:12px;font-weight:700;color:#888;margin-right:6px;letter-spacing:.03em;text-transform:uppercase;}
+  .toolbar button{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:9px 16px;border-radius:999px;border:1px solid #d8d5c8;background:#f7f5ee;color:#544;cursor:pointer;transition:all .15s;}
+  .toolbar button:hover{background:#efece0;}
+  .toolbar button.active{background:var(--text);color:#fff;border-color:var(--text);}
+  .stage{padding:36px 20px 60px;display:flex;justify-content:center;}
+  .frame{width:1040px;max-width:100%;min-height:585px;background:var(--bg);border-radius:14px;overflow:hidden;position:relative;box-shadow:0 10px 40px rgba(0,0,0,0.18);display:none;}
+  .frame.active{display:block;}
+  .cap{max-width:1040px;margin:14px auto 0;font-size:13px;color:#7a7768;text-align:center;}
+  .baloo{font-family:'Baloo 2',sans-serif;}
+
+  /* ---- shared chrome ---- */
+  .header{height:78px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:3px solid var(--red);}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .crest{width:46px;height:46px;border-radius:12px;background:var(--orange);color:var(--text);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',sans-serif;}
+  .brand-text .name{font-weight:800;font-size:17px;}
+  .brand-text .motto{font-size:12px;color:var(--text2);}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .toggle{display:flex;border:1px solid var(--border);border-radius:999px;overflow:hidden;font-size:12px;font-weight:700;}
+  .toggle span{padding:8px 14px;}
+  .toggle span.on{background:var(--green);color:#fff;}
+  .toggle span.off{color:var(--text2);}
+  .btn-outline{border:1px solid var(--border);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;background:#fff;color:var(--text);}
+
+  .topbar{height:64px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);}
+  .back{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 16px;}
+  .pill{background:var(--c1);color:#fff;font-weight:800;font-size:14px;padding:8px 22px;border-radius:999px;}
+  .crest-sm{width:30px;height:30px;border-radius:8px;background:var(--orange);color:var(--text);font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',sans-serif;}
+
+  .footer{position:absolute;left:0;right:0;bottom:0;height:44px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:12px;color:var(--text2);}
+
+  /* ---- screen 1: pilih kelas ---- */
+  .s1-body{display:grid;grid-template-columns:0.85fr 1.1fr;gap:36px;padding:28px 32px 0;}
+  .s1-heading{font-size:26px;font-weight:800;margin:0 0 16px;font-family:'Baloo 2',sans-serif;}
+  .kelas-terakhir-label{font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700;}
+  .kelas-terakhir{background:var(--c1);color:#fff;border-radius:16px;padding:18px 20px;font-weight:800;font-size:17px;margin-bottom:16px;}
+  .hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
+  .field-label{font-size:11px;color:var(--text2);font-weight:700;margin-bottom:5px;}
+  .dropdown{border:1px solid var(--border);border-radius:12px;padding:13px 16px;font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;background:#fff;}
+  .dropdown.disabled{background:var(--soft);color:#a19c86;}
+  .btn-primary{width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Baloo 2',sans-serif;}
+  .panel-soft{background:var(--soft);border-radius:16px;padding:22px 24px;}
+  .panel-soft h3{margin:0 0 8px;font-size:17px;font-weight:800;font-family:'Baloo 2',sans-serif;}
+  .panel-soft p{margin:0 0 14px;font-size:13px;color:var(--text2);line-height:1.5;}
+  .step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+  .step-num{width:24px;height:24px;border-radius:50%;background:var(--orange);color:var(--text);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-text{font-size:13px;padding-top:3px;}
+  .reassure{background:#fff;border-left:3px solid var(--green);border-radius:0 10px 10px 0;padding:10px 14px;font-size:12px;color:var(--text2);margin:12px 0;line-height:1.5;}
+  .dest-row{display:flex;gap:10px;}
+  .dest-chip{flex:1;border:1px solid var(--border);border-radius:10px;padding:9px;text-align:center;font-size:12px;font-weight:700;background:#fff;}
+
+  /* ---- screen 2: cari nama ---- */
+  .s2-body{padding:18px 24px 0;}
+  .s2-heading{font-size:22px;font-weight:800;text-align:center;margin:0 0 12px;font-family:'Baloo 2',sans-serif;}
+  .search{max-width:340px;margin:0 auto 16px;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--text2);text-align:left;}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;}
+  .pname{font-size:12px;font-weight:800;text-align:center;line-height:1.2;}
+  .card.missing{border:2px dashed #c9c4b0;background:transparent;color:#8a8570;}
+  .card.missing .avatar{background:transparent;border:2px dashed #c9c4b0;color:#8a8570;font-weight:800;}
+
+  /* ---- screen 3: kata laluan gambar ---- */
+  .s3-body{padding:20px 24px 0;text-align:center;}
+  .s3-heading{font-size:22px;font-weight:800;margin:0 0 4px;font-family:'Baloo 2',sans-serif;}
+  .s3-sub{font-size:13px;color:var(--text2);margin:0 0 16px;}
+  .dots{display:flex;justify-content:center;gap:10px;margin-bottom:20px;}
+  .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--green);}
+  .dot.filled{background:var(--green);}
+  .icon-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;max-width:760px;margin:0 auto;}
+  .icon-tile{aspect-ratio:1;border-radius:16px;background:var(--soft);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);}
+  .icon-tile.picked{outline:3px solid var(--green);outline-offset:2px;}
+  .attempts{font-size:12px;color:var(--text2);margin-top:16px;}
+
+  /* ---- screen 4: pergi ke mana ---- */
+  .s4-body{padding:30px 24px 0;text-align:center;}
+  .s4-avatar{width:76px;height:76px;border-radius:50%;background:var(--soft);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
+  .s4-name{font-size:24px;font-weight:800;margin:0 0 2px;font-family:'Baloo 2',sans-serif;}
+  .s4-email{font-size:13px;color:var(--text2);margin:0 0 22px;}
+  .s4-q{font-size:20px;font-weight:800;margin:0 0 20px;font-family:'Baloo 2',sans-serif;}
+  .dest-btn{max-width:380px;margin:0 auto 12px;display:flex;align-items:center;gap:14px;border:none;border-radius:14px;padding:16px 22px;font-size:17px;font-weight:800;}
+  .dest-btn .logo-chip{width:30px;height:30px;border-radius:50%;background:#fff;color:var(--text2);font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .dest-btn.delima{background:var(--green);color:#fff;}
+  .dest-btn.classroom{background:var(--orange);color:var(--text);}
+  .bukan-saya{font-size:13px;color:var(--text2);margin-top:6px;}
+
+  /* ---- screen 5: sedang masuk ---- */
+  .s5-body{padding:70px 24px 0;text-align:center;}
+  .spinner{width:52px;height:52px;border-radius:50%;border:5px solid var(--soft);border-top-color:var(--green);margin:0 auto 24px;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .s5-title{font-size:22px;font-weight:800;margin:0 0 6px;font-family:'Baloo 2',sans-serif;}
+  .s5-sub{font-size:14px;color:var(--text2);margin:0 0 28px;}
+  .btn-cancel{border:1px solid var(--border);background:#fff;color:var(--text2);border-radius:999px;padding:10px 22px;font-size:13px;font-weight:700;}
+
+  /* ---- screen 6: selesai floating bar ---- */
+  .s6-bg{position:relative;height:585px;background:#e4ded0;overflow:hidden;}
+  .fake-browser{position:absolute;top:20px;left:20px;right:20px;bottom:20px;background:#fff;border-radius:10px;box-shadow:var(--shadow);opacity:.55;}
+  .fake-browser .bar{height:34px;background:#f1f1f1;border-radius:10px 10px 0 0;display:flex;align-items:center;gap:6px;padding:0 12px;}
+  .fake-browser .dotx{width:8px;height:8px;border-radius:50%;background:#ccc;}
+  .float-bar{position:absolute;top:20px;right:20px;background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.18);padding:12px 16px;display:flex;align-items:center;gap:12px;}
+  .float-bar .btn-selesai{background:var(--c1);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-weight:800;font-size:14px;font-family:'Baloo 2',sans-serif;text-align:left;line-height:1.3;}
+  .float-bar .btn-selesai small{display:block;font-weight:600;font-size:11px;opacity:.85;}
+
+  /* ---- screen 7: ralat ---- */
+  .s7-body{padding:80px 24px 0;text-align:center;}
+  .warn-circle{width:64px;height:64px;border-radius:50%;background:#FAEEDA;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#854F0B;font-family:'Baloo 2',sans-serif;}
+  .s7-title{font-size:24px;font-weight:800;margin:0 0 8px;font-family:'Baloo 2',sans-serif;}
+  .s7-sub{font-size:16px;color:var(--text2);margin:0 0 26px;}
+  .btn-retry{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:999px;padding:11px 26px;font-size:14px;font-weight:700;}
+
+  /* ---- screen 8: mod guru ---- */
+  .s8-body{display:flex;flex-direction:column;align-items:center;padding:34px 24px 0;}
+  .s8-title{font-size:18px;font-weight:800;margin:0 0 18px;font-family:'Baloo 2',sans-serif;}
+  .pin-dots{display:flex;gap:14px;margin-bottom:22px;}
+  .pin-dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--text2);}
+  .pin-dots span.filled{background:var(--text);border-color:var(--text);}
+  .keypad{display:grid;grid-template-columns:repeat(3,72px);gap:10px;}
+  .key{height:56px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .key.wide{background:var(--soft);color:var(--text2);font-size:12px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar">
+  <span class="label">Skrin</span>
+</div>
+
+<div class="stage">
+
+  <!-- 1. PILIH KELAS -->
+  <div class="frame active" data-screen="1">
+    <div class="header">
+      <div class="brand">
+        <div class="crest">SK</div>
+        <div class="brand-text">
+          <div class="name">SK Seksyen 24 Shah Alam</div>
+          <div class="motto">Berilmu Berdisiplin</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="toggle"><span class="on">BM</span><span class="off">EN</span></div>
+        <div class="btn-outline">Guru</div>
+      </div>
+    </div>
+    <div class="s1-body">
+      <div>
+        <h1 class="s1-heading">Pilih Kelas Anda</h1>
+        <div class="kelas-terakhir-label">Kelas Terakhir</div>
+        <div class="kelas-terakhir">Tahun 2 Cemerlang</div>
+        <hr class="hr">
+        <div class="field-label">Tahun</div>
+        <div class="dropdown">Tahun 2 <span>▾</span></div>
+        <div class="field-label">Kelas</div>
+        <div class="dropdown disabled">Pilih tahun dahulu <span>▾</span></div>
+        <button class="btn-primary">Teruskan →</button>
+      </div>
+      <div class="panel-soft">
+        <h3>Apa itu laman ini?</h3>
+        <p>Masuk ke DELIMa dan Google Classroom tanpa perlu menaip alamat e-mel yang panjang.</p>
+        <div class="step"><div class="step-num">1</div><div class="step-text">Pilih kelas anda</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Cari nama anda</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Pilih DELIMa atau Google Classroom</div></div>
+        <div class="reassure">Laman ini tidak menyimpan kata laluan. Anda akan menaip kata laluan di halaman rasmi Google.</div>
+        <div class="dest-row">
+          <div class="dest-chip">DELIMa 3.0</div>
+          <div class="dest-chip">Classroom</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Senarai dikemas kini 6 Ogos 2026</span><span>Masalah? Panggil cikgu.</span></div>
+  </div>
+
+  <!-- 2. CARI NAMA -->
+  <div class="frame" data-screen="2">
+    <div class="topbar">
+      <div class="back">◂ Kembali</div>
+      <div class="pill">Tahun 2 Cemerlang</div>
+      <div class="crest-sm">SK</div>
+    </div>
+    <div class="s2-body">
+      <h2 class="s2-heading">Cari Nama Anda</h2>
+      <div class="search">Taip nama…</div>
+      <div class="grid" id="s2grid"></div>
+    </div>
+    <div class="footer"><span>Senarai dikemas kini 6 Ogos 2026</span><span>Masalah? Panggil cikgu.</span></div>
+  </div>
+
+  <!-- 3. KATA LALUAN GAMBAR -->
+  <div class="frame" data-screen="3">
+    <div class="topbar">
+      <div class="back">◂ Kembali</div>
+      <div class="pill">Tahun 2 Cemerlang</div>
+      <div class="crest-sm">SK</div>
+    </div>
+    <div class="s3-body">
+      <h2 class="s3-heading">Pilih Gambar Anda</h2>
+      <p class="s3-sub">Sentuh 3 gambar mengikut turutan yang betul.</p>
+      <div class="dots"><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="icon-grid" id="s3grid"></div>
+      <div class="attempts">Percubaan yang tinggal: 4</div>
+    </div>
+    <div class="footer"><span>Senarai dikemas kini 6 Ogos 2026</span><span>Masalah? Panggil cikgu.</span></div>
+  </div>
+
+  <!-- 4. PERGI KE MANA -->
+  <div class="frame" data-screen="4">
+    <div class="topbar">
+      <div class="back">◂ Kembali</div>
+      <div class="pill">Tahun 2 Cemerlang</div>
+      <div class="crest-sm">SK</div>
+    </div>
+    <div class="s4-body">
+      <div class="s4-avatar" id="s4avatar"></div>
+      <h2 class="s4-name">Nur Aishah Binti Ahmad</h2>
+      <p class="s4-email">m-1234••••@moe-dl.edu.my</p>
+      <p class="s4-q">Hai, Aishah! Nak pergi ke mana?</p>
+      <button class="dest-btn delima"><span class="logo-chip">3.0</span>DELIMa 3.0</button>
+      <button class="dest-btn classroom"><span class="logo-chip">GC</span>Google Classroom</button>
+      <div class="bukan-saya">Bukan saya</div>
+    </div>
+    <div class="footer"><span>Senarai dikemas kini 6 Ogos 2026</span><span>Masalah? Panggil cikgu.</span></div>
+  </div>
+
+  <!-- 5. SEDANG MASUK -->
+  <div class="frame" data-screen="5">
+    <div class="s5-body">
+      <div class="spinner"></div>
+      <h2 class="s5-title">Sedang masuk…</h2>
+      <p class="s5-sub">Sila tunggu sebentar, Aishah.</p>
+      <button class="btn-cancel">Batal</button>
+    </div>
+  </div>
+
+  <!-- 6. SELESAI FLOATING BAR -->
+  <div class="frame" data-screen="6">
+    <div class="s6-bg">
+      <div class="fake-browser">
+        <div class="bar"><div class="dotx"></div><div class="dotx"></div><div class="dotx"></div></div>
+      </div>
+      <div class="float-bar">
+        <button class="btn-selesai">Selesai<small>Murid seterusnya</small></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. RALAT -->
+  <div class="frame" data-screen="7">
+    <div class="s7-body">
+      <div class="warn-circle">!</div>
+      <h2 class="s7-title">Alamak, ada masalah.</h2>
+      <p class="s7-sub">Panggil cikgu.</p>
+      <button class="btn-retry">Cuba Lagi</button>
+    </div>
+  </div>
+
+  <!-- 8. MOD GURU -->
+  <div class="frame" data-screen="8">
+    <div class="topbar">
+      <div class="back">◂ Kembali</div>
+      <div class="pill" style="background:var(--text2)">Mod Guru</div>
+      <div class="crest-sm">SK</div>
+    </div>
+    <div class="s8-body">
+      <h2 class="s8-title">Masukkan PIN Guru</h2>
+      <div class="pin-dots" id="pindots"></div>
+      <div class="keypad" id="keypad"></div>
+    </div>
+  </div>
+
+</div>
+
+<p class="cap" id="caption"></p>
+
+<script>
+  const screens = [
+    {n:"1", label:"Pilih Kelas", note:"Skrin 1 — pemilihan kelas. Diwarisi terus daripada Normal_SSO."},
+    {n:"2", label:"Cari Nama", note:"Skrin 2 — grid nama boleh ubah suai (7/8/9 lajur ikut saiz kelas)."},
+    {n:"3", label:"Kata Laluan Gambar", note:"BARU — menutup B1. Kedudukan ikon dikocok setiap percubaan."},
+    {n:"4", label:"Pergi ke Mana", note:"Skrin 3 — e-mel disamarkan, sentiasa."},
+    {n:"5", label:"Sedang Masuk", note:"BARU — semasa suntikan kata laluan, dengan Batal."},
+    {n:"6", label:"Selesai", note:"Bar terapung sentiasa di atas, satu butang merah."},
+    {n:"7", label:"Ralat", note:"BARU — mesej tenang untuk murid, kod untuk guru (tidak dipaparkan di sini)."},
+    {n:"8", label:"Mod Guru", note:"PIN 4-digit sebelum sebarang fungsi pentadbiran."}
+  ];
+
+  const bar = document.getElementById('toolbar');
+  const caption = document.getElementById('caption');
+
+  function show(n){
+    document.querySelectorAll('.frame').forEach(f=>f.classList.toggle('active', f.dataset.screen===n));
+    document.querySelectorAll('.toolbar button').forEach(b=>b.classList.toggle('active', b.dataset.n===n));
+    const s = screens.find(s=>s.n===n);
+    caption.textContent = s ? s.note : '';
+  }
+
+  screens.forEach(s=>{
+    const b=document.createElement('button');
+    b.textContent=s.n+'. '+s.label;
+    b.dataset.n=s.n;
+    b.onclick=()=>show(s.n);
+    bar.appendChild(b);
+  });
+  show("1");
+
+  // ---- tiny hand-drawn glyph set (placeholders for the real bespoke avatar/icon assets) ----
+  function glyph(kind, colour){
+    const g = {
+      cat:`<circle cx="17" cy="17" r="11" fill="${colour}"/><path d="M9 9 L12 3 L15 10 Z" fill="${colour}"/><path d="M25 9 L22 3 L19 10 Z" fill="${colour}"/><circle cx="13" cy="17" r="1.6" fill="#1A1208"/><circle cx="21" cy="17" r="1.6" fill="#1A1208"/>`,
+      fish:`<ellipse cx="15" cy="17" rx="10" ry="7" fill="${colour}"/><path d="M25 17 L32 11 L32 23 Z" fill="${colour}"/><circle cx="10" cy="15" r="1.4" fill="#1A1208"/>`,
+      flower:`<circle cx="17" cy="9" r="5" fill="${colour}"/><circle cx="25" cy="17" r="5" fill="${colour}"/><circle cx="17" cy="25" r="5" fill="${colour}"/><circle cx="9" cy="17" r="5" fill="${colour}"/><circle cx="17" cy="17" r="4.5" fill="#FAEEDA"/>`,
+      car:`<rect x="4" y="14" width="26" height="9" rx="3" fill="${colour}"/><rect x="9" y="8" width="16" height="8" rx="3" fill="${colour}"/><circle cx="10" cy="24" r="3.4" fill="#1A1208"/><circle cx="24" cy="24" r="3.4" fill="#1A1208"/>`,
+      star:`<path d="M17 3 L20.5 13 L31 13 L22.5 19.5 L26 30 L17 23.5 L8 30 L11.5 19.5 L3 13 L13.5 13 Z" fill="${colour}"/>`,
+      apple:`<circle cx="17" cy="19" r="10" fill="${colour}"/><path d="M17 9 C17 6 20 5 21 6" stroke="#5C5344" stroke-width="1.6" fill="none"/><ellipse cx="21" cy="8" rx="3" ry="1.6" fill="#639922"/>`,
+      balloon:`<ellipse cx="17" cy="13" rx="9" ry="11" fill="${colour}"/><path d="M17 24 L17 31" stroke="#5C5344" stroke-width="1.4"/><path d="M15 24 L19 24 L17 27 Z" fill="${colour}"/>`,
+      umbrella:`<path d="M4 17 A13 13 0 0 1 30 17 Z" fill="${colour}"/><path d="M17 17 L17 29" stroke="#5C5344" stroke-width="1.6"/><path d="M17 29 C17 32 22 32 22 28" stroke="#5C5344" stroke-width="1.6" fill="none"/>`,
+      kite:`<path d="M17 3 L28 17 L17 31 L6 17 Z" fill="${colour}"/><path d="M17 17 L17 31" stroke="#5C5344" stroke-width="1.2"/>`,
+      turtle:`<ellipse cx="17" cy="18" rx="10" ry="8" fill="${colour}"/><circle cx="27" cy="14" r="4" fill="${colour}"/><circle cx="29" cy="13" r="1.2" fill="#1A1208"/>`,
+    };
+    return `<svg width="34" height="34" viewBox="0 0 34 34">${g[kind]}</svg>`;
+  }
+
+  // ---- screen 2: name grid (representative subset, real grid is 7-9 x 5) ----
+  const pupils = [
+    ["Aishah","cat","#C41118"],["Danial","fish","#9E2B0E"],["Siti","flower","#A85200"],
+    ["Wei Ming","car","#8A6100"],["Arjun","star","#056839"],["Iman","apple","#2F6B12"],["Haziq","turtle","#0A6265"],
+    ["Zara","cat","#7A4A21"],["Amirul","balloon","#C41118"],["Hana","umbrella","#9E2B0E"],
+    ["Ravi","kite","#A85200"],["Syafiq","fish","#8A6100"],["Nabila","flower","#056839"],["Aqil","star","#2F6B12"],
+    ["Puteri","cat","#0A6265"],["Irfan","car","#7A4A21"],["Alia","apple","#C41118"],
+    ["Zulkifli","turtle","#9E2B0E"],["Hakim","balloon","#A85200"],["Yusof","umbrella","#8A6100"],["Adam","kite","#056839"]
+  ];
+  const s2grid = document.getElementById('s2grid');
+  pupils.forEach(([name,icon,colour])=>{
+    const el=document.createElement('div');
+    el.className='card';
+    el.innerHTML=`<div class="avatar">${glyph(icon,colour)}</div><div class="pname">${name}</div>`;
+    s2grid.appendChild(el);
+  });
+  const missing=document.createElement('div');
+  missing.className='card missing';
+  missing.innerHTML=`<div class="avatar">?</div><div class="pname">Nama saya tiada</div>`;
+  s2grid.appendChild(missing);
+
+  // ---- screen 3: 16 picture-password icons, 2 already "picked" to show progress ----
+  const kinds=["cat","fish","flower","car","star","apple","balloon","umbrella","kite","turtle"];
+  const cols=["#C41118","#9E2B0E","#A85200","#8A6100","#056839","#2F6B12","#0A6265","#7A4A21"];
+  const s3grid=document.getElementById('s3grid');
+  for(let i=0;i<16;i++){
+    const el=document.createElement('div');
+    el.className='icon-tile'+(i===2||i===9?' picked':'');
+    el.innerHTML=glyph(kinds[i%kinds.length], cols[i%cols.length]);
+    s3grid.appendChild(el);
+  }
+
+  // ---- screen 4 avatar ----
+  document.getElementById('s4avatar').innerHTML = glyph('cat','#C41118');
+
+  // ---- screen 8: PIN dots + keypad ----
+  const pindots=document.getElementById('pindots');
+  for(let i=0;i<4;i++){
+    const d=document.createElement('span');
+    if(i<2) d.className='filled';
+    pindots.appendChild(d);
+  }
+  const keypad=document.getElementById('keypad');
+  ["1","2","3","4","5","6","7","8","9","Padam","0","OK"].forEach(k=>{
+    const el=document.createElement('div');
+    el.className='key'+((k==="Padam"||k==="OK")?' wide':'');
+    el.textContent=k;
+    keypad.appendChild(el);
+  });
+</script>
+
+</body>
+</html>

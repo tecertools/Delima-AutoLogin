@@ -310,6 +310,8 @@ Between the name card and the launch, closing blocker B1. Grid of 16 concrete BM
 
 **How to actually build these in WPF** — fonts, theming as runtime-swappable data rather than a compiled resource, the retemplated (never native) dropdown, and the adaptive card grid — is specified in `Technical_Architecture_Visual_SSO.md` §6. That section also restates the web product's WCAG 2.2 AA / keyboard-navigation requirement for this app, which this PRD does not currently state on its own.
 
+**Visual reference for all eight screens:** `mockups/DELIMa_Screen_Mockups.html` — open it in any browser. It's a proportional mockup built to the real colour/type/spacing tokens in `../Normal_SSO/stitch-wireframes/PROMPT.txt`, not pixel-exact to the production spec above (this PRD's written measurements are the source of truth for implementation; the mockup is for reviewing layout and flow). Avatar and picture-password icons are simple placeholder glyphs standing in for the bespoke flat-illustration asset set specified elsewhere in this document — they are not final art.
+
 ---
 
 ## 8. The installer (requirement 1)

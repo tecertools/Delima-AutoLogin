@@ -31,7 +31,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── PRD_Visual_SSO_v2.md        ← start here
 │   ├── Technical_Architecture_Visual_SSO.md
 │   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
-│   └── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
+│   ├── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
+│   └── mockups/DELIMa_Screen_Mockups.html   All 8 screens, one file, open in a browser
 │
 ├── InjectionSpike/                 T0.3 harness — PASSED, 17 Aug 2026 (see Visual_SSO/T0.3_Injection_Test_Protocol.md)
 │
