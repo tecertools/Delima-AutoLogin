@@ -322,7 +322,7 @@ Inno Setup gives one `.exe`, a scriptable build, `/VERYSILENT` for scripted lab 
 
 **Self-contained, single-file, win-x64, .NET 10 LTS.** Roughly 80–100 MB per program, and correct: lab PCs will not have any modern .NET, and telling En. Zul to install a runtime on 40 machines before he can install the app loses him at minute five. Framework-dependent builds are offered as a secondary download for schools with managed images.
 
-**Not .NET 8**, despite the spike being written against it: .NET 8 leaves support on 10 November 2026, before this product could ship. Shipping an unsupported runtime to schools holding children's credentials is not defensible, and the migration would land mid-project. See arch §1.
+**Not .NET 8**, which is what the spike was originally written against before being retargeted (arch §1): .NET 8 leaves support on 10 November 2026, before this product could ship. Shipping an unsupported runtime to schools holding children's credentials is not defensible, and the migration would land mid-project.
 
 ### 8.3 Install modes
 

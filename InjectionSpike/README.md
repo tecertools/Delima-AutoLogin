@@ -45,7 +45,7 @@ Use the synthetic passwords supplied; do not point this at a real account.
 **On a representative lab PC**, not a developer machine. Cold-start latency on
 lab hardware with a spinning disk is the entire point of Mode B.
 
-Requires the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) and
+Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and
 Google Chrome.
 
 ```powershell
@@ -124,7 +124,7 @@ get tested for free:
 
 ## Status
 
-Written against the .NET 8 SDK but **not yet compiled** — it was authored on a
-machine without a Windows toolchain. Expect to fix trivia on first build; the
-P/Invoke signatures and struct layouts are the parts worth reviewing closely if
-something misbehaves.
+Targets **.NET 10 (LTS, supported to November 2028)**. Originally written against
+.NET 8, retargeted before .NET 8's 10 November 2026 end-of-support date made it
+the wrong choice even for a short-lived harness. Compiled and run against a real
+lab PC; results and fixes are tracked in `../Visual_SSO/T0.3_Injection_Test_Protocol.md`.

@@ -7,7 +7,7 @@
 
 > **Runtime version — corrected.** Earlier drafts said .NET 8, inherited from the spike. **.NET 8 reaches end of support on 10 November 2026** — roughly three months from this revision, and well before this product would ship. Building on it would mean a forced migration mid-project and shipping an unsupported runtime to schools, which is indefensible for software handling children's credentials.
 >
-> Target **.NET 10 LTS** (supported to November 2028). The spike may stay on .NET 8 — it is a throwaway measurement harness that runs once. The production code in §2 must not.
+> Target **.NET 10 LTS** (released 11 November 2025, supported to 14 November 2028). The spike was originally written against .NET 8 as a throwaway harness, but has since been retargeted to .NET 10 as well — one less version mismatch to reason about between the spike and the production code in §2, and .NET 8 was going to be a dead end within months regardless.
 
 ---
 
