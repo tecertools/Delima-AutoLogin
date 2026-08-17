@@ -305,8 +305,10 @@ Between the name card and the launch, closing blocker B1. Grid of 16 concrete BM
 | Pergi ke Mana | Masked email, DELIMa / Classroom | Normal_SSO screen 3 |
 | Sedang Masuk | Progress + abort, during injection | **New** |
 | Selesai (floating bar) | Topmost bar, one red logout button | v1 §4 screen 3 |
-| Ralat | Failure taxonomy, BM message + teacher code | **New — arch §6** |
+| Ralat | Failure taxonomy, BM message + teacher code | **New — arch §7** |
 | Mod Guru | PIN-gated: password update, picture reset, add pupil, reset all, diagnostics | v1, expanded |
+
+**How to actually build these in WPF** — fonts, theming as runtime-swappable data rather than a compiled resource, the retemplated (never native) dropdown, and the adaptive card grid — is specified in `Technical_Architecture_Visual_SSO.md` §6. That section also restates the web product's WCAG 2.2 AA / keyboard-navigation requirement for this app, which this PRD does not currently state on its own.
 
 ---
 
@@ -339,7 +341,7 @@ Program files to `%ProgramFiles%\DELIMa Launcher`. Data to `%ProgramData%\DELIMa
 - Apply Chrome enterprise policy — disables the password manager, DevTools, incognito, and browser sign-in on the launcher's profile (Gap Analysis §1.6). Writes to `HKLM\SOFTWARE\Policies\Google\Chrome`. **Requires admin, affects the whole machine, and the checkbox says so.**
 - Desktop / Start Menu shortcuts
 
-**One thing the installer cannot do, and must not pretend to.** Restricting which programs the pupil account may run (AppLocker/SRP, arch §8) is what protects the credential store from anyone sitting at a lab PC. It depends on the school's Windows edition and existing group policy, so it ships as a documented snippet the coordinator applies, and as a **required** line on the lab checklist — not a checkbox in the installer that might silently fail.
+**One thing the installer cannot do, and must not pretend to.** Restricting which programs the pupil account may run (AppLocker/SRP, arch §9) is what protects the credential store from anyone sitting at a lab PC. It depends on the school's Windows edition and existing group policy, so it ships as a documented snippet the coordinator applies, and as a **required** line on the lab checklist — not a checkbox in the installer that might silently fail.
 
 ### 8.4 Upgrade and uninstall
 

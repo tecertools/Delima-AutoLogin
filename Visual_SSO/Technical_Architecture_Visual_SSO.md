@@ -284,7 +284,69 @@ Reimplemented in C#, semantics unchanged — `../Normal_SSO/Technical_Architectu
 
 ---
 
-## 6. Failure taxonomy
+## 6. UI implementation — WPF specifics
+
+§1 says everything not specified here "is a normal WPF application and should be built as one." That line covers ordinary MVVM plumbing but leaves a real gap: PRD §7 adopts `../Normal_SSO/stitch-wireframes/PROMPT.txt` — a design system written for a **web** Stitch mockup — as the visual spec for a **WPF** app. Translating CSS custom properties, web fonts, and a native `<select>`-replacement into XAML is not "normal WPF," so it gets specified here.
+
+### 6.1 Hand-styled WPF, not a component library
+
+**Do not adopt a third-party WPF UI kit** (WPF-UI, MaterialDesignInXAML, HandyControl, ModernWpf) as the basis for this app's look. Reasoning:
+
+- PROMPT.txt's requirements don't match any kit's default visual language — non-standard corner radii (20 px large cards, 16 px small), an adaptive card grid whose column count is computed from class size (§6.3 below), a dropdown that is explicitly *not* a native control and carries 64 px rows with a colour swatch, and an explicit ban list (no gradients on text, no glassmorphism, no dark mode). Every one of these fights a kit's own theme (Fluent, Material, Office) rather than being helped by it.
+- Appendix A already commits to keeping dependencies short because "every package is something an ICT coordinator's antivirus may flag on an unsigned build." A UI kit is a large dependency for a benefit — generic chrome — this app doesn't need, since virtually every visible control is bespoke to this design regardless of what kit sits underneath it.
+- WPF's native controls are fully retemplatable via `ControlTemplate` and `ItemContainerStyle` without losing their behaviour. Retemplating `ComboBox` for the Tahun/Kelas dropdowns (§6.4) keeps keyboard navigation, focus visuals, and screen-reader support that a from-scratch `Popup`-based control would have to reimplement by hand — and accessibility is a requirement here (§6.6), not a nice-to-have.
+
+Build a small `Delima.Launcher/Theming/` set of `Styles.xaml` + `ControlTemplates.xaml` resource dictionaries instead. This is more upfront work than pulling in a kit, and it is the correct trade for a design this specific.
+
+### 6.2 Theming as data, not as a compiled resource
+
+`config.theme` (§3.2) carries `primary`, `accent`, and eight `class_colours` per school — this is meant to be **swapped per school**, the same way the web design assumes CSS custom properties can be swapped. A `ResourceDictionary` compiled into the binary can't do that; brushes must be constructed at runtime from the decrypted bundle and merged into `Application.Resources` before the first window shows.
+
+```
+Theming/
+  DefaultTheme.xaml       fallback palette (SK Seksyen 24's, per PRD §7.1), used only if the bundle is unreadable
+  ThemeBuilder.cs         config.theme -> ResourceDictionary at runtime (SolidColorBrush per token, keyed by name)
+  Tokens.cs                the token names themselves: PrimaryBrush, AccentBrush, ClassColour[0..7],
+                            SurfaceBrush, SoftSurfaceBrush, BorderBrush, PrimaryTextBrush, SecondaryTextBrush
+```
+
+`ThemeBuilder` is also where the contrast validation from PRD §6 Step 1 (FR-S1.4) actually runs against real brush values — reject a palette that fails 4.5:1 for the text it will carry, not just at wizard-authoring time but again defensively when the Launcher loads a bundle, in case a hand-edited or corrupted bundle slips through.
+
+### 6.3 The adaptive name grid
+
+PRD §7.2 and arch §5 specify rows fixed at 5, columns following class size (7 for 30–34 pupils, 8 for 35–39, 9 for 40–44), constant card height, varying card width. This is naturally a `ViewModel`-computed `int ColumnCount` property — not a XAML-only layout — bound to an `ItemsControl` whose `ItemsPanel` is a `UniformGrid` with `Columns="{Binding ColumnCount}"`. The below-1200px-width degrade to vertical scroll (PRD §7.2, "a known limit at 1024×768") is a `Trigger` on the window's `ActualWidth`, swapping the `UniformGrid` panel for a `WrapPanel` inside a `ScrollViewer` — do not implement this as two entirely separate views; the card `DataTemplate` must be identical in both so a pupil sees the same card regardless of which layout is active.
+
+### 6.4 The non-native dropdown
+
+PRD FR-1a is explicit: **never a native `<select>`-equivalent**. In WPF terms, that means never a bare `ComboBox` with its default `ComboBoxItem` styling — but it does mean a **retemplated** `ComboBox` (§6.1), because rebuilding open/close, keyboard arrow navigation, typeahead, and `AutomationPeer` support from a `Popup` is a lot of accessibility surface to reimplement correctly for very little visual gain over retemplating. Style target: closed state 72 px tall; open, each row 64 px with 20 px text and a `Rectangle`/`Ellipse` colour swatch bound to the class's `ColourIndex` (§Roster/ClassInfo). `IsEnabled="{Binding TahunSelected}"` on the Kelas dropdown covers FR-1c (disabled until a tahun is chosen) directly through binding rather than code-behind.
+
+### 6.5 Fonts
+
+Nunito, Quicksand, and Baloo 2 (PROMPT.txt) are Google Fonts (OFL-1.1 licensed — free to embed and redistribute) and **are not present on a lab PC by default**. They must ship as embedded resources, not assumed system fonts:
+
+```
+Assets/Fonts/
+  Nunito-Regular.ttf, Nunito-Bold.ttf
+  Baloo2-Bold.ttf     (headings, per PROMPT.txt's 40px/28px/28px weights)
+```
+
+Referenced via a pack URI FontFamily (`/Delima.Launcher;component/Assets/Fonts/#Nunito`) set once in `App.xaml`'s base `TextBlock`/`Control` style, not per-view. Verify the exact font files' licence file is retained in the repo alongside them (`OFL.txt` per font family) — a small thing, but the kind of thing that gets asked about during a school procurement review.
+
+### 6.6 Motion — restrained, and WPF-native
+
+The audience is 7–9-year-olds on kiosk hardware; motion should confirm what happened, not entertain. WPF's `Storyboard` + `CubicEase`/`BackEase` easing functions are sufficient — there's no need for a physics-based spring animation library here (that's a web/Skia-adjacent concern; the equivalent WPF tooling doesn't carry the same ecosystem weight and isn't worth the dependency). Concretely:
+
+- Screen transitions: a short (150–200 ms) cross-fade or slide, matching PROMPT.txt's "calm, orderly" instruction — never a bounce or an attention-seeking entrance.
+- The floating **Selesai** reset bar (PRD §7.4): minimize/restore is the one moment worth a slightly longer, clearly legible transition, since it's the pupil's confirmation that their session ended.
+- Picture-password shuffle (PRD §7.3): the 16-icon grid re-shuffling on each attempt should happen instantly, with no animation — an animated shuffle would let a classmate watching over a shoulder track icons *through* the transition, which defeats the whole point of shuffling.
+
+### 6.7 Accessibility — a gap this document is closing
+
+`../Normal_SSO/PRD_Normal_SSO.md` §7 requires WCAG 2.2 AA, 4.5:1 contrast, ≥48×48 px touch targets, full keyboard navigation, and BM screen-reader labels for the web product. **`PRD_Visual_SSO_v2.md` never restates this for the desktop app**, and it should — the pupil audience is identical, and Mod Guru (teacher-mode admin) is used standing at a shared kiosk PC where keyboard-only operation matters just as much. Treat the same bar as binding here: `AutomationProperties.Name` in Bahasa Melayu on every interactive element, `TabIndex` ordering that matches visual flow, and the retemplated controls in §6.4 chosen specifically because they keep this "for free" rather than requiring a second accessibility pass later.
+
+---
+
+## 7. Failure taxonomy
 
 Gap Analysis §3 requires this and v1 has none. Every failure gets a calm BM message for the pupil and a code for the teacher. The pupil never sees a code; the teacher never has to guess.
 
@@ -308,7 +370,7 @@ Gap Analysis §3 requires this and v1 has none. Every failure gets a calm BM mes
 
 ---
 
-## 7. Audit log
+## 8. Audit log
 
 Append-only, local, one file per month, in `%ProgramData%\DELIMa Launcher\audit\`.
 
@@ -322,7 +384,7 @@ This is what tells a school whether impersonation is happening, and it is not op
 
 ---
 
-## 8. Kiosk hardening
+## 9. Kiosk hardening
 
 Gap Analysis §1.6 — a curious nine-year-old finds all of these in week one.
 
@@ -345,7 +407,7 @@ Gap Analysis §1.6 — a curious nine-year-old finds all of these in week one.
 
 ---
 
-## 9. Provisioning
+## 10. Provisioning
 
 `Delima.Provision.exe`, run once per lab PC:
 
@@ -361,7 +423,7 @@ Silent mode `--quiet --pack <path> --passphrase-stdin` for the PowerShell route,
 
 ---
 
-## 10. Testing
+## 11. Testing
 
 | Layer | Approach |
 | :--- | :--- |
@@ -380,7 +442,7 @@ The window-verification adversarial test is the one that matters most: it is the
 
 ---
 
-## 11. Build sequence
+## 12. Build sequence
 
 | # | Deliverable | Depends on |
 | :-- | :--- | :--- |
@@ -392,7 +454,7 @@ The window-verification adversarial test is the one that matters most: it is the
 | 6 | `Delima.Admin` — wizard steps 1–7 | 5 |
 | 7 | `Delima.Provision` | 3 |
 | 8 | `Delima.Win32` — promote spike code, add window verification + abort | 1 |
-| 9 | `Delima.Launcher` — theming, class + name screens | 4 |
+| 9 | `Delima.Launcher` — theming tokens, embedded fonts, retemplated dropdown, class + name screens (§6) | 4 |
 | 10 | `Delima.Launcher` — picture password | 3, 9 |
 | 11 | `Delima.Launcher` — injection flow, failure taxonomy, floating reset bar | 8, 10 |
 | 12 | Audit log | 11 |
