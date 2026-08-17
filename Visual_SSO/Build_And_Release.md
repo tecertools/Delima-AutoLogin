@@ -16,7 +16,7 @@ For setting up the machine that runs these commands, see `Build_Machine_Setup.md
 
 That constraint turns out to be convenient. **You do not need a Windows machine to produce a release.** GitHub's `windows-latest` runner is free for public repositories, and the repository must be public anyway for SignPath eligibility. The specs in this repository were written on a Mac; the releases can be built from one too, because the Mac never touches the compiler.
 
-**A local Windows machine is still worth having, for three things** none of which is producing the release:
+**A local Windows machine is still needed for development**, though not for releases and not immediately:
 
 1. **Testing.** Arch §11 requires a clean Win10 1809 VM, real lab hardware for injection, and pupil-account ACL checks. CI cannot do any of that.
 2. **Iterating.** Waiting on a CI round-trip to find a XAML typo is miserable.
@@ -24,7 +24,11 @@ That constraint turns out to be convenient. **You do not need a Windows machine 
 
 `Build_Machine_Setup.md` covers setting that machine up. Note it does **not** need `signtool`, a certificate, or the Windows SDK — signing happens in the pipeline.
 
-**Do not use a school lab PC even for local testing builds.** They are locked down in ways that break builds; the T0.3 spike already hit "insufficient access to delete" on one (`T0.3_Tutorial_Step_By_Step.md`, troubleshooting).
+**But not yet, and not for everything.** `Delima.Core` — the credential store, crypto, tamper tests, roster model and importer, which is build steps 3, 4 and 5 — has no UI and no Win32 and **builds and unit-tests on macOS or Linux**. Arch §2 enforces that boundary deliberately: *"`Delima.Core` must not reference `Delima.Win32`."* Windows becomes necessary at step 8 (`Delima.Win32`) and step 9 (the first WPF screens), which is a substantial way into the build order.
+
+**A school lab PC is acceptable for development builds**, with one caveat. The earlier objection — that a code-signing private key must never sit on a shared machine — no longer applies, because signing happens in the pipeline and no key exists locally. What remains is that lab PCs are locked down in ways that break builds; the T0.3 spike hit "insufficient access to delete" on one and was resolved by copying the folder to the Desktop and building from there (`T0.3_Tutorial_Step_By_Step.md`, troubleshooting). Do not put the repository in a restricted location.
+
+**On Apple Silicon**, a Windows 11 ARM VM (Parallels, UTM) is fine for writing and running WPF, since x64 is emulated — but the release target is `win-x64` and injection testing requires real lab hardware regardless, so treat the VM as an editor, not as a test environment.
 
 **Releases are cut from a tag, never from a working tree.** The workflow triggers on `v*` tags (§4.4), which makes this structural rather than a matter of discipline — there is no way to publish an unreproducible build, because there is no manual publish path at all.
 
