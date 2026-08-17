@@ -287,4 +287,10 @@ Then go to `Build_And_Release.md` and follow it from §2.
 
 ## A last word
 
-Nothing here should be run against a real school until **T0.1** — the written MOE/BSTP position on storing and replaying pupil passwords — has an answer (`PRD_Visual_SSO_v2.md` §2.1). Setting up the build machine, compiling, and testing on your own hardware are all fine now. Handing a signed installer to a second school is not, yet.
+**T0.1 no longer gates development or your own school.** The project publishes without a written MOE/BSTP position and places that responsibility on each downloading school instead (PRD §2.2, §8.7). Building, testing, and running this at your own school are all fine.
+
+**What T0.1 still gates is the public release**, and only in one specific way: the responsibility statement in PRD §8.7 must actually appear in all three places — release page, installer licence page, and `Delima.Admin` first run. Publishing without it isn't the decision that was made; it's a worse one, because the risk gets transferred without being disclosed.
+
+**Testing note, since it is easy to worry about the wrong thing.** The T0.3 injection runs on lab hardware used the synthetic passwords hardcoded in `InjectionSpike/Program.cs`, typed into a local `testpage.html`. No pupil account, no real credential, no DELIMa sign-in, nothing written to disk. That never engaged T0.1 and needed no permission. The line to watch for is different: **the first time a real pupil's real password is imported and stored.** Before that happens at any school other than your own, the §8.7 statement needs to be in front of whoever is doing it.
+
+`T0.2` is the near-term exception worth noting — it requires one real pupil account to confirm the live SSO URL and whether `login_hint` is honoured. That is an ordinary sign-in, not storage or replay, and raises none of the same questions.

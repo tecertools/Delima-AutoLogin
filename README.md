@@ -53,14 +53,18 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 - **T0.3** — run the injection spike, 50 runs, on representative lab hardware. **Passed, 17 August 2026.** `SendInput` scored 100/100 across two independent 50-run batches on real lab hardware; the `SendKeys` control failed exactly as predicted. Full results in `Visual_SSO/T0.3_Injection_Test_Protocol.md`.
-- **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started — now the active blocker.**
-- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Not started.**
+- **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started, and no longer a blocker.** Requirement G-1 was consciously relaxed: the project publishes without it and places the responsibility on each downloading school instead, via the statement specified in PRD §8.7. Still worth pursuing — see below.
+- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Not started. The only remaining blocker**, and a cheap one: one real pupil account and an afternoon. Blocks build step 11.
 
-**T0.3 no longer blocks the programme.** The question of whether password injection works reliably on real hardware is answered. T0.1 is next, and it's slower, since it depends on someone outside this project.
+**Nothing blocks starting.** T0.3 answered the question the programme was contingent on. T0.1 has been routed around deliberately (PRD §2.2), and T0.2 doesn't bite until step 11.
 
 ## Next step
 
-Start **T0.1** — a written policy position on storing and replaying pupil passwords, from BSTP or state ICT (`Visual_SSO/PRD_Visual_SSO_v2.md` §2.1–2.2). This doesn't block on code; it can run in parallel with anything else.
+**Start building.** `Delima.Core` — the credential store, crypto and tamper tests (arch §12 step 3), then the roster model (step 4). Neither is blocked, and both build and unit-test on macOS or Linux: arch §2 keeps `Delima.Core` free of any Win32 or UI reference precisely so it can. Windows is first needed at step 8.
+
+**Do T0.2 in parallel.** It needs one real pupil account and an afternoon, and leaving it undone is the kind of thing that stalls step 11 for no reason.
+
+**Keep pursuing T0.1 anyway.** It no longer gates anything, but an actual answer would be strictly better than a disclosure — the difference between telling schools they are responsible and telling them it is permitted. If it comes back negative, the release is withdrawn and schools are told (PRD §2.2).
 
 Optionally, round out T0.3's adversarial test to the full 5/5 (currently 2/5, both clean — see `Visual_SSO/T0.3_Injection_Test_Protocol.md`, "Actual results"), and take a quick look at the one anomalous `sendkeys` run before the pilot phase, though neither blocks moving forward.
 
