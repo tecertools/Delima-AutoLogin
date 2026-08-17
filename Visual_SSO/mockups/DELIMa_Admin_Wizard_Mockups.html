@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>DELIMa Admin — Mockup Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#056839; --orange:#F7941D; --amber-bg:#FDF3E2; --amber-text:#8A5A0B;
+    --danger-bg:#FBEAEA; --danger-text:#A3312D;
+    --ink:#1F2421; --ink2:#5B6560; --line:#DDE1DC; --sidebar:#F6F5EF; --stripe:#FAFAF7;
+    --radius:8px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#E9E5D8;font-family:'Nunito',sans-serif;color:var(--ink);font-size:14px;}
+  .mono{font-family:'Roboto Mono',monospace;}
+  .toolbar{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;z-index:50;}
+  .toolbar button{font-family:'Nunito';font-size:12px;font-weight:700;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:#f3f2ec;color:#555;cursor:pointer;}
+  .toolbar button.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .stage{padding:32px 20px 60px;display:flex;justify-content:center;}
+  .frame{width:1080px;max-width:100%;min-height:620px;background:#fff;border-radius:10px;overflow:hidden;position:relative;box-shadow:0 10px 40px rgba(0,0,0,0.16);display:none;}
+  .frame.active{display:flex;}
+
+  .sidebar{width:236px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--line);padding:20px 0;}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 18px 18px;border-bottom:1px solid var(--line);margin-bottom:8px;}
+  .sb-crest{width:28px;height:28px;border-radius:6px;background:var(--orange);color:#1F2421;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;}
+  .sb-brand div{font-size:12px;font-weight:700;color:var(--ink2);}
+  .step-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;border-left:3px solid transparent;}
+  .step-item .num{width:20px;height:20px;border-radius:50%;border:1.5px solid #c7c3b4;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;color:#8a8676;}
+  .step-item.done .num{background:var(--green);border-color:var(--green);color:#fff;}
+  .step-item.current{background:#fff;border-left-color:var(--green);color:var(--ink);}
+  .step-item.current .num{border-color:var(--green);color:var(--green);}
+  .step-item.locked{color:#b3b0a4;}
+  .step-item.locked .num{color:#c7c3b4;}
+  .step-item.attention .num{background:var(--orange);border-color:var(--orange);color:#1F2421;}
+
+  .content{flex:1;padding:24px 32px 90px;position:relative;overflow-y:auto;max-height:620px;}
+  .content h2{font-size:19px;font-weight:700;margin:0 0 4px;}
+  .content .sub{font-size:13px;color:var(--ink2);margin:0 0 22px;}
+  .content .actions{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:14px 32px;display:flex;justify-content:flex-end;gap:10px;}
+
+  .btn{font-family:'Nunito';font-size:13px;font-weight:700;padding:9px 18px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+  .btn-primary{background:var(--green);color:#fff;border-color:var(--green);}
+  .btn-primary:disabled{background:#c7c3b4;border-color:#c7c3b4;color:#fff;cursor:not-allowed;}
+  .btn-sm{padding:6px 12px;font-size:12px;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:5px;}
+  .field input, .field select{width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 11px;font-size:13px;font-family:'Nunito';color:var(--ink);background:#fff;}
+  .field .hint{font-size:11px;color:#8a8676;margin-top:4px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+  .swatch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .swatch{border:1px solid var(--line);border-radius:6px;padding:8px;text-align:center;}
+  .swatch .sq{width:100%;height:28px;border-radius:4px;margin-bottom:6px;}
+  .swatch .hex{font-size:10px;color:var(--ink2);}
+  .tag{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px;}
+  .tag.ok{background:#E5F2EA;color:var(--green);}
+  .tag.fail{background:var(--danger-bg);color:var(--danger-text);}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink2);padding:8px 10px;border-bottom:1px solid var(--line);}
+  td{padding:8px 10px;border-bottom:1px solid #EEECE4;}
+  tr:nth-child(even) td{background:var(--stripe);}
+
+  .mapping-row{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid #EEECE4;}
+  .mapping-row .target{font-weight:700;font-size:13px;}
+  .mapping-row .target.req::after{content:" *";color:var(--danger-text);}
+
+  .toggle-pair{display:flex;gap:6px;margin-bottom:18px;}
+  .toggle-pair button{font-size:12px;font-weight:700;padding:8px 14px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink2);}
+  .toggle-pair button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+  .dry-section{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden;}
+  .dry-head{padding:10px 14px;font-weight:700;font-size:13px;display:flex;justify-content:space-between;background:#FAFAF7;}
+  .dry-body{padding:10px 14px;font-size:12.5px;}
+  .dry-body div{padding:3px 0;color:var(--ink2);}
+  .count-ok{color:var(--green);font-weight:800;}
+  .count-warn{color:var(--amber-text);font-weight:800;}
+  .count-bad{color:var(--danger-text);font-weight:800;}
+
+  .consent-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #EEECE4;font-size:13px;}
+  .consent-item .ico{width:22px;height:22px;border-radius:50%;background:var(--amber-bg);color:var(--amber-text);font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+  .pw-mask{font-family:'Roboto Mono',monospace;letter-spacing:2px;cursor:pointer;color:var(--ink2);}
+  .badge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;}
+  .badge.missing{background:#EFEDE4;color:#8a8676;}
+  .badge.shared{background:var(--amber-bg);color:var(--amber-text);}
+  .popover{position:absolute;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.15);padding:12px;font-size:12px;width:210px;}
+  .popover input{width:100%;border:1px solid var(--line);border-radius:5px;padding:6px 8px;font-size:12px;margin:6px 0;}
+
+  .avatar-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #EEECE4;font-size:13px;}
+  .mini-avatar{width:26px;height:26px;border-radius:50%;background:#FDF3E2;flex-shrink:0;}
+  .switch{width:38px;height:20px;border-radius:999px;background:var(--green);position:relative;flex-shrink:0;}
+  .switch::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;right:2px;}
+  .switch.off{background:#c7c3b4;}
+  .switch.off::after{left:2px;right:auto;}
+  .warn-box{background:var(--danger-bg);color:var(--danger-text);border-radius:6px;padding:10px 12px;font-size:12px;margin-top:10px;display:none;}
+  .warn-box.show{display:block;}
+
+  .dest-row{display:grid;grid-template-columns:1fr 1.4fr 32px;gap:10px;margin-bottom:8px;align-items:center;}
+  .dest-row input{border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:12.5px;}
+  .link-add{font-size:12.5px;font-weight:700;color:var(--green);cursor:pointer;}
+
+  .route-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+  .route-card{border:1px solid var(--line);border-radius:8px;padding:16px;}
+  .route-card.selected{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+  .route-card h4{margin:0 0 6px;font-size:13.5px;}
+  .route-card p{margin:0 0 12px;font-size:11.5px;color:var(--ink2);}
+
+  .checklist-preview{border:1px solid var(--line);border-radius:8px;padding:14px;}
+  .cap{max-width:1080px;margin:14px auto 0;font-size:13px;color:#7a7768;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar"></div>
+<div class="stage"><div id="mount"></div></div>
+<p class="cap" id="caption"></p>
+
+<script>
+const steps = [
+  {n:1, label:"Identiti Sekolah", state:"done"},
+  {n:2, label:"Kata Laluan Pentadbir", state:"done"},
+  {n:3, label:"Import Senarai Murid", state:"current"},
+  {n:4, label:"Import Kata Laluan", state:"attention"},
+  {n:5, label:"Avatar & Kata Laluan Gambar", state:"locked"},
+  {n:6, label:"Destinasi & Tetapan", state:"locked"},
+  {n:7, label:"Bina & Sediakan", state:"locked"},
+];
+
+function sidebar(activeN){
+  return `<div class="sidebar">
+    <div class="sb-brand"><div class="sb-crest">SK</div><div>DELIMa Admin<br>SK Seksyen 24</div></div>
+    ${steps.map(s=>{
+      let cls = "step-item";
+      if(s.n===activeN) cls+=" current";
+      else if(s.n<activeN || s.state==="done") cls+=" done";
+      if(s.state==="locked" && s.n!==activeN) cls+=" locked";
+      if(s.state==="attention") cls+=" attention";
+      return `<div class="${cls}"><div class="num">${(s.n<activeN||s.state==="done")?"&#10003;":s.n}</div>${s.label}</div>`;
+    }).join("")}
+  </div>`;
+}
+
+const frames = {};
+
+frames["1"] = `${sidebar(1)}
+<div class="content">
+  <h2>Identiti Sekolah</h2>
+  <p class="sub">Ini menentukan apa yang menjadikan pemasangan ini milik sekolah anda. Tiada apa dikodkan terus ke dalam perisian.</p>
+  <div class="row2">
+    <div class="field"><label>Kod Sekolah</label><input value="SKS24"></div>
+    <div class="field"><label>Domain E-mel MOE</label><input value="moe-dl.edu.my"></div>
+  </div>
+  <div class="field"><label>Nama Sekolah</label><input value="SK Seksyen 24 Shah Alam"></div>
+  <div class="field"><label>Moto (pilihan)</label><input value="Berilmu Berdisiplin"></div>
+  <div class="field"><label>Lambang Sekolah</label><input type="button" value="Muat Naik Lambang…" class="btn btn-sm" style="width:auto;"></div>
+  <div class="field">
+    <label>Palet Jenama — kontras disahkan secara langsung</label>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="sq" style="background:#056839"></div><div class="hex">#056839</div><span class="tag ok">OK 7.1:1</span></div>
+      <div class="swatch"><div class="sq" style="background:#F7941D"></div><div class="hex">#F7941D</div><span class="tag ok">OK 8.4:1</span></div>
+      <div class="swatch"><div class="sq" style="background:#C41118"></div><div class="hex">#C41118</div><span class="tag ok">OK 6.2:1</span></div>
+      <div class="swatch"><div class="sq" style="background:#FFE9A8"></div><div class="hex">#FFE9A8</div><span class="tag fail">GAGAL 1.9:1</span></div>
+      <div class="swatch"><div class="sq" style="background:#8A6100"></div><div class="hex">#8A6100</div><span class="tag ok">OK 5.4:1</span></div>
+    </div>
+  </div>
+  <div class="actions"><button class="btn btn-primary">Seterusnya →</button></div>
+</div>`;
+
+frames["2"] = `${sidebar(2)}
+<div class="content">
+  <h2>Kata Laluan Pentadbir</h2>
+  <p class="sub">Kunci induk bagi semula bungkusan sekolah ini. <strong>Tiada pemulihan jika hilang.</strong></p>
+  <div class="row2">
+    <div class="field"><label>Kata Laluan Pentadbir</label><input type="password" value="••••••••••••"></div>
+    <div class="field"><label>Sahkan Kata Laluan</label><input type="password" value="••••••••••••"></div>
+  </div>
+  <div class="field"><label>Kekuatan</label>
+    <div style="height:6px;background:#EEECE4;border-radius:99px;overflow:hidden;"><div style="width:82%;height:100%;background:var(--green);"></div></div>
+    <div class="hint">Kuat. 16 aksara, tiada dalam senarai kata laluan biasa.</div>
+  </div>
+  <div class="warn-box show" style="background:var(--amber-bg);color:var(--amber-text);">
+    ☑ Saya faham bahawa jika kata laluan ini hilang, tiada cara untuk memulihkannya — saya perlu mengimport semula daripada eksport APDM.
+  </div>
+  <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary">Seterusnya →</button></div>
+</div>`;
+
+frames["3"] = `${sidebar(3)}
+<div class="content">
+  <h2>Import Senarai Murid</h2>
+  <p class="sub">Nama, kelas dan ID DELIMa sahaja. Tiada kata laluan pada langkah ini.</p>
+  <div class="toggle-pair">
+    <button class="on" onclick="showSub('3a')">Pemetaan Lajur</button>
+    <button onclick="showSub('3b')">Laporan Percubaan</button>
+  </div>
+  <div id="3a">
+    <div class="field"><label>Fail</label><input value="roster_2026_APDM_export.xlsx" readonly></div>
+    <div class="mapping-row"><div class="target req">Nama penuh</div><select><option>Kolum C — nama_pelajar</option></select></div>
+    <div class="mapping-row"><div class="target req">Kelas</div><select><option>Kolum E — kelas</option></select></div>
+    <div class="mapping-row"><div class="target req">Tahun</div><select><option>Diperoleh daripada Kelas</option></select></div>
+    <div class="mapping-row"><div class="target req">ID DELIMa</div><select><option>Kolum H — id_moe</option></select></div>
+    <div class="mapping-row"><div class="target">No. KP / No. Daftar</div><select><option>Kolum B — no_kp</option></select></div>
+    <div style="margin-top:16px;"><label style="font-size:12px;font-weight:700;color:var(--ink2);">Pratonton (10 baris pertama)</label></div>
+    <table style="margin-top:6px;">
+      <tr><th>Nama penuh</th><th>Kelas</th><th>Tahun</th><th>ID DELIMa</th></tr>
+      <tr><td>Nur Aishah Binti Ahmad</td><td>2 Cemerlang</td><td>2</td><td class="mono">m-12345678</td></tr>
+      <tr><td>Tan Wei Ming</td><td>2 Cemerlang</td><td>2</td><td class="mono">m-12345679</td></tr>
+      <tr><td>Arjun A/L Kumaran</td><td>2 Cemerlang</td><td>2</td><td class="mono">m-12345680</td></tr>
+    </table>
+  </div>
+  <div id="3b" style="display:none;">
+    <div class="dry-section"><div class="dry-head"><span>Sedia diimport</span><span class="count-ok">1,987</span></div></div>
+    <div class="dry-section"><div class="dry-head"><span>Amaran (tidak menghalang)</span><span class="count-warn">21</span></div>
+      <div class="dry-body">
+        <div>18 × ID DELIMa berganda → kejadian pertama dikekalkan (lihat baris 205, 649, 1023…)</div>
+        <div>3 × kelas tidak dikenali "6 Amamah" → bukan sebahagian mana-mana tahun, sahkan atau betulkan</div>
+      </div>
+    </div>
+    <div class="dry-section"><div class="dry-head"><span>Ditolak</span><span class="count-bad">6</span></div>
+      <div class="dry-body"><div>6 × ID DELIMa cacat → disenaraikan mengikut nombor baris, eksport ke rejects_2026-08-17.csv</div></div>
+    </div>
+    <div class="dry-body" style="padding:0;margin-top:6px;">54 kelas merentasi 6 tahun · 2 kelas melebihi 44 murid — grid akan menatal pada 1366×768</div>
+  </div>
+  <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary">Import & Sahkan →</button></div>
+</div>`;
+
+frames["4"] = `${sidebar(4)}
+<div class="content">
+  <h2>Import Kata Laluan</h2>
+  <p class="sub">Langkah berasingan, dengan pengesahan berasingan — dengan sengaja.</p>
+  <div class="toggle-pair">
+    <button class="on" onclick="showSub('4a')">Persetujuan</button>
+    <button onclick="showSub('4b')">Grid Kata Laluan</button>
+  </div>
+  <div id="4a">
+    <div class="consent-item"><div class="ico">1</div>Kata laluan murid akan disimpan, disulitkan dengan AES-256-GCM.</div>
+    <div class="consent-item"><div class="ico">2</div>Ia disimpan pada PC ini sahaja — tiada salinan awan, tiada pelayan pusat.</div>
+    <div class="consent-item"><div class="ico">3</div>Sesiapa dengan akses pentadbir tempatan pada PC ini boleh membacanya.</div>
+    <div class="consent-item"><div class="ico">4</div>Sekolah — bukan pembekal perisian — bertanggungjawab ke atas keputusan ini.</div>
+    <div class="field" style="margin-top:18px;"><label>Taip kod sekolah untuk teruskan</label><input placeholder="SKS24"></div>
+    <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary" disabled>Teruskan →</button></div>
+  </div>
+  <div id="4b" style="display:none;position:relative;">
+    <table>
+      <tr><th>Nama</th><th>Kelas</th><th>ID DELIMa</th><th>Kata Laluan</th><th>Status</th></tr>
+      <tr><td>Nur Aishah Binti Ahmad</td><td>2 Cemerlang</td><td class="mono">m-12345678</td><td class="pw-mask" onclick="togglePop()">••••••••</td><td></td></tr>
+      <tr><td>Tan Wei Ming</td><td>2 Cemerlang</td><td class="mono">m-12345679</td><td class="pw-mask">••••••••</td><td><span class="badge shared">Dikongsi</span></td></tr>
+      <tr><td>Arjun A/L Kumaran</td><td>2 Cemerlang</td><td class="mono">m-12345680</td><td class="pw-mask">••••••</td><td></td></tr>
+      <tr><td>Siti Nurhaliza</td><td>2 Cemerlang</td><td class="mono">m-12345681</td><td>—</td><td><span class="badge missing">Tiada</span></td></tr>
+    </table>
+    <div class="popover" id="pwpop" style="display:none;top:70px;left:400px;">
+      <div>Sahkan kata laluan pentadbir untuk dedah:</div>
+      <input type="password" placeholder="••••••••••••">
+      <button class="btn btn-sm btn-primary" style="width:100%;">Dedah</button>
+    </div>
+    <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary">Seterusnya →</button></div>
+  </div>
+</div>`;
+
+frames["5"] = `${sidebar(5)}
+<div class="content">
+  <h2>Avatar & Kata Laluan Gambar</h2>
+  <p class="sub">Avatar diberikan secara automatik, unik dalam setiap kelas.</p>
+  <div class="avatar-row"><div class="mini-avatar"></div>Nur Aishah Binti Ahmad — kucing <span class="link-add" style="margin-left:auto;">Tukar</span></div>
+  <div class="avatar-row"><div class="mini-avatar"></div>Tan Wei Ming — ikan <span class="link-add" style="margin-left:auto;">Tukar</span></div>
+  <div class="avatar-row"><div class="mini-avatar"></div>Arjun A/L Kumaran — bintang <span class="link-add" style="margin-left:auto;">Tukar</span></div>
+  <div class="field" style="margin-top:20px;display:flex;align-items:center;gap:12px;">
+    <div class="switch" id="ppSwitch" onclick="toggleSwitch()"></div>
+    <label style="margin:0;">Kata Laluan Gambar diperlukan</label>
+  </div>
+  <div class="warn-box" id="ppWarn">Melumpuhkan ini mendedahkan semula B1 — sebarang murid boleh log masuk sebagai rakan sekelas. Pilihan ini direkodkan dalam log audit.</div>
+  <div style="margin-top:16px;"><button class="btn btn-sm">Cetak Helaian Avatar Kelas</button></div>
+  <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary">Seterusnya →</button></div>
+</div>`;
+
+frames["6"] = `${sidebar(6)}
+<div class="content">
+  <h2>Destinasi & Tetapan</h2>
+  <div class="field"><label>Destinasi</label>
+    <div class="dest-row"><input value="DELIMa 3.0"><input value="https://d3.delima.edu.my/"><button class="btn btn-sm">✕</button></div>
+    <div class="dest-row"><input value="Google Classroom"><input value="https://classroom.google.com/"><button class="btn btn-sm">✕</button></div>
+    <div class="link-add">+ Tambah Destinasi</div>
+  </div>
+  <div class="row2" style="margin-top:20px;">
+    <div class="field"><label>Tempoh Tidak Aktif (saat)</label><input value="600"></div>
+    <div class="field"><label>Dasar PIN Guru</label><select><option>4 digit, kunci selepas 5 percubaan</option></select></div>
+  </div>
+  <div class="field"><label>Bahasa Lalai</label><select><option>Bahasa Melayu</option><option>English</option></select></div>
+  <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary">Seterusnya →</button></div>
+</div>`;
+
+frames["7"] = `${sidebar(7)}
+<div class="content">
+  <h2>Bina & Sediakan</h2>
+  <p class="sub">Membina school.dlmpack dan menyediakan PC makmal.</p>
+  <div class="route-cards">
+    <div class="route-card selected"><h4>Pendrive</h4><p>Pendrive kosong, 1 GB+. Jalankan Provision.exe pada setiap PC.</p><button class="btn btn-sm btn-primary" style="width:100%;">Dipilih</button></div>
+    <div class="route-card"><h4>Rangkaian</h4><p>Laluan UNC boleh dicapai daripada setiap PC makmal.</p><button class="btn btn-sm" style="width:100%;">Pilih</button></div>
+    <div class="route-card"><h4>Skrip</h4><p>Skrip PowerShell untuk PDQ/GPO merentasi makmal.</p><button class="btn btn-sm" style="width:100%;">Pilih</button></div>
+  </div>
+  <label style="font-size:12px;font-weight:700;color:var(--ink2);">Senarai Semak Makmal (pratonton)</label>
+  <div class="checklist-preview" style="margin-top:8px;">
+    <table>
+      <tr><th>PC</th><th>Disediakan</th><th>Versi</th><th>Tarikh Simpan</th></tr>
+      <tr><td class="mono">MAKMAL-01</td><td>—</td><td>2.0.0</td><td>—</td></tr>
+      <tr><td class="mono">MAKMAL-02</td><td>—</td><td>2.0.0</td><td>—</td></tr>
+    </table>
+  </div>
+  <div class="actions"><button class="btn">← Kembali</button><button class="btn btn-primary">Tulis ke Pendrive →</button></div>
+</div>`;
+
+const notes = {
+  "1":"Langkah 1 — palet dan kontras disahkan secara langsung (FR-S1.4).",
+  "2":"Langkah 2 — tiada pemulihan; kotak ini mesti disemak sebelum diteruskan.",
+  "3":"Langkah 3 — pemetaan lajur (bukan tajuk tetap) + pratonton langsung, kemudian laporan kering 3-bahagian.",
+  "4":"Langkah 4 — skrin persetujuan (kod sekolah ditaip, bukan kotak semak) berasingan daripada grid kata laluan bertopeng.",
+  "5":"Langkah 5 — melumpuhkan Kata Laluan Gambar mendedahkan semula blocker B1, dan sistem berkata begitu.",
+  "6":"Langkah 6 — tetapan lalai munasabah; langkah ini wujud untuk override.",
+  "7":"Langkah 7 — tiga laluan pembekalan berakhir pada senarai semak yang sama."
+};
+
+const bar = document.getElementById('toolbar');
+const mount = document.getElementById('mount');
+const caption = document.getElementById('caption');
+
+function render(n){
+  mount.innerHTML = `<div class="frame active">${frames[n]}</div>`;
+  caption.textContent = notes[n];
+  document.querySelectorAll('.toolbar button').forEach(b=>b.classList.toggle('active', b.dataset.n===n));
+}
+steps.forEach(s=>{
+  const b=document.createElement('button');
+  b.textContent = s.n+'. '+s.label;
+  b.dataset.n = String(s.n);
+  b.onclick=()=>render(String(s.n));
+  bar.appendChild(b);
+});
+render("1");
+
+function showSub(id){
+  const pair = id.slice(0,1);
+  document.getElementById(pair+'a').style.display = id.endsWith('a') ? 'block' : 'none';
+  document.getElementById(pair+'b').style.display = id.endsWith('b') ? 'block' : 'none';
+  event.target.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  event.target.classList.add('on');
+}
+function togglePop(){
+  const p = document.getElementById('pwpop');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+function toggleSwitch(){
+  const sw = document.getElementById('ppSwitch');
+  const warn = document.getElementById('ppWarn');
+  sw.classList.toggle('off');
+  warn.classList.toggle('show', sw.classList.contains('off'));
+}
+</script>
+
+</body>
+</html>

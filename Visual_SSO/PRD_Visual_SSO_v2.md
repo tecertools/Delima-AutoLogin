@@ -155,6 +155,8 @@ This is the largest new component in v2 and the one that determines whether the 
 
 En. Zul is competent with a spreadsheet and Windows, and has never seen a JSON file he wanted to edit. Therefore: **no configuration file is ever hand-edited, no step requires the command line, and every destructive action has a dry run.** Every error message names the row, the column, and the fix.
 
+**This app does not look like the Launcher, deliberately.** `Delima.Launcher` is a picture-book for seven-year-olds; `Delima.Admin` is a data-entry and validation tool for an adult doing spreadsheet work at a desk. Reusing rounded cards and 48 px touch targets here would fight the actual job, which is density — scanning a 2,014-row report for the three rows that are wrong. The concrete visual language (sidebar step navigator, dense DataGrids, column-mapper interaction, dry-run report layout, password-grid reveal behaviour, consent-screen copy, provisioning-route selector) is specified in `Technical_Architecture_Visual_SSO.md` §6.8 — read it before building any Admin screen. Only the crest and a thin accent of the school's colour carry over from the Launcher's palette; nothing else does.
+
 ### Step 1 — School identity
 
 Establishes what makes this install *this school's*, so nothing is compiled in.
