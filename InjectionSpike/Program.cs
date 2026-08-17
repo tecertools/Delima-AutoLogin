@@ -179,7 +179,10 @@ internal static class Program
         // rather than a blind sleep.
         Thread.Sleep(settleMs);
 
+        var readyMs = (int)ready.Value.TotalMilliseconds;
+
         var blocked = NativeMethods.BlockInput(true);
+        string? thrown = null;
         try
         {
             if (method == "sendkeys")
@@ -187,17 +190,33 @@ internal static class Program
             else
                 NativeMethods.SendUnicodeString(password, charDelayMs);
         }
+        catch (Exception ex)
+        {
+            // SendKeys doesn't only mistype reserved characters -- for a
+            // malformed brace sequence like "{2026}" (not a recognised keyword
+            // such as {ENTER} or {TAB}), SendKeys.SendWait throws an
+            // ArgumentException outright instead of typing anything at all.
+            // Left uncaught, that exception propagates out of RunFidelity's
+            // loop and kills the whole batch before the CSV is ever written --
+            // every result measured before the crash, including the passwords
+            // that legitimately passed, would be lost with nothing saved. This
+            // is a worse failure mode than corruption, and it is itself part
+            // of the evidence against SendKeys, so it is recorded as a FAIL
+            // row rather than allowed to end the run.
+            thrown = $"{ex.GetType().Name}: {ex.Message}";
+        }
         finally
         {
             if (blocked) NativeMethods.BlockInput(false);
         }
 
+        if (thrown is not null)
+            return new Result(label, password.Length, method, false, readyMs, $"SENDKEYS_THREW: {thrown}");
+
         var title = session.WaitForTitle(
             t => t.StartsWith("SPIKE:PASS", StringComparison.Ordinal) ||
                  t.StartsWith("SPIKE:FAIL", StringComparison.Ordinal),
             TimeSpan.FromSeconds(5));
-
-        var readyMs = (int)ready.Value.TotalMilliseconds;
 
         if (title is null)
             return new Result(label, password.Length, method, false, readyMs, "NO_VERDICT_TIMEOUT");
