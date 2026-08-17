@@ -11,7 +11,7 @@ They differ in one decision — **whether the software handles the pupil's passw
 | Stores passwords | **No** | Yes, encrypted, locally |
 | Google ToS / MOE policy | Ordinary link, no gate | **Needs written sign-off** |
 | Effort | Weeks | Months |
-| Status | Specified, not built | Specified, not built |
+| Status | Specified, not built | Specified; **T0.3 passed 17 Aug 2026**, not built |
 
 If only one ships, it should be Normal SSO. It is the smaller product with most of the benefit and none of the policy risk.
 
@@ -33,8 +33,7 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
 │   └── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
 │
-├── InjectionSpike/                 T0.3 harness — decides whether Visual SSO is viable
-│                                   WRITTEN BUT NEVER COMPILED OR RUN
+├── InjectionSpike/                 T0.3 harness — PASSED, 17 Aug 2026 (see Visual_SSO/T0.3_Injection_Test_Protocol.md)
 │
 ├── PRD_Gap_Analysis.md             Review of Visual SSO v1; source of the v2 blockers
 └── DELIMa_Visual_SSO_PRD_TechArch.md   v1, SUPERSEDED by Visual_SSO/PRD_Visual_SSO_v2.md
@@ -44,29 +43,21 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 ## Where things actually stand
 
-**No application code exists.** The only C# in the repository is `InjectionSpike/` — a console test harness that measures whether password injection works. Its own README records that it has never been compiled.
+**No application code exists yet.** The only C# in the repository is `InjectionSpike/` — the console test harness that measures whether password injection works. It has been compiled and run on real lab hardware.
 
-Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5 and none have been completed:
+Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
-- **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords
-- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured
-- **T0.3** — run the injection spike, 50 runs, on representative lab hardware
+- **T0.3** — run the injection spike, 50 runs, on representative lab hardware. **Passed, 17 August 2026.** `SendInput` scored 100/100 across two independent 50-run batches on real lab hardware; the `SendKeys` control failed exactly as predicted. Full results in `Visual_SSO/T0.3_Injection_Test_Protocol.md`.
+- **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started — now the active blocker.**
+- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Not started.**
 
-**T0.3 decides whether Visual SSO is viable at all.** It costs about a day. Everything in `Visual_SSO/` is contingent on its result.
+**T0.3 no longer blocks the programme.** The question of whether password injection works reliably on real hardware is answered. T0.1 is next, and it's slower, since it depends on someone outside this project.
 
 ## Next step
 
-Run T0.3. **Follow `Visual_SSO/T0.3_Injection_Test_Protocol.md`** — it covers the control run, cold-vs-warm timing, and the adversarial focus-steal test, none of which are obvious from the commands alone.
+Start **T0.1** — a written policy position on storing and replaying pupil passwords, from BSTP or state ICT (`Visual_SSO/PRD_Visual_SSO_v2.md` §2.1–2.2). This doesn't block on code; it can run in parallel with anything else.
 
-```powershell
-cd InjectionSpike
-dotnet build -c Release                                    # never been compiled
-dotnet run -c Release -- fidelity --method sendkeys  --runs 50   # control, run first
-dotnet run -c Release -- fidelity --method sendinput --runs 50
-dotnet run -c Release -- timing --runs 50
-```
-
-On a lab PC, not a developer machine, and not over Remote Desktop.
+Optionally, round out T0.3's adversarial test to the full 5/5 (currently 2/5, both clean — see `Visual_SSO/T0.3_Injection_Test_Protocol.md`, "Actual results"), and take a quick look at the one anomalous `sendkeys` run before the pilot phase, though neither blocks moving forward.
 
 ---
 

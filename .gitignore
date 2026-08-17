@@ -14,9 +14,13 @@ roster.json
 audit/
 *.log
 
-# Spike output
+# Spike output — ignored by default (a run against real, if synthetic, test
+# data shouldn't accumulate in the working tree), but results worth keeping as
+# evidence are committed deliberately into spike-results/. These are synthetic
+# passwords hardcoded in InjectionSpike/Program.cs, never real credentials.
 fidelity_*.csv
 timing_*.csv
+!spike-results/*.csv
 
 # ---------------------------------------------------------------------------
 # .NET

@@ -37,9 +37,9 @@ Requirement 3 is the only one that is nearly free. Requirements 1 and 2 together
 | :-- | :--- | :--- |
 | **T0.1** | Written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords | **Not started.** No document in the repository. |
 | **T0.2** | Is the live `d3.delima.edu.my` SSO entry URL confirmed, and is `login_hint` honoured end to end? | **Not started.** `InjectionSpike/Program.cs` still carries a placeholder default with a comment saying so. |
-| **T0.3** | Does injection actually work — 50 runs on lab hardware with reserved characters? | **Written, never compiled or run.** `InjectionSpike/README.md`: *"not yet compiled."* No CSV results exist. |
+| **T0.3** | Does injection actually work — 50 runs on lab hardware with reserved characters? | **Passed, 17 August 2026.** `SendInput` 100/100 across two independent 50-run batches on real lab hardware, including every reserved character combined in one password. `SendKeys` control failed exactly as predicted on the same hardware — corrupted 8 of 9 reserved-character passwords, crashed outright on the ninth. See arch §4.2–4.3 for the full result and one open follow-up (a topmost-overlay requirement, now confirmed rather than theoretical). |
 
-**T0.3 decides whether the product is viable at all**, and it has not been run. If `SendInput` cannot reliably deliver a password into a verified Chrome window on real lab hardware, everything downstream of this document is wasted work. Compiling and running the spike costs perhaps a day.
+**T0.3 no longer blocks.** `SendInput` reliably delivers a password into a verified Chrome window on real lab hardware — the question this whole document was contingent on is answered. **T0.1 is now the active blocker**, and it is slower because it depends on someone outside this project.
 
 ### 2.2 Multi-school distribution raises the stakes on T0.1
 
@@ -86,7 +86,7 @@ This document does not recommend one over the other. It records that the cheap o
 | Median class-wide time to all-signed-in | 15 min *(est. — unverified)* | ≤ 3 min | Teacher stopwatch, 5 lessons pre/post |
 | Click → password submitted, p50 | n/a | ≤ 8 s | In-app timing, local log |
 | Click → password submitted, p95 | n/a | ≤ 15 s | Same |
-| Injection success rate | **unknown — T0.3 unrun** | ≥ 99% | **Measured at pilot, not at T0.3.** 50 spike runs bound the failure rate at ~6%, not 1% — they detect gross failure, they cannot certify 99%. See `T0.3_Injection_Test_Protocol.md` §5. |
+| Injection success rate | **100/100 at T0.3 (§2.1)** — gross failure ruled out | ≥ 99% | **Still measured at pilot, not at T0.3.** 100 clean runs is consistent with ≥99% but doesn't certify it statistically — T0.3's job was detecting gross, deterministic failure (which `SendKeys` had and `SendInput` didn't), not certifying a reliability figure. See `T0.3_Injection_Test_Protocol.md` §5. |
 | Wrong-pupil sign-ins | 3–5 per lesson *(est.)* | 0 | Audit log + teacher tally |
 | New-school setup time, ICT coordinator, unaided | n/a | ≤ 90 min | Timed with a real coordinator at school #2 |
 | Import rejects on a real APDM export | n/a | ≤ 2% of rows, all with actionable messages | Dry-run report |
@@ -232,7 +232,7 @@ This screen is not compliance theatre. It is the only moment at which anyone at 
 
 - Report pupils with no password (they remain in the roster; their card shows a teacher-visible "belum siap" state rather than failing at injection time).
 - Report passwords not present in the roster.
-- Warn on characters outside the injectable set (arch §4.3) — **this is where T0.3's findings become a product feature.**
+- ~~Warn on characters outside the injectable set~~ — **removed.** T0.3 found no character class `SendInput` mishandles (arch §4.3): 100/100 across two batches, including every reserved character combined. Nothing to warn about.
 - Warn on obviously shared passwords (the same value across many pupils) — common in practice, and worth the coordinator knowing.
 - **Never display a password.** The grid shows `••••••` with a per-row reveal that requires the passphrase and writes to the audit log.
 
@@ -401,7 +401,7 @@ No central service means no central support. Each school owns its install. The a
 
 | Phase | Scope | Duration | Exit criteria |
 | :--- | :--- | :--- | :--- |
-| **0 — De-risk** | T0.1, T0.2, T0.3 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **zero unexplained injection failures across 50 runs on lab hardware, with `SendKeys` corruption reproduced as the control**, and 5/5 on the adversarial focus-steal test. Any failure stops the programme here. See `T0.3_Injection_Test_Protocol.md`. |
+| **0 — De-risk** | T0.1, T0.2, T0.3 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **zero unexplained injection failures across 50 runs on lab hardware, with `SendKeys` corruption reproduced as the control**, and 5/5 on the adversarial focus-steal test. **T0.3: done.** T0.1 and T0.2: not started — now the active blockers. Pre-injection focus-steal is 2/2 clean so far (1s, 3s); complete to 5 for full protocol coverage. See `T0.3_Injection_Test_Protocol.md`. |
 | **1 — Baseline** | Time 5 real lessons | 1 week | The 15-minute estimate replaced with a measurement |
 | 2 — Credential foundation | Store format, Admin wizard, importer, provisioning | 3 weeks | A second person can import a real APDM export unaided |
 | 3 — Client | WPF shell, picture password, injection engine, failure taxonomy | 4 weeks | One class signs in end to end on lab hardware |
@@ -418,7 +418,7 @@ Phases 2 and 3 are the only ones that look like building the app. That ratio is 
 
 | Risk | Impact | Mitigation |
 | :--- | :--- | :--- |
-| **T0.3 fails — injection unreliable on lab hardware** | **Fatal** | Run it first. Phase 0 is a go/no-go, not a formality. `Normal_SSO` is the fallback product. |
+| ~~T0.3 fails — injection unreliable on lab hardware~~ | ~~Fatal~~ | **Resolved, 17 August 2026.** 100/100 across two batches on real lab hardware. See arch §4.2–4.3. |
 | MOE/BSTP refuses password storage | Fatal for v2 | T0.1 before school #2. `Normal_SSO` ships instead. |
 | MOE enables 2SV on pupil accounts | Fatal | No mitigation exists. Ask now (Gap Analysis §6 Q2). Watch for announcements. |
 | Google anti-automation (CAPTCHA, "unusual activity") on 40 near-identical logins from one IP | High | Jitter between launches; failure taxonomy surfaces it as a teacher-legible state rather than a hang. Cannot be fully solved. |
@@ -436,7 +436,7 @@ Phases 2 and 3 are the only ones that look like building the app. That ratio is 
 
 ## 12. Open questions
 
-1. **Has T0.3 been run?** If not, nothing below matters yet.
+1. ~~Has T0.3 been run?~~ **Yes — passed, 17 August 2026.** Next blocker is T0.1.
 2. Who at each school actually holds pupil passwords, and in what form? If they don't hold them in bulk, Step 4 has no input and the product cannot work there.
 3. Does MOE enforce 2SV on `moe-dl.edu.my` today, or plan to?
 4. How many schools, realistically — 2, or 20? At 2, the installer matters and the support story doesn't. At 20, the reverse.

@@ -230,17 +230,21 @@ Never a bare sleep. Timeout (default 30 s, configurable) → abort to the `Ralat
 
 **Injection** — `SendInput` with `KEYEVENTF_UNICODE`, one `INPUT` pair per UTF-16 code unit, surrogate pairs sent as two units. This is codepoint-transparent and immune to the `SendKeys` parsing problem entirely.
 
-**Input blocking** — `BlockInput(true)` for the duration so a stray click cannot move focus mid-password. `BlockInput` requires elevation on some images; if denied, fall back to a topmost transparent overlay covering all monitors, and record `blockinput_denied` in the audit log. The spike already reports this condition.
+**Input blocking** — `BlockInput(true)` for the duration so a stray click cannot move focus mid-password. `BlockInput` requires elevation, and **the topmost-overlay fallback is not a contingency — it is required for every standard lab deployment.** T0.3 confirmed this directly: across two 50-run fidelity batches on real lab hardware, `BlockInput` returned `false` (denied) on 100% of runs — the Launcher will not run elevated on a shared pupil account, so this is the normal case, not an edge case. The gap this leaves was also demonstrated directly, not theoretically: during the adversarial test, stealing focus *before* injection began produced zero leaked keystrokes (window verification working as designed), but stealing focus *during* active injection let the remaining characters land in the stolen window. Window verification protects the moment injection starts; only the overlay protects the moment it is running. Ship both. Record `blockinput_denied` in the audit log regardless — it is expected, not a fault to chase.
 
 **Never send `{ENTER}` blind.** Either confirm the field accepted the expected length, or let the pupil press Enter — a design choice worth testing with real seven-year-olds, since one keystroke may be easier for them than for the app.
 
 **Abort path.** The `Sedang Masuk` screen carries a visible cancel. Cancelling stops injection, kills the process tree, wipes the profile, and zeroes the credential.
 
-### 4.3 Injectable character set
+### 4.3 Injectable character set — resolved by T0.3
 
-Step 4 of the wizard warns on passwords outside the set the engine is proven to handle. That set is defined by **T0.3's actual results**, not by assumption. Until the spike runs, this section has a hole in it, and that hole is the reason Phase 0 comes first.
+**No restriction needed.** T0.3 ran against real lab hardware on 17 August 2026: `SendInput`/`KEYEVENTF_UNICODE` passed **100/100** across two independent 50-run batches, covering all twelve test passwords including `all-reserved` (`M+u^r%i~d(2){0}[26]`, every reserved character in one string) and the realistic `moe-style` shape. Zero failures, zero exceptions, both batches.
 
-Expected: `SendInput`/UNICODE handles the full BMP, so the warning should end up applying to nothing. If it does not, the finding is far more interesting than the app.
+The control confirmed the mechanism behind the original bug at the same time: a clean 50-run `SendKeys.SendWait` batch on the same hardware showed the three plain passwords passing every time and all nine reserved-character passwords failing every time — eight via silent length/content corruption (`LEN_9_OF_10` and similar), and `Murid{2026}` via an outright `ArgumentException` (`Keyword "2026" is not valid`) rather than mistyping. A real MOE password containing `{` would have **crashed** the v1 design mid-lesson, not merely logged a pupil in wrong.
+
+Wizard Step 4's warning threshold (PRD §6, Step 4) can therefore be removed rather than tuned — there is no character class `SendInput` is known to mishandle. Keep the length/shared-password warnings; drop the character-set one.
+
+One run (of four total across the session) produced anomalous results on `SendKeys` — even plain passwords failed with `NO_VERDICT_TIMEOUT` — roughly 14 minutes after a clean run on the same machine, cause undetermined (possibly antivirus or a background scan). It does not affect this section's conclusion, since it was `SendKeys` (the rejected method) and `SendInput`'s own two batches were unaffected and fully clean. Worth a light look before the pilot, not a blocker now.
 
 ### 4.4 Session isolation
 

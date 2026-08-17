@@ -1,0 +1,13 @@
+﻿run,label,password_length,method,success,window_ready_ms,detail,machine,os
+1,plain-lower,10,sendkeys,False,662,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+2,plain-mixed,10,sendkeys,False,667,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+3,digits-symbols-ok,11,sendkeys,False,705,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+4,plus,10,sendkeys,False,638,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+5,caret,10,sendkeys,False,776,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+6,percent,10,sendkeys,False,1549,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+7,tilde,10,sendkeys,False,764,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+8,parens,11,sendkeys,False,-1,"WINDOW_NOT_READY",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+9,braces,11,sendkeys,False,664,"SENDKEYS_THREW: ArgumentException: Keyword "2026" is not valid.",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+10,brackets,11,sendkeys,False,661,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+11,all-reserved,19,sendkeys,False,546,"NO_VERDICT_TIMEOUT",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
+12,moe-style,15,sendkeys,False,642,"LEN_1_OF_15 - Google Chrome",PEP-BBA8105-18,"Microsoft Windows NT 10.0.22621.0"
