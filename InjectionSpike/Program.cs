@@ -47,6 +47,20 @@ internal static class Program
         var hint = ParseStringArg(args, "--login-hint", "m-00000000@moe-dl.edu.my");
         var timingUrl = ParseStringArg(args, "--url", DefaultTimingUrl);
 
+        // Guard against exactly the mistake that produced a mislabelled run in
+        // practice: --method sendkets (typo) silently fell through the old
+        // `if (method == "sendkeys") ... else sendinput` check and ran
+        // SendInput under a filename that read as the SendKeys control. The
+        // whole point of Mode A is a clean two-way comparison; a third,
+        // accidental method that nothing warns about defeats it silently.
+        if (mode == "fidelity" && method != "sendkeys" && method != "sendinput")
+        {
+            Console.Error.WriteLine($"FATAL: --method \"{method}\" is neither \"sendkeys\" nor \"sendinput\".");
+            Console.Error.WriteLine("       Refusing to guess. A typo here previously ran SendInput under a");
+            Console.Error.WriteLine("       filename that looked like the SendKeys control -- check spelling.");
+            return 2;
+        }
+
         var chromePath = ChromeSession.ResolveChromePath();
         if (chromePath is null)
         {
@@ -90,19 +104,35 @@ internal static class Program
                           $"settle={settleMs}ms   char-delay={charDelayMs}ms");
         Console.WriteLine(new string('-', 78));
 
-        var results = new List<Result>();
-        var perPassword = runs / TestPasswords.Length + 1;
-
-        foreach (var (label, value) in TestPasswords)
+        // Build the run order up front, guaranteeing every password in
+        // TestPasswords appears at least once before any repeats. The previous
+        // version (runs / TestPasswords.Length + 1, stopping the outer loop the
+        // instant results.Count hit `runs`) silently dropped whichever passwords
+        // sorted last once the arithmetic didn't divide evenly -- at runs=50
+        // against 12 passwords that meant "all-reserved" and "moe-style", the
+        // two most informative cases, never ran at all. That failure was
+        // invisible in the console output; nothing said "skipped".
+        if (runs < TestPasswords.Length)
         {
-            for (var i = 0; i < perPassword && results.Count < runs; i++)
-            {
-                var r = FidelityRun(chromePath, pagePath, label, value, method, settleMs, charDelayMs);
-                results.Add(r);
-                Console.WriteLine(
-                    $"  {results.Count,3}. {label,-18} {(r.Success ? "PASS" : "FAIL"),-4}  " +
-                    $"ready={r.WindowReadyMs,5}ms  {r.Detail}");
-            }
+            Console.WriteLine($"NOTE: --runs {runs} is fewer than the {TestPasswords.Length} test " +
+                              $"passwords. Raising to {TestPasswords.Length} so every password gets " +
+                              "at least one run -- a fidelity test that never tries a password proves nothing about it.");
+            runs = TestPasswords.Length;
+        }
+
+        var order = new List<(string Label, string Value)>(TestPasswords);
+        for (var i = 0; order.Count < runs; i++)
+            order.Add(TestPasswords[i % TestPasswords.Length]);
+
+        var results = new List<Result>();
+
+        foreach (var (label, value) in order)
+        {
+            var r = FidelityRun(chromePath, pagePath, label, value, method, settleMs, charDelayMs);
+            results.Add(r);
+            Console.WriteLine(
+                $"  {results.Count,3}. {label,-18} {(r.Success ? "PASS" : "FAIL"),-4}  " +
+                $"ready={r.WindowReadyMs,5}ms  {r.Detail}");
         }
 
         Console.WriteLine();
@@ -188,11 +218,21 @@ internal static class Program
         {
             using var session = ChromeSession.Launch(chromePath, url);
 
+            // NOT "Contains(\"Google\")" -- every Chrome window's title ends in
+            // "- Google Chrome", including a blank tab before anything has
+            // loaded. That match declared victory the instant the Chrome window
+            // *appeared*, not when the destination page was actually ready, and
+            // it swallowed the real number: a school-lab run against this exact
+            // bug logged 47/50 "ready" times of ~550ms while the 3 runs where a
+            // real page title happened to win the race first showed 2.4s, 7.5s
+            // and 12.1s -- the true figures this test exists to surface.
             var ready = session.WaitForForegroundWindow(
-                t => t.Contains("Google", StringComparison.OrdinalIgnoreCase) ||
-                     t.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
-                     t.Contains("Log masuk", StringComparison.OrdinalIgnoreCase) ||
-                     t.Contains("DELIMa", StringComparison.OrdinalIgnoreCase),
+                t => !IsBlankChromeTitle(t) &&
+                     (t.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
+                      t.Contains("Log masuk", StringComparison.OrdinalIgnoreCase) ||
+                      t.Contains("DELIMa", StringComparison.OrdinalIgnoreCase) ||
+                      t.Contains("Google Account", StringComparison.OrdinalIgnoreCase) ||
+                      t.Contains("Akaun Google", StringComparison.OrdinalIgnoreCase)),
                 TimeSpan.FromSeconds(45));
 
             var ms = ready is null ? -1 : (int)ready.Value.TotalMilliseconds;
@@ -223,6 +263,22 @@ internal static class Program
         var csv = WriteCsv(results, "timing");
         Console.WriteLine($"\nCSV: {csv}");
         return 0;
+    }
+
+    /// <summary>
+    /// A blank/loading Chrome window still carries "Google Chrome" in its
+    /// title, which is why the ready-check must not match on that string alone.
+    /// Covers English and BM variants of the empty states seen in practice.
+    /// </summary>
+    private static bool IsBlankChromeTitle(string t)
+    {
+        if (string.IsNullOrWhiteSpace(t)) return true;
+        var t2 = t.Trim();
+        return t2.Equals("Untitled - Google Chrome", StringComparison.OrdinalIgnoreCase)
+            || t2.Equals("New Tab - Google Chrome", StringComparison.OrdinalIgnoreCase)
+            || t2.Equals("Tab Baharu - Google Chrome", StringComparison.OrdinalIgnoreCase)
+            || t2.Equals("Untitled", StringComparison.OrdinalIgnoreCase)
+            || t2.Equals("Google Chrome", StringComparison.OrdinalIgnoreCase);
     }
 
     // ------------------------------------------------------------------
