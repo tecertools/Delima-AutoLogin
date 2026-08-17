@@ -484,6 +484,8 @@ The window-verification adversarial test is the one that matters most: it is the
 
 Steps 1 and 2 are days. Everything after them is weeks. Doing them in the other order is the most expensive mistake available here.
 
+Step 15 is specified in full in `Build_And_Release.md` — publish flags, the `.iss` script, signing order, and a pre-release checklist. It is worth reading before step 3 rather than at step 15: self-contained single-file WPF forbids trimming and constrains how embedded fonts and theme resources are loaded (§6.2, §6.5), and those are decisions made early and expensive to revisit.
+
 ---
 
 ## Appendix A — Dependencies

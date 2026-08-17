@@ -54,8 +54,13 @@ packages/
 !packages/build/
 
 # ---------------------------------------------------------------------------
-# Installer output
+# Build and installer output — see Visual_SSO/Build_And_Release.md
+# publish/ holds ~300 MB of self-contained binaries per build; dist/ holds the
+# packaged installer. Neither belongs in version control.
 # ---------------------------------------------------------------------------
+publish/
+publish-fx/
+dist/
 installer/Output/
 *.msi
 *.msix

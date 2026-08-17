@@ -32,6 +32,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── Technical_Architecture_Visual_SSO.md
 │   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
 │   ├── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
+│   ├── Build_Machine_Setup.md      Set up a Windows PC to compile the release
+│   ├── Build_And_Release.md        Publish flags, Inno Setup script, signing, checklist
 │   └── mockups/
 │       ├── DELIMa_Screen_Mockups.html         Launcher (pupil-facing), all 8 screens
 │       └── DELIMa_Admin_Wizard_Mockups.html   Admin Wizard (ICT coordinator), all 7 steps
@@ -61,6 +63,8 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 Start **T0.1** — a written policy position on storing and replaying pupil passwords, from BSTP or state ICT (`Visual_SSO/PRD_Visual_SSO_v2.md` §2.1–2.2). This doesn't block on code; it can run in parallel with anything else.
 
 Optionally, round out T0.3's adversarial test to the full 5/5 (currently 2/5, both clean — see `Visual_SSO/T0.3_Injection_Test_Protocol.md`, "Actual results"), and take a quick look at the one anomalous `sendkeys` run before the pilot phase, though neither blocks moving forward.
+
+**On compiling a distributable `.exe`:** the procedure is fully specified in `Visual_SSO/Build_And_Release.md`, and the machine to run it on in `Visual_SSO/Build_Machine_Setup.md` — but it is the *last* of 15 build steps (arch §12) and the first fourteen produce code that does not exist yet. Two things can usefully start now regardless, because both take weeks of waiting rather than hours of work: **T0.1**, and **buying an OV code-signing certificate** (`Build_And_Release.md` §4). An unsigned installer trips SmartScreen on every coordinator's PC, which for software handling children's passwords is fatal to adoption — and correctly so.
 
 ---
 

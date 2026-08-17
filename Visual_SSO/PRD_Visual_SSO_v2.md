@@ -318,6 +318,8 @@ Between the name card and the launch, closing blocker B1. Grid of 16 concrete BM
 
 ## 8. The installer (requirement 1)
 
+> This section states *what* ships and *why*. The exact build commands, the full Inno Setup script, signing procedure and pre-release checklist are in `Build_And_Release.md`; setting up the machine that runs them is in `Build_Machine_Setup.md`.
+
 ### 8.1 Choice: Inno Setup 6
 
 Over WiX/MSI (a toolchain to learn and maintain for a benefit — GPO-native deployment — that a 40-PC lab does not need) and MSIX (signing and packaging constraints that fight a kiosk app and a per-machine credential store).
