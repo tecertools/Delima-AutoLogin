@@ -4,7 +4,9 @@
 **Result:** a Windows PC that can turn the source code into one `DELIMaLauncher-Setup-2.0.0.exe`.
 **Time:** about 60 minutes, most of it downloads.
 
-> **Releases are unsigned** — see `Build_And_Release.md` §4 for that decision and what compensates for it. **Parts 5 and 6 below are therefore optional**, and only apply if a code-signing certificate is obtained later. Skip them for now; everything else is required.
+> **This machine does not produce releases.** Releases are built and signed by GitHub Actions, because SignPath Foundation only signs artefacts from a trusted build system (`Build_And_Release.md` §1, §4.2). This machine is for **local development, testing on real hardware, and reproducing faults schools report** — all things CI cannot do.
+>
+> **Parts 5 and 6 are therefore optional and can be skipped entirely.** You do not need `signtool` or a certificate locally; signing happens in the pipeline.
 
 Once this is done, the actual build is the commands in `Build_And_Release.md`. This document only gets you to the point where those commands work.
 
@@ -205,15 +207,15 @@ Get-ChildItem publish\Provision
 
 If it prints its usage text, the toolchain works end to end.
 
-**5. Record the checksum.** Since releases are unsigned, this is the only way a school can confirm the installer it receives is the one you built — so it is a required step, not an optional one:
+**5. Compare against CI.** Once the release workflow exists (`Build_And_Release.md` §4.4), a local build should produce the same thing the pipeline does. If a bug reproduces locally but not in CI, or the reverse, the difference is usually a setting configured outside source control — which is also exactly what SignPath's origin verification rejects.
 
 ```powershell
 Get-FileHash publish\Provision\Delima.Provision.exe -Algorithm SHA256
 ```
 
-Keep this value somewhere separate from the file itself. `Build_And_Release.md` §4.3 and §6 explain why that separation is the whole point.
+Local and CI hashes will not match byte-for-byte (timestamps, paths), so this is a sanity check on size and behaviour, not an equality test.
 
-**6. Test signing** — only if you completed Parts 5 and 6, which are optional. Using the `signtool` path you noted:
+**6. Test signing** — only if you completed the optional Parts 5 and 6, and normally you should not need to, since the pipeline signs. Using the `signtool` path you noted:
 
 ```powershell
 $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe"
@@ -257,7 +259,7 @@ Scoped to the process, so it lapses when you close the window. That is deliberat
 Almost always because a framework-dependent build was published to a machine without .NET 10. Confirm `--self-contained true` was used. See `Build_And_Release.md` §3.
 
 **Antivirus quarantines the freshly built exe**
-Common with unsigned, self-contained, single-file executables — a large opaque binary with no signature is genuinely hard for heuristics to tell from packed malware. **Expect this, since releases are unsigned.** Submit it to the antivirus vendor as a false positive. Do not add a permanent exclusion folder on lab PCs, and do not tell schools to: an excluded folder on a machine holding children's credentials is a worse problem than the one it solves.
+Common with self-contained single-file executables — a large opaque binary is hard for heuristics to tell from packed malware. **Expect it on local builds especially**, since those are unsigned; released builds are signed and fare better. Report it to the antivirus vendor as a false positive. Do not add a permanent exclusion folder on lab PCs, and do not tell schools to: an excluded folder on a machine holding children's credentials is a worse problem than the one it solves.
 
 **`signtool` is not found at the path in Part 5**
 The version number folder differs between machines. Re-run the search command in Part 5 and use whatever it actually prints. (Only relevant if you took the optional signing route.)
@@ -274,14 +276,10 @@ Before your first real release, all of these should be true:
 - [ ] `ISCC.exe` found; path noted
 - [ ] `dotnet build -c Release` succeeds on a clean clone
 - [ ] A published single-file exe is genuinely one file, and runs
-- [ ] SHA-256 checksum recorded, stored separately from the build output
-- [ ] Installer tested **from a pendrive**, not from the build folder — no SmartScreen dialog appears
+- [ ] A clean Win10 1809 VM is available for install testing (arch §11)
+- [ ] Lab hardware is reachable for injection runs — never a developer machine, never over RDP
 
-Optional, only if you took the signing route:
-
-- [ ] `signtool.exe` found; full path written down
-- [ ] Certificate installed; `Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert` lists it
-- [ ] `signtool verify /pa` reports success
+Not needed on this machine, and listed so you don't go looking for them: `signtool`, a code-signing certificate, or any release-publishing step. Those live in the pipeline (`Build_And_Release.md` §4.4).
 
 Then go to `Build_And_Release.md` and follow it from §2.
 

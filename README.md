@@ -66,7 +66,10 @@ Optionally, round out T0.3's adversarial test to the full 5/5 (currently 2/5, bo
 
 **On compiling a distributable `.exe`:** the procedure is fully specified in `Visual_SSO/Build_And_Release.md`, and the machine to run it on in `Visual_SSO/Build_Machine_Setup.md` — but it is the *last* of 15 build steps (arch §12) and the first fourteen produce code that does not exist yet.
 
-**Releases will be unsigned** (`Build_And_Release.md` §4, PRD §8.5). SmartScreen turns out to be a smaller obstacle than it looks: its warning depends on Mark-of-the-Web, which FAT32 and exFAT cannot store, and the pendrive is already the primary provisioning route — though an NTFS-formatted stick breaks that, so it has to be tested. The real cost is that a school cannot verify the installer it received is the one that was built, which makes **published SHA-256 checksums and hand delivery load-bearing rather than decorative**. Proportionate for a pilot; it does not scale past roughly five schools. Free OV signing via SignPath Foundation is available if the project ever goes open-source — the same undecided question as the licence.
+**Distribution, licence and signing are now settled** (PRD §8.5): free public download, open source, and free OV-level signing from [SignPath Foundation](https://signpath.org/). Two consequences that shape the build:
+
+- **Releases are built by GitHub Actions, not by hand.** SignPath signs only artefacts from a trusted build system whose configuration is under source control. The convenient side effect is that **no Windows machine is needed to cut a release** — only to test one.
+- **Ship one unsigned release first, then apply.** The Foundation requires a project already be released in the form to be signed, and it reviews applications. Software that stores passwords and injects keystrokes deserves a plain-spoken application; expect questions.
 
 ---
 
@@ -76,4 +79,6 @@ All pupil-facing text is Bahasa Melayu. Specification documents are in English. 
 
 ## Licence
 
-Not yet decided. See `Visual_SSO/PRD_Visual_SSO_v2.md` §8.5 — this needs answering before the software is given to a second school.
+**Open source, OSI-approved — GPL-3.0 recommended.** See `Visual_SSO/PRD_Visual_SSO_v2.md` §8.5 for the reasoning. Briefly: the software is given away free, so there is no revenue to protect; an open licence is what makes free code signing available; and copyleft means a fork that weakens the credential store or drops the picture-password requirement has to publish its source, which keeps the difference visible.
+
+The `LICENSE` file is not yet in the repository. Add it before the first public release, along with the T0.1 responsibility statement (PRD §8.7).

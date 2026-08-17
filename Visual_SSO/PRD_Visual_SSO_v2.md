@@ -47,7 +47,19 @@ For one school, storing pupil passwords is a decision the headmaster can make ab
 
 The v2 architecture deliberately minimises this: **no credential ever leaves the school that created it**, there is no central server, and the author holds no key and receives no data (§5.1). That is the strongest defensible position available while still storing passwords at all. It does not remove the need for T0.1; it makes T0.1 answerable.
 
-**Requirement G-1:** A written T0.1 position must exist before the software is given to a second school. The installer's licence page (§8.5) states the school's own responsibilities explicitly.
+**Requirement G-1, as originally written:** a written T0.1 position must exist before the software is given to a second school.
+
+**G-1 has been consciously relaxed, and this is the most consequential decision in the document.** The project now publishes for free public download without a T0.1 answer, and instead places the policy responsibility explicitly on each school that downloads — via the statement specified in §8.7, shown on the release page, in the installer's licence page, and at `Delima.Admin` first run.
+
+The reasoning: T0.1 depends on someone outside this project, has no committed timeline, and may never arrive. Withholding a tool that saves a class 12 minutes of lesson time indefinitely, waiting on a letter that may not come, has its own cost — borne by pupils and teachers.
+
+**What that trade actually buys, stated honestly.** It converts an unanswered question into a disclosed one. A school still receives no assurance that the practice is sanctioned; it receives a clear statement that nobody has said it is, and that the school is responsible for deciding. That is meaningfully better than silence and meaningfully worse than an answer.
+
+**This relaxation does not extend to:**
+
+- **Concealment.** If the statement in §8.7 is absent from any of its three placements, the trade has not been made — the risk has simply been transferred without disclosure.
+- **Abandoning T0.1.** It remains listed as the active blocker in `../README.md` and should still be pursued. An actual answer would let this section be rewritten to something stronger.
+- **Silence if the answer comes back negative.** If BSTP or state ICT rules the practice out, the release is withdrawn and schools are told — not left running an installed product while the repository quietly stops mentioning it.
 
 ### 2.3 The honest alternative
 
@@ -355,18 +367,22 @@ Program files to `%ProgramFiles%\DELIMa Launcher`. Data to `%ProgramData%\DELIMa
 - The store carries a schema version; a newer Launcher migrates forward and refuses to open a future-versioned store.
 - **Uninstall securely deletes** `credentials.dat`, any temporary Chrome profiles, and the audit log only if the coordinator confirms — the log may be required evidence.
 
-### 8.5 Signing — decided against, with conditions
+### 8.5 Licence and signing — resolved
 
-**Releases are unsigned.** A code-signing certificate is ~RM 900/year and the free routes require open-sourcing the project, which is the undecided licence question below. The full reasoning, costs and compensating controls are in `Build_And_Release.md` §4; the summary:
+Three decisions that turned out to be one decision, and which close the open question carried since v1.
 
-- **SmartScreen is smaller than it first appears, conditionally.** Its warning is triggered by Mark-of-the-Web, which FAT32 and exFAT cannot store — so the pendrive route (already primary, §6 Step 7) avoids it, **provided the stick is not NTFS-formatted**. Distribution pendrives must be FAT32 or exFAT, and this must be tested rather than assumed.
-- **The real cost is tamper-evidence.** A school receiving a pendrive cannot verify the installer is the one that was built. For software that writes children's passwords to disk, that is a genuine residual risk, not a formality.
-- **Compensating controls are therefore mandatory, not optional:** SHA-256 checksums published through a channel separate from the installer; `Panduan_Pemasangan.pdf` teaching how to verify them; hand delivery wherever possible; and a screenshot in the guide of the amber *"Unknown Publisher"* UAC prompt so coordinators expect it.
-- **Never distribute an unsigned build by web download or email** — Mark-of-the-Web applies there and SmartScreen will warn.
+**Distribution: free public download**, to any Malaysian school that wants it. Not sold, not restricted, not hand-delivered.
 
-**This is proportionate at pilot scale and does not scale.** Revisit past roughly five schools, or at any school the author does not deal with directly, or the moment the installer needs to be downloadable. [SignPath Foundation](https://signpath.org/about) then offers free OV-level signing to open-source projects — the same decision as the licence question, settled once.
+**Licence: open source, OSI-approved.** This follows from the distribution choice — there is no revenue to protect — and it is what makes free code signing available. **Recommended: GPL-3.0.** A permissive licence (MIT, Apache-2.0) would allow a fork that removes the picture-password requirement, weakens the credential store, or adds telemetry, and distributes it to schools as a closed binary. GPL-3.0 does not prevent a hostile fork, but it requires that one which is distributed publishes its source, which makes the difference visible to anyone who looks. For software handling children's credentials that visibility is worth the constraint. Change the choice if there is a reason, but record the reason.
 
-The installer's licence page states plainly: no warranty; the school is the data controller for its pupils' credentials; the school is responsible for obtaining its own MOE/BSTP position; no data is transmitted to the author or anyone else. **It must also state that the build is unsigned and how to verify the checksum** — a school accepting the tamper-evidence gap should be told it is accepting one.
+**Signing: [SignPath Foundation](https://signpath.org/), free, OV-level.** Full detail in `Build_And_Release.md` §4. Two consequences worth surfacing here:
+
+- **Releases must be built by CI, not by hand.** SignPath signs only artefacts from a trusted build system whose configuration is under source control. A useful side effect: no Windows machine is needed to cut a release, only to test one.
+- **Apply early and describe the software plainly.** The Foundation reviews applications and refuses malware or potentially unwanted programs. An application that stores passwords and injects keystrokes is behaviourally close to a credential stealer, and a reviewer may reasonably pause. Ship one unsigned release first (the Foundation requires the project already be released in the form to be signed), then apply.
+
+**Signing matters more under free download than it did under hand delivery.** Mark-of-the-Web applies to everything downloaded, so SmartScreen would warn on every install; and unsigned reputation is tracked per file hash, so it never accumulates — the warning would never stop. Signed, reputation attaches to the certificate and carries across releases.
+
+**The installer's licence page** states plainly: no warranty; the school is the data controller for its pupils' credentials; the school is responsible for its own MOE/BSTP position (see §8.7); no data is transmitted to the author or anyone else.
 
 ### 8.6 What ships
 
@@ -379,6 +395,21 @@ contoh_roster.csv / contoh_kata_laluan.csv   templates
 ```
 
 The two PDFs are deliverables, not documentation debt. G3 — 90 minutes, unaided — is not achievable without them.
+
+### 8.7 The T0.1 responsibility statement
+
+T0.1 is unanswered and the project publishes anyway (§2.1). The policy responsibility is therefore placed explicitly on each school that downloads, which requires the statement to appear in three places — release page, installer licence page, and `Delima.Admin` first run, before wizard Step 1.
+
+It must say, in Bahasa Melayu and plainly:
+
+- what the software stores (pupil passwords, encrypted, on the school's own machines);
+- that no written MOE or BSTP position on this practice has been obtained by the author;
+- that the school deploying it is the data controller and is responsible for obtaining its own position;
+- that the author provides the software without warranty and receives no data.
+
+The first-run acknowledgement is a separate gate from the Step 4 password-import consent (§6 Step 4). They cover different things: this one is about policy authority to run the software at all; that one is about the specific act of importing passwords. Do not merge them into a single click.
+
+**This is a mitigation, not a resolution.** It documents the responsibility and puts it in front of a human. It does not make the practice sanctioned, and a coordinator who clicks through has consulted no one. Pursuing an actual T0.1 answer stays worthwhile — it is the difference between telling schools they are responsible and telling them it is permitted.
 
 ---
 

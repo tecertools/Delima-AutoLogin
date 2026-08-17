@@ -10,25 +10,30 @@ For setting up the machine that runs these commands, see `Build_Machine_Setup.md
 
 ---
 
-## 1. The build machine
+## 1. Where builds happen
 
-**Windows. There is no way around this.** WPF is a Windows-only UI stack; `dotnet publish` for a WPF project fails on macOS and Linux regardless of `-r win-x64`, because the WPF targets themselves aren't installed. Inno Setup and `signtool` are also Windows-only. The specs in this repository were written on a Mac; the build cannot be.
+**Releases are built by GitHub Actions, not by a person.** This is not a preference — SignPath Foundation signs only artefacts produced by a *trusted build system*, where the build is fully determined by configuration under source control and cannot be manually overridden (§4.2). A binary compiled on someone's laptop cannot be signed, however carefully it was made.
 
-**Requirements:** Windows 10 22H2 or Windows 11, .NET 10 SDK, Inno Setup 6, Windows SDK (for `signtool`), Git.
+That constraint turns out to be convenient. **You do not need a Windows machine to produce a release.** GitHub's `windows-latest` runner is free for public repositories, and the repository must be public anyway for SignPath eligibility. The specs in this repository were written on a Mac; the releases can be built from one too, because the Mac never touches the compiler.
 
-**Do not use a school lab PC as the build machine.** Two reasons, and the second is the serious one:
+**A local Windows machine is still worth having, for three things** none of which is producing the release:
 
-1. Lab PCs are locked down in ways that break builds — the T0.3 spike already hit "insufficient access to delete" on one (`T0.3_Tutorial_Step_By_Step.md`, troubleshooting).
-2. **The code-signing private key must never sit on a shared machine.** Whoever controls that key can sign anything as you, including malware that schools will then trust because it carries your name. Use a personal or dedicated machine, and prefer a hardware token if the CA offers one (EV certificates are typically issued on one; OV increasingly is too).
+1. **Testing.** Arch §11 requires a clean Win10 1809 VM, real lab hardware for injection, and pupil-account ACL checks. CI cannot do any of that.
+2. **Iterating.** Waiting on a CI round-trip to find a XAML typo is miserable.
+3. **Reproducing faults** a school reports.
 
-**Build from a clean checkout of a tagged commit.** Not from a working tree with uncommitted edits. A release you cannot reproduce from a tag is a release you cannot debug six months later when one school reports a fault.
+`Build_Machine_Setup.md` covers setting that machine up. Note it does **not** need `signtool`, a certificate, or the Windows SDK — signing happens in the pipeline.
 
-```powershell
-git clone <repo> C:\build\delima
-cd C:\build\delima
-git checkout v2.0.0
-git status --short     # must print nothing
+**Do not use a school lab PC even for local testing builds.** They are locked down in ways that break builds; the T0.3 spike already hit "insufficient access to delete" on one (`T0.3_Tutorial_Step_By_Step.md`, troubleshooting).
+
+**Releases are cut from a tag, never from a working tree.** The workflow triggers on `v*` tags (§4.4), which makes this structural rather than a matter of discipline — there is no way to publish an unreproducible build, because there is no manual publish path at all.
+
+```bash
+git tag v2.0.0
+git push origin v2.0.0     # this is the entire release procedure
 ```
+
+**Locally, WPF requires Windows.** `dotnet publish` for a WPF project fails on macOS and Linux regardless of `-r win-x64`, because the WPF targets aren't installed. This is why local testing needs a Windows box or VM even though releases don't.
 
 ---
 
@@ -113,82 +118,85 @@ Ship it as a separate archive, not as an installer option. A coordinator who pic
 
 ---
 
-## 4. Signing — decided against, and what that costs
+## 4. Signing — SignPath Foundation
 
-**Decision: releases are unsigned.** A code-signing certificate is roughly RM 900/year and the free routes all require open-sourcing the project, which is a separate decision the project has not made (PRD §8.5). This section records what that costs and what has to compensate, because the honest answer is "something", not "nothing".
+**Decision: releases are signed, free, via [SignPath Foundation](https://signpath.org/), which provides OV-level code signing at no cost to open-source projects.** This follows from two other decisions: the project is distributed free to any school that wants it, and it is open-source under the licence recorded in PRD §8.5.
 
-### 4.1 What it does *not* cost
+The private key never exists on any machine you control — it lives in SignPath's hardware security module, and artefacts are submitted to be signed rather than signed locally. For a one-person project that is strictly safer than a certificate on a laptop, which is the usual failure mode: the key gets copied to a second machine, then a backup, then it is on a drive in a drawer.
 
-**SmartScreen usually does not appear on the pendrive route — but this depends on how the pendrive is formatted.** The *"Windows protected your PC"* dialog is triggered by **Mark-of-the-Web**, a tag Windows attaches to files arriving from the internet. That tag is stored in an NTFS alternate data stream, so:
+### 4.1 Why this matters more than it did
 
-- **FAT32 / exFAT pendrive → tag is lost, no SmartScreen.** These are the default formats on virtually every USB stick sold. Copying a downloaded file onto one strips the tag.
-- **NTFS pendrive → tag survives, SmartScreen still warns.** `T0.3_Tutorial_Step_By_Step.md` Part 10 records exactly this happening with the spike binary.
+Free public download makes signing close to mandatory, for a reason that is easy to miss:
 
-**So this must be verified, not assumed** — hence check 11 in §7. Format the distribution pendrive as **FAT32 or exFAT** and confirm on a test machine that no dialog appears. Do not rely on it having worked once on a different stick.
+**Mark-of-the-Web applies to everything downloaded.** The *"Windows protected your PC"* dialog is triggered by a tag Windows attaches to files arriving from the internet. A pendrive formatted FAT32 cannot carry that tag, so hand-delivered installers avoid the warning — but a download always carries it. **Every install, at every school, on every release.**
 
-This matters because **the pendrive is already the primary provisioning route** (PRD §6 Step 7, arch §10): the distribution model chosen for other reasons happens to sidestep the loudest consequence of not signing, provided the medium is right.
+**Unsigned reputation never accumulates.** SmartScreen tracks reputation for unsigned files by *file hash*. Every new release is a new hash and starts from zero, so the warning never stops appearing no matter how many schools install it. Signed, reputation attaches to the certificate and new releases inherit it — the warning fades after the first weeks and stays gone.
 
-Two cases where the warning definitely does appear:
+**The warning is a friction, not a wall** — a coordinator can click *More info* → *Run anyway*. But teaching ICT coordinators to click past that specific dialog, on software that writes children's passwords to disk, is training exactly the wrong reflex. Two exceptions where it *is* a hard block: schools with SmartScreen set to Block rather than Warn by group policy, and coordinators who are not local administrators.
 
-- **Network share.** Since a 2024 File Explorer change, Windows applies Mark-of-the-Web to files copied from shares it does not consider trusted. The `Rangkaian` provisioning route can therefore trip SmartScreen where a FAT32 USB does not.
-- **Any web download.** A website, Drive link, or email attachment all apply Mark-of-the-Web. **Do not distribute unsigned builds this way.**
+### 4.2 What SignPath requires, and what that forces
 
-Note that SmartScreen is a warning the coordinator can click past — *More info* → *Run anyway*, as the T0.3 tutorial documents. It is a friction and adoption problem, not a hard block. The tamper-evidence gap in §4.2 is the more serious cost.
+Eligibility, from the [Foundation's conditions](https://signpath.org/terms.html):
 
-### 4.2 What it does cost
+| Requirement | Status for this project |
+| :--- | :--- |
+| OSI-approved licence, no commercial dual-licensing | Set by PRD §8.5 |
+| Publicly available codebase | Repository must be made public |
+| No proprietary or non-open-source component | Check fonts and any icon set before applying — see below |
+| Actively maintained | True while the pilot runs |
+| Already released in the form to be signed | **Ship one unsigned release first**, then apply |
+| Functionality described on the download page | The release page must explain what the app does |
+| Signing team = development team, owning the repo | True |
 
-**The UAC prompt says "Unknown Publisher".** The installer requests administrator rights (§5, `PrivilegesRequired=admin`). Signed, Windows shows the blue elevation dialog naming the publisher. Unsigned, it shows the amber one reading *Publisher: Unknown*. This appears on every install regardless of how the file arrived — pendrive included. It cannot be suppressed and should not be; the install guide must show a screenshot of it so coordinators expect it rather than abandon the install.
+**Origin verification is the constraint with teeth.** SignPath verifies that a signed binary is an automated build of the source at the stated repository. In practice that means the build must run on a supported CI system — GitHub Actions, Azure DevOps, Jenkins — with build settings fully determined by a file under source control, no manual overrides in the CI job, and no reuse of cached artefacts from earlier unverified builds. Origin metadata comes from GitHub itself, so it cannot be forged by the build script. **This is why §1 moves releases to CI.**
 
-**There is no tamper-evidence.** This is the real cost, and it is not cosmetic. A signature proves the installer a school received is the one that was built. Without it, a coordinator handed a pendrive has no way to distinguish the genuine installer from a modified one — and this is software that writes children's passwords to disk. A malicious build would be an excellent way to collect them.
+**Two risks worth naming before applying:**
 
-**Antivirus false positives get more likely.** A large, unsigned, self-contained single-file executable is genuinely hard for heuristics to distinguish from packed malware. Expect occasional quarantines, and expect them to differ between schools' antivirus products. Do not respond by telling schools to add a permanent exclusion folder — that is worse than the problem.
+- **The Foundation reviews applications and rejects malware or potentially unwanted programs.** This application stores passwords and injects keystrokes into a browser — behaviourally, that is not far from what a credential stealer does, and a reviewer may well pause on it. **Describe the purpose plainly in the application**: a school-managed kiosk launcher for seven-year-olds who cannot type a 26-character MOE address, deployed by the school on its own machines, with the credential store and threat model documented in `Technical_Architecture_Visual_SSO.md` §3. Do not discover this objection after building the whole pipeline around it — apply early, expect questions.
+- **"No proprietary component" includes assets.** Nunito and Baloo 2 are OFL-1.1 (arch §6.5) and fine. Audit the avatar artwork and any icons for licences that are free-to-use but not open-source before applying, because a single non-OSS asset disqualifies the project.
 
-### 4.3 What compensates
+### 4.3 Fallbacks, if the application is refused
 
-**SHA-256 checksums stop being a nicety and become the integrity control** (§6). With no signature, the checksum is the *only* way a school can verify what it received. That imposes two obligations:
+- **[Certum open-source certificate](https://shop.certum.eu/code-signing.html)** — from €25/year, but the first purchase needs a smartcard and reader (~€69 plus shipping, ~€29 to renew). Also requires open source, but no CI or origin verification, so it works with local builds. Roughly RM 350 the first year.
+- **Ordinary OV certificate** — DigiCert, Sectigo, SSL.com and similar, roughly RM 900/year, no open-source requirement.
+- **Ship unsigned** — see §4.5 for what that would then require.
 
-1. **Publish the checksum through a different channel than the installer.** A hash file sitting on the same pendrive as the installer proves nothing — anyone who can alter one can alter the other. Send it separately: a message to the coordinator, a page on the school site, a printed line on the handover sheet.
-2. **`Panduan_Pemasangan.pdf` must teach how to check it**, in Bahasa Melayu, with the exact command:
+> **Azure Artifact Signing** ($9.99/month) is widely recommended and is **not currently available to individual developers outside the US and Canada**. Unlikely to apply here.
 
-   ```powershell
-   Get-FileHash .\DELIMaLauncher-Setup-2.0.0.exe -Algorithm SHA256
-   ```
+**Never self-sign as a substitute.** It requires teaching an ICT coordinator to install an unknown publisher certificate on lab machines — a far more dangerous habit than the one it fixes, and worse than shipping unsigned.
 
-   Be realistic: most coordinators will not do this. It is still worth documenting, because the ones handling something sensitive on a school's behalf are exactly the ones who might.
+### 4.4 The release pipeline
 
-**Deliver by hand, in person, wherever possible.** Given the tamper-evidence gap, physical handover by someone the school knows is doing real work — it substitutes a human trust relationship for the cryptographic one that isn't there.
+One workflow, triggered by pushing a `v*` tag, running on `windows-latest`:
 
-### 4.4 When to revisit
+1. **Check out** the tagged commit.
+2. **Set up .NET 10**, restore, build `-c Release`.
+3. **Run the unit tests** (arch §11 crypto, display-name and importer suites). Fail the release here, not later.
+4. **Publish** the three executables with the §3 flags.
+5. **Build the installer** with Inno Setup (`iscc`, §5), version passed from the tag.
+6. **Upload** the installer as a workflow artefact.
+7. **Submit to SignPath** for signing via their GitHub Action, and wait for the signed artefact to return.
+8. **Generate SHA-256 checksums** of the *signed* installer (§6) — order matters, since signing changes the file.
+9. **Create a draft GitHub Release**, attaching installer, checksums, and the two BM guides.
 
-This decision is proportionate at pilot scale — a handful of schools, installers handed over personally by someone they know. **It does not scale.** Revisit when any of these becomes true:
+**Leave it as a draft.** A human should read the release notes and confirm the T0.1 responsibility statement (PRD §8.5) is present on the release page before it goes public. Everything upstream of that is automated; the decision to publish is not.
 
-- distribution passes roughly five schools, or reaches any school the author does not deal with directly;
-- the installer needs to be downloadable rather than hand-delivered;
-- T0.1 comes back permitting broad deployment.
+**Three properties this pipeline must preserve**, because they are what SignPath's origin verification is checking:
 
-At that point the cheapest route is **[SignPath Foundation](https://signpath.org/about)** — free OV-level signing for open-source projects, private key held in their HSM. It requires a public repository under a recognised open-source licence, which is the same undecided question as PRD §8.5. One decision would settle both.
+- Every build setting lives in the repository. Nothing configured only in the GitHub UI.
+- No step reuses a cached build output from an earlier run.
+- The workflow does not accept inputs that change what gets compiled.
 
-### 4.5 If a certificate is obtained later
+### 4.5 If signing is ever unavailable
 
-Sign the executables **before** packaging, then sign the installer — Inno Setup embeds the executables as payload, so signing them afterwards means rebuilding.
+Should the project need to ship unsigned — application refused, and no budget for a fallback certificate — these stop being optional:
 
-```powershell
-$ts = "http://timestamp.digicert.com"      # or your CA's timestamp service
-$sign = "signtool sign /fd SHA256 /td SHA256 /tr $ts /a"
+- **The SHA-256 checksum becomes the only integrity control**, so publish it somewhere other than beside the installer. A hash file next to the file it describes proves nothing.
+- **`Panduan_Pemasangan.pdf` must teach verification** in BM, with the exact command: `Get-FileHash .\DELIMaLauncher-Setup-2.0.0.exe -Algorithm SHA256`.
+- **The install guide must show a screenshot of the amber "Unknown Publisher" UAC prompt** so coordinators expect it rather than abandon the install.
+- **Expect antivirus false positives.** A large unsigned self-contained single-file exe is hard for heuristics to distinguish from packed malware. Report them to the vendor; never tell schools to add an exclusion folder on a machine holding credentials.
 
-& cmd /c "$sign publish\Launcher\Delima.Launcher.exe"
-& cmd /c "$sign publish\Admin\Delima.Admin.exe"
-& cmd /c "$sign publish\Provision\Delima.Provision.exe"
-& cmd /c "$sign dist\DELIMaLauncher-Setup-2.0.0.exe"    # after §5
-
-signtool verify /pa /v dist\DELIMaLauncher-Setup-2.0.0.exe
-```
-
-**`/tr` (timestamp) is not optional.** Without it, every distributed copy stops validating the day the certificate expires — including installers already on coordinators' desks. With it, the signature stays valid because it proves the code was signed while the certificate was live. This is the most common code-signing mistake and it surfaces a year later, when every school has to re-download.
-
-**Do not self-sign and ask schools to trust the certificate.** It is tempting and it is worse than shipping unsigned: it trains an ICT coordinator to install an unknown root or publisher certificate on lab machines, which is a habit with much larger consequences than this application. Unsigned is the honest state; a self-signed certificate only dresses it up.
-
----
+Signing is worth real effort to avoid landing here.
 
 ## 5. The installer
 
@@ -288,12 +296,14 @@ Get-FileHash dist\DELIMaLauncher-Setup-2.0.0.exe -Algorithm SHA256 |
   Out-File dist\DELIMaLauncher-2.0.0-checksums.txt -Encoding ascii
 ```
 
-**Because releases are unsigned (§4), this checksum is the only integrity control the product has.** Publish it through a channel separate from the installer — a message to the coordinator, the school's own site, a printed line on the handover sheet. A hash file sitting on the same pendrive as the installer proves nothing, since anyone who can replace one can replace both.
+**Hash the *signed* installer, not the one that went to SignPath.** Signing rewrites the file, so a checksum taken before signing describes something no school will ever download. This is step 8 of the pipeline (§4.4) for that reason.
+
+The signature is the primary integrity control; the checksum is a second, independent one that does not depend on Windows trusting a certificate chain. Publish it on the release page alongside the download — with a signature present, co-location is acceptable, since the two controls fail independently.
 
 **Release contents** (PRD §8.6):
 
 ```
-DELIMaLauncher-Setup-2.0.0.exe          signed installer
+DELIMaLauncher-Setup-2.0.0.exe          signed installer (SignPath, §4)
 DELIMaLauncher-2.0.0-checksums.txt      SHA-256
 DELIMaLauncher-2.0.0-fx-dependent.zip   secondary, needs .NET 10 installed
 Panduan_Pemasangan.pdf                  BM install guide, screenshots, 10 pages
@@ -311,8 +321,8 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 
 | # | Check | Why |
 | :-- | :--- | :--- |
-| 1 | `git status --short` empty, on a tag | Reproducibility |
-| 2 | Checksum generated and recorded **outside** the release folder | Unsigned, this is the only integrity control (§4.3) |
+| 1 | Release was produced by the tagged CI run, not a local build | SignPath will not sign anything else (§4.2) |
+| 2 | `signtool verify /pa` passes on the downloaded installer | Confirms the signature survived the release pipeline |
 | 3 | Installer runs on a **clean** Win10 1809 VM with no .NET installed | The entire reason for self-contained |
 | 4 | Launcher opens, class + name screens render, fonts embedded correctly | Single-file resource loading fails here first |
 | 5 | Admin opens, imports `contoh_roster.csv` end to end | Import is the feature schools adopt on |
@@ -321,8 +331,9 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 | 8 | Uninstall; confirm the store is removed only on confirmation | Audit log may be required evidence |
 | 9 | A pupil-account user cannot read `%ProgramData%\DELIMa Launcher` | The ACL in §5 |
 | 10 | Injection still passes on lab hardware, ≥ 50 runs | Never regress T0.3 |
-| 11 | Install **from a FAT32/exFAT pendrive**, not the build folder — confirm no SmartScreen dialog | The unsigned path depends on this, and NTFS sticks break it (§4.1) |
-| 12 | Scan the installer with the antivirus the target schools actually run | Unsigned single-file exes draw false positives (§4.2) |
+| 11 | **Download the installer from the release page** and install from there | The real path a school takes; catches Mark-of-the-Web and signature problems together (§4.1) |
+| 12 | Scan the installer with the antivirus the target schools actually run | Self-contained single-file exes draw false positives even signed (§4.5) |
+| 13 | Release page carries the T0.1 responsibility statement | PRD §8.5 — the duty-shift only works if it is actually there |
 
 **Checks 3 and 10 need real hardware or a real VM.** Both have already bitten this project once — the .NET runtime assumption and the injection behaviour are exactly where a developer machine lies to you (arch §11: *never on a developer machine, never over RDP*).
 
@@ -334,18 +345,27 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 | :--- | :--- | :--- |
 | `MissingMethodException` / XAML fails at runtime, fine in Debug | Trimming enabled | `PublishTrimmed=false`, §3 |
 | `.dll` files appear beside the exe after single-file publish | Missing self-extract flag | `IncludeNativeLibrariesForSelfExtract=true` |
-| Publish fails on macOS/Linux with WPF targets missing | Wrong OS | Build on Windows, §1 |
-| SmartScreen warns on an unsigned build | It arrived with Mark-of-the-Web — downloaded, emailed, or copied from an untrusted share | Deliver by pendrive instead, §4.1 |
-| UAC prompt is amber, says "Unknown Publisher" | No signature | Expected and unavoidable; show it in the install guide, §4.2 |
-| Antivirus quarantines the installer at a school | Unsigned self-contained single-file exe | Submit as a false positive to the vendor; do **not** tell schools to add exclusions, §4.2 |
+| Publish fails on macOS/Linux with WPF targets missing | Wrong OS | Local testing needs Windows; releases build on CI, §1 |
+| SignPath refuses to sign the artefact | Build did not come from the trusted build system, or a setting was overridden in the CI job | Origin verification, §4.2 |
+| SmartScreen still warns after signing | Certificate reputation not yet established | Normal for the first weeks; it accrues to the certificate and does not reset per release, §4.1 |
+| UAC prompt is amber, says "Unknown Publisher" | The installer was not signed, or signing ran before packaging | Sign the payload exes first, then the installer, §4.4 |
+| Antivirus quarantines the installer at a school | Self-contained single-file exe, heuristics | Report as a false positive to the vendor; do **not** tell schools to add exclusions, §4.5 |
 | Upgrade creates a second entry in Programs & Features | `AppId` changed | Restore the original GUID, §5 |
 | App starts, no theme, default fonts | Embedded resource pack URI wrong under single-file | Arch §6.2/§6.5 |
 | `MSB1011: more than one project` | Building a folder, not a `.csproj` | Give the full `.csproj` path, as in §3 |
 
 ---
 
-## 9. What this document does not authorise
+## 9. The T0.1 obligation on every release
 
-Building an installer is not permission to distribute one. **T0.1 — the written MOE/BSTP position on storing and replaying pupil passwords — remains open** (PRD §2.1, README). A signed installer sent to a second school before that answer exists moves a policy question the project has not resolved onto schools who don't know they're being asked it.
+**T0.1 — a written MOE/BSTP position on storing and replaying pupil passwords — remains unanswered** (PRD §2.1, README). The project has chosen to publish anyway, and to place the policy responsibility explicitly on each downloading school (PRD §8.5).
 
-Build it, test it, keep it internal. Ship it when T0.1 says you may.
+That choice only works if the statement is actually in front of people. **Three placements are required on every release, and check 13 in §7 exists to enforce the first:**
+
+1. **The release page** — above the download link, not below it.
+2. **The installer's licence page** — which the coordinator must scroll and accept.
+3. **`Delima.Admin` first run** — before Step 1 of the wizard, requiring acknowledgement.
+
+Publishing without these is not the decision that was made; it is a different and worse one.
+
+Be clear-eyed about what the duty-shift achieves: it makes the responsibility explicit and documented, which is worth real something. It does not make the underlying question answered, and a school that clicks through has still not consulted anyone. **Getting T0.1 answered remains the better outcome** and is still worth pursuing in parallel — it is the difference between schools being told they are responsible and schools being told it is permitted.
