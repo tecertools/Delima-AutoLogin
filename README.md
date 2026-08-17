@@ -32,6 +32,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── Technical_Architecture_Visual_SSO.md
 │   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
 │   ├── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
+│   ├── AI_Build_Guide.md           ← start building here (novice walkthrough)
+│   ├── Build_Prompts.md            Ready-to-paste prompts for an AI coding assistant
 │   ├── Build_Machine_Setup.md      Set up a Windows PC to compile the release
 │   ├── Build_And_Release.md        Publish flags, Inno Setup script, signing, checklist
 │   └── mockups/
@@ -60,7 +62,7 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 ## Next step
 
-**Start building.** `Delima.Core` — the credential store, crypto and tamper tests (arch §12 step 3), then the roster model (step 4). Neither is blocked, and both build and unit-test on macOS or Linux: arch §2 keeps `Delima.Core` free of any Win32 or UI reference precisely so it can. Windows is first needed at step 8.
+**Start building** — `Visual_SSO/AI_Build_Guide.md` is the walkthrough, `Visual_SSO/Build_Prompts.md` the prompts. First target is `Delima.Core`: the credential store, crypto and tamper tests (arch §12 step 3), then the roster model (step 4). Neither is blocked, and both build and unit-test on macOS or Linux — arch §2 keeps `Delima.Core` free of any Win32 or UI reference precisely so it can. Windows is first needed at step 8.
 
 **Do T0.2 in parallel.** It needs one real pupil account and an afternoon, and leaving it undone is the kind of thing that stalls step 11 for no reason.
 
