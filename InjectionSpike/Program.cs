@@ -69,6 +69,19 @@ internal static class Program
             return 2;
         }
         Console.WriteLine($"Chrome: {chromePath}");
+
+        // A run started after any interrupted/crashed earlier attempt can find
+        // a leftover "SPIKE:*" window still open. WaitForForegroundWindow would
+        // then latch onto that stale window instead of the fresh one, producing
+        // exactly what a real session showed: ~45% NO_VERDICT_TIMEOUT and one
+        // run with a 15s "ready" time versus ~650ms for the rest. Clear the
+        // slate before every batch.
+        var stale = NativeMethods.CloseWindowsWithTitlePrefix("SPIKE:");
+        if (stale > 0)
+        {
+            Console.WriteLine($"Closed {stale} leftover SPIKE window(s) from an earlier run.");
+            Thread.Sleep(500);
+        }
         Console.WriteLine();
 
         return mode switch

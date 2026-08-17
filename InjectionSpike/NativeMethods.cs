@@ -26,6 +26,56 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool BlockInput([MarshalAs(UnmanagedType.Bool)] bool fBlockIt);
 
+    // ---------- Stale-window cleanup ----------
+    //
+    // WaitForForegroundWindow identifies "the right window" purely by title
+    // prefix ("SPIKE:") and class. If an earlier run was interrupted -- Ctrl+C,
+    // a crash, a debugging session where the test was stopped mid-flight -- its
+    // Chrome window can still be sitting open, title unchanged. The next run's
+    // wait can then grab that leftover window instead of the one it just
+    // launched, inject into the wrong place, and poll a title that never moves.
+    // A run started right after a troubleshooting-heavy session is exactly
+    // where this bites: NO_VERDICT_TIMEOUT on roughly half the runs, plus one
+    // run with a 15-second "ready" time versus ~650ms for the rest, is the
+    // signature of stale windows competing for foreground focus.
+
+    private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    private const uint WM_CLOSE = 0x0010;
+
+    /// <summary>
+    /// Closes every visible top-level window whose title starts with
+    /// <paramref name="titlePrefix"/>. Call once, before a test batch starts,
+    /// so a prior interrupted run cannot be mistaken for the current one.
+    /// Returns how many windows were asked to close.
+    /// </summary>
+    internal static int CloseWindowsWithTitlePrefix(string titlePrefix)
+    {
+        var closed = 0;
+        EnumWindows((hWnd, _) =>
+        {
+            if (!IsWindowVisible(hWnd)) return true;
+            var title = GetTitle(hWnd);
+            if (title.StartsWith(titlePrefix, StringComparison.Ordinal))
+            {
+                PostMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                closed++;
+            }
+            return true; // keep enumerating
+        }, IntPtr.Zero);
+        return closed;
+    }
+
     internal static string GetForegroundClassName()
     {
         var hWnd = GetForegroundWindow();
