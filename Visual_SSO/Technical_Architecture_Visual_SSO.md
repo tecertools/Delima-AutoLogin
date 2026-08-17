@@ -20,6 +20,23 @@ Two decisions frame the rest:
 - **No network service exists.** The application makes exactly one class of outbound connection: launching Chrome at a Google URL. It has no listening ports, no API client, no telemetry, and no update check. This is what makes a multi-school deployment defensible.
 - **The InjectionSpike code is the seed of the engine, not a throwaway.** `ChromeLauncher.cs` (path resolution, throwaway profile, scoped teardown) and `NativeMethods.cs` (`SendInput` with `KEYEVENTF_UNICODE`, foreground-window inspection, `BlockInput`) already implement the hard parts correctly and should be promoted into the production assembly rather than rewritten. **They have never been compiled** (`../InjectionSpike/README.md`), so budget a day for P/Invoke trivia first.
 
+### 1.1 Why not Electron, Tauri, or another web-UI stack
+
+Considered and rejected, August 2026. Recorded here because it is a reasonable question that will be asked again.
+
+**It would invalidate T0.3.** The 100/100 result was obtained with `SendInput` called from C#. A web-UI stack reaches that API through an FFI layer, marshalling a union-containing `INPUT` struct array by hand — a change to the exact mechanism the product's viability rests on. The full 50-run protocol would have to be re-run to know where the project stood, discarding the only completed de-risking task.
+
+**The hard parts are all Win32, so the UI framework buys nothing where the risk is.** Window verification before injection, the topmost overlay (required, not optional — §4.2), the low-level keyboard hook, scoped process-tree teardown, and DPAPI at `LocalMachine` scope all need native interop regardless. Electron's `safeStorage` is unusable here on two counts: it is *user*-scoped, where this store must be per-machine (§3.3), and it uses AES-128-CBC rather than the AES-256-GCM specified in §3.2. The crypto would go through FFI too.
+
+**Resource cost on the target hardware.** These are 20–40 lab PCs, some with 4 GB RAM and spinning disks. Electron means running a Chromium instance in order to launch a second Chromium instance, and cold-start latency is a real product concern when a seven-year-old is watching a blank screen — the reason §3 of `Build_And_Release.md` enables ReadyToRun.
+
+**Two arguments that do not survive contact:**
+
+- *"A standalone app avoids needing a certificate."* It does not. Windows evaluates the file, not the framework that produced it. An unsigned Electron `.exe` downloaded from a release page carries Mark-of-the-Web, trips SmartScreen, and shows the same "Unknown Publisher" elevation prompt as an unsigned .NET one. No framework ships pre-trusted.
+- *"It avoids a runtime install."* Already solved. The self-contained single-file build (PRD §8.2) runs on a lab PC with no .NET present, which is precisely why it is 80–110 MB.
+
+**What is genuinely lost by this decision:** the HTML mockups in `mockups/` do not become the shipping UI and must be re-implemented in XAML — a few days, once. **If a web UI is ever revisited, Tauri is the better candidate** (system WebView2, a fraction of the footprint, Rust backend), but it carries the same T0.3 re-run cost.
+
 ---
 
 ## 2. Solution layout
