@@ -153,6 +153,133 @@ The point of this one is to stop the assistant "fixing" a failing test by weaken
 
 ---
 
+# Phase 2 — Windows
+
+Everything above builds on any machine. Everything below needs Windows (`Build_Machine_Setup.md`, Parts 0–4 — **skip Parts 5 and 6**, they are the optional signing steps and signing happens in CI).
+
+---
+
+## Prompt 4b — Extract `Delima.Import` (do this on the Mac, before switching)
+
+> Extract the roster importer out of `src/Delima.Admin` into its own project, `src/Delima.Import`, targeting `net10.0`.
+>
+> Reason: `Delima.Admin` becomes a WPF application shortly, which forces it to `net10.0-windows`. If the importer stays inside it, `Delima.Import.Tests` can no longer run on macOS or Linux, and the importer is the component whose fixtures need the most iteration. The test project is already named `Delima.Import.Tests`, which matches this split.
+>
+> - Move `Import/` — `ColumnMapping`, `DataFileReader`, `FileEncodingDetector`, `ImportModels`, `RosterImporter` — into `Delima.Import`
+> - `Delima.Import` references `Delima.Core` only; no Windows-only or UI packages
+> - `Delima.Admin` references `Delima.Import`
+> - Repoint `Delima.Import.Tests` at the new project
+>
+> Run `dotnet test`. The same tests must pass, with the same count, before and after. Show me both numbers.
+
+Cheap now — five files. Expensive once WPF is in the way.
+
+---
+
+## Prompt 5 — Verify the Windows environment
+
+> This repository was developed on macOS. I have moved to a Windows machine. Before writing anything new, confirm the existing work still builds and passes here.
+>
+> Run `dotnet build` and `dotnet test`, and show me the full output. Report the test count and compare it to what the repository's last commit message claims. If anything fails, diagnose it before changing it — a test that passes on macOS and fails on Windows is telling us something real about the code, usually line endings, path separators, or culture-sensitive string comparison.
+
+Do this **before** the first Windows-only line of code. If something is broken you want to know it was the platform, not the new work.
+
+---
+
+## Prompt 6 — `Delima.Win32` (build step 8)
+
+The highest-confidence work in the project: most of it already exists and has been proven on real hardware.
+
+> Create `src/Delima.Win32`, targeting `net10.0-windows`, per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §2 and §4.
+>
+> **Promote, do not rewrite.** `InjectionSpike/NativeMethods.cs` and `InjectionSpike/ChromeLauncher.cs` already implement the hard parts correctly and passed T0.3 at 100/100 on real lab hardware (`Visual_SSO/T0.3_Injection_Test_Protocol.md`). Move them in and tidy them; do not reimplement them. If you think something in them is wrong, tell me before changing it — that code is the only part of this project with real-world evidence behind it.
+>
+> Then add what the spike did not have, per §4.2:
+>
+> - **Window verification before every keystroke.** Poll the foreground window's class and title and confirm it is the expected Chrome window. §4.2 is explicit that zero keystrokes may be sent if verification fails.
+> - **An abort path** that sends nothing and returns a failure code from the taxonomy in §7.
+> - **The topmost overlay**, which §4.2 marks as required rather than optional — T0.3 found `BlockInput` is consistently denied to non-elevated processes on lab PCs, so the overlay is the actual defence, not a fallback.
+>
+> `Delima.Win32` may reference `Delima.Core`. `Delima.Core` must never reference `Delima.Win32`.
+>
+> Do not wire this to any UI yet.
+
+---
+
+## Prompt 7 — The per-PC DPAPI store
+
+This completes build step 3, which was deliberately left half-done because it cannot work off Windows.
+
+> Implement the per-PC credential store described in `Visual_SSO/Technical_Architecture_Visual_SSO.md` §3.3 and §3.5, against the `ICredentialStore` interface already in `Delima.Core`.
+>
+> **Put the implementation in `Delima.Win32`, not `Delima.Core`.** DPAPI is Windows-only, and `Delima.Core` must stay cross-platform (§2). Tell me if you disagree before moving anything.
+>
+> Requirements:
+>
+> - `ProtectedData` with **`LocalMachine` scope**, plus entropy — not `CurrentUser`. §3.3 requires any pupil account on the PC to be able to read it; a user-scoped store would give every Windows profile its own broken copy.
+> - The file location and ACLs from §3.5
+> - The decryption discipline from §3.4 — plaintext must not linger
+>
+> §3.3 states plainly what this does and does not protect against. Read it, then write me one paragraph in your own words on what an attacker with an interactive lab session can still do. If your answer is more reassuring than §3.3 is, you have misread it.
+
+---
+
+## Prompt 8 — `Delima.Provision` (build step 7)
+
+> Implement `src/Delima.Provision` per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §10 — the seven numbered steps are the specification.
+>
+> It must work as a single self-contained executable run from a pendrive on each lab PC, so keep it dependency-light.
+>
+> Include the silent mode: `--quiet --pack <path> --passphrase-stdin`. **The passphrase is read from stdin and must never appear in a command line or a process list** — that is the entire point of the flag. Exit 0 on success, non-zero on failure, so PDQ or GPO can drive 40 PCs from one prompt.
+
+---
+
+## Prompt 9 — Launcher shell and the first two screens (build step 9)
+
+> Create `src/Delima.Launcher`, a WPF application targeting `net10.0-windows`, and implement the **Pilih Kelas** and **Cari Nama** screens.
+>
+> Read first, in this order: `Visual_SSO/Technical_Architecture_Visual_SSO.md` §6.1–6.7, `Visual_SSO/PRD_Visual_SSO_v2.md` §7, and `Normal_SSO/stitch-wireframes/PROMPT.txt`. `Visual_SSO/mockups/DELIMa_Screen_Mockups.html` shows the intended result — treat it as a visual reference to reproduce in XAML, not as code to port.
+>
+> Binding constraints from those documents:
+>
+> - **No third-party UI kit** (§6.1). Retemplate native controls.
+> - **Theming is runtime data, not compiled resources** (§6.2) — colours come from the school's config.
+> - **The name grid column count is computed in the ViewModel** and bound to a `UniformGrid` (§6.3); it must handle a 44-pupil class at 1366×768.
+> - **Fonts are embedded** via pack URIs (§6.5). Nunito and Baloo 2, both OFL-1.1.
+> - **Accessibility is binding** (§6.7): `AutomationProperties.Name` in Bahasa Melayu on every interactive element, tab order matching visual order, ≥48×48 px targets, 4.5:1 contrast.
+> - **All pupil-facing text in Bahasa Melayu**, and the forbidden vocabulary list in PRD §7 applies — *SSO, portal, autentikasi, sesi, log masuk tunggal* must never appear.
+>
+> Use the roster model and display-name logic already in `Delima.Core`. Do not reimplement them.
+
+---
+
+## Prompt 10 — Picture password (build step 10)
+
+> Implement the picture-password screen per `Visual_SSO/PRD_Visual_SSO_v2.md` §7.3 and the security requirements in `Visual_SSO/Technical_Architecture_Visual_SSO.md`.
+>
+> Two requirements that are easy to get wrong and matter more than they look:
+>
+> - **The shuffle must not animate** (§6.6). Animation leaks position information and makes the layout predictable to an observer. This is deliberate; do not add motion here for polish.
+> - **Lock out after 5 failed attempts**, and verify with Argon2id.
+>
+> This screen is what closes blocker B1 — a pupil signing in as a classmate — which was v1's largest defect. Treat it accordingly.
+
+---
+
+## Prompt 11 — Injection flow (build step 11) — **blocked on T0.2**
+
+**Do not run this prompt until T0.2 is answered.** It needs the confirmed live SSO entry URL and whether `login_hint` is honoured. Building against a placeholder means rebuilding.
+
+> Wire the injection flow per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.4, §4.5 and §7, using `Delima.Win32` from Prompt 6.
+>
+> The confirmed handoff URL from T0.2 is: `[paste it here]`
+>
+> Every failure mode in §7's taxonomy needs a code and a Bahasa Melayu message a seven-year-old can act on. Implement the floating reset bar from PRD §7.4.
+>
+> Then write the adversarial test from §11: launch, steal focus at 500, 1000, 2000 and 4000 ms, and **assert that zero keystrokes are sent**. §11 calls this the test that matters most — it is what proves a child's password is never typed into the wrong window. It must run on real lab hardware, never on a developer machine and never over RDP.
+
+---
+
 ## Constraints to repeat when the assistant drifts
 
 Paste any of these when you see the relevant mistake:
@@ -173,10 +300,10 @@ These depend on work not done, or on decisions not made. Asking early produces c
 
 | Not yet | Why | Unblocked by |
 | :--- | :--- | :--- |
-| `Delima.Win32`, injection engine | Needs a Windows machine | Build step 8 |
-| Any WPF screen | Needs Windows; needs the roster model first | Steps 4, then 9 |
-| The injection flow | Needs the confirmed live SSO URL | **T0.2** |
+| The injection flow (Prompt 11) | Needs the confirmed live SSO URL | **T0.2** |
+| Audit log, Mod Guru, kiosk hardening | Need the injection flow working first | Steps 12–14 |
 | The Inno Setup script | It is already written out in `Build_And_Release.md` §5 — copy it, don't generate it | Step 15 |
 | The GitHub Actions workflow | Needed only for the first release | Step 15 |
+| The SignPath application | The Foundation requires the project already be released in the form to be signed | One unsigned release |
 
-**T0.2 is the one to start in parallel** — one real pupil account, an afternoon, and it blocks step 11.
+**T0.2 is the one to do now** — one real pupil account, an afternoon, and it is the only thing standing between you and Prompt 11. If you are travelling to a school for a Windows machine anyway, do both on the same trip.
