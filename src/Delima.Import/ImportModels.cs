@@ -1,7 +1,7 @@
 using System.Text;
 using Delima.Core.Roster;
 
-namespace Delima.Admin.Import;
+namespace Delima.Import;
 
 public enum TargetField
 {

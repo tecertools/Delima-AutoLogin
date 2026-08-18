@@ -1,7 +1,7 @@
 using System.Text;
 using UtfUnknown;
 
-namespace Delima.Admin.Import;
+namespace Delima.Import;
 
 /// <summary>
 /// Detects text file encoding (BOM sniffer, null-byte UTF-16 heuristics, and UTF.Unknown).

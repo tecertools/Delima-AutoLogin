@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Delima.Core.Roster;
 
-namespace Delima.Admin.Import;
+namespace Delima.Import;
 
 /// <summary>
 /// Implements APDM roster import, column mapping validation, dry-run analysis, and idempotent roster updates.

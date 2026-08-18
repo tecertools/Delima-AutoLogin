@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delima.Admin", "src\Delima.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delima.Import.Tests", "tests\Delima.Import.Tests\Delima.Import.Tests.csproj", "{E4BD4725-CD76-4008-A9A1-B1EAB28ACAE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delima.Import", "src\Delima.Import\Delima.Import.csproj", "{B6495DFA-AE90-4D62-BC69-CF32EC39C691}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,18 @@ Global
 		{E4BD4725-CD76-4008-A9A1-B1EAB28ACAE3}.Release|x64.Build.0 = Release|Any CPU
 		{E4BD4725-CD76-4008-A9A1-B1EAB28ACAE3}.Release|x86.ActiveCfg = Release|Any CPU
 		{E4BD4725-CD76-4008-A9A1-B1EAB28ACAE3}.Release|x86.Build.0 = Release|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Debug|x64.Build.0 = Debug|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Debug|x86.Build.0 = Debug|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Release|x64.ActiveCfg = Release|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Release|x64.Build.0 = Release|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Release|x86.ActiveCfg = Release|Any CPU
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +96,6 @@ Global
 		{12B74412-1E4E-42D9-BC2F-1716E6D00D7C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{B31EA338-9414-4012-BD86-7B92019AC501} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{E4BD4725-CD76-4008-A9A1-B1EAB28ACAE3} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{B6495DFA-AE90-4D62-BC69-CF32EC39C691} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

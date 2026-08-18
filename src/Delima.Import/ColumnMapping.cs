@@ -1,4 +1,4 @@
-namespace Delima.Admin.Import;
+namespace Delima.Import;
 
 /// <summary>
 /// Defines mapping from source spreadsheet/CSV column headers to target domain fields.

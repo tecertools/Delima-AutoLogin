@@ -5,7 +5,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using ExcelDataReader;
 
-namespace Delima.Admin.Import;
+namespace Delima.Import;
 
 /// <summary>
 /// Reads tabular data from CSV, TSV, XLSX, and XLS files.

@@ -42,7 +42,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │
 ├── src/                            Application code
 │   ├── Delima.Core/                Crypto, credential store, roster, display names — cross-platform
-│   └── Delima.Admin/               Roster importer (WPF wizard not yet built)
+│   ├── Delima.Import/              Roster importer (APDM parsing, dry run) — cross-platform
+│   └── Delima.Admin/               WPF wizard (not yet built)
 │
 ├── tests/                          xUnit — Delima.Core.Tests, Delima.Import.Tests
 │

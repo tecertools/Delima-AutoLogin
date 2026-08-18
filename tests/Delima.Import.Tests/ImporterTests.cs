@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Text;
-using Delima.Admin.Import;
+using Delima.Import;
 using Delima.Core.Roster;
 using Xunit;
 using Xunit.Abstractions;
