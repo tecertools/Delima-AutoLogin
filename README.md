@@ -11,7 +11,7 @@ They differ in one decision — **whether the software handles the pupil's passw
 | Stores passwords | **No** | Yes, encrypted, locally |
 | Google ToS / MOE policy | Ordinary link, no gate | **Needs written sign-off** |
 | Effort | Weeks | Months |
-| Status | Specified, not built | Specified; **T0.3 passed 17 Aug 2026**, not built |
+| Status | Specified, not built | **In build.** T0.3 passed 17 Aug 2026; `Delima.Core` and the importer built and tested |
 
 If only one ships, it should be Normal SSO. It is the smaller product with most of the benefit and none of the policy risk.
 
@@ -40,6 +40,12 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │       ├── DELIMa_Screen_Mockups.html         Launcher (pupil-facing), all 8 screens
 │       └── DELIMa_Admin_Wizard_Mockups.html   Admin Wizard (ICT coordinator), all 7 steps
 │
+├── src/                            Application code
+│   ├── Delima.Core/                Crypto, credential store, roster, display names — cross-platform
+│   └── Delima.Admin/               Roster importer (WPF wizard not yet built)
+│
+├── tests/                          xUnit — Delima.Core.Tests, Delima.Import.Tests
+│
 ├── InjectionSpike/                 T0.3 harness — PASSED, 17 Aug 2026 (see Visual_SSO/T0.3_Injection_Test_Protocol.md)
 │
 ├── spike-results/                  T0.3 evidence — 4 CSVs from real lab hardware
@@ -51,7 +57,9 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 ## Where things actually stand
 
-**No application code exists yet.** The only C# in the repository is `InjectionSpike/` — the console test harness that measures whether password injection works. It has been compiled and run on real lab hardware.
+**The cross-platform half of the application is built and tested.** `Delima.Core` (credential store, Argon2id/AES-256-GCM crypto, roster model, display names) and the roster importer compile and pass tests on macOS, Linux and Windows — arch §2 keeps them free of any Win32 or UI reference precisely so they can. `InjectionSpike/` remains as the T0.3 harness.
+
+**Not built yet:** `Delima.Win32` (build step 8), the WPF Launcher and Admin UIs (steps 9–13), kiosk hardening (14) and the installer (15). All of those need Windows.
 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
@@ -86,6 +94,6 @@ All pupil-facing text is Bahasa Melayu. Specification documents are in English. 
 
 ## Licence
 
-**Open source, OSI-approved — GPL-3.0 recommended.** See `Visual_SSO/PRD_Visual_SSO_v2.md` §8.5 for the reasoning. Briefly: the software is given away free, so there is no revenue to protect; an open licence is what makes free code signing available; and copyleft means a fork that weakens the credential store or drops the picture-password requirement has to publish its source, which keeps the difference visible.
+**GPL-3.0** — see `LICENSE`, and `Visual_SSO/PRD_Visual_SSO_v2.md` §8.5 for the reasoning. Briefly: the software is given away free, so there is no revenue to protect; an open licence is what makes free code signing available; and copyleft means a fork that weakens the credential store or drops the picture-password requirement has to publish its source, which keeps the difference visible.
 
-The `LICENSE` file is not yet in the repository. Add it before the first public release, along with the T0.1 responsibility statement (PRD §8.7).
+Still outstanding before the first public release: the T0.1 responsibility statement (PRD §8.7) on the release page, the installer licence page, and `Delima.Admin` first run.
