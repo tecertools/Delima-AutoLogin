@@ -1,0 +1,26 @@
+BIL,NAMA MURID,NO. KAD PENGENALAN / SURAT BERANAK,TAHUN,KELAS,ID PENGGUNA DELIMA,CATATAN
+1,Muhammad Danial Bin Rahim,170101-10-1234,2,2 Cemerlang,m-12345678,Aktif
+2,Nur Aishah Binti Ahmad,170202-10-2345,2,2 Cemerlang,12345679,Aktif
+3,Tan Wei Ming,170303-10-3456,2,2 Cemerlang,m-12345680@moe-dl.edu.my,Aktif
+4,Arjun A/L Kumaran,170404-10-4567,2,2 Cemerlang,M-12345681,Aktif
+5,Nurul A'in Binti Dato' Yusof,170505-10-5678,2,2 Cemerlang,m-12345682,Aktif
+6,Chong Mei Ling,170606-10-6789,2,2 Cemerlang,m-12345683,Aktif
+7,Kavitha D/O Rajan,170707-10-7890,2,2 Cemerlang,m-12345684,Aktif
+8,Wan Nurul Ain Binti Wan Zulkifli,170808-10-8901,2,2 Cemerlang,m-12345685,Aktif
+9,Lee Jia Jun,170909-10-9012,2,2 Cemerlang,m-12345686,Aktif
+10,Dayang Anak Libau,171010-10-0123,2,2 Cemerlang,m-12345687,Aktif
+11,Muhammad Danial Bin Rahim,170101-10-1234,2,2 Cemerlang,m-12345678,DUPLICATE
+12,Murid ID Lima Digit,171111-10-1234,2,2 Cemerlang,m-12345,MALFORMED
+13,Murid ID Huruf,171212-10-2345,2,2 Cemerlang,m-abcdefgh,MALFORMED
+14,,171313-10-3456,2,2 Cemerlang,m-12345688,TIADA NAMA
+15,Murid Tiada Kelas,171414-10-4567,2,,m-12345689,TIADA KELAS
+16,Murid Tiada ID,171515-10-5678,2,2 Cemerlang,,TIADA ID
+17,Murid Kelas Tidak Dikenal,171616-10-6789,0,Amamah Cemerlang,m-12345690,KELAS TIDAK DIKENAL
+
+ , , , , , , 
+
+18,Muhammad Haziq Bin Osman,160101-10-1234,3,3 Amanah,m-20000001,Aktif
+19,Siti Nurhaliza Bt Tarudin,160202-10-2345,3,3 Amanah,m-20000002,Aktif
+20,Ravi S/O Mohan,160303-10-3456,3,3 Amanah,m-20000003,Aktif
+21,Ng Kai Xuan,160404-10-4567,3,3 Amanah,m-20000004,Aktif
+22,Farah Bte Yusof,160505-10-5678,3,3 Amanah,m-20000005,Aktif
