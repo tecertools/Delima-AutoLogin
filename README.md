@@ -67,7 +67,7 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 - **T0.3** — run the injection spike, 50 runs, on representative lab hardware. **Passed, 17 August 2026.** `SendInput` scored 100/100 across two independent 50-run batches on real lab hardware; the `SendKeys` control failed exactly as predicted. Full results in `Visual_SSO/T0.3_Injection_Test_Protocol.md`.
 - **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started, and no longer a blocker.** Requirement G-1 was consciously relaxed: the project publishes without it and places the responsibility on each downloading school instead, via the statement specified in PRD §8.7. Still worth pursuing — see below.
-- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Not started. The only remaining blocker**, and a cheap one: about an hour with one account you control. Procedure in `Visual_SSO/T0.2_URL_Confirmation.md`. Blocks build step 11.
+- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Partly answered, Aug 2026.** DELIMa signs in via Google OAuth 2.0 using its own Cloud project, which confirms arch §4.5's assumption and removes the cost that made the `login_hint` route look expensive. Still open: whether any pre-fill route works, and the password-screen window title that arch §4.2 verifies against. About an hour with one account you control — `Visual_SSO/T0.2_URL_Confirmation.md`. Blocks build step 11.
 
 **Nothing blocks starting.** T0.3 answered the question the programme was contingent on. T0.1 has been routed around deliberately (PRD §2.2), and T0.2 doesn't bite until step 11.
 

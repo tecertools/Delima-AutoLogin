@@ -274,15 +274,31 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 
 ### 4.5 The handoff URL
 
-v1's `AccountChooser?Email=` is legacy and contradicts v1's own §2, which specifies `login_hint`. Resolve by **T0.2, against the live portal**, before writing this code. Both candidates:
+**Partially resolved by T0.2 observation, August 2026.** See `T0.2_URL_Confirmation.md` for the full record and the tests still outstanding.
+
+**Confirmed: DELIMa signs in via Google OAuth 2.0.** The live flow is an authorization-code flow — `flowName=GeneralOAuthFlow`, `response_type=code`, `scope=openid email profile` — redirecting to `https://d3.delima.edu.my/authentication/code`. The assumption underlying this whole section holds.
+
+**DELIMa operates its own Google Cloud project.** The observed `client_id` is DELIMa's, not a school's. **This voids the "needs a school Cloud project" caveat previously attached to the `login_hint` candidate** — no Cloud project has to be created or funded by anyone here. (An OAuth `client_id` is not a secret; it appears in every authorize URL every user sees. The *client secret* is DELIMa's alone and must never appear in this repository or in any bundle.)
+
+**The obstacle, which was not anticipated: `state`.** The authorize URL carries a `state` parameter that DELIMa's server generates per session and validates on callback — ordinary CSRF protection. The launcher therefore **cannot construct its own authorize URL** with `login_hint` appended: a self-generated `state` fails validation and the pupil ends up signed into Google but not into DELIMa. The same applies to the session-bound `dsh` and `as` parameters.
+
+This rules out the naive form of the second candidate. Three routes remain, in order of preference:
 
 ```
-# Account chooser (Normal_SSO §5.2, in use today)
-https://accounts.google.com/AccountChooser?Email=<email>&hd=<domain>&continue=<dest>
+# A. login_hint passed through DELIMa's own login initiation — TEST THIS FIRST
+https://d3.delima.edu.my/landing?login_hint=<email>          (or whatever DELIMa's auth-start path is)
 
-# OAuth 2.0 login_hint (documented, needs a school Cloud project)
-https://accounts.google.com/o/oauth2/v2/auth?...&login_hint=<email>&hd=<domain>&prompt=login
+# B. Account chooser first, then let DELIMa start its own flow against the
+#    now-signed-in Google session (Normal_SSO §5.2's mechanism, indirectly)
+https://accounts.google.com/AccountChooser?Email=<email>&hd=<domain>&continue=https://d3.delima.edu.my/landing
+
+# C. No pre-fill. Land on the identifier page, inject the email, then the password.
+#    Two injections instead of one. Proven viable by T0.3.
 ```
+
+**Route C is the floor, and it is an acceptable floor.** Unlike `Normal_SSO` — where the pre-fill *is* the product — this application types the email itself, so a missing hint costs an extra injection step and extra failure modes, not the product's value. Design §4.2's engine to handle a two-step sequence regardless, since even route A may degrade to C when Google changes something.
+
+**Do not build on a missing `state` check.** If constructing an authorize URL with an invented `state` happens to work, that means DELIMa is not validating it — a CSRF weakness in someone else's system, which may be fixed without warning and should not be a dependency of this product. If it is observed, report it to BSTP rather than exploit it.
 
 Destination URLs are **configuration, not code** (§3.2 `config.destinations`), so a Google change is a bundle rebuild rather than a release.
 
