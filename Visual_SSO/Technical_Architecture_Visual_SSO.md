@@ -280,6 +280,8 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 
 **DELIMa operates its own Google Cloud project.** The observed `client_id` is DELIMa's, not a school's. **This voids the "needs a school Cloud project" caveat previously attached to the `login_hint` candidate** — no Cloud project has to be created or funded by anyone here. (An OAuth `client_id` is not a secret; it appears in every authorize URL every user sees. The *client secret* is DELIMa's alone and must never appear in this repository or in any bundle.)
 
+**The authorize request DELIMa builds** carries five parameters only — `scope=openid email profile`, `state`, `response_type=code`, `redirect_uri=https://d3.delima.edu.my/authentication/code`, `client_id`. **Neither `login_hint` nor `hd` is sent today.** Two consequences: that request is the place to observe whether a forwarded hint arrives (T0.2 test 3A), and because `hd` is absent, Google's account picker may offer a personal account alongside the school one where a signed-in profile exists — irrelevant on the throwaway profile §4.4 mandates, but relevant to anyone testing on their own machine.
+
 **The obstacle, which was not anticipated: `state`.** The authorize URL carries a `state` parameter that DELIMa's server generates per session and validates on callback — ordinary CSRF protection. The launcher therefore **cannot construct its own authorize URL** with `login_hint` appended: a self-generated `state` fails validation and the pupil ends up signed into Google but not into DELIMa. The same applies to the session-bound `dsh` and `as` parameters.
 
 This rules out the naive form of the second candidate. Three routes remain, in order of preference:
