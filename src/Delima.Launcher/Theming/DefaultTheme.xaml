@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- SK Seksyen 24 Fallback Palette (PROMPT.txt and PRD §7.1) -->
+    <SolidColorBrush x:Key="PageBackgroundBrush" Color="#FFFDF7" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SoftSurfaceBrush" Color="#FDF9DC" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#E5DCC8" />
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1A1208" />
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#5C5344" />
+    
+    <!-- Branding colours -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#056839" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#F7941D" />
+    <SolidColorBrush x:Key="AlertBrush" Color="#ED1B24" />
+    <SolidColorBrush x:Key="FocusRingBrush" Color="#056839" />
+
+    <!-- 8 Standard Class Colours -->
+    <SolidColorBrush x:Key="ClassColour0" Color="#C41118" />
+    <SolidColorBrush x:Key="ClassColour1" Color="#9E2B0E" />
+    <SolidColorBrush x:Key="ClassColour2" Color="#A85200" />
+    <SolidColorBrush x:Key="ClassColour3" Color="#8A6100" />
+    <SolidColorBrush x:Key="ClassColour4" Color="#056839" />
+    <SolidColorBrush x:Key="ClassColour5" Color="#2F6B12" />
+    <SolidColorBrush x:Key="ClassColour6" Color="#0A6265" />
+    <SolidColorBrush x:Key="ClassColour7" Color="#7A4A21" />
+
+</ResourceDictionary>
