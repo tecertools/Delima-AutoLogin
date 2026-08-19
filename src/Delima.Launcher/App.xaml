@@ -1,0 +1,16 @@
+<Application x:Class="Delima.Launcher.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theming/DefaultTheme.xaml" />
+                <ResourceDictionary Source="Theming/Styles.xaml" />
+                <ResourceDictionary Source="Theming/ControlTemplates.xaml" />
+                <ResourceDictionary Source="Theming/AvatarTemplates.xaml" />
+                <ResourceDictionary Source="Theming/PicturePasswordTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

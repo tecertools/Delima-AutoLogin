@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Delima.Core.Store;
 
 namespace Delima.Core.Roster;
 
@@ -36,6 +37,7 @@ public sealed class Student
     public string Avatar { get; set; } = "";
     public string DisplayName { get; set; } = "";
     public int PasswordVersion { get; set; } = 1;
+    public PicturePasswordInfo? PicturePassword { get; set; }
     public bool Active { get; set; } = true;
 
     /// <summary>
