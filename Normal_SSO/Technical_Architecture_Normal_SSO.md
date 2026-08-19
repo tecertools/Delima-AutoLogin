@@ -271,6 +271,21 @@ Constraints: no iframe, no WebView, no scripting of Google pages, no keystroke a
 
 ### 5.2 Primary Method — Account Chooser Hint
 
+> ## ⚠ Unverified as of August 2026 — observed returning HTTP 400
+>
+> While running T0.2 for the sibling product, this exact URL shape —
+> `AccountChooser?Email=…&hd=…&continue=https://d3.delima.edu.my/landing` —
+> **returned a 400 error against live Google.** Two candidate causes, not yet distinguished:
+>
+> 1. Google restricts `continue` to Google-owned domains as open-redirect protection, so a `continue` pointing at a school or portal domain is rejected outright; or
+> 2. the `/AccountChooser` endpoint has been retired.
+>
+> **Either would break this method, and with it this product's core mechanism.** §5.3 below already warned that `AccountChooser` "is not a contractually documented API surface" while `login_hint` on the OAuth 2.0 authorization endpoint is — that risk appears to have arrived.
+>
+> **Verify before building anything on this section.** Open the URL above in a clean browser profile with a real address. If it 400s, this method is dead and the product needs re-planning around a documented flow. See `../Visual_SSO/T0.2_URL_Confirmation.md` for the test method.
+>
+> Note that `Visual_SSO` is **not** blocked by this: it types the email itself, so it degrades to a two-step injection (arch §4.5, route C). `Normal_SSO` has no such fallback — the hint *is* the product.
+
 ```ts
 const BASE = "https://accounts.google.com/AccountChooser";
 

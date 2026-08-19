@@ -15,6 +15,10 @@ They differ in one decision — **whether the software handles the pupil's passw
 
 If only one ships, it should be Normal SSO. It is the smaller product with most of the benefit and none of the policy risk.
 
+> **⚠ That recommendation is now in doubt.** Normal SSO's primary mechanism is Google's `AccountChooser` URL, which **returned HTTP 400 in live testing during T0.2, August 2026** — either because Google restricts `continue` to its own domains, or because the endpoint has been retired. Normal SSO has no fallback: the pre-filled hint *is* the product. Verify before investing further — see `Normal_SSO/Technical_Architecture_Normal_SSO.md` §5.2.
+>
+> **Visual SSO is unaffected.** It types the email itself, so it degrades to a two-step injection rather than failing (arch §4.5, route C).
+
 ---
 
 ## Repository map
