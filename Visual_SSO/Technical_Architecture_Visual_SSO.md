@@ -237,13 +237,41 @@ launch  →  wait for verified window  →  settle  →  block input
         →  inject via SendInput/KEYEVENTF_UNICODE  →  verify  →  unblock  →  wipe
 ```
 
-**Window verification** — poll `GetForegroundWindow()` at 100 ms and require *all* of:
+**Window verification.** Poll at 100 ms. Never a bare sleep. Timeout (default 30 s, configurable) → abort to the `Ralat` screen, inject nothing.
+
+> **Confirmed viable by T0.2, August 2026, with conditions.** Route C (§4.5) requires the engine to distinguish "type the email here" from "type the password here". Measured on lab hardware, the two pages **do** carry different titles:
+>
+> | Stage | Observed title |
+> | :--- | :--- |
+> | Identifier (email) page | `Sign in - Google Accounts - Google` |
+> | Password page | `Welcome - Google Chrome` |
+>
+> Title verification therefore survives — but it is a **page-content string being used as a safety interlock**, and this project has already been bitten once by exactly that (the spike matched a fragment present in every Chrome window, §4.3). The three requirements below are not optional polish.
+
+**1. Window identity — is this our Chrome?**
 
 - window class `Chrome_WidgetWin_1`
 - PID belongs to the process tree this launch started (not the teacher's Chrome)
-- title matches the expected Google sign-in page for the current locale
 
-Never a bare sleep. Timeout (default 30 s, configurable) → abort to the `Ralat` screen, inject nothing.
+Process identity, never title. This is what stops a password reaching an unrelated window.
+
+**2. Page identity — which step of the flow is this?**
+
+Match on the title, subject to all three of:
+
+- **Exact, full-string match against a configured value — never a substring.** `Welcome` alone is a generic word that could appear elsewhere in the flow. The full expected string lives in config, not code (§3.2), alongside the destinations.
+- **The title must be stable across ≥ 3 consecutive 100 ms polls** before anything is injected. Titles lag page state during a transition, and the harness hit precisely this race in T0.3 — sampling a transient title mid-update and acting on it. A settle requirement is what fixed it there and is what fixes it here.
+- **The password step is sequence-gated.** The engine may only inject the password after it has observed a verified transition *out of* the identifier title. A password injection is never authorised by matching `Welcome` in isolation — only by having watched the flow arrive there.
+
+**Locale is a live risk.** These strings are Google's UI, and `Welcome` becomes something else on a Chrome running in Bahasa Melayu. Titles are per-locale configuration; a school whose lab images differ from the test machine must be able to correct them without a new build. **Verify the Malay-locale strings before the pilot.**
+
+**3. Recommended hardening — field identity (not blocking step 11)**
+
+Before the password injection specifically, resolve the focused element through **UI Automation** (`AutomationElement.FocusedElement`) and require `IsPassword == true`. Chrome must then be launched with `--force-renderer-accessibility`, since it builds its accessibility tree lazily.
+
+This asks the real question — *is the caret in a password box?* — rather than a proxy for it, and it is immune to the locale and redesign risks above. It is **defence in depth rather than a replacement**: title checks establish which page, `IsPassword` establishes which field.
+
+Treat it as a fast follow if it would delay step 11, and measure it as T0.4 (§11.1). **Rejected outright: CDP over `--remote-debugging-port`** — it opens an endpoint any local process can drive to read cookies and control the browser, which is indefensible on a lab PC in an application built to protect credentials. If UIA proves insufficient, use `--remote-debugging-pipe`; never the port.
 
 **Injection** — `SendInput` with `KEYEVENTF_UNICODE`, one `INPUT` pair per UTF-16 code unit, surrogate pairs sent as two units. This is codepoint-transparent and immune to the `SendKeys` parsing problem entirely.
 
@@ -274,7 +302,17 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 
 ### 4.5 The handoff URL
 
-**Partially resolved by T0.2 observation, August 2026.** See `T0.2_URL_Confirmation.md` for the full record and the tests still outstanding.
+**Resolved by T0.2, August 2026 — route C selected.** Full record in `T0.2_URL_Confirmation.md`.
+
+| Route | Result |
+| :--- | :--- |
+| A — `login_hint` forwarded by DELIMa | **Failed.** DELIMa drops `login_hint`, `hint` and `email`; its authorize request carries the same five parameters regardless |
+| B — account chooser, then DELIMa's own flow | **Failed.** `/AccountChooser` returns HTTP 400 **with or without** a `continue` parameter — the endpoint itself is gone, not merely restricted |
+| **C — inject the email, then the password** | **Selected.** Two injections, both mechanisms proven at T0.3 |
+
+**Route C is not a consolation.** It removes every dependency on Google or DELIMa passing a parameter along, both of which have now demonstrably changed or never existed. What the launcher types, it controls.
+
+**Its cost is a second verified injection**, which is what §4.2's page-identity rules exist to make safe: the engine must establish which of the two fields it is looking at before it types anything into either.
 
 **Confirmed: DELIMa signs in via Google OAuth 2.0.** The live flow is an authorization-code flow — `flowName=GeneralOAuthFlow`, `response_type=code`, `scope=openid email profile` — redirecting to `https://d3.delima.edu.my/authentication/code`. The assumption underlying this whole section holds.
 
@@ -487,6 +525,8 @@ Silent mode `--quiet --pack <path> --passphrase-stdin` for the PowerShell route,
 | Display names | Fixture set covering Malay, Chinese and Indian conventions, plus collisions at 3 card widths. Shared with `Normal_SSO`. |
 | Importer | **Real APDM exports** — ANSI, UTF-8 BOM/no-BOM, UTF-16, CRLF/LF, diacritics, blank rows, duplicate IDs, `m-` prefixed and bare IDs. Fixtures are the deliverable here, not the tests. |
 | Injection | The spike, on **representative lab hardware**, ≥ 50 runs per method. Never on a developer machine, never over RDP. |
+| **UIA field detection (T0.4)** | Recommended hardening, not blocking. See §11.1. |
+| **Title settle and sequence gating** | Assert no injection occurs on a transient title; assert the password step refuses to fire without a preceding verified identifier state (§4.2). |
 | Window verification | Adversarial: launch, then steal focus at 500/1000/2000/4000 ms; assert **zero** keystrokes are sent. |
 | Teardown | Assert the teacher's separate Chrome survives; assert the temp profile directory is gone. |
 | Picture password | Lockout after 5; shuffle produces a different layout each attempt; Argon2id verification. |
@@ -494,6 +534,27 @@ Silent mode `--quiet --pack <path> --passphrase-stdin` for the PowerShell route,
 | End to end | One class, real accounts, lab hardware, teacher present. |
 
 The window-verification adversarial test is the one that matters most: it is the test that proves a child's password is never typed into the wrong window.
+
+### 11.1 T0.4 — does UIA report `IsPassword` reliably?
+
+**Recommended, not blocking.** T0.2 confirmed the identifier and password pages carry distinguishable titles, so step 11 can proceed on title verification (§4.2) alone. This spike measures the hardening layer that removes the locale and redesign risks titles carry.
+
+**Worth doing before the pilot rather than after.** The title strings are Google's UI copy in whatever locale the lab image runs; `IsPassword` is a structural property that does not move when Google restyles a page or a school images its PCs in Malay.
+
+Extend `InjectionSpike` with a `uia` mode. On **representative lab hardware**, against the real DELIMa flow, launching Chrome with `--force-renderer-accessibility`:
+
+| # | Question | Pass condition |
+| :-- | :--- | :--- |
+| 1 | Is a focused edit element resolvable on the identifier page? | Yes, ≥ 49/50 runs |
+| 2 | Does it report `IsPassword == false` there? | Yes, 50/50 — a false positive here means an email typed into a password box |
+| 3 | Is a focused edit element resolvable on the password page? | Yes, ≥ 49/50 |
+| 4 | Does it report `IsPassword == true` there? | **50/50. No tolerance.** A false negative here is a password typed into a visible field |
+| 5 | How long after page load does the property become readable? | Record p50 and p95; feeds `injection_settle_ms` |
+| 6 | Does forcing accessibility measurably slow Chrome's start? | Record; a 7-year-old is watching a blank screen |
+
+**Question 4 admits no failures.** Every other check degrades into an abort and a retry; that one degrades into a child's password displayed on screen in a room full of other children.
+
+**If UIA proves unreliable**, the fallback is `--remote-debugging-pipe` and CDP — never `--remote-debugging-port`, for the reason in §4.2. Re-plan step 11 rather than shipping a weaker check.
 
 ---
 

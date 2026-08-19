@@ -15,9 +15,9 @@ They differ in one decision — **whether the software handles the pupil's passw
 
 If only one ships, it should be Normal SSO. It is the smaller product with most of the benefit and none of the policy risk.
 
-> **⚠ That recommendation is now in doubt.** Normal SSO's primary mechanism is Google's `AccountChooser` URL, which **returned HTTP 400 in live testing during T0.2, August 2026** — either because Google restricts `continue` to its own domains, or because the endpoint has been retired. Normal SSO has no fallback: the pre-filled hint *is* the product. Verify before investing further — see `Normal_SSO/Technical_Architecture_Normal_SSO.md` §5.2.
+> **⚠ That recommendation no longer holds.** Normal SSO's only mechanism is Google's `AccountChooser` URL, and T0.2 found it **returns HTTP 400 in live testing — with or without a `continue` parameter**, which points at the endpoint having been retired rather than merely restricted. Normal SSO has no fallback: the pre-filled hint *is* the product. **It needs re-planning around a documented flow before any further work** — and the obvious substitute is not simple either, since DELIMa drops `login_hint` from its own login URL. See `Normal_SSO/Technical_Architecture_Normal_SSO.md` §5.2.
 >
-> **Visual SSO is unaffected.** It types the email itself, so it degrades to a two-step injection rather than failing (arch §4.5, route C).
+> **Visual SSO is unaffected**, and is now the more viable of the two. It types the email itself, so it degrades to a two-step injection rather than losing its mechanism (arch §4.5, route C).
 
 ---
 

@@ -271,20 +271,17 @@ Constraints: no iframe, no WebView, no scripting of Google pages, no keystroke a
 
 ### 5.2 Primary Method — Account Chooser Hint
 
-> ## ⚠ Unverified as of August 2026 — observed returning HTTP 400
+> ## ⚠ THIS METHOD NO LONGER WORKS — verified August 2026
 >
-> While running T0.2 for the sibling product, this exact URL shape —
-> `AccountChooser?Email=…&hd=…&continue=https://d3.delima.edu.my/landing` —
-> **returned a 400 error against live Google.** Two candidate causes, not yet distinguished:
+> Tested against live Google during T0.2 for the sibling product. **`accounts.google.com/AccountChooser` returns HTTP 400 — both with and without a `continue` parameter.** Dropping `continue` was the isolating test, and it did not help, which rules out the "Google restricts `continue` to its own domains" explanation and points at the endpoint itself having been retired.
 >
-> 1. Google restricts `continue` to Google-owned domains as open-redirect protection, so a `continue` pointing at a school or portal domain is rejected outright; or
-> 2. the `/AccountChooser` endpoint has been retired.
+> **This section, and therefore this product's only mechanism, is dead as written.** §5.3 below already warned that `AccountChooser` "is not a contractually documented API surface" while `login_hint` on the OAuth 2.0 authorization endpoint is. That risk has now arrived.
 >
-> **Either would break this method, and with it this product's core mechanism.** §5.3 below already warned that `AccountChooser` "is not a contractually documented API surface" while `login_hint` on the OAuth 2.0 authorization endpoint is — that risk appears to have arrived.
+> **Do not build on this section.** Re-plan around a documented flow before any further work on `Normal_SSO`. Note that the obvious substitute is not straightforward either: T0.2 found DELIMa **drops** `login_hint`, `hint` and `email` from its own login URL, so an SP-initiated hint does not survive to Google. A working design likely needs either DELIMa-side cooperation or a different entry point entirely.
 >
-> **Verify before building anything on this section.** Open the URL above in a clean browser profile with a real address. If it 400s, this method is dead and the product needs re-planning around a documented flow. See `../Visual_SSO/T0.2_URL_Confirmation.md` for the test method.
+> **`Visual_SSO` is unaffected.** It types the email itself, so it degrades to a two-step injection (`../Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.5, route C) rather than losing its mechanism. `Normal_SSO` has no equivalent fallback — the pre-filled hint *is* the product.
 >
-> Note that `Visual_SSO` is **not** blocked by this: it types the email itself, so it degrades to a two-step injection (arch §4.5, route C). `Normal_SSO` has no such fallback — the hint *is* the product.
+> Test method and full results: `../Visual_SSO/T0.2_URL_Confirmation.md`.
 
 ```ts
 const BASE = "https://accounts.google.com/AccountChooser";
