@@ -32,6 +32,7 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── Technical_Architecture_Visual_SSO.md
 │   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
 │   ├── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
+│   ├── T0.2_URL_Confirmation.md    ← the remaining blocker, ~1 hour in a browser
 │   ├── AI_Build_Guide.md           ← start building here (novice walkthrough)
 │   ├── Build_Prompts.md            Ready-to-paste prompts for an AI coding assistant
 │   ├── Build_Machine_Setup.md      Set up a Windows PC to compile the release
@@ -66,7 +67,7 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 - **T0.3** — run the injection spike, 50 runs, on representative lab hardware. **Passed, 17 August 2026.** `SendInput` scored 100/100 across two independent 50-run batches on real lab hardware; the `SendKeys` control failed exactly as predicted. Full results in `Visual_SSO/T0.3_Injection_Test_Protocol.md`.
 - **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started, and no longer a blocker.** Requirement G-1 was consciously relaxed: the project publishes without it and places the responsibility on each downloading school instead, via the statement specified in PRD §8.7. Still worth pursuing — see below.
-- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Not started. The only remaining blocker**, and a cheap one: one real pupil account and an afternoon. Blocks build step 11.
+- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Not started. The only remaining blocker**, and a cheap one: about an hour with one account you control. Procedure in `Visual_SSO/T0.2_URL_Confirmation.md`. Blocks build step 11.
 
 **Nothing blocks starting.** T0.3 answered the question the programme was contingent on. T0.1 has been routed around deliberately (PRD §2.2), and T0.2 doesn't bite until step 11.
 
