@@ -196,7 +196,7 @@ The highest-confidence work in the project: most of it already exists and has be
 >
 > Then add what the spike did not have, per §4.2:
 >
-> - **Window verification before every keystroke.** Poll the foreground window's class and title and confirm it is the expected Chrome window. §4.2 is explicit that zero keystrokes may be sent if verification fails.
+> - **Window verification before every keystroke.** Two layers, and §4.2 is exact: window identity by class `Chrome_WidgetWin_1` **and PID belonging to the process tree this launch started** — never by title — then page identity by exact full-title match from config, held stable across ≥ 3 consecutive polls. T0.2 confirmed the identifier and password pages are distinguishable, but only on exact strings; substring matching is what produced 47 false ready states in T0.3.
 > - **An abort path** that sends nothing and returns a failure code from the taxonomy in §7.
 > - **The topmost overlay**, which §4.2 marks as required rather than optional — T0.3 found `BlockInput` is consistently denied to non-elevated processes on lab PCs, so the overlay is the actual defence, not a fallback.
 >
@@ -266,17 +266,25 @@ This completes build step 3, which was deliberately left half-done because it ca
 
 ---
 
-## Prompt 11 — Injection flow (build step 11) — **blocked on T0.2**
+## Prompt 11 — Injection flow (build step 11) — **unblocked, T0.2 complete**
 
-**Do not run this prompt until T0.2 is answered.** It needs the confirmed live SSO entry URL and whether `login_hint` is honoured. Building against a placeholder means rebuilding.
-
-> Wire the injection flow per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.4, §4.5 and §7, using `Delima.Win32` from Prompt 6.
+> Wire the injection flow per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.2, §4.4, §4.5 and §7, using `Delima.Win32` from Prompt 6.
 >
-> The confirmed handoff URL from T0.2 is: `[paste it here]`
+> **T0.2 selected route C (§4.5): the launcher types the email, then the password.** There is no pre-fill — DELIMa drops `login_hint`, and `/AccountChooser` is retired. Entry URL is `https://d3.delima.edu.my/landing`, and the pupil's sign-in button click is part of the flow.
+>
+> **Two injections means two verifications, and §4.2 is exact about this.** The identifier and password pages are distinguishable by title, but only under three conditions, all of which are requirements and not suggestions:
+>
+> - **Exact full-string match against a configured value, never a substring.** `Welcome` is a generic word.
+> - **The title must be stable across ≥ 3 consecutive 100 ms polls** before anything is typed. Titles lag page state mid-transition; the T0.3 harness hit exactly this race.
+> - **The password injection is sequence-gated.** It may fire only after the engine has observed a verified transition *out of* the identifier title. Matching the password-page title in isolation must never authorise typing a password.
+>
+> Titles are **per-locale configuration** (§3.2, Appendix B), not constants in code — Google's strings differ on a Malay-locale Chrome.
 >
 > Every failure mode in §7's taxonomy needs a code and a Bahasa Melayu message a seven-year-old can act on. Implement the floating reset bar from PRD §7.4.
 >
-> Then write the adversarial test from §11: launch, steal focus at 500, 1000, 2000 and 4000 ms, and **assert that zero keystrokes are sent**. §11 calls this the test that matters most — it is what proves a child's password is never typed into the wrong window. It must run on real lab hardware, never on a developer machine and never over RDP.
+> Then write the adversarial tests from §11. Steal focus at 500, 1000, 2000 and 4000 ms and **assert zero keystrokes are sent**. Add two more that T0.2 made necessary: assert nothing is injected while a title is still settling, and assert the password step refuses to fire without a preceding verified identifier state. Run on real lab hardware — never a developer machine, never over RDP.
+
+**Consider T0.4 first** (arch §11.1) — UIA `IsPassword` as a second gate before the password injection. It is structural rather than textual, so it survives the locale and redesign risks the titles carry. Recommended before the pilot, not required before this prompt.
 
 ---
 

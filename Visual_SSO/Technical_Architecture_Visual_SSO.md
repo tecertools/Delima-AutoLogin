@@ -605,6 +605,10 @@ AES-256-GCM, HMAC-SHA256 and the CSPRNG come from the BCL. **No custom cryptogra
 | `idle_reset_seconds` | `600` | Auto-logout, profile wipe |
 | `injection_settle_ms` | `400` | After window verification, before first keystroke |
 | `window_wait_timeout_ms` | `30000` | Then `E02` |
+| `entry_url` | `https://d3.delima.edu.my/landing` | Confirmed by T0.2 |
+| `title_identifier_page` | `Sign in - Google Accounts - Google` | **Per locale.** Exact full string, never a substring (§4.2) |
+| `title_password_page` | `Welcome - Google Chrome` | **Per locale.** Exact full string; `Welcome` alone is generic |
+| `title_settle_polls` | `3` | Consecutive 100 ms polls a title must hold before injecting (§4.2) |
 | `store_max_age_days` | `30` | Then `E10` |
 | `force_signout` | `true` | Lab only; never at home |
 | `enter_mode` | `manual` | `manual` \| `auto` — auto only after length verification |
