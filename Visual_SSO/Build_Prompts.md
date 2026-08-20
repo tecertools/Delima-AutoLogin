@@ -266,9 +266,29 @@ This completes build step 3, which was deliberately left half-done because it ca
 
 ---
 
+## Prompt 10a — Harden the injection engine against §4.2
+
+Run this before Prompt 11. Two requirements from the revised §4.2 are not currently enforceable in `Delima.Win32`.
+
+> Review `src/Delima.Win32/InjectionEngine.cs` against `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.2, which was revised after T0.2. Two gaps to close. Do not change anything else — the per-keystroke window re-verification already there is correct and exceeds what §4.2 requires, so leave it alone.
+>
+> **1. The title check cannot currently be trusted, because the engine has no opinion about it.** `Inject` accepts `Func<string, bool> titlePredicate`, so a caller can pass `t => t.Contains("Welcome")` and reintroduce the exact defect that produced 47 false ready states in T0.3. §4.2 requires an **exact full-string match against a configured value, never a substring**.
+>
+> Replace the predicate parameter with an expected-title `string`, compared with `string.Equals(..., StringComparison.Ordinal)`. If a predicate overload must remain for testing, mark it `internal` and keep it out of the public surface. The public API should make the unsafe thing impossible to express rather than merely discouraged.
+>
+> **2. `InjectionSettleMs` is a delay, not a stability check.** The current code sleeps for a fixed period and then verifies once. §4.2 requires the title be **stable across ≥ 3 consecutive 100 ms polls** before any keystroke. A delay does not detect a title that is still changing; two samples separated by a sleep are not three consecutive matches.
+>
+> Implement the settle as a polling loop: sample the title every 100 ms, require `title_settle_polls` (Appendix B, default 3) consecutive identical matches against the expected string, and abort to `E02` if that is not reached inside `window_wait_timeout_ms`.
+>
+> Then add tests for both: a substring-matching title must be rejected, and a title that changes during the settle window must abort rather than inject.
+
+---
+
 ## Prompt 11 — Injection flow (build step 11) — **unblocked, T0.2 complete**
 
-> Wire the injection flow per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.2, §4.4, §4.5 and §7, using `Delima.Win32` from Prompt 6.
+> Wire the injection flow per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.2, §4.4, §4.5 and §7, using `Delima.Win32` from Prompt 6 as hardened by Prompt 10a.
+>
+> **`InjectionEngine` currently performs one injection.** Route C needs two — email, Enter, then password — each with its own expected title and its own verification. Build that orchestration here rather than by loosening the engine.
 >
 > **T0.2 selected route C (§4.5): the launcher types the email, then the password.** There is no pre-fill — DELIMa drops `login_hint`, and `/AccountChooser` is retired. Entry URL is `https://d3.delima.edu.my/landing`, and the pupil's sign-in button click is part of the flow.
 >
