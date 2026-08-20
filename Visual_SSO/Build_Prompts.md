@@ -266,6 +266,20 @@ This completes build step 3, which was deliberately left half-done because it ca
 
 ---
 
+## Prompt 10b — Stop the ACL failure being silent
+
+Small, and it protects the credential store.
+
+> In `src/Delima.Win32/Store/StoreAclConfigurator.cs`, `SetAccessControl` is wrapped in a `try`/`catch (UnauthorizedAccessException)` whose body is a comment. If applying the ACL fails, the credential store keeps whatever permissions it had, the caller is told nothing, and nothing is recorded.
+>
+> Arch §3.5 names this ACL as the control that stops a pupil opening `credentials.dat` in Explorer, so a silent failure is the difference between the documented protection and none at all.
+>
+> Change it to: write the failure to the audit log (§8) and return or throw so the caller can surface it as a provisioning error. Do not leave a code path where the store is unprotected and the app believes it succeeded.
+>
+> Check the other `catch` blocks in that file for the same pattern while you are there. Leave the `if (!OperatingSystem.IsWindows()) return;` guards alone — those are correct.
+
+---
+
 ## Prompt 10a — Harden the injection engine against §4.2
 
 Run this before Prompt 11. Two requirements from the revised §4.2 are not currently enforceable in `Delima.Win32`.

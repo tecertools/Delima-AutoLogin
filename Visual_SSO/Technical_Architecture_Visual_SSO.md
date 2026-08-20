@@ -535,6 +535,38 @@ Silent mode `--quiet --pack <path> --passphrase-stdin` for the PowerShell route,
 
 The window-verification adversarial test is the one that matters most: it is the test that proves a child's password is never typed into the wrong window.
 
+### 11.0 Field verification — what can be tested on lab hardware today
+
+Three checks are possible with what is currently built, and are worth doing before more is built on top of them. None require the injection flow.
+
+**1. The store ACL, on a real pupil account. Do this one first.**
+
+`StoreAclConfigurator` correctly calls `SetAccessRuleProtection(true, false)`, which breaks inheritance and drops `%ProgramData%`'s default read grant to `Users` — the mistake that would otherwise leave the store world-readable. But **the call that applies it swallows its own failure**:
+
+```csharp
+try { fileInfo.SetAccessControl(fileSecurity); }
+catch (UnauthorizedAccessException) { /* comment only */ }
+```
+
+If that throws, the credential store keeps whatever permissions it had, the app reports success, and nothing is logged. §3.5 names this ACL as what stops a pupil browsing to `credentials.dat` in Explorer, so a silent failure is the difference between the documented protection and none.
+
+**Fix required:** log the failure to the audit log (§8) and surface it as a provisioning error. A control that can fail without anyone knowing is not a control.
+
+**Then verify it empirically**, which no unit test can do:
+
+1. Provision a lab PC with `Delima.Provision`
+2. Log in as a **standard (non-admin) pupil account** — not the coordinator's
+3. Attempt to open `%ProgramData%\DELIMa Launcher\credentials.dat` in Notepad
+4. **Expected: access denied.** Anything else means §3.5's protection does not exist on that machine
+
+**2. The name grid at 1366×768 with a full class.** PRD §7.2 requires 44 pupils to render at that resolution, and `GridCalculator` currently floors at 7 columns. Load a 44-pupil class on a real lab monitor and confirm no card is clipped, no name is truncated to ambiguity, and targets stay ≥ 48 px. Reading it on a developer monitor proves nothing.
+
+**3. Cold-start time on a spinning disk.** PRD §4's G1 is a time-to-signed-in target, and a seven-year-old watching a blank screen is the reason `PublishReadyToRun` is enabled. Take a rough figure now, while it is cheap to act on.
+
+**Also worth ten minutes while at a school machine:** capture the Malay-locale sign-in titles (§4.2, Appendix B). They block the pilot on any lab imaged in Bahasa Melayu, and they cannot be guessed.
+
+---
+
 ### 11.1 T0.4 — does UIA report `IsPassword` reliably?
 
 **Recommended, not blocking.** T0.2 confirmed the identifier and password pages carry distinguishable titles, so step 11 can proceed on title verification (§4.2) alone. This spike measures the hardening layer that removes the locale and redesign risks titles carry.
