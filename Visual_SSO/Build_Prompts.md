@@ -339,6 +339,74 @@ Run this before Prompt 11. Two requirements from the revised §4.2 are not curre
 
 ---
 
+# Phase 3 — What remains
+
+Build steps 6, 13, 14 and 15. Everything else in arch §12 is done.
+
+---
+
+## Prompt 12 — The Admin wizard (build step 6)
+
+The largest remaining piece, and the one with the most spec behind it. `src/Delima.Admin` is currently empty — the importer moved to `Delima.Import` at Prompt 4b.
+
+> Build `src/Delima.Admin` as a WPF application targeting `net10.0-windows`: the seven-step School Setup Wizard.
+>
+> Read first: `Visual_SSO/PRD_Visual_SSO_v2.md` §6 (the seven steps and their requirements) and `Visual_SSO/Technical_Architecture_Visual_SSO.md` §6.8 (the visual language, and it is deliberately not the Launcher's). `Visual_SSO/mockups/DELIMa_Admin_Wizard_Mockups.html` shows the intended result — reproduce it in XAML, do not port the HTML.
+>
+> **This app must not look like `Delima.Launcher`.** §6.8 is explicit: En. Zul is an adult doing data-entry at a desk, scanning a 2,000-row report for the three rows that are wrong. Rounded 20 px cards and 48 px touch targets fight that job. Radii 6–8 px, control heights 32–36 px, body text 13–14 px, alternating row striping, and a fixed-width font for anything columnar — pupil IDs, row numbers. Only the crest and a thin accent of the school colour carry over.
+>
+> Structural requirements from §6.8:
+>
+> - **Left sidebar step navigator** with per-step state. On first run steps 2 onward are locked until the preceding step completes; **once setup has been completed once, every step unlocks for direct navigation** — Step 3 and Step 4 are re-entered on completely different schedules and forcing a coordinator back through 1–2 to reach 4 in March is a real, remembered annoyance.
+> - **The column mapper is a fixed list of the five target fields**, each with a dropdown of the source file's headers and a best-guess default — not a decision per column, since APDM exports run 15–30 columns wide. A live preview of the first 10 rows re-renders as each dropdown changes.
+> - **The dry-run report is a full step, not a modal**, with three collapsible sections: ready, warnings (expanded), rejects (expanded).
+> - **Step 4's consent screen** requires typing the school code, not ticking a box. A checkbox gets clicked without reading.
+> - **The password grid reveals per row, not per grid** — passphrase prompt in a popover anchored to the row, auto-re-mask after 10 seconds or on losing focus, and every reveal written to the audit log per §8.
+>
+> Use `Delima.Import` for all import logic and `Delima.Core` for the store — reimplement neither. Blocked buttons must state their reason inline rather than sitting disabled and silent.
+
+---
+
+## Prompt 13 — Mod Guru (build step 13)
+
+> Implement Mod Guru per `Visual_SSO/PRD_Visual_SSO_v2.md` §7.4, in `Delima.Launcher`.
+>
+> It is the teacher's escape hatch at a kiosk: PIN-gated, per Appendix B's `teacher_pin_policy` (4 digits, lock after 5 attempts). It must let a teacher resolve a stuck pupil without a support call — that is the feature's whole purpose (PRD §3, Cikgu Farah).
+>
+> Every action taken in Mod Guru is written to the audit log (§8) with the Windows user and timestamp. Use the `AuditLogger` already in `Delima.Core`.
+>
+> Accessibility applies here as much as to the pupil screens (§6.7): this is used standing at a shared kiosk, so keyboard-only operation matters. Bahasa Melayu throughout, and the forbidden vocabulary list still applies.
+
+---
+
+## Prompt 14 — Kiosk hardening and Chrome policy (build step 14)
+
+`KioskGuard` and `TopmostOverlay` exist from Prompt 6. This completes the surrounding controls.
+
+> Complete kiosk hardening per `Visual_SSO/Technical_Architecture_Visual_SSO.md` §9.
+>
+> Already built: `KioskGuard`, `TopmostOverlay`, the injection shield. What remains is the environment around them — idle reset on `idle_reset_seconds` (Appendix B, default 600) wiping the profile and zeroing credentials, launch-at-logon, and the Chrome enterprise policy values.
+>
+> **The Chrome policy writes to `HKLM` and changes Chrome for every user on the machine, including the teacher's own browsing.** It is opt-in, and whatever surfaces it must say so plainly (PRD §8.3). Do not apply it silently.
+>
+> **AppLocker is deliberately out of scope for code.** It depends on the school's Windows edition and existing group policy, and a checkbox that silently fails on Windows Home would be worse than none — a coordinator would believe he was protected. Produce it as a documented PowerShell snippet plus a required line on the lab checklist, per PRD §8.3.
+
+---
+
+## Prompt 15 — Installer and release pipeline (build step 15)
+
+> Build the installer and release pipeline per `Visual_SSO/Build_And_Release.md`.
+>
+> **The Inno Setup script is already written out in full in §5 of that document.** Copy it into `installer/DelimaLauncher.iss` and adapt only what the real project layout requires — do not generate a new one. Same for the publish flags in §3: they are specified, including the two that fail at runtime rather than build time (`PublishTrimmed` must stay `false` — WPF is not trim-compatible).
+>
+> Then the GitHub Actions workflow per §4.4: triggered on `v*` tags, `windows-latest`, build → test → publish → package → **submit to SignPath** → checksum the *signed* installer → create a **draft** release. Leave it a draft; a human confirms the T0.1 responsibility statement (PRD §8.7) is on the release page before it goes public.
+>
+> Three properties the workflow must preserve, because they are what SignPath's origin verification checks: every build setting lives in the repository, no step reuses a cached build output, and the workflow accepts no inputs that change what gets compiled.
+>
+> Generate a fixed `AppId` GUID once and add a comment saying never to change it — it is how Windows knows 2.0.1 upgrades 2.0.0 rather than installing beside it.
+
+---
+
 ## Constraints to repeat when the assistant drifts
 
 Paste any of these when you see the relevant mistake:

@@ -63,9 +63,13 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 ## Where things actually stand
 
-**The cross-platform half of the application is built and tested.** `Delima.Core` (credential store, Argon2id/AES-256-GCM crypto, roster model, display names) and the roster importer compile and pass tests on macOS, Linux and Windows — arch §2 keeps them free of any Win32 or UI reference precisely so they can. `InjectionSpike/` remains as the T0.3 harness.
+**Eleven of the fifteen build steps in arch §12 are done.**
 
-**Not built yet:** `Delima.Win32` (build step 8), the WPF Launcher and Admin UIs (steps 9–13), kiosk hardening (14) and the installer (15). All of those need Windows.
+Built and tested: `Delima.Core` (credential store, Argon2id/AES-256-GCM, roster model, display names), `Delima.Import`, `Delima.Win32` (injection engine, DPAPI store, kiosk guard, topmost overlay), `Delima.Provision`, the audit log, and `Delima.Launcher` through the class, name, picture-password, sign-in and error screens — including the route C two-step login orchestrator with its sequence gate.
+
+**Remaining:** the Admin wizard (step 6), Mod Guru (13), the rest of kiosk hardening (14), and the installer and release pipeline (15). Prompts 12–15 in `Visual_SSO/Build_Prompts.md`.
+
+**Also outstanding, none blocking:** T0.4 (measure UIA `IsPassword` on lab hardware, then enable the gate — arch §11.1), the three field checks in arch §11.0, and capturing the Malay-locale sign-in titles.
 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
