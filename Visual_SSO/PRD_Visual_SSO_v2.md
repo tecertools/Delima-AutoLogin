@@ -338,7 +338,9 @@ Over WiX/MSI (a toolchain to learn and maintain for a benefit — GPO-native dep
 
 Inno Setup gives one `.exe`, a scriptable build, `/VERYSILENT` for scripted lab deployment, component selection, and a custom licence page. It is the standard choice for exactly this shape of product.
 
-**Inno Setup is also open source** (modified BSD). With the project on GPL-3.0 and SignPath requiring no proprietary components (§8.5), a commercial packager would have been an awkward conversation.
+**Inno Setup is source-available and free to use** — the source is on GitHub and there is no charge for building installers. JRSoftware asks *commercial* users to buy a licence; this project is given away free, so that does not apply. **Confirm the current licence text before the first release** rather than relying on this line, since the terms were revised around the version 7 release. A paid packager would have been an awkward conversation next to GPL-3.0 and SignPath's no-proprietary-components rule (§8.5).
+
+**Version:** either current line works — **6.7.3** or **7.1.0**. Version 7 is backward compatible with 6's `.iss` scripts and adds a 64-bit compiler edition and extended-length path support, neither of which this project needs. `Build_And_Release.md` §5 requires whichever is chosen to be **pinned in CI**, because an unpinned toolchain breaks both reproducibility and SignPath's origin verification.
 
 #### Re-evaluated August 2026, decision unchanged
 

@@ -212,6 +212,21 @@ iscc /DMyAppVersion=2.0.0 installer\DelimaLauncher.iss
 
 The version comes from the command line so it cannot disagree with §2.
 
+> **Pin the Inno Setup version in CI. Do not install "latest".**
+>
+> Two current lines exist: **6.7.3** (May 2026) and **7.1.0** (August 2026). Inno Setup 7 is backward compatible with 6 and its `.iss` scripts, adds a 64-bit compiler edition and extended-length path support — **neither of which this project needs**, since the installer targets `%ProgramFiles%\DELIMa Launcher` and a 32-bit installer stub is normal. Either line works. Both can be installed side by side.
+>
+> What matters is that the release pipeline pins one:
+>
+> ```yaml
+> - run: winget install --id JRSoftware.InnoSetup -e -v 6.7.3 --silent
+> #  or: winget install --id JRSoftware.InnoSetup.7 -e -v 7.1.0 --silent
+> ```
+>
+> An unpinned installer toolchain means a release you cannot reproduce, and SignPath's origin verification (§4.2) requires the build to be fully determined by the repository. A compiler version that changes underneath you is exactly what that rule exists to prevent.
+>
+> **Upgrade deliberately, between releases, and re-run §7's checklist afterwards** — never mid-release-cycle.
+
 ```pascal
 #define MyAppName "DELIMa Smart Launcher"
 #ifndef MyAppVersion
