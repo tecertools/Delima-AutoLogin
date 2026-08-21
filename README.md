@@ -77,13 +77,13 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 | # | Item | Where |
 | :-- | :--- | :--- |
-| 1 | **Apply the T0.4 findings + the consent step to the code.** The identifier title is still wrong, so every sign-in aborts — the launcher does not work as it stands | Prompt T0.4b |
-| 2 | **Fix the PDPA claim** in the first-run disclaimer, and add the T0.1 statement to `LESEN.rtf` and the release notes | Prompt 16 |
-| 3 | Restore `everyone-none` on the store directory in the `.iss` (the CI half of 15a is done) | Prompt 15a |
-| 4 | **First full run** — wizard → bundle → provision → sign-in. Nothing has ever produced a `school.dlmpack` | `E2E_First_Run.md` |
+| ~~1–3~~ | ~~T0.4 findings, consent step, T0.1 statement, installer ACL, title lists, post-password verification, failure taxonomy~~ — **all done** | Prompts T0.4b, 15a, 16–19 |
+| **4** | **First full run** — wizard → bundle → provision → sign-in. Nothing has ever produced a `school.dlmpack` | `E2E_First_Run.md` |
 | 5 | Tag a release, ship it unsigned, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 
-**Item 1 is not polish — it is the difference between a working product and one that aborts every sign-in.** T0.4 found the configured identifier title had a word dropped when it was transcribed from T0.2, and exact matching means it never matches. The pupil-account ACL test, the most important of the field checks, has passed.
+**Every code path the specs call for is now implemented and verified.** The pupil-account ACL test has passed on real hardware, and the failure taxonomy has no dead codes.
+
+**What has never happened is the whole thing running as one thing.** No `school.dlmpack` has ever been produced, so the wizard, provisioning, the launcher and the injection chain have only ever been tested apart. Item 4 is where that changes, and where the seams will show.
 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
@@ -94,7 +94,7 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 ## Next step
 
-**Prompt T0.4b first.** T0.4 passed, but its findings have not reached the code: the identifier title is still the mis-transcribed string, the password title is still treated as a constant it can never be, the UIA gate is still off, and `injection_settle_ms` still sits below the measured p95. Until this runs, every sign-in aborts.
+**The first end-to-end run** — `E2E_First_Run.md`. One pupil, using an account you control, on a lab PC. Expect stage 1 or 2 to fail before the sign-in does: the wizard and provisioning have unit tests and have never met a real file, a real pendrive or a real ACL.
 
 **Then Prompt 15a** — the CI workflow calls `iscc` without installing Inno Setup, and the installer dropped `everyone-none` from the credential-store directory permissions.
 
