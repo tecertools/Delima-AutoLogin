@@ -165,4 +165,29 @@ public class LauncherFlowTests
         Assert.NotNull(mainVm.Config);
         Assert.Equal(300, mainVm.Config.IdleResetSeconds);
     }
+
+    [Theory]
+    [InlineData(LoginFlowState.LaunchingBrowser, "Sedang membuka DELIMa...")]
+    [InlineData(LoginFlowState.WaitingForIdentifierPage, "Menunggu skrin masuk...")]
+    [InlineData(LoginFlowState.InjectingIdentifier, "Mengisi maklumat...")]
+    [InlineData(LoginFlowState.WaitingForTransition, "Menyambung...")]
+    [InlineData(LoginFlowState.WaitingForPasswordPage, "Menyediakan akaun...")]
+    [InlineData(LoginFlowState.InjectingPassword, "Hampir siap...")]
+    [InlineData(LoginFlowState.WaitingForConsentPage, "Mengesahkan akaun...")]
+    [InlineData(LoginFlowState.Completed, "Berjaya!")]
+    [InlineData(LoginFlowState.Aborted, "Dibatalkan.")]
+    [InlineData(LoginFlowState.Failed, "Ada masalah teknikal.")]
+    public void SedangMasukViewModel_StateMessages_Map_Correctly(LoginFlowState state, string expectedMessage)
+    {
+        // Assert BM state messages match PRD §7 and Technical Architecture §4.5
+        Assert.Equal(expectedMessage, SedangMasukViewModel.GetStateMessage(state));
+    }
+
+    [Fact]
+    public void ConsentPrompt_ExactText_Matches_Architecture_Spec()
+    {
+        // §4.5 & PRD §7.4: Identity check prompt on floating reset bar
+        const string expectedPrompt = "Lihat nama kamu. Kalau betul, tekan butang biru di bawah.";
+        Assert.Equal("Lihat nama kamu. Kalau betul, tekan butang biru di bawah.", expectedPrompt);
+    }
 }

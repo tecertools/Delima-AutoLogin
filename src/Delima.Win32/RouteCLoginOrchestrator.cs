@@ -74,6 +74,11 @@ public sealed record RouteCOptions
     };
 
     /// <summary>
+    /// Settle delay duration in milliseconds after window verification (700 ms default per T0.4 latency findings).
+    /// </summary>
+    public int InjectionSettleMs { get; init; } = 700;
+
+    /// <summary>
     /// Consecutive 100 ms polls a title must hold stably before initiating injection (§4.2).
     /// Default is 3 polls.
     /// </summary>
@@ -238,6 +243,7 @@ public static class RouteCLoginOrchestrator
                 WindowWaitTimeout = options.WindowWaitTimeout,
                 TitleSettlePolls = options.TitleSettlePolls,
                 PollIntervalMs = options.PollIntervalMs,
+                InjectionSettleMs = options.InjectionSettleMs,
                 PerCharDelayMs = options.PerCharDelayMs,
                 ExpectedClassName = options.ExpectedClassName
             };

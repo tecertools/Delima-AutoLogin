@@ -110,4 +110,29 @@ public class StoreAclConfiguratorTests : IDisposable
         Assert.Contains("Access is denied", content);
         Assert.Contains("credentials.dat", content);
     }
+
+    [Fact]
+    public void InstallerScript_DelimaLauncherIss_Specifies_EveryoneNone_AdminsFull_SystemFull()
+    {
+        string baseDir = AppContext.BaseDirectory;
+        string? solutionRoot = null;
+        var dir = new DirectoryInfo(baseDir);
+        while (dir != null)
+        {
+            if (File.Exists(Path.Combine(dir.FullName, "DelimaLauncher.sln")) || Directory.Exists(Path.Combine(dir.FullName, "installer")))
+            {
+                solutionRoot = dir.FullName;
+                break;
+            }
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(solutionRoot);
+        string issPath = Path.Combine(solutionRoot, "installer", "DelimaLauncher.iss");
+        Assert.True(File.Exists(issPath), $"DelimaLauncher.iss not found at {issPath}");
+
+        string issContent = File.ReadAllText(issPath);
+        Assert.Contains(@"Name: ""{commonappdata}\DELIMa Launcher""; Permissions: everyone-none admins-full system-full", issContent);
+    }
 }
+

@@ -336,6 +336,23 @@ public class RouteCLoginOrchestratorTests
     }
 
     [Fact]
+    public void Regression_TitleIdentifierPage_Must_Include_Chrome_Suffix_And_Reject_MisTranscribed_T02_Value()
+    {
+        // Regression test: T0.2 mis-transcribed the identifier page title by dropping the " Chrome" suffix
+        // ("Sign in - Google Accounts - Google" instead of "Sign in - Google Accounts - Google Chrome").
+        // This single dropped word made the product silently non-functional under exact ordinal matching (E02 abort).
+        var options = new RouteCOptions();
+
+        // 1. Assert configured primary value equals measured string exactly
+        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage[0]);
+
+        // 2. Assert the mis-transcribed string is rejected by exact matching
+        const string oldMisTranscribedValue = "Sign in - Google Accounts - Google";
+        Assert.False(InjectionEngine.MatchesAnyTitle(oldMisTranscribedValue, options.TitleIdentifierPage));
+        Assert.DoesNotContain(oldMisTranscribedValue, options.TitleIdentifierPage);
+    }
+
+    [Fact]
     public void RouteCOptions_Defaults_Reflect_T04_Empirical_Findings()
     {
         var options = new RouteCOptions();

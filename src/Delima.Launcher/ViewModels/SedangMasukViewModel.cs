@@ -93,22 +93,24 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         }
     }
 
+    public static string GetStateMessage(LoginFlowState state) => state switch
+    {
+        LoginFlowState.LaunchingBrowser => "Sedang membuka DELIMa...",
+        LoginFlowState.WaitingForIdentifierPage => "Menunggu skrin masuk...",
+        LoginFlowState.InjectingIdentifier => "Mengisi maklumat...",
+        LoginFlowState.WaitingForTransition => "Menyambung...",
+        LoginFlowState.WaitingForPasswordPage => "Menyediakan akaun...",
+        LoginFlowState.InjectingPassword => "Hampir siap...",
+        LoginFlowState.WaitingForConsentPage => "Mengesahkan akaun...",
+        LoginFlowState.Completed => "Berjaya!",
+        LoginFlowState.Aborted => "Dibatalkan.",
+        LoginFlowState.Failed => "Ada masalah teknikal.",
+        _ => "Sedang diproses..."
+    };
+
     private void UpdateStateMessage(LoginFlowState state)
     {
-        StatusMessage = state switch
-        {
-            LoginFlowState.LaunchingBrowser => "Sedang membuka DELIMa...",
-            LoginFlowState.WaitingForIdentifierPage => "Menunggu skrin masuk...",
-            LoginFlowState.InjectingIdentifier => "Mengisi maklumat...",
-            LoginFlowState.WaitingForTransition => "Menyambung...",
-            LoginFlowState.WaitingForPasswordPage => "Menyediakan akaun...",
-            LoginFlowState.InjectingPassword => "Hampir siap...",
-            LoginFlowState.WaitingForConsentPage => "Mengesahkan akaun...",
-            LoginFlowState.Completed => "Berjaya!",
-            LoginFlowState.Aborted => "Dibatalkan.",
-            LoginFlowState.Failed => "Ada masalah teknikal.",
-            _ => "Sedang diproses..."
-        };
+        StatusMessage = GetStateMessage(state);
     }
 
     [RelayCommand]
