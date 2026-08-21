@@ -49,8 +49,9 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 
 [Dirs]
 ; Per-machine store. Interactive users must not be able to read it (arch §3.5).
-; Detailed DACLs (disabling inheritance, restricting to SYSTEM/Admins) are also reinforced by StoreAclConfigurator.
-Name: "{commonappdata}\DELIMa Launcher"; Permissions: admins-full
+; Inno Setup Permissions syntax only supports full, modify, readexec (not none).
+; Inheritance removal and Murid/Admin/SYSTEM DACLs are applied by StoreAclConfigurator.
+Name: "{commonappdata}\DELIMa Launcher"; Permissions: admins-full system-full
 
 [Icons]
 Name: "{group}\DELIMa";           Filename: "{app}\Delima.Launcher.exe"; Components: lab
@@ -70,3 +71,7 @@ Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
   ValueName: "IncognitoModeAvailability"; ValueData: 1; Tasks: chromepolicy; Flags: uninsdeletevalue
 Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
   ValueName: "BrowserSignin"; ValueData: 0; Tasks: chromepolicy; Flags: uninsdeletevalue
+
+[Run]
+; Strip inherited permissions from %ProgramData% immediately upon install to close the exposure window before first launch
+Filename: "icacls.exe"; Parameters: """{commonappdata}\DELIMa Launcher"" /inheritance:r /grant:r ""*S-1-5-18:(OI)(CI)F"" /grant:r ""*S-1-5-32-544:(OI)(CI)F"""; Flags: runhidden

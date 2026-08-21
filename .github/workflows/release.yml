@@ -52,13 +52,21 @@ jobs:
           dotnet publish src/Delima.Admin/Delima.Admin.csproj $cfg -o publish/Admin
           dotnet publish src/Delima.Provision/Delima.Provision.csproj $cfg -o publish/Provision
 
-      # 7. Build Inno Setup installer package
+      # 7. Install Inno Setup (pinned version for reproducibility & SignPath origin verification)
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          winget install --id JRSoftware.InnoSetup -e -v 6.7.3 --silent `
+            --accept-package-agreements --accept-source-agreements
+          echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+
+      # 8. Build Inno Setup installer package
       - name: Compile Inno Setup installer
         shell: pwsh
         run: |
-          iscc /DMyAppVersion=$env:VERSION installer/DelimaLauncher.iss
+          & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" /DMyAppVersion=$env:VERSION installer/DelimaLauncher.iss
 
-      # 8. Upload unsigned installer artifact for SignPath origin verification
+      # 9. Upload unsigned installer artifact for SignPath origin verification
       - name: Upload unsigned installer artifact
         id: upload_unsigned_artifact
         uses: actions/upload-artifact@v4
@@ -67,7 +75,7 @@ jobs:
           path: dist/DELIMaLauncher-Setup-${{ env.VERSION }}.exe
           if-no-files-found: error
 
-      # 9. Submit to SignPath Foundation for OV code signing
+      # 10. Submit to SignPath Foundation for OV code signing
       - name: Submit signing request to SignPath
         id: signpath_sign
         uses: signpath/github-action-submit-signing-request@v1
@@ -80,7 +88,7 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: 'signed-dist'
 
-      # 10. Generate SHA-256 Checksums of the SIGNED installer
+      # 11. Generate SHA-256 Checksums of the SIGNED installer
       - name: Generate SHA-256 checksums of signed installer
         shell: pwsh
         run: |
@@ -89,7 +97,7 @@ jobs:
             Out-File "signed-dist/DELIMaLauncher-$env:VERSION-checksums.txt" -Encoding ascii
           Get-Content "signed-dist/DELIMaLauncher-$env:VERSION-checksums.txt"
 
-      # 11. Create Draft GitHub Release with T0.1 responsibility statement
+      # 12. Create Draft GitHub Release with T0.1 responsibility statement
       - name: Create Draft GitHub Release
         uses: softprops/action-gh-release@v2
         with:
