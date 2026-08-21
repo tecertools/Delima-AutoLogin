@@ -338,6 +338,29 @@ Over WiX/MSI (a toolchain to learn and maintain for a benefit — GPO-native dep
 
 Inno Setup gives one `.exe`, a scriptable build, `/VERYSILENT` for scripted lab deployment, component selection, and a custom licence page. It is the standard choice for exactly this shape of product.
 
+**Inno Setup is also open source** (modified BSD). With the project on GPL-3.0 and SignPath requiring no proprietary components (§8.5), a commercial packager would have been an awkward conversation.
+
+#### Re-evaluated August 2026, decision unchanged
+
+Revisited after the application was largely built. The original rejections were made on general grounds; there is now specific code that settles them.
+
+**MSIX — rejected, and now on harder evidence than before.**
+
+- **An unsigned MSIX cannot be installed.** Windows requires the package to be signed *and* the certificate trusted on the device. That collides directly with §8.5's release path, which depends on publishing one **unsigned** release first, because SignPath Foundation only signs projects already released in the form to be signed. Both cannot be true. Windows 11's PowerShell sideload exception is documented by Microsoft as a testing aid, not a distribution mechanism.
+- **The workaround is the practice §8.5 already forbids** — asking each school to install a certificate into Trusted People or Trusted Root, which teaches an ICT coordinator to trust unknown publishers on lab machines.
+- **The container breaks shipped code.** MSIX virtualizes filesystem and registry writes. `StoreAclConfigurator` writes real ACLs to `%ProgramData%` (arch §3.5) and the optional Chrome policy writes `HKLM\SOFTWARE\Policies\Google\Chrome` (§8.3). Manifest declarations exist to disable virtualization for full-trust packages, but they would need proving on lab hardware, and nothing is gained for the cost.
+- **Per-user by default**, where the credential store is per-machine by design (arch §3.3). Per-machine provisioning means `Add-AppxProvisionedPackage` and DISM — a different, worse story for En. Zul than running one `Setup.exe`.
+
+> **The one coherent MSIX variant** is Microsoft Store distribution: the Store signs the package, which removes both the certificate problem and SmartScreen. It still leaves container virtualization to solve, needs a developer account and Store review, and many school labs block the Store outright. Not chosen, but it is the version worth reconsidering if the certificate route ever fails.
+
+**Velopack / Squirrel — rejected.** Good tools for a different product. They install per-user into `%LocalAppData%`, and their principal value is auto-update, which arch §1 rules out entirely: no network service, no update check, no telemetry. That absence is what makes multi-school deployment defensible.
+
+**NSIS — rejected.** Same niche as Inno Setup with more primitive scripting. A lateral move.
+
+**Advanced Installer / InstallShield — rejected.** Commercial, against a project that could not justify RM 900 for a code-signing certificate.
+
+**WiX/MSI remains the only genuine alternative**, and there is a specific trigger for revisiting it: a state education office or district wanting to push the software to hundreds of PCs by Group Policy, for which MSI is native and an EXE is not. Until someone asks for that, its cost — XML authoring with a real learning curve — buys a capability no one in the deployment story wants. Inno Setup's limitation is that it produces only an EXE; that limitation is not currently felt.
+
 ### 8.2 Payload
 
 **Self-contained, single-file, win-x64, .NET 10 LTS.** Roughly 80–100 MB per program, and correct: lab PCs will not have any modern .NET, and telling En. Zul to install a runtime on 40 machines before he can install the app loses him at minute five. Framework-dependent builds are offered as a secondary download for schools with managed images.
