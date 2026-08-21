@@ -76,14 +76,14 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 | # | Item | Where |
 | :-- | :--- | :--- |
-| 1 | Two installer/pipeline fixes — CI never installs Inno Setup; `everyone-none` dropped from the store ACL | Prompt 15a |
-| 2 | **Field verification on real lab hardware** — the pupil-account ACL test above all | arch §11.0 |
-| 3 | ~~T0.4~~ — **done, passed, gate enabled** | arch §11.1 |
-| 4 | Capture the **Malay-locale** sign-in titles | arch §4.2, Appendix B |
+| 1 | **Apply the T0.4 findings to the code.** The identifier title in `RouteCLoginOrchestrator` is wrong, so every sign-in currently aborts — the launcher does not work as it stands | Prompt T0.4b |
+| 2 | Two installer/pipeline fixes — CI never installs Inno Setup; `everyone-none` dropped from the store ACL | Prompt 15a |
+| 3 | Capture the **Malay-locale** sign-in titles | arch §4.2, Appendix B |
+| 4 | Remaining field checks — name grid at 1366×768 with 44 pupils, cold-start on a spinning disk | arch §11.0 |
 | 5 | Ship one **unsigned** release, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 | 6 | The **T0.1 responsibility statement** in all three required placements | PRD §8.7 |
 
-Item 2 is what decides whether this is safe to put in a school, and it cannot be answered from a developer machine. Its most important part — the pupil-account ACL test — has passed; the name grid at 1366×768 and cold-start timing remain.
+**Item 1 is not polish — it is the difference between a working product and one that aborts every sign-in.** T0.4 found the configured identifier title had a word dropped when it was transcribed from T0.2, and exact matching means it never matches. The pupil-account ACL test, the most important of the field checks, has passed.
 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
@@ -94,9 +94,9 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 ## Next step
 
-**Prompt 15a** — two fixes that would stop the first release: the CI workflow calls `iscc` without installing Inno Setup, and the installer dropped `everyone-none` from the credential-store directory permissions.
+**Prompt T0.4b first.** T0.4 passed, but its findings have not reached the code: the identifier title is still the mis-transcribed string, the password title is still treated as a constant it can never be, the UIA gate is still off, and `injection_settle_ms` still sits below the measured p95. Until this runs, every sign-in aborts.
 
-**T0.4 is done and passed**, and the gate is on. It also caught two wrong titles in the config — including that the password page embeds the pupil's own name, so no fixed string could match it. Arch §4.2 now gates that step on `IsPassword` rather than the title.
+**Then Prompt 15a** — the CI workflow calls `iscc` without installing Inno Setup, and the installer dropped `everyone-none` from the credential-store directory permissions.
 
 **Then, for a release:** capture the Malay-locale sign-in titles, put the T0.1 responsibility statement in all three placements (PRD §8.7), ship one unsigned release, and apply to SignPath Foundation.
 

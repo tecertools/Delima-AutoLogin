@@ -393,6 +393,32 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt T0.4b — Apply the T0.4 findings to the code
+
+**Run this before anything else.** T0.4 measured what the sign-in pages actually report, and all four relevant values in `RouteCLoginOrchestrator` and `InjectionEngine` still hold pre-measurement guesses. As it stands the identifier title never matches, so every sign-in aborts at `E02` — safe, but the launcher does not work.
+
+> Apply the T0.4 results to `src/Delima.Win32`, per the revised `Visual_SSO/Technical_Architecture_Visual_SSO.md` §4.2 and Appendix B. Full evidence in `Visual_SSO/T0.4_UIA_Verification.md`.
+>
+> **1. `TitleIdentifierPage` is wrong.** It reads `"Sign in - Google Accounts - Google"`; the measured value is `"Sign in - Google Accounts - Google Chrome"`. The trailing ` Chrome` was dropped when T0.2 transcribed it. **This alone makes the product non-functional**, since exact matching never succeeds.
+>
+> **2. `TitlePasswordPage` cannot be a constant, and must stop being used as one.** The password page shows `"Welcome - Google Chrome"` briefly, then `"Hi <ACCOUNT HOLDER NAME> - Google Chrome"` — **it contains the pupil's own name**, so no fixed string matches it for more than one account.
+>
+> Restructure the password step's verification to what §4.2 now specifies:
+>
+> - **`IsPassword == true` via UIA is the primary gate.** T0.4 justifies this: 49/49 runs, and `true` on no page that was not a password page.
+> - **The title check degrades to sequence-and-stability** — it must have changed away from `TitleIdentifierPage` and held stable for `TitleSettlePolls`. Not equality against a constant.
+> - Keep `TitlePasswordPageGeneric` (`"Welcome - Google Chrome"`) only as an optional positive signal, never as a requirement.
+>
+> **3. Enable the gate.** `CheckUiaPasswordElement` → `true`. The measurement it was waiting on has been made and passed.
+>
+> **4. `InjectionSettleMs` 400 → 700.** T0.4 measured p50 314 ms, p95 417 ms, max 434 ms to `IsPassword` becoming readable. 400 sat below the 95th percentile, so about one sign-in in twenty would have started typing before the field was confirmed. 700 leaves headroom over the measured max.
+>
+> **Then add a regression test for the identifier title specifically.** A single dropped word made the whole product silently non-functional and nothing caught it; assert the configured value equals the measured string exactly, so a future edit cannot reintroduce it quietly.
+>
+> Do not change the sequence gate, the per-keystroke re-verification or the fail-closed semantics — all three are correct.
+
+---
+
 ## Prompt T0.4 — Build the UIA probe
 
 Small observational tool. Procedure and pass conditions are in `Visual_SSO/T0.4_UIA_Verification.md`.
