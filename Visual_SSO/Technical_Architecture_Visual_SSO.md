@@ -292,6 +292,21 @@ Match on the title, subject to all three of:
 >
 > Keep the titles as per-locale configuration (Appendix B) rather than constants. The risk is smaller than feared but not zero, and it costs nothing to leave configurable. If a school reports sign-ins failing at `E02` on every pupil, this is the first thing to check.
 
+> ### Titles are a set, not a string — measured August 2026
+>
+> Re-analysis of the T0.4 captures found the identifier page reporting **two distinct titles**:
+>
+> | Count | Title |
+> | ---: | :--- |
+> | 2025 | `Sign in - Google Accounts - Google Chrome` |
+> | 18 | `Sign in – Google accounts - Google Chrome` — **en-dash (U+2013)**, lowercase `accounts` |
+>
+> About 0.9% of samples. Under exact `Ordinal` matching the second fails, costing roughly one sign-in every two or three classes of 44. It fails closed, so this is a reliability cost rather than a safety one.
+>
+> **Each title setting is therefore a list of accepted exact strings**, matched as `Ordinal` equality against any entry. **Do not normalise dashes or case instead.** That reintroduces the fuzzy matching this section exists to forbid, and T0.3's 47 false ready-states are the reason. A list keeps every individual comparison exact.
+>
+> **The consent title is not yet measured, and probably collides with the identifier title** — both are `accounts.google.com` pages. **The consent state must therefore be entered by sequence, never by title alone:** only after a successful password injection in the same run. A title match with no preceding injection is `E02`, not consent. Otherwise a flow that falls back to the identifier page reads as success, and the pupil is told to press a button that is not on screen.
+
 **Locale is a live risk.** These strings are Google's UI, and `Welcome` becomes something else on a Chrome running in Bahasa Melayu. Titles are per-locale configuration; a school whose lab images differ from the test machine must be able to correct them without a new build. **Verify the Malay-locale strings before the pilot.**
 
 **3. Recommended hardening — field identity (not blocking step 11)**

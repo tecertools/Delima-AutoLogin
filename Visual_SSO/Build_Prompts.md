@@ -393,6 +393,33 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 17 — The title is not a single string, and the consent title was guessed
+
+Three fixes. The first is backed by evidence already in `spike-results/`.
+
+> **1. Accept a list of exact titles, not one.** Re-analysing the T0.4 captures shows the identifier page reports **two different titles**:
+>
+> ```
+> 2025 ×  "Sign in - Google Accounts - Google Chrome"   hyphen, capital A
+>   18 ×  "Sign in – Google accounts - Google Chrome"   EN-DASH (U+2013), lowercase a
+> ```
+>
+> Under `StringComparison.Ordinal` the second never matches — about 0.9% of samples, so roughly one failed sign-in every two or three classes of 44. It fails closed, so this is reliability rather than safety, but it is real and measured.
+>
+> Change the title options from `string` to `IReadOnlyList<string>`, matched as **exact `Ordinal` equality against any entry**. Do **not** solve this by normalising dashes or lowering case — that reintroduces the fuzzy matching §4.2 forbids, and the 47 false ready-states in T0.3 are why. A list keeps every comparison exact while accommodating variants that were actually observed.
+>
+> Seed the list with both strings above, and add the same treatment to the password and consent titles.
+>
+> **2. `TitleConsentPage` is an unmeasured guess, and it collides.** It is currently set to the same string as `TitleIdentifierPage`, which was never captured on lab hardware — arch §4.5 asked for it and the step was skipped.
+>
+> The collision is probably genuine, since both are `accounts.google.com` pages, and that creates a **false-success** path: if the flow ever falls back to the identifier page, the engine reads the identifier title, believes it has reached consent, and tells the pupil to press a blue button that is not there.
+>
+> Guard it by state rather than by string: the consent state may only be entered **after** a successful password injection, never from a title match alone. If the title matches but no password was injected in this run, that is `E02`, not consent. Measure the real consent title when convenient and add it to the list, but do not depend on it being distinct.
+>
+> **3. `everyone-none` is still missing.** `installer/DelimaLauncher.iss` line 54 reads `Permissions: admins-full system-full`. Adding `system-full` was right; dropping `everyone-none` was not. Without it the directory keeps `%ProgramData%`'s inherited read grant to `Users` — every pupil — between installation and first provisioning. Make it `Permissions: everyone-none admins-full system-full`.
+
+---
+
 ## Prompt 16 — The T0.1 statement: fix the legal claim, add the two missing placements
 
 PRD §8.7 requires the statement in three places. `Delima.Admin`'s first-run screen has it and is mostly right; the other two are missing, and one paragraph needs correcting.
