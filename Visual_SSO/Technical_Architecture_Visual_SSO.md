@@ -535,6 +535,23 @@ Gap Analysis §3 requires this and v1 has none. Every failure gets a calm BM mes
 
 ---
 
+### 7.1 Rejected password — the failure this taxonomy was missing
+
+**Added August 2026.** §7 had no code for the password being refused, which is the most likely runtime failure in ordinary use, not an exotic one: PRD §9.2 rotates passwords, so a store one rotation behind is expected. Every other listed failure is rarer.
+
+It matters more than its frequency suggests, because the injection engine cannot see it. Keystrokes are sent successfully whether or not Google accepts them, so **a rejected password is indistinguishable from a successful one at the point of injection**. It can only be detected by observing what the page does next — which is why §4.5's consent step must poll rather than assume.
+
+| | |
+| :--- | :--- |
+| **Detected by** | Still on a password-page title after `window_wait_timeout_ms` |
+| **Pupil message** | Bahasa Melayu, actionable by a seven-year-old — *"Kata laluan tidak diterima. Beritahu cikgu."* |
+| **Teacher action** | Re-import in `Delima.Admin`. **The fix is not on the lab PC**, which is worth stating plainly, because the natural instinct is to retry locally |
+| **Audit log** | Record it. A cluster of these across one class is the signature of a stale bundle after a rotation |
+
+**Do not retry automatically.** Repeated failed sign-ins against a Google account trigger rate limiting and security alerts, and a lab of 44 pupils retrying in unison would look exactly like an attack on the school's domain.
+
+---
+
 ## 8. Audit log
 
 Append-only, local, one file per month, in `%ProgramData%\DELIMa Launcher\audit\`.

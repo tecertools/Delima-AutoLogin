@@ -393,6 +393,41 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 18 — The consent step is a comment, not code
+
+Prompt 17's title lists and the `everyone-none` fix both landed correctly. This is what sits underneath them.
+
+> **1. `RouteCLoginOrchestrator` never verifies anything after the password is typed.** Step 3 consists of ten lines of comment correctly describing §4.5, followed by:
+>
+> ```csharp
+> onStateChanged?.Invoke(LoginFlowState.WaitingForConsentPage);
+> onStateChanged?.Invoke(LoginFlowState.Completed);
+> return RouteCResult.Succeeded(session, totalChars, sw.Elapsed);
+> ```
+>
+> There is no wait, no title check, and no verification that the consent screen appeared. `TitleConsentPage` is declared with both measured variants and **never read**. The run reports success the instant the password keystrokes are sent.
+>
+> **So `Succeeded` currently carries no information.** A wrong password, a 2FA challenge, a suspended account or a dropped connection all return success, and the floating bar then tells a seven-year-old to look at their name and press a blue button that is not on screen.
+>
+> Replace it with a poll, using `TitleConsentPage`, until one of these resolves or `window_wait_timeout_ms` expires:
+>
+> | Observed | Meaning | Result |
+> | :--- | :--- | :--- |
+> | A title in `TitleConsentPage` | Consent screen reached | **Success.** `WaitingForConsentPage`, and stop — the pupil presses Continue |
+> | The destination URL/title | Consent was skipped (domain-trusted) | **Success**, `Completed` |
+> | Still a password-page title after the timeout | **Password rejected** | New failure code — see below |
+> | Anything else | Unknown state | `E02` |
+>
+> **2. Add a failure code for a rejected password.** §7 has no code for it, and it is the single most likely runtime failure in normal operation: PRD §9.2 rotates passwords, so a store one rotation behind is expected, not exotic. A stale credential currently reports success.
+>
+> It needs a Bahasa Melayu message a seven-year-old can act on — something to the effect of *"Kata laluan tidak diterima. Beritahu cikgu."* — and a teacher action pointing at re-importing, since the fix is in `Delima.Admin`, not on the lab PC. Follow the pattern of the existing codes in `FailureTaxonomy.cs`.
+>
+> **3. Remove the two dead title lists.** `TitlePasswordPage` and `TitlePasswordPageGeneric` are declared and never used. `TitlePasswordPage` contains only `"Welcome - Google Chrome"` and is labelled "maintained for backward compatibility" — with nothing, since nothing has shipped. T0.4 established the password page is usually `Hi <name>`, so if either is ever wired in as a strict check it reintroduces the exact defect T0.4 found. Delete them, or wire `TitlePasswordPageGeneric` in as the optional positive signal §4.2 describes. Do not leave them sitting there.
+>
+> **Then add a test** asserting that a run which never reaches a consent or destination title does **not** return `Succeeded`. That is the assertion whose absence let this through.
+
+---
+
 ## Prompt 17 — The title is not a single string, and the consent title was guessed
 
 Three fixes. The first is backed by evidence already in `spike-results/`.
