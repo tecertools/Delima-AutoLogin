@@ -228,10 +228,24 @@ public static class ProvisionEngine
                 outWriter.WriteLine("[3/5] Menguruskan ID peranti dan metadata storan...");
             }
 
-            string deviceId = ManageDeviceId(targetDir, options.PupilAccount, options.DryRun, options.ApplyAcls);
-            if (!options.DryRun)
+            string deviceId;
+            try
             {
-                WriteProvisionMetadata(targetDir, deviceId, payload, options.PupilAccount, options.ApplyAcls);
+                deviceId = ManageDeviceId(targetDir, options.PupilAccount, options.DryRun, options.ApplyAcls);
+                if (!options.DryRun)
+                {
+                    WriteProvisionMetadata(targetDir, deviceId, payload, options.PupilAccount, options.ApplyAcls);
+                }
+            }
+            catch (Exception ex)
+            {
+                errWriter.WriteLine($"[RALAT STORAN] Gagal menguruskan metadata storan: {ex.Message}");
+                return new ProvisionResult
+                {
+                    Success = false,
+                    ExitCode = ExitStoreWriteFailed,
+                    ErrorMessage = $"Failed to write device or provision metadata: {ex.Message}"
+                };
             }
 
             // ================================================================

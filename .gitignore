@@ -11,7 +11,7 @@ roster.json
 *.xls
 !contoh_*.csv
 !**/fixtures/**/*.csv
-audit/
+/audit/
 *.log
 
 # Spike output — ignored by default (a run against real, if synthetic, test

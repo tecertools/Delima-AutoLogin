@@ -1,0 +1,99 @@
+<UserControl x:Class="Delima.Launcher.Views.RalatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Delima.Launcher.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=vm:RalatViewModel}"
+             d:DesignHeight="768" d:DesignWidth="1366"
+             Background="{DynamicResource PageBackgroundBrush}">
+
+    <Grid>
+        <!-- Centered Failure Card Container (520px width, 20px Radius) -->
+        <Border Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="20"
+                Width="540"
+                Padding="40,48"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- Warning / Alert Icon Badge -->
+                <Border Width="80" Height="80"
+                        CornerRadius="40"
+                        Background="#FDF0ED"
+                        BorderBrush="{DynamicResource AlertBrush}"
+                        BorderThickness="2"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,24">
+                    <TextBlock Text="⚠️"
+                               FontSize="36"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <!-- Calm Pupil Message in BM -->
+                <TextBlock Text="{Binding PupilMessage}"
+                           Style="{DynamicResource ScreenHeadingStyle}"
+                           FontSize="24"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,16" />
+
+                <!-- Teacher Code Badge & Actionable Pill -->
+                <Border Background="{DynamicResource SoftSurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="16,12"
+                        Margin="0,0,0,32">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                            <TextBlock Text="Kod Guru: "
+                                       FontWeight="Bold"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <TextBlock Text="{Binding ErrorCode}"
+                                       FontWeight="Bold"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text=" — "
+                                       FontSize="13"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <TextBlock Text="{Binding ConditionDescription}"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding TeacherAction}"
+                                   FontSize="12"
+                                   FontStyle="Italic"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Action Button: Cuba Lagi -->
+                <Button Content="Cuba Lagi"
+                        Command="{Binding RetryCommand}"
+                        Background="{DynamicResource PrimaryBrush}"
+                        Foreground="#FFFFFF"
+                        BorderThickness="0"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Padding="36,14"
+                        HorizontalAlignment="Center"
+                        Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="14" />
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -29,6 +29,12 @@
         <DataTemplate DataType="{x:Type vm:KataLaluanGambarViewModel}">
             <views:KataLaluanGambarView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SedangMasukViewModel}">
+            <views:SedangMasukView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RalatViewModel}">
+            <views:RalatView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>

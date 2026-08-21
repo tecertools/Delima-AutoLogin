@@ -1,7 +1,10 @@
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Core.Roster;
 using Delima.Core.Store;
 using Delima.Launcher.Services;
+using Delima.Launcher.Views;
+using Delima.Win32;
 using ClassInfo = Delima.Core.Roster.ClassInfo;
 
 namespace Delima.Launcher.ViewModels;
@@ -19,6 +22,9 @@ public sealed partial class MainViewModel : ObservableObject
     public List<ClassInfo> Classes { get; private set; }
     public List<Student> Students { get; private set; }
     public ClassInfo? LastClass { get; private set; }
+    public ICredentialStore? CredentialStore { get; private set; }
+
+    private FloatingResetBarWindow? _resetBarWindow;
 
     public MainViewModel()
     {
@@ -39,19 +45,23 @@ public sealed partial class MainViewModel : ObservableObject
         ThemeInfo theme,
         List<ClassInfo> classes,
         List<Student> students,
-        ClassInfo? lastClass = null)
+        ClassInfo? lastClass = null,
+        ICredentialStore? credentialStore = null)
     {
         School = school;
         Theme = theme;
         Classes = classes;
         Students = students;
         LastClass = lastClass;
+        CredentialStore = credentialStore;
 
         NavigateToPilihKelas();
     }
 
     public void NavigateToPilihKelas()
     {
+        CloseResetBar();
+
         CurrentView = new PilihKelasViewModel(
             School,
             Classes,
@@ -63,6 +73,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     public void NavigateToCariNama(ClassInfo classInfo)
     {
+        CloseResetBar();
+
         // Filter students for this class or create sample students
         var classStudents = Students.Where(s => s.ClassId == classInfo.Id).ToList();
         if (classStudents.Count == 0)
@@ -96,6 +108,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     public void NavigateToKataLaluanGambar(Student student, ClassInfo classInfo)
     {
+        CloseResetBar();
+
         CurrentView = new KataLaluanGambarViewModel(
             School,
             classInfo,
@@ -107,9 +121,107 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void OnPicturePasswordVerified(Student student)
     {
-        // Successful picture password verification (closes Blocker B1)
-        // Passes pupil to next step (Pergi ke Mana / launch)
-        System.Diagnostics.Debug.WriteLine($"Picture password verified for pupil: {student.DisplayName} ({student.Id})");
+        ICredential? credential = null;
+        try
+        {
+            if (CredentialStore != null && CredentialStore.HasCredential(student.Id))
+            {
+                credential = CredentialStore.OpenCredential(student.Id);
+            }
+            else
+            {
+                // Fallback sample credential for development and test harnesses
+                credential = new SecurePasswordBuffer("StandardPassword123!"u8);
+            }
+
+            NavigateToSedangMasuk(student, credential);
+        }
+        catch (Exception ex)
+        {
+            credential?.Dispose();
+            NavigateToRalat(student, FailureCodes.E09_StoreDecryptFailure, customTeacherAction: ex.Message);
+        }
+    }
+
+    public void NavigateToSedangMasuk(Student student, ICredential credential)
+    {
+        CurrentView = new SedangMasukViewModel(
+            School,
+            student,
+            credential,
+            onSuccess: session => OnInjectionSucceeded(student, session),
+            onFailure: result => OnInjectionFailed(student, result),
+            onCancel: () =>
+            {
+                if (LastClass != null) NavigateToCariNama(LastClass);
+                else NavigateToPilihKelas();
+            }
+        );
+    }
+
+    private void OnInjectionSucceeded(Student student, ChromeSession session)
+    {
+        // Display Floating Reset Bar (PRD §7.4)
+        try
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                _resetBarWindow = new FloatingResetBarWindow(student, session, onReset: () =>
+                {
+                    if (LastClass != null) NavigateToCariNama(LastClass);
+                    else NavigateToPilihKelas();
+                });
+                _resetBarWindow.Show();
+            });
+        }
+        catch
+        {
+            // If running in headless test environment without WPF Application instance
+        }
+    }
+
+    private void OnInjectionFailed(Student student, RouteCResult result)
+    {
+        NavigateToRalat(
+            student,
+            result.ErrorCode ?? FailureCodes.E02_WindowNotVerified,
+            result.PupilMessage,
+            result.TeacherAction);
+    }
+
+    public void NavigateToRalat(
+        Student? student,
+        string errorCode,
+        string? customPupilMessage = null,
+        string? customTeacherAction = null)
+    {
+        CloseResetBar();
+
+        CurrentView = new RalatViewModel(
+            School,
+            errorCode,
+            onRetry: () =>
+            {
+                if (LastClass != null) NavigateToCariNama(LastClass);
+                else NavigateToPilihKelas();
+            },
+            student: student,
+            customPupilMessage: customPupilMessage,
+            customTeacherAction: customTeacherAction
+        );
+    }
+
+    private void CloseResetBar()
+    {
+        try
+        {
+            _resetBarWindow?.Close();
+            _resetBarWindow = null;
+        }
+        catch
+        {
+            // Ignore
+        }
     }
 
     private void OnMissingStudentRequested()

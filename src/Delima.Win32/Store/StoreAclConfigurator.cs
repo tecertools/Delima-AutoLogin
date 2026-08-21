@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Delima.Core.Audit;
 
 namespace Delima.Win32.Store;
 
@@ -64,19 +65,21 @@ public static class StoreAclConfigurator
                     AccessControlType.Allow));
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore identity resolution failure
+            string auditDir = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(filePath)) ?? DpapiCredentialStore.GetDefaultStoreDirectory(), "audit");
+            AuditLogger.RecordWarning($"Failed to resolve or add current user identity rule to ACL for '{filePath}': {ex.Message}", filePath, auditDir);
         }
 
         try
         {
             fileInfo.SetAccessControl(fileSecurity);
         }
-        catch (UnauthorizedAccessException)
+        catch (Exception ex)
         {
-            // If running non-elevated (e.g. standard developer session without admin privileges),
-            // SetAccessControl may fail when modifying protected ACLs.
+            string auditDir = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(filePath)) ?? DpapiCredentialStore.GetDefaultStoreDirectory(), "audit");
+            AuditLogger.RecordAclFailure(filePath, ex.Message, pupilAccount, auditDir);
+            throw new UnauthorizedAccessException($"Failed to apply security ACLs to store file '{filePath}': {ex.Message}", ex);
         }
     }
 
@@ -140,9 +143,10 @@ public static class StoreAclConfigurator
         {
             dirInfo.SetAccessControl(dirSecurity);
         }
-        catch (UnauthorizedAccessException)
+        catch (Exception ex)
         {
-            // Non-elevated fallback
+            AuditLogger.RecordAclFailure(auditDirectoryPath, ex.Message, pupilAccount, auditDirectoryPath);
+            throw new UnauthorizedAccessException($"Failed to apply security ACLs to audit directory '{auditDirectoryPath}': {ex.Message}", ex);
         }
     }
 
@@ -192,9 +196,11 @@ public static class StoreAclConfigurator
         {
             dirInfo.SetAccessControl(dirSecurity);
         }
-        catch (UnauthorizedAccessException)
+        catch (Exception ex)
         {
-            // Non-elevated fallback
+            string auditDir = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(publicDirectoryPath)) ?? DpapiCredentialStore.GetDefaultStoreDirectory(), "audit");
+            AuditLogger.RecordAclFailure(publicDirectoryPath, ex.Message, pupilAccount: null, auditDir);
+            throw new UnauthorizedAccessException($"Failed to apply security ACLs to public directory '{publicDirectoryPath}': {ex.Message}", ex);
         }
     }
 
