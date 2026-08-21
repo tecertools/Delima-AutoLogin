@@ -339,6 +339,26 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 | B — account chooser, then DELIMa's own flow | **Failed.** `/AccountChooser` returns HTTP 400 **with or without** a `continue` parameter — the endpoint itself is gone, not merely restricted |
 | **C — inject the email, then the password** | **Selected.** Two injections, both mechanisms proven at T0.3 |
 
+> ### Route C has three steps, not two — the OAuth consent screen
+>
+> **Observed August 2026.** After the password is accepted, Google shows a consent screen — *"Sign in to DELIMa 3 · Google will allow DELIMa 3 to access this info about you"*, listing name, profile picture and email address, with **Cancel** and **Continue**. Only after **Continue** does the browser reach DELIMa.
+>
+> **It appears on every sign-in because of §4.4's throwaway profile.** A consent granted once is remembered in the Chrome profile; a profile discarded after every session has nothing to remember. The design choice that provides session isolation is the same one that makes this screen permanent.
+>
+> **The launcher must not click Continue on the pupil's behalf.** This is a consent dialog — a child granting Google permission to release their name and email to a third-party application. Automating it away means the software consents on behalf of a seven-year-old, silently, every lesson. That is a different act from typing a credential the school already holds, and it is exactly the kind of thing that would, rightly, be raised in any review of this product. **Ship the click to the pupil.**
+>
+> **That is a smaller ask than it sounds.** It is one large, centred button. The product exists because a seven-year-old cannot type a 26-character email address; pressing a button is not that problem. The `Sedang Masuk` screen should show a plain instruction — *"Tekan butang biru: Continue"* — with the same illustration language as the rest of the pupil UI.
+>
+> **The proper fix is not in this software.** A Google Workspace administrator can mark an OAuth application as trusted for the domain, which suppresses the consent screen entirely for that domain's users. DELIMa is MOE's own application on MOE's own domain, so this is available to BSTP and to nobody else. **Worth raising with them alongside T0.1** — it is a small, concrete, uncontroversial request, unlike T0.1, and it would remove a step from every pupil's sign-in nationally.
+>
+> **Three consequences for §4.2:**
+>
+> 1. The sequence gate gains a third state. Identifier → password → **consent** → destination. The engine must recognise the consent page and stop there rather than treating it as a failed sign-in.
+> 2. The consent page has its own window title, not yet captured. **Add it to the T0.4-style capture** before the pilot.
+> 3. `E0x` for "stuck on consent" is not a failure — it is the normal terminal state of injection. The launcher hands over to the pupil and stops.
+>
+> **Unverified: whether pupil accounts behave identically.** The observation was made on a teacher account (`KPM-Guru`). Murid accounts may be configured differently, and a domain-trusted app would skip this entirely. **Confirm with one real pupil account before the pilot.**
+
 **Route C is not a consolation.** It removes every dependency on Google or DELIMa passing a parameter along, both of which have now demonstrably changed or never existed. What the launcher types, it controls.
 
 **Its cost is a second verified injection**, which is what §4.2's page-identity rules exist to make safe: the engine must establish which of the two fields it is looking at before it types anything into either.
