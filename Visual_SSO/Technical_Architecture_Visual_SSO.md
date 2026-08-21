@@ -263,6 +263,29 @@ Match on the title, subject to all three of:
 - **The title must be stable across ≥ 3 consecutive 100 ms polls** before anything is injected. Titles lag page state during a transition, and the harness hit precisely this race in T0.3 — sampling a transient title mid-update and acting on it. A settle requirement is what fixed it there and is what fixes it here.
 - **The password step is sequence-gated.** The engine may only inject the password after it has observed a verified transition *out of* the identifier title. A password injection is never authorised by matching `Welcome` in isolation — only by having watched the flow arrive there.
 
+> ### Revised again, August 2026, by T0.4 — the password page has no fixed title
+>
+> T0.4 measured what the pages actually report, and two of T0.2's captured strings were wrong in ways an exact match would not survive.
+>
+> | Page | T0.2 recorded | T0.4 measured |
+> | :--- | :--- | :--- |
+> | Identifier | `Sign in - Google Accounts - Google` | `Sign in - Google Accounts - Google Chrome` |
+> | Password | `Welcome - Google Chrome` | `Welcome - Google Chrome` **briefly**, then `Hi <ACCOUNT HOLDER NAME> - Google Chrome` |
+>
+> **The identifier string was simply mis-transcribed** — ` Chrome` was dropped — and would have failed every match. Corrected in Appendix B.
+>
+> **The password page is the real problem: its title contains the pupil's own name.** Google shows a generic `Welcome` while loading, then replaces it with `Hi ` plus the account's profile name. **No single configured constant can match it**, because every pupil produces a different string.
+>
+> **Resolution — the password step no longer verifies on title alone:**
+>
+> 1. **`IsPassword` via UIA becomes the primary gate for the password step.** T0.4 justifies this directly: across 49 runs that reached the page it reported `true` **49/49**, and it reported `true` on **no page that was not a password page** — the false-positive direction, the only one that can put a password in a visible field, was clean.
+> 2. **The title check for that step degrades to a sequence-and-stability test** — the title must have changed away from the identifier title and held stable for `title_settle_polls` — rather than an equality test against a constant.
+> 3. **Optionally, and stronger:** construct the expected title per pupil as `Hi {name} - Google Chrome`. Be careful — `{name}` is the **Google profile name from MOE's directory**, which is not guaranteed to equal the roster display name. Treat a mismatch as "cannot confirm" and fall back to (1) and (2); never as a hard failure, or pupils whose directory name differs will simply never sign in.
+>
+> **The identifier step keeps exact-match**, since its title is a fixed string and contains nothing pupil-specific.
+>
+> **`injection_settle_ms` raised 400 → 700.** T0.4 measured p50 314 ms, p95 417 ms and max 434 ms from the password page appearing to `IsPassword` becoming readable. The old 400 ms default sat below the 95th percentile, meaning roughly one sign-in in twenty would have begun typing before the field was confirmed.
+
 **Locale is a live risk.** These strings are Google's UI, and `Welcome` becomes something else on a Chrome running in Bahasa Melayu. Titles are per-locale configuration; a school whose lab images differ from the test machine must be able to correct them without a new build. **Verify the Malay-locale strings before the pilot.**
 
 **3. Recommended hardening — field identity (not blocking step 11)**
@@ -569,14 +592,22 @@ If that throws, the credential store keeps whatever permissions it had, the app 
 
 ### 11.1 T0.4 — does UIA report `IsPassword` reliably?
 
-> **Implementation status, August 2026: built but inert.** `Delima.Win32/UiaHelper.cs` and the gate in `RouteCLoginOrchestrator` exist and fail closed correctly — every error path returns `false`, and the call site treats `false` as abort-to-`E02` rather than proceed. That is the right direction to fail.
+> **T0.4 COMPLETE — 21 August 2026. PASS. Enable the gate.**
 >
-> **It is switched off in two independent ways, and both must be closed together:**
+> 100 runs on lab hardware; 49 reached the password page. Results:
 >
-> 1. `CheckUiaPasswordElement` defaults to `false`, so the gate never runs.
-> 2. `ChromeSession` does not pass `--force-renderer-accessibility`, so Chrome exposes no accessibility tree to query. Enabling the gate without adding the flag would make every password injection abort — safe, but the product would never sign anyone in.
+> | Q | Result |
+> | :-- | :--- |
+> | 1 — focus resolvable, identifier page | **2025/2025 samples** — PASS |
+> | 2 — `IsPassword == false` there | **100%**, zero `true` — PASS |
+> | 3 — focus resolvable, password page | PASS on every run that reached it |
+> | 4 — `IsPassword == true` there | **49/49 runs** — PASS, and **zero false positives on any non-password page** |
+> | 5 — latency to readable | p50 314 ms, p95 417 ms, max 434 ms → `injection_settle_ms` raised to 700 |
+> | 6 — accessibility flag startup cost | **Not measured** — no `--no-accessibility` comparison run was made. Outstanding, minor. |
 >
-> Anyone reading the code today would reasonably conclude the T0.4 hardening is active. It is not. Do not treat §4.2's field-identity layer as present until this spike has run and both switches are on.
+> **Action: set `CheckUiaPasswordElement = true`.** The property is reliable in the direction that matters, and §4.2 now depends on it because the password page title turned out to contain the pupil's name.
+>
+> Full record: `T0.4_UIA_Verification.md`.
 
 **Recommended, not blocking.** T0.2 confirmed the identifier and password pages carry distinguishable titles, so step 11 can proceed on title verification (§4.2) alone. This spike measures the hardening layer that removes the locale and redesign risks titles carry.
 
@@ -646,11 +677,12 @@ AES-256-GCM, HMAC-SHA256 and the CSPRNG come from the BCL. **No custom cryptogra
 | :--- | :--- | :--- |
 | `picture_password_required` | `true` | `false` reintroduces blocker B1; warned and logged |
 | `idle_reset_seconds` | `600` | Auto-logout, profile wipe |
-| `injection_settle_ms` | `400` | After window verification, before first keystroke |
+| `injection_settle_ms` | `700` | After window verification, before first keystroke. **Raised from 400 by T0.4** — measured p95 to `IsPassword` readable was 417 ms and max 434 ms, so 400 sat below the 95th percentile |
 | `window_wait_timeout_ms` | `30000` | Then `E02` |
 | `entry_url` | `https://d3.delima.edu.my/landing` | Confirmed by T0.2 |
-| `title_identifier_page` | `Sign in - Google Accounts - Google` | **Per locale.** Exact full string, never a substring (§4.2) |
-| `title_password_page` | `Welcome - Google Chrome` | **Per locale.** Exact full string; `Welcome` alone is generic |
+| `title_identifier_page` | `Sign in - Google Accounts - Google Chrome` | **Per locale.** Exact full string (§4.2). Corrected by T0.4 — the earlier value omitted ` Chrome` and would never have matched |
+| `title_password_page_generic` | `Welcome - Google Chrome` | The password page **before** the account name loads |
+| `title_password_page_named` | `Hi {name} - Google Chrome` | The password page **after** it loads. `{name}` is the Google profile name, **not** the roster display name — see §4.2 |
 | `title_settle_polls` | `3` | Consecutive 100 ms polls a title must hold before injecting (§4.2) |
 | `store_max_age_days` | `30` | Then `E10` |
 | `force_signout` | `true` | Lab only; never at home |
