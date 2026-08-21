@@ -35,11 +35,12 @@ Requirement 3 is the only one that is nearly free. Requirements 1 and 2 together
 
 | Task | Question it answers | State |
 | :-- | :--- | :--- |
-| **T0.1** | Written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords | **Not started.** No document in the repository. |
-| **T0.2** | Is the live `d3.delima.edu.my` SSO entry URL confirmed, and is `login_hint` honoured end to end? | **Not started.** `InjectionSpike/Program.cs` still carries a placeholder default with a comment saying so. |
+| **T0.1** | Written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords | **Not started, and deliberately routed around** — see §2.2. Still worth pursuing. |
+| **T0.2** | Is the live `d3.delima.edu.my` SSO entry URL confirmed, and is `login_hint` honoured end to end? | **Passed, August 2026.** Google OAuth 2.0; no pre-fill route works, so **route C** — the launcher types the email, then the password. See `T0.2_URL_Confirmation.md`. |
+| **T0.4** | Does Chrome report `IsPassword` via UI Automation, so the engine can verify the *field* and not just the page? | **Passed, 21 August 2026.** 49/49 runs, zero false positives. Also caught two wrong window titles in config. See `T0.4_UIA_Verification.md`. |
 | **T0.3** | Does injection actually work — 50 runs on lab hardware with reserved characters? | **Passed, 17 August 2026.** `SendInput` 100/100 across two independent 50-run batches on real lab hardware, including every reserved character combined in one password. `SendKeys` control failed exactly as predicted on the same hardware — corrupted 8 of 9 reserved-character passwords, crashed outright on the ninth. See arch §4.2–4.3 for the full result and one open follow-up (a topmost-overlay requirement, now confirmed rather than theoretical). |
 
-**T0.3 no longer blocks.** `SendInput` reliably delivers a password into a verified Chrome window on real lab hardware — the question this whole document was contingent on is answered. **T0.1 is now the active blocker**, and it is slower because it depends on someone outside this project.
+**T0.2, T0.3 and T0.4 have all passed.** Injection works, the sign-in route is settled, and the engine can verify it is looking at a real password field. **T0.1 alone remains unanswered**, and §2.2 records the decision to publish without it rather than wait indefinitely.
 
 ### 2.2 Multi-school distribution raises the stakes on T0.1
 
