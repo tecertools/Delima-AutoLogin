@@ -393,6 +393,27 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 19 — Three password failure codes, one observable state
+
+Small, and it matters because the failure taxonomy is what a teacher reads at 8:40 in the morning with a class waiting.
+
+> `FailureTaxonomy.cs` declares three password-related codes. Only `E14_PasswordRejected` is ever raised; `E04_WrongPassword` and `E05_PasswordStale` appear nowhere in `RouteCLoginOrchestrator`.
+>
+> **`E04` and `E14` are the same event.** Both mean Google did not accept the password, and the engine's only observation is "still on a password-page title after the timeout" — nothing distinguishes a wrong password from a stale one. Two codes for one state would be untidy; the problem is that they give **contradictory instructions**:
+>
+> - `E04` → *"Update via Mod Guru; check password_version"*
+> - `E14` → *"Re-import in Delima.Admin"*
+>
+> A teacher following the wrong one loses the lesson. **Keep `E14`, delete `E04`**, and make sure `E14`'s teacher action is the one you would actually want followed. If Mod Guru genuinely can fix a single pupil faster than a re-import, say both, in order — *"Mod Guru for one pupil; re-import in Delima.Admin if the whole class fails"* — because that distinction is real and useful.
+>
+> **`E05_PasswordStale` is also dead**, and needs a decision rather than deletion by default. It was meant to catch a stale credential *before* typing anything, by comparing `password_version`. That would be strictly better than `E14` — it avoids a failed sign-in attempt entirely, and avoids 44 pupils generating failed authentications against the school's domain in the same minute (§7.1). But `store_max_age_days` and `E10` already cover staleness by age, and the bundle and store are provisioned together so their versions may never diverge in practice.
+>
+> **Either implement it or remove it.** A code that cannot fire is worse than no code: it will end up in `Panduan_Pemasangan.pdf`, and a coordinator will one day try to diagnose against a symptom the software cannot produce.
+>
+> Then check the rest of the taxonomy the same way — **any code with zero call sites is either a missing feature or dead weight**, and both are worth knowing before the guides are written.
+
+---
+
 ## Prompt 18 — The consent step is a comment, not code
 
 Prompt 17's title lists and the `everyone-none` fix both landed correctly. This is what sits underneath them.
