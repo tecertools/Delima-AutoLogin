@@ -406,7 +406,7 @@ Small observational tool. Procedure and pass conditions are in `Visual_SSO/T0.4_
 > 1. Launch Chrome at a configurable URL, defaulting to `https://d3.delima.edu.my/landing`, **with `--force-renderer-accessibility`** — without it Chrome exposes no accessibility tree and every sample is meaningless
 > 2. Poll every 100 ms until the window closes, appending one CSV row per sample: `run`, `elapsed_ms`, `window_title`, `focus_resolvable`, `is_password`
 > 3. `focus_resolvable` is whether UIA returned a focused element at all; `is_password` is the property value, left **blank** when unresolvable — do not write `false` for "could not tell", since questions 2 and 4 depend on telling those apart
-> 4. When the operator closes the window, finish the run and relaunch, up to `--runs` (default 50)
+> 4. When the operator closes the window, finish the run and relaunch, up to `--runs` (**default 20** — fifty is more than the questions need and long enough that runs get abandoned mid-way, which biases the sample)
 >
 > Also add a `--no-accessibility` switch that omits the flag, so question 6 — whether forcing accessibility slows Chrome's start — can be measured by comparison.
 >

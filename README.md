@@ -78,7 +78,7 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 | :-- | :--- | :--- |
 | 1 | Two installer/pipeline fixes — CI never installs Inno Setup; `everyone-none` dropped from the store ACL | Prompt 15a |
 | 2 | **Field verification on real lab hardware** — the pupil-account ACL test above all | arch §11.0 |
-| 3 | **T0.4** — measure UIA `IsPassword`, then enable the gate that is currently built but inert | arch §11.1 |
+| 3 | ~~T0.4~~ — **done, passed, gate enabled** | arch §11.1 |
 | 4 | Capture the **Malay-locale** sign-in titles | arch §4.2, Appendix B |
 | 5 | Ship one **unsigned** release, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 | 6 | The **T0.1 responsibility statement** in all three required placements | PRD §8.7 |
@@ -90,13 +90,13 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 - **T0.3** — run the injection spike, 50 runs, on representative lab hardware. **Passed, 17 August 2026.** `SendInput` scored 100/100 across two independent 50-run batches on real lab hardware; the `SendKeys` control failed exactly as predicted. Full results in `Visual_SSO/T0.3_Injection_Test_Protocol.md`.
 - **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started, and no longer a blocker.** Requirement G-1 was consciously relaxed: the project publishes without it and places the responsibility on each downloading school instead, via the statement specified in PRD §8.7. Still worth pursuing — see below.
 - **T0.2** — confirm the live SSO entry URL and whether `login_hint` is honoured. **Passed, August 2026.** DELIMa signs in via Google OAuth 2.0 on its own Cloud project. No pre-fill route works — DELIMa drops `login_hint`, and `/AccountChooser` returns 400 — so **route C was selected**: the launcher types the email, then the password. The identifier and password pages carry distinguishable window titles, so arch §4.2's verification holds. Full record in `Visual_SSO/T0.2_URL_Confirmation.md`.
-- **T0.4** — verify Chrome reports `IsPassword` through UI Automation, so §4.2 can gate on the *field* rather than only the page title. **Not started; recommended before the pilot.** Needs a lab PC and an email address — no password. `Visual_SSO/T0.4_UIA_Verification.md`.
+- **T0.4** — verify Chrome reports `IsPassword` through UI Automation. **Passed, 21 August 2026.** 49/49 runs on lab hardware, zero false positives on any non-password page. The gate is enabled. It also caught two wrong window titles in the config, one of which — the password page containing the pupil's own name — meant no fixed string could ever have matched it. `Visual_SSO/T0.4_UIA_Verification.md`.
 
 ## Next step
 
 **Prompt 15a** — two fixes that would stop the first release: the CI workflow calls `iscc` without installing Inno Setup, and the installer dropped `everyone-none` from the credential-store directory permissions.
 
-**Then T0.4**, which is the last technical unknown. `UiaHelper` and its gate are built and fail closed correctly, but switched off because nobody has measured whether Chrome actually reports the property. Until that runs, arch §4.2 rests on window titles alone — which works, but carries locale and redesign risk that the field check removes.
+**T0.4 is done and passed**, and the gate is on. It also caught two wrong titles in the config — including that the password page embeds the pupil's own name, so no fixed string could match it. Arch §4.2 now gates that step on `IsPassword` rather than the title.
 
 **Then, for a release:** capture the Malay-locale sign-in titles, put the T0.1 responsibility statement in all three placements (PRD §8.7), ship one unsigned release, and apply to SignPath Foundation.
 
