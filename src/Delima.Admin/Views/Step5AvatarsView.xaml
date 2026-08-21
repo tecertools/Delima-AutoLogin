@@ -1,0 +1,78 @@
+<UserControl x:Class="Delima.Admin.Views.Step5AvatarsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:Delima.Admin.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="700">
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Text="Avatar &amp; Kata Laluan Gambar" Style="{StaticResource StepHeading}" />
+            <TextBlock Text="Avatar diberikan secara automatik, unik dalam setiap kelas." Style="{StaticResource StepSubHeading}" />
+
+            <!-- Class Filter Dropdown -->
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Tapis Mengikut Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
+                <ComboBox Grid.Column="2" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" />
+                <Button Grid.Column="4" Content="Cetak Helaian Avatar Kelas" Style="{StaticResource SmallButton}" Click="OnPrintAvatarSheetClick" />
+            </Grid>
+
+            <!-- Avatar List for Selected Class -->
+            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Padding="14,10" Margin="0,0,0,18">
+                <ItemsControl ItemsSource="{Binding AvatarItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="#EEECE4" BorderThickness="0,0,0,1" Padding="0,7">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Mini Avatar Circle -->
+                                    <Border Grid.Column="0" Width="26" Height="26" CornerRadius="13" Background="{StaticResource AmberBgBrush}" VerticalAlignment="Center">
+                                        <TextBlock Text="👤" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
+                                        <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13"/>
+                                        <TextBlock Text="{Binding Avatar, StringFormat=' — {0}'}" Foreground="{StaticResource Ink2Brush}" FontSize="13"/>
+                                        <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="#8A8676" FontSize="12"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="2" Content="Tukar" Style="{StaticResource SmallButton}" Background="Transparent" BorderThickness="0" Foreground="{StaticResource PrimaryGreenBrush}" FontWeight="Bold" Click="OnCycleAvatarClick" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <!-- Picture Password Policy Toggle Switch -->
+            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="{StaticResource StripeBgBrush}" Padding="14">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding PicturePasswordRequired, Mode=TwoWay}" VerticalContentAlignment="Center">
+                        <TextBlock Text="Kata Laluan Gambar (3-ikon) diperlukan untuk setiap murid" FontWeight="Bold" FontSize="13" Margin="8,0,0,0" />
+                    </CheckBox>
+
+                    <!-- Warning Box if Disabled -->
+                    <Border Background="{StaticResource DangerBgBrush}" BorderBrush="#F0C0C0" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,12,0,0"
+                            Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVisConv}}">
+                        <TextBlock Text="AMARAN: Melumpuhkan ini mendedahkan semula risiko B1 — sebarang murid boleh log masuk sebagai rakan sekelas dengan hanya menekan kad nama. Pilihan ini direkodkan dalam log audit." 
+                                   TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{StaticResource DangerTextBrush}" FontSize="12" />
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

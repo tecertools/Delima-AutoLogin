@@ -35,6 +35,12 @@
         <DataTemplate DataType="{x:Type vm:RalatViewModel}">
             <views:RalatView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ModGuruPinViewModel}">
+            <views:ModGuruPinView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ModGuruDashboardViewModel}">
+            <views:ModGuruDashboardView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>

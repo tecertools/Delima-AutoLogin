@@ -124,11 +124,11 @@ public sealed class KioskGuard : IDisposable
                 return (IntPtr)1;
             }
 
-            // Suppress Ctrl+Esc
-            if (kb.vkCode == NativeMethods.VK_ESCAPE && (NativeMethods.GetForegroundWindow() != IntPtr.Zero))
+            // Suppress Ctrl+Esc (Start menu shortcut)
+            var isCtrlDown = (NativeMethods.GetKeyState((int)NativeMethods.VK_CONTROL) & 0x8000) != 0;
+            if (isCtrlDown && kb.vkCode == NativeMethods.VK_ESCAPE)
             {
-                // If Ctrl is held down
-                // (Note: Ctrl+Shift+Esc is handled at OS kernel level; Alt+Esc/Ctrl+Esc handled here)
+                return (IntPtr)1;
             }
         }
 

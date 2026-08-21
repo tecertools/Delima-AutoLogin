@@ -76,23 +76,38 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Action Button: Cuba Lagi -->
-                <Button Content="Cuba Lagi"
-                        Command="{Binding RetryCommand}"
-                        Background="{DynamicResource PrimaryBrush}"
-                        Foreground="#FFFFFF"
-                        BorderThickness="0"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Padding="36,14"
-                        HorizontalAlignment="Center"
-                        Cursor="Hand">
-                    <Button.Resources>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="CornerRadius" Value="14" />
-                        </Style>
-                    </Button.Resources>
-                </Button>
+                <!-- Action Buttons: Cuba Lagi & Mod Guru -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Cuba Lagi"
+                            Command="{Binding RetryCommand}"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Foreground="#FFFFFF"
+                            BorderThickness="0"
+                            FontSize="17"
+                            FontWeight="Bold"
+                            Height="48"
+                            Padding="28,0"
+                            Margin="0,0,12,0"
+                            Cursor="Hand"
+                            TabIndex="1"
+                            AutomationProperties.Name="Cuba masuk semula">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="14" />
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                    <Button Style="{StaticResource OutlineButtonStyle}"
+                            Content="Mod Guru"
+                            Command="{Binding OpenTeacherModeCommand}"
+                            Height="48"
+                            Padding="24,0"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            TabIndex="2"
+                            AutomationProperties.Name="Buka Mod Guru untuk selesaikan ralat" />
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>

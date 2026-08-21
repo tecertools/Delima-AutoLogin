@@ -1,0 +1,239 @@
+<UserControl x:Class="Delima.Admin.Views.Step3RosterImportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:Delima.Admin.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="750">
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+        <conv:StringEqualityConverter x:Key="StringEqConv" />
+        <conv:EqualityToVisibilityConverter x:Key="EqToVisConv" />
+        <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisConv" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Text="Import Senarai Murid" Style="{StaticResource StepHeading}" />
+            <TextBlock Text="Nama, kelas dan ID DELIMa sahaja. Tiada kata laluan pada langkah ini." Style="{StaticResource StepSubHeading}" />
+
+            <!-- Sub-Step Toggle Switch Tabs -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <RadioButton Content="1. Pemetaan Lajur" Style="{StaticResource SubStepToggleButton}" Margin="0,0,8,0"
+                             IsChecked="{Binding ActiveSubView, Converter={StaticResource StringEqConv}, ConverterParameter=Mapping, Mode=TwoWay}" />
+                <RadioButton Content="2. Laporan Percubaan" Style="{StaticResource SubStepToggleButton}"
+                             IsChecked="{Binding ActiveSubView, Converter={StaticResource StringEqConv}, ConverterParameter=DryRun, Mode=TwoWay}" />
+            </StackPanel>
+
+            <!-- SUB-VIEW 3A: COLUMN MAPPING -->
+            <StackPanel Visibility="{Binding ActiveSubView, Converter={StaticResource EqToVisConv}, ConverterParameter=Mapping}">
+                <!-- File Picker Row -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Fail Roster APDM (.csv, .xlsx, .xls)" Style="{StaticResource FieldLabel}" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding FilePath, Mode=OneWay}" IsReadOnly="True" />
+                        <Button Grid.Column="2" Content="Pilih Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" />
+                    </Grid>
+                </Grid>
+
+                <!-- Encoding & Diacritic Sniffing Banner -->
+                <Border Background="{StaticResource StripeBgBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,14"
+                        Visibility="{Binding HasFileLoaded, Converter={StaticResource BoolToVisConv}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Pengekodan &amp; Nama Khas: " FontWeight="Bold" Foreground="{StaticResource Ink2Brush}" FontSize="12"/>
+                        <TextBlock Grid.Column="1" Text="{Binding DiacriticPreview}" Foreground="{StaticResource PrimaryGreenBrush}" FontWeight="SemiBold" FontSize="12"/>
+                    </Grid>
+                </Border>
+
+                <!-- 5 Fixed Target Fields Mapping Table -->
+                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Background="#FFFFFF" Padding="14,10" Margin="0,0,0,16"
+                        Visibility="{Binding HasFileLoaded, Converter={StaticResource BoolToVisConv}}">
+                    <StackPanel>
+                        <TextBlock Text="Padankan 5 Lajur Sasaran" FontWeight="Bold" Margin="0,0,0,8" />
+
+                        <!-- Row 1: Nama Penuh -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Nama penuh" FontWeight="SemiBold" />
+                                <TextBlock Text=" *" Foreground="{StaticResource DangerTextBrush}" FontWeight="Bold" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding SourceHeaders}" SelectedItem="{Binding SelectedFullNameCol, Mode=TwoWay}" SelectionChanged="OnMappingSelectionChanged" />
+                        </Grid>
+
+                        <!-- Row 2: Kelas -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Kelas" FontWeight="SemiBold" />
+                                <TextBlock Text=" *" Foreground="{StaticResource DangerTextBrush}" FontWeight="Bold" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding SourceHeaders}" SelectedItem="{Binding SelectedClassNameCol, Mode=TwoWay}" SelectionChanged="OnMappingSelectionChanged" />
+                        </Grid>
+
+                        <!-- Row 3: Tahun -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Tahun" FontWeight="SemiBold" />
+                                <TextBlock Text=" *" Foreground="{StaticResource DangerTextBrush}" FontWeight="Bold" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding GradeOptions}" SelectedItem="{Binding SelectedGradeCol, Mode=TwoWay}" SelectionChanged="OnMappingSelectionChanged" />
+                        </Grid>
+
+                        <!-- Row 4: ID DELIMa -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="ID DELIMa" FontWeight="SemiBold" />
+                                <TextBlock Text=" *" Foreground="{StaticResource DangerTextBrush}" FontWeight="Bold" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding SourceHeaders}" SelectedItem="{Binding SelectedDelimaIdCol, Mode=TwoWay}" SelectionChanged="OnMappingSelectionChanged" />
+                        </Grid>
+
+                        <!-- Row 5: No. KP / Daftar -->
+                        <Grid Margin="0,4,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="No. KP / No. Daftar" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding SourceHeaders}" SelectedItem="{Binding SelectedRegisterNoCol, Mode=TwoWay}" SelectionChanged="OnMappingSelectionChanged" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Live Preview Table (10 rows) -->
+                <StackPanel Margin="0,0,0,10" Visibility="{Binding HasFileLoaded, Converter={StaticResource BoolToVisConv}}">
+                    <TextBlock Text="Pratonton Langsung (10 Baris Pertama)" Style="{StaticResource FieldLabel}" />
+                    <DataGrid ItemsSource="{Binding PreviewRows}" MaxHeight="220" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Binding="{Binding RowNumber}" Width="40" ElementStyle="{StaticResource MonoText}" />
+                            <DataGridTextColumn Header="NAMA PENUH" Binding="{Binding FullName}" Width="2*" />
+                            <DataGridTextColumn Header="KELAS" Binding="{Binding ClassName}" Width="1*" />
+                            <DataGridTextColumn Header="TAHUN" Binding="{Binding Grade}" Width="60" ElementStyle="{StaticResource MonoText}" />
+                            <DataGridTextColumn Header="ID DELIMA" Binding="{Binding EmailLocal}" Width="120" ElementStyle="{StaticResource MonoText}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- SUB-VIEW 3B: DRY RUN REPORT -->
+            <StackPanel Visibility="{Binding ActiveSubView, Converter={StaticResource EqToVisConv}, ConverterParameter=DryRun}">
+                <!-- Section 1: Ready to Import (Collapsed by default) -->
+                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Margin="0,0,0,12" ClipToBounds="True">
+                    <StackPanel>
+                        <Border Background="{StaticResource StripeBgBrush}" Padding="12,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Sedia Diimport (Murid Sah)" FontWeight="Bold" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding DryRunReport.ValidCount, FallbackValue='0'}" FontWeight="ExtraBold" FontSize="15" Foreground="{StaticResource PrimaryGreenBrush}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Section 2: Warnings (Expanded by default) -->
+                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Margin="0,0,0,12" ClipToBounds="True">
+                    <StackPanel>
+                        <Border Background="{StaticResource StripeBgBrush}" Padding="12,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Amaran (Tidak Menghalang)" FontWeight="Bold" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding DryRunReport.Warnings.Count, FallbackValue='0'}" FontWeight="ExtraBold" FontSize="15" Foreground="{StaticResource AmberTextBrush}" />
+                            </Grid>
+                        </Border>
+                        <ItemsControl ItemsSource="{Binding DryRunReport.Warnings}" Margin="12,8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Baris {0}'}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Message}" Foreground="{StaticResource InkBrush}" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Resolution, StringFormat='→ {0}'}" Foreground="{StaticResource Ink2Brush}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Section 3: Rejects (Expanded by default) -->
+                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Margin="0,0,0,12" ClipToBounds="True">
+                    <StackPanel>
+                        <Border Background="{StaticResource StripeBgBrush}" Padding="12,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Ditolak (Ralat Format / Tidak Sah)" FontWeight="Bold" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding DryRunReport.Rejects.Count, FallbackValue='0'}" FontWeight="ExtraBold" FontSize="15" Foreground="{StaticResource DangerTextBrush}" VerticalAlignment="Center" />
+                                <Button Grid.Column="3" Content="Eksport CSV Ditolak" Style="{StaticResource SmallButton}" Click="OnExportRejectsClick" />
+                            </Grid>
+                        </Border>
+                        <ItemsControl ItemsSource="{Binding DryRunReport.Rejects}" Margin="12,8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="180"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Baris {0}'}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding StudentName}" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Reason}" Foreground="{StaticResource DangerTextBrush}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Summary statistics -->
+                <Border Background="{StaticResource StripeBgBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
+                    <TextBlock Text="{Binding DryRunSummaryText}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,397 @@
+<UserControl x:Class="Delima.Launcher.Views.ModGuruPinView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Delima.Launcher.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=vm:ModGuruPinViewModel}"
+             d:DesignHeight="768" d:DesignWidth="1366"
+             Background="{DynamicResource PageBackgroundBrush}"
+             Focusable="True"
+             KeyDown="UserControl_KeyDown"
+             Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        
+        <Style x:Key="KeypadButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="72" />
+            <Setter Property="Height" Value="72" />
+            <Setter Property="Margin" Value="8" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontFamily" Value="{DynamicResource Baloo2Font}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="36"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource PrimaryBrush}" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                <Setter TargetName="border" Property="BorderThickness" Value="3" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="KeypadActionButtonStyle" TargetType="Button" BasedOn="{StaticResource KeypadButtonStyle}">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Header (78px) -->
+            <RowDefinition Height="78" />
+            <!-- Main Content -->
+            <RowDefinition Height="*" />
+            <!-- Footer (44px) -->
+            <RowDefinition Height="44" />
+        </Grid.RowDefinitions>
+
+        <!-- TOP BAR -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource AlertBrush}"
+                BorderThickness="0,0,0,3"
+                Padding="32,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Kembali Button -->
+                <Button Grid.Column="0"
+                        Style="{StaticResource OutlineButtonStyle}"
+                        Command="{Binding CancelCommand}"
+                        TabIndex="20"
+                        AutomationProperties.Name="Kembali ke skrin sebelumnya">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="◂ " FontSize="16" FontWeight="Bold" />
+                        <TextBlock Text="Kembali" FontSize="15" FontWeight="Bold" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Center: Mod Guru Pill -->
+                <Border Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Background="{DynamicResource SecondaryTextBrush}"
+                        CornerRadius="999"
+                        Padding="16,6">
+                    <TextBlock Text="Mod Guru"
+                               Foreground="#FFFFFF"
+                               FontWeight="Bold"
+                               FontSize="14" />
+                </Border>
+
+                <!-- Right: School Crest -->
+                <Border Grid.Column="2"
+                        Width="46" Height="46"
+                        CornerRadius="12"
+                        Background="{DynamicResource AccentBrush}"
+                        AutomationProperties.Name="Lencana Sekolah">
+                    <TextBlock Text="{Binding SchoolCode}"
+                               FontFamily="{DynamicResource Baloo2Font}"
+                               FontWeight="Bold"
+                               FontSize="15"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- MAIN CARD -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <Border Width="460"
+                    Margin="0,20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="20"
+                    Padding="36,28"
+                    Effect="{StaticResource CardShadow}">
+                <StackPanel HorizontalAlignment="Center">
+
+                    <!-- Title -->
+                    <TextBlock Text="Masukkan PIN Guru"
+                               Style="{DynamicResource ScreenHeadingStyle}"
+                               FontSize="26"
+                               TextAlignment="Center"
+                               Margin="0,0,0,6" />
+
+                    <TextBlock Text="Sila masukkan PIN 4 angka untuk membuka kawalan guru."
+                               Style="{DynamicResource HelperTextStyle}"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,20" />
+
+                    <!-- PIN DOTS INDICATOR -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,20"
+                                AutomationProperties.Name="{Binding PinLength, StringFormat='PIN dimasukkan {0} daripada 4 angka'}">
+                        
+                        <!-- Dot 1 -->
+                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource SecondaryTextBrush}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Dot1Filled}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+
+                        <!-- Dot 2 -->
+                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource SecondaryTextBrush}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Dot2Filled}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+
+                        <!-- Dot 3 -->
+                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource SecondaryTextBrush}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Dot3Filled}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+
+                        <!-- Dot 4 -->
+                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource SecondaryTextBrush}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Dot4Filled}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- ERROR / LOCKOUT BANNER -->
+                    <Border Visibility="{Binding IsError, Converter={StaticResource BoolToVisConverter}}"
+                            Background="#FDF0ED"
+                            BorderBrush="{DynamicResource AlertBrush}"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="12,8"
+                            Margin="0,0,0,14">
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{DynamicResource AlertBrush}"
+                                   FontWeight="Bold"
+                                   FontSize="13"
+                                   TextAlignment="Center" />
+                    </Border>
+
+                    <Border Visibility="{Binding IsLockedOut, Converter={StaticResource BoolToVisConverter}}"
+                            Background="#FDF0ED"
+                            BorderBrush="{DynamicResource AlertBrush}"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="14,10"
+                            Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock Text="{Binding LockoutMessage}"
+                                       Foreground="{DynamicResource AlertBrush}"
+                                       FontWeight="Bold"
+                                       FontSize="13"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding LockoutTimeRemainingText, StringFormat='Masa baki: {0}'}"
+                                       Foreground="{DynamicResource AlertBrush}"
+                                       FontWeight="Bold"
+                                       FontSize="16"
+                                       TextAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- KEYPAD (3 COLUMNS x 4 ROWS) -->
+                    <UniformGrid Columns="3"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,0,0,16">
+                        <!-- Row 1 -->
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="1"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="1"
+                                TabIndex="1"
+                                AutomationProperties.Name="Angka 1" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="2"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="2"
+                                TabIndex="2"
+                                AutomationProperties.Name="Angka 2" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="3"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="3"
+                                TabIndex="3"
+                                AutomationProperties.Name="Angka 3" />
+
+                        <!-- Row 2 -->
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="4"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="4"
+                                TabIndex="4"
+                                AutomationProperties.Name="Angka 4" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="5"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="5"
+                                TabIndex="5"
+                                AutomationProperties.Name="Angka 5" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="6"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="6"
+                                TabIndex="6"
+                                AutomationProperties.Name="Angka 6" />
+
+                        <!-- Row 3 -->
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="7"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="7"
+                                TabIndex="7"
+                                AutomationProperties.Name="Angka 7" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="8"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="8"
+                                TabIndex="8"
+                                AutomationProperties.Name="Angka 8" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="9"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="9"
+                                TabIndex="9"
+                                AutomationProperties.Name="Angka 9" />
+
+                        <!-- Row 4 -->
+                        <Button Style="{StaticResource KeypadActionButtonStyle}"
+                                Content="Padam"
+                                Command="{Binding ClearCommand}"
+                                TabIndex="10"
+                                AutomationProperties.Name="Padam Semua Angka" />
+                        <Button Style="{StaticResource KeypadButtonStyle}"
+                                Content="0"
+                                Command="{Binding AppendDigitCommand}"
+                                CommandParameter="0"
+                                TabIndex="11"
+                                AutomationProperties.Name="Angka 0" />
+                        <Button Style="{StaticResource KeypadActionButtonStyle}"
+                                Content="⌫"
+                                Command="{Binding BackspaceCommand}"
+                                TabIndex="12"
+                                AutomationProperties.Name="Padam Satu Angka" />
+                    </UniformGrid>
+
+                    <!-- REMAINING ATTEMPTS TEXT -->
+                    <TextBlock Text="{Binding AttemptsRemainingText}"
+                               Style="{DynamicResource HelperTextStyle}"
+                               TextAlignment="Center"
+                               Margin="0,0,0,16" />
+
+                    <!-- BATAL BUTTON -->
+                    <Button Style="{StaticResource OutlineButtonStyle}"
+                            Command="{Binding CancelCommand}"
+                            Content="Batal"
+                            Height="48"
+                            TabIndex="13"
+                            HorizontalAlignment="Center"
+                            Padding="32,0"
+                            AutomationProperties.Name="Batal dan kembali ke skrin utama" />
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+
+        <!-- FOOTER -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="32,0">
+            <Grid VerticalAlignment="Center">
+                <TextBlock Text="Mod Guru — Kawalan Kiosk"
+                           Style="{DynamicResource HelperTextStyle}"
+                           FontSize="13"
+                           HorizontalAlignment="Left" />
+                <TextBlock Text="Kunci automatik selepas 5 percubaan tidak sah"
+                           Style="{DynamicResource HelperTextStyle}"
+                           FontSize="13"
+                           HorizontalAlignment="Right" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
