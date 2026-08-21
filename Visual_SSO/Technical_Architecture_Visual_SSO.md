@@ -357,7 +357,11 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 > 2. The consent page has its own window title, not yet captured. **Add it to the T0.4-style capture** before the pilot.
 > 3. `E0x` for "stuck on consent" is not a failure — it is the normal terminal state of injection. The launcher hands over to the pupil and stops.
 >
-> **Unverified: whether pupil accounts behave identically.** The observation was made on a teacher account (`KPM-Guru`). Murid accounts may be configured differently, and a domain-trusted app would skip this entirely. **Confirm with one real pupil account before the pilot.**
+> **Confirmed for every account type, every sign-in.** Checked on both teacher and pupil accounts — the consent screen is not a teacher-account artefact and DELIMa is not domain-trusted. Every pupil will see it every lesson until BSTP changes the Workspace configuration.
+>
+> **Where the pupil is told to press it.** The pupil is looking at Chrome, not at the launcher, so the instruction cannot live on a launcher screen behind it. Use the **floating reset bar** (PRD §7.4) — the existing mechanism for launcher UI that coexists with Chrome. On detecting the consent page it shows one line, *"Tekan butang biru: Continue"*, and drops it once the destination loads. The topmost overlay must be down by then; injection is finished and nothing further is typed.
+>
+> **G1 absorbs one extra click per pupil.** The under-3-minutes class target (PRD §4) was set before this step was known. One button press per pupil is small against the 26-character address it replaces, but it is not nothing across 44 pupils, and it should be measured rather than assumed at the pilot.
 
 **Route C is not a consolation.** It removes every dependency on Google or DELIMa passing a parameter along, both of which have now demonstrably changed or never existed. What the launcher types, it controls.
 

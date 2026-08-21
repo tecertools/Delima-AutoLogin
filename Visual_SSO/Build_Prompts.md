@@ -415,7 +415,15 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 >
 > **Then add a regression test for the identifier title specifically.** A single dropped word made the whole product silently non-functional and nothing caught it; assert the configured value equals the measured string exactly, so a future edit cannot reintroduce it quietly.
 >
-> Do not change the sequence gate, the per-keystroke re-verification or the fail-closed semantics — all three are correct.
+> **5. Route C has a third step — the OAuth consent screen.** After the password is accepted, Google shows a consent page (*"Sign in to DELIMa 3"*, listing name and email, with **Cancel** and **Continue**) and only then reaches DELIMa. It appears on **every** sign-in for **every** account, because §4.4's throwaway Chrome profile means consent is never remembered.
+>
+> - Extend the sequence gate to a third state: identifier → password → consent → destination.
+> - **Do not click Continue.** It is a consent dialog, and automating it means the software consents on a seven-year-old's behalf every lesson. Arch §4.5 is explicit about this. The pupil presses it.
+> - Reaching the consent page is the **normal, successful terminal state** of injection — not a failure, not an `E0x`. The engine finishes there.
+> - Show *"Tekan butang biru: Continue"* on the floating reset bar (PRD §7.4), since the pupil is looking at Chrome rather than the launcher. Clear it when the destination loads, and ensure the topmost overlay is down first.
+> - Capture the consent page's window title on lab hardware and add it to Appendix B, the same way the other two were captured.
+>
+> Do not change the sequence gate's existing transitions, the per-keystroke re-verification or the fail-closed semantics — all three are correct.
 
 ---
 
