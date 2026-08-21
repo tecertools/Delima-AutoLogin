@@ -393,6 +393,32 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 15a — Two fixes in the installer and pipeline
+
+Both small, both would bite on the first real release.
+
+> Two corrections against `Visual_SSO/Build_And_Release.md`. Change nothing else — the AppLocker handling, the opt-in Chrome policy task, the signed-file checksum ordering and the draft release are all correct as built.
+>
+> **1. `.github/workflows/release.yml` calls `iscc` without installing Inno Setup.** GitHub's `windows-latest` image does not ship it, so the job fails at that step; and if a version ever is present, it is unpinned, which breaks reproducibility and SignPath's origin verification (§4.2 of that document requires the build to be fully determined by the repository).
+>
+> Add an explicit install step before the compile step, pinned to a version:
+>
+> ```yaml
+> - name: Install Inno Setup
+>   run: winget install --id JRSoftware.InnoSetup -e -v 6.7.3 --silent `
+>          --accept-package-agreements --accept-source-agreements
+> ```
+>
+> Then invoke `iscc` by full path rather than relying on `PATH`, or add its directory to `PATH` in the same step. Confirm the compile step actually runs — a silent skip here produces a release with no installer in it.
+>
+> **2. `installer/DelimaLauncher.iss` dropped `everyone-none` from the `[Dirs]` permissions.** It currently reads `Permissions: admins-full`; §5 specifies `Permissions: everyone-none admins-full`.
+>
+> Without `everyone-none` the directory keeps `%ProgramData%`'s inherited grant, which gives every interactive user — every pupil — read access. `StoreAclConfigurator` does fix this at runtime by disabling inheritance, and the comment in the file correctly says so, but that leaves a window between installation and first provisioning where the directory is readable, and it removes a layer that was specified deliberately. Restore it.
+>
+> Then verify empirically per arch §11.0: install on a test machine, log in as a **standard non-admin account**, and confirm `%ProgramData%\DELIMa Launcher` cannot be listed or read.
+
+---
+
 ## Prompt 15 — Installer and release pipeline (build step 15)
 
 > Build the installer and release pipeline per `Visual_SSO/Build_And_Release.md`.

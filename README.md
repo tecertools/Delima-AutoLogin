@@ -63,13 +63,20 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 ## Where things actually stand
 
-**Eleven of the fifteen build steps in arch §12 are done.**
+**All fifteen build steps in arch §12 are implemented.** `Delima.Core`, `Delima.Import`, `Delima.Win32`, `Delima.Provision`, `Delima.Launcher` (all pupil screens, route C login orchestrator, Mod Guru), `Delima.Admin` (the seven-step wizard), the audit log, kiosk hardening, the Inno Setup installer and a tag-triggered GitHub Actions release pipeline.
 
-Built and tested: `Delima.Core` (credential store, Argon2id/AES-256-GCM, roster model, display names), `Delima.Import`, `Delima.Win32` (injection engine, DPAPI store, kiosk guard, topmost overlay), `Delima.Provision`, the audit log, and `Delima.Launcher` through the class, name, picture-password, sign-in and error screens — including the route C two-step login orchestrator with its sequence gate.
+**Nothing has been released, and several things stand between here and a first release:**
 
-**Remaining:** the Admin wizard (step 6), Mod Guru (13), the rest of kiosk hardening (14), and the installer and release pipeline (15). Prompts 12–15 in `Visual_SSO/Build_Prompts.md`.
+| # | Item | Where |
+| :-- | :--- | :--- |
+| 1 | Two installer/pipeline fixes — CI never installs Inno Setup; `everyone-none` dropped from the store ACL | Prompt 15a |
+| 2 | **Field verification on real lab hardware** — the pupil-account ACL test above all | arch §11.0 |
+| 3 | **T0.4** — measure UIA `IsPassword`, then enable the gate that is currently built but inert | arch §11.1 |
+| 4 | Capture the **Malay-locale** sign-in titles | arch §4.2, Appendix B |
+| 5 | Ship one **unsigned** release, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
+| 6 | The **T0.1 responsibility statement** in all three required placements | PRD §8.7 |
 
-**Also outstanding, none blocking:** T0.4 (measure UIA `IsPassword` on lab hardware, then enable the gate — arch §11.1), the three field checks in arch §11.0, and capturing the Malay-locale sign-in titles.
+Items 2 and 3 are the ones that decide whether this is safe to put in a school, and neither can be answered from a developer machine.
 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
