@@ -425,6 +425,45 @@ The two PDFs are deliverables, not documentation debt. G3 — 90 minutes, unaide
 
 T0.1 is unanswered and the project publishes anyway (§2.1). The policy responsibility is therefore placed explicitly on each school that downloads, which requires the statement to appear in three places — release page, installer licence page, and `Delima.Admin` first run, before wizard Step 1.
 
+**The text is below.** It was previously specified by its four required points but never written; that gap is what let the statement stay theoretical.
+
+#### The statement — Bahasa Melayu
+
+> ### Perakuan Tanggungjawab Sekolah
+>
+> **1. Apa yang disimpan.**
+> Perisian ini menyimpan kata laluan akaun DELIMa murid pada komputer sekolah anda. Kata laluan tersebut disulitkan dan disimpan pada komputer makmal berkenaan sahaja. Tiada salinan dihantar ke mana-mana pelayan luar, dan pembangun perisian ini tidak menerima sebarang data.
+>
+> **2. Tiada pendirian rasmi diperoleh.**
+> Setakat ini, tiada pendirian bertulis diperoleh daripada Kementerian Pendidikan Malaysia (KPM) atau Bahagian Sumber dan Teknologi Pendidikan (BSTP) mengenai amalan menyimpan kata laluan murid dan mengisinya semula secara automatik. Ini bermakna amalan tersebut **tidak pernah disahkan, dan tidak pernah dilarang**, oleh mana-mana pihak berkuasa.
+>
+> **3. Tanggungjawab sekolah.**
+> Sekolah yang memasang perisian ini bertanggungjawab sepenuhnya ke atas kata laluan murid yang disimpan — termasuk keputusan untuk menggunakannya, cara ia dilindungi, dan pematuhan terhadap mana-mana dasar atau perundangan yang terpakai. Tanggungjawab untuk menilai amalan ini dan mendapatkan kelulusan daripada pihak berkuasa yang berkenaan terletak pada pihak sekolah, bukan pada pembangun perisian.
+>
+> **4. Tanpa jaminan.**
+> Perisian ini diberikan secara percuma dan tanpa sebarang jaminan.
+
+#### English gloss (for reviewers, not for display)
+
+1. What is stored — pupil DELIMa passwords, encrypted, on the school's own lab PCs only; no copies leave the machine, the author receives no data.
+2. No written position has been obtained from MOE or BSTP on storing and automatically re-entering pupil passwords. The practice has therefore **never been approved, and never been prohibited**.
+3. The school installing it is fully responsible for the stored passwords — the decision to use it, how it is protected, and compliance with any applicable policy or law. Obtaining any approval rests with the school, not the author.
+4. Provided free and without warranty.
+
+#### Placement-specific wording
+
+| Placement | Form | Acknowledgement |
+| :--- | :--- | :--- |
+| **Release page** | All four points, above the download link — not below it | None; it is a notice |
+| **Installer licence page** | All four points inside `LESEN.rtf`, ahead of the licence terms | Inno Setup's standard accept radio |
+| **`Delima.Admin` first run** | All four points, before wizard Step 1 | Button **"Saya Faham"**, with the line *"Saya faham dan menerima tanggungjawab ini bagi pihak sekolah."* |
+
+**Point 3 deliberately avoids naming a statute.** An earlier draft described the school as a *pengguna data* under the Personal Data Protection Act 2010. That is likely wrong for a government school — PDPA 2010 excludes the Federal and State Governments from its scope, and a public school is plausibly within that exclusion. Rather than assert a legal characterisation that may not hold, the text states the responsibility in plain terms and leaves the classification open. **If this is ever reviewed by someone legally qualified, that is the paragraph to show them.**
+
+**Do not soften point 2.** "Never approved, and never prohibited" is the honest position, and it is the entire reason this statement exists. A version reading only "no objection has been raised" would imply an assurance nobody has given.
+
+---
+
 It must say, in Bahasa Melayu and plainly:
 
 - what the software stores (pupil passwords, encrypted, on the school's own machines);
