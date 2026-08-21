@@ -418,9 +418,9 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 > **5. Route C has a third step — the OAuth consent screen.** After the password is accepted, Google shows a consent page (*"Sign in to DELIMa 3"*, listing name and email, with **Cancel** and **Continue**) and only then reaches DELIMa. It appears on **every** sign-in for **every** account, because §4.4's throwaway Chrome profile means consent is never remembered.
 >
 > - Extend the sequence gate to a third state: identifier → password → consent → destination.
-> - **Do not click Continue.** It is a consent dialog, and automating it means the software consents on a seven-year-old's behalf every lesson. Arch §4.5 is explicit about this. The pupil presses it.
+> - **Do not click Continue.** Two reasons, both in arch §4.5: it is a consent dialog, so automating it means the software consents on a seven-year-old's behalf every lesson; and the page shows the pupil's own name and email, making it an identity check that supports G2 — clicking through would destroy it. The pupil presses it.
 > - Reaching the consent page is the **normal, successful terminal state** of injection — not a failure, not an `E0x`. The engine finishes there.
-> - Show *"Tekan butang biru: Continue"* on the floating reset bar (PRD §7.4), since the pupil is looking at Chrome rather than the launcher. Clear it when the destination loads, and ensure the topmost overlay is down first.
+> - Show a line on the floating reset bar (PRD §7.4), since the pupil is looking at Chrome rather than the launcher. Clear it when the destination loads, and ensure the topmost overlay is down first. **Do not name the button in English** — Google localises it (`Continue` / `Teruskan`). Identify it by position and colour, and use the line to prompt the identity check: *"Lihat nama kamu. Kalau betul, tekan butang biru di bawah."*
 > - Capture the consent page's window title on lab hardware and add it to Appendix B, the same way the other two were captured.
 >
 > Do not change the sequence gate's existing transitions, the per-keystroke re-verification or the fail-closed semantics — all three are correct.
