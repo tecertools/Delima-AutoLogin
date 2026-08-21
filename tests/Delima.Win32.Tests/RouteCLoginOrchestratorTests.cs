@@ -1,4 +1,7 @@
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Automation;
 using Delima.Core.Store;
 using Delima.Win32;
 using Xunit;
@@ -182,5 +185,140 @@ public class RouteCLoginOrchestratorTests
         bool isPassword = UiaHelper.IsFocusedElementPassword();
         // Returns boolean without throwing exceptions
         Assert.False(isPassword); // Normal non-password edit focus in test runner
+    }
+
+    [Fact]
+    public void UiaHelper_IsFocusedElementPassword_Distinguishes_PasswordBox_From_TextBox()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        bool? textBoxIsPassword = null;
+        bool? passwordBoxIsPassword = null;
+        Exception? threadEx = null;
+
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                var window = new System.Windows.Window
+                {
+                    Width = 300,
+                    Height = 200,
+                    WindowStyle = System.Windows.WindowStyle.None,
+                    ShowInTaskbar = false
+                };
+
+                var stack = new System.Windows.Controls.StackPanel();
+                var textBox = new System.Windows.Controls.TextBox { Width = 200, Height = 30 };
+                var passwordBox = new System.Windows.Controls.PasswordBox { Width = 200, Height = 30 };
+
+                AutomationProperties.SetAutomationId(textBox, "testTextBox");
+                AutomationProperties.SetAutomationId(passwordBox, "testPasswordBox");
+
+                stack.Children.Add(textBox);
+                stack.Children.Add(passwordBox);
+                window.Content = stack;
+
+                window.Show();
+
+                var hwnd = new System.Windows.Interop.WindowInteropHelper(window).EnsureHandle();
+                var windowEl = AutomationElement.FromHandle(hwnd);
+
+                var textEl = windowEl.FindFirst(
+                    TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.AutomationIdProperty, "testTextBox"));
+
+                var passEl = windowEl.FindFirst(
+                    TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.AutomationIdProperty, "testPasswordBox"));
+
+                textBoxIsPassword = UiaHelper.IsElementPassword(textEl);
+                passwordBoxIsPassword = UiaHelper.IsElementPassword(passEl);
+
+                window.Close();
+            }
+            catch (Exception ex)
+            {
+                threadEx = ex;
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join(TimeSpan.FromSeconds(5));
+
+        Assert.Null(threadEx);
+        Assert.NotNull(textBoxIsPassword);
+        Assert.NotNull(passwordBoxIsPassword);
+        Assert.False(textBoxIsPassword.Value, "TextBox should report IsPassword == false");
+        Assert.True(passwordBoxIsPassword.Value, "PasswordBox should report IsPassword == true");
+    }
+
+    [Fact]
+    public void PreInjectionCheck_Failure_Aborts_With_E02_And_Zero_Keystrokes()
+    {
+        // §11.1 (T0.4): When UIA IsPassword or PreInjectionCheck returns false,
+        // injection must abort immediately with E02 and zero characters sent.
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cred = new SecurePasswordBuffer("SensitiveSecret123"u8);
+
+        var result = InjectionEngine.Inject(
+            session,
+            cred.PasswordSpan,
+            _ => true, // Window verified
+            new InjectionOptions
+            {
+                WindowWaitTimeout = TimeSpan.FromMilliseconds(500),
+                TitleSettlePolls = 1,
+                ExpectedClassName = NativeMethods.GetForegroundClassName(),
+                PreInjectionCheck = () => false // Simulates focused element IsPassword == false
+            });
+
+        // If current window is test host, pre-check failure stops all typing
+        if (NativeMethods.GetForegroundProcessId() == (uint)currentProc.Id)
+        {
+            Assert.False(result.Success);
+            Assert.Equal(0, result.CharactersInjected);
+            Assert.Equal(FailureCodes.E02_WindowNotVerified, result.ErrorCode);
+        }
+    }
+
+    [Fact]
+    public void RouteCOptions_Supports_Malay_Locale_Titles_Per_AppendixB()
+    {
+        // §3.2 & Appendix B: Titles are per-locale configuration, not hardcoded constants.
+        // Schools with Malay-locale Chrome can supply exact BM strings.
+        var malayOptions = new RouteCOptions
+        {
+            TitleIdentifierPage = "Log masuk - Akaun Google - Google",
+            TitlePasswordPage = "Selamat Datang - Google Chrome",
+            TitleSettlePolls = 3,
+            PollIntervalMs = 100,
+            WindowWaitTimeout = TimeSpan.FromSeconds(30),
+            CheckUiaPasswordElement = true
+        };
+
+        Assert.Equal("Log masuk - Akaun Google - Google", malayOptions.TitleIdentifierPage);
+        Assert.Equal("Selamat Datang - Google Chrome", malayOptions.TitlePasswordPage);
+        Assert.True(malayOptions.CheckUiaPasswordElement);
+    }
+
+    [Fact]
+    public void RouteCResult_Failure_Factory_Preserves_Taxonomy_Information()
+    {
+        var failure = RouteCResult.Failure(
+            FailureCodes.E04_WrongPassword,
+            FailureCodes.GetPupilMessageBm(FailureCodes.E04_WrongPassword),
+            FailureCodes.GetTeacherAction(FailureCodes.E04_WrongPassword),
+            session: null,
+            charsInjected: 12,
+            elapsed: TimeSpan.FromMilliseconds(450));
+
+        Assert.False(failure.Success);
+        Assert.Equal(FailureCodes.E04_WrongPassword, failure.ErrorCode);
+        Assert.Equal("Kata laluan tidak betul. Panggil cikgu.", failure.PupilMessage);
+        Assert.Equal("Update via Mod Guru; check password_version", failure.TeacherAction);
+        Assert.Equal(12, failure.TotalCharsInjected);
     }
 }

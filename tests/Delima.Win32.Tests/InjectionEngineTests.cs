@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using Delima.Core.Store;
 using Delima.Win32;
 using Xunit;

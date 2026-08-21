@@ -161,13 +161,24 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void OnInjectionSucceeded(Student student, ChromeSession session)
     {
-        // Display Floating Reset Bar (PRD §7.4)
+        // Display Floating Reset Bar (PRD §7.4) and minimize Launcher window
         try
         {
             Application.Current?.Dispatcher.Invoke(() =>
             {
+                if (Application.Current?.MainWindow != null)
+                {
+                    Application.Current.MainWindow.WindowState = WindowState.Minimized;
+                }
+
                 _resetBarWindow = new FloatingResetBarWindow(student, session, onReset: () =>
                 {
+                    if (Application.Current?.MainWindow != null)
+                    {
+                        Application.Current.MainWindow.WindowState = WindowState.Normal;
+                        Application.Current.MainWindow.Activate();
+                    }
+
                     if (LastClass != null) NavigateToCariNama(LastClass);
                     else NavigateToPilihKelas();
                 });

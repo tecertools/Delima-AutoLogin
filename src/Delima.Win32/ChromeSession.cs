@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using Microsoft.Win32;
 
 namespace Delima.Win32;
@@ -64,6 +65,7 @@ public sealed class ChromeSession : IDisposable
     /// <summary>
     /// Launches Chrome with a unique throwaway profile so no cookies, history, or
     /// saved credentials survive between pupils.
+    /// Always passes --force-renderer-accessibility so Chrome exposes its accessibility tree for UIA per §4.2 and §11.1.
     /// </summary>
     public static ChromeSession Launch(string chromePath, string url)
     {
@@ -78,6 +80,7 @@ public sealed class ChromeSession : IDisposable
         psi.ArgumentList.Add($"--user-data-dir={profileDir}");
         psi.ArgumentList.Add("--no-first-run");
         psi.ArgumentList.Add("--no-default-browser-check");
+        psi.ArgumentList.Add("--force-renderer-accessibility");
         psi.ArgumentList.Add("--disable-features=PasswordManagerOnboarding,AutofillServerCommunication");
         psi.ArgumentList.Add("--password-store=basic");
         psi.ArgumentList.Add("--new-window");

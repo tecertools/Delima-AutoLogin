@@ -19,10 +19,10 @@ public partial class FloatingResetBarWindow : Window
 
         Loaded += (_, _) =>
         {
-            // Position at top center of screen with 12px margin
+            // Position at top center of screen with 16px margin per PRD §7.4
             var screenWidth = SystemParameters.PrimaryScreenWidth;
             Left = (screenWidth - Width) / 2;
-            Top = 12;
+            Top = 16;
         };
     }
 

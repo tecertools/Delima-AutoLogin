@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using Delima.Core.Audit;
 using Delima.Core.Store;
 
@@ -283,25 +284,19 @@ public static class RouteCLoginOrchestrator
             {
                 onStateChanged?.Invoke(LoginFlowState.InjectingPassword);
 
-                // Optional UIA IsPassword validation (T0.4)
-                if (options.CheckUiaPasswordElement && OperatingSystem.IsWindows())
+                var passwordOptions = injectionOptions with
                 {
-                    if (!UiaHelper.IsFocusedElementPassword())
-                    {
-                        // Caret is not in a verified password field
-                        return InjectionResult.Failure(
-                            FailureCodes.E02_WindowNotVerified,
-                            0,
-                            false,
-                            sw.Elapsed);
-                    }
-                }
+                    SendEnter = options.SendEnterAfterPassword,
+                    PreInjectionCheck = options.CheckUiaPasswordElement && OperatingSystem.IsWindows()
+                        ? () => UiaHelper.IsFocusedElementPassword()
+                        : null
+                };
 
                 return InjectionEngine.Inject(
                     session,
                     credential.PasswordSpan,
                     options.TitlePasswordPage,
-                    injectionOptions with { SendEnter = options.SendEnterAfterPassword },
+                    passwordOptions,
                     cancellationToken);
             }, cancellationToken);
 

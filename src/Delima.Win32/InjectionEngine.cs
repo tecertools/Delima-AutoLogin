@@ -49,6 +49,13 @@ public sealed record InjectionOptions
     /// Default is "Chrome_WidgetWin_1".
     /// </summary>
     public string ExpectedClassName { get; init; } = "Chrome_WidgetWin_1";
+
+    /// <summary>
+    /// Optional validation check executed immediately after window title settle,
+    /// before shield engagement and keystroke injection (e.g. UIA IsPassword validation for T0.4).
+    /// If it returns false, injection aborts immediately with E02 and zero keystrokes.
+    /// </summary>
+    public Func<bool>? PreInjectionCheck { get; init; }
 }
 
 /// <summary>
@@ -160,11 +167,29 @@ public static class InjectionEngine
             return InjectionResult.WindowTimeout(sw.Elapsed);
         }
 
-        // 3. Engage Injection Shield (TopmostOverlay + BlockInput)
+        // 3. Pre-injection field check (e.g. UIA IsPassword validation for T0.4)
+        if (options.PreInjectionCheck != null)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return InjectionResult.Aborted(0, sw.Elapsed);
+            }
+
+            if (!options.PreInjectionCheck())
+            {
+                return InjectionResult.Failure(
+                    FailureCodes.E02_WindowNotVerified,
+                    charsInjected: 0,
+                    blockInputGranted: false,
+                    elapsed: sw.Elapsed);
+            }
+        }
+
+        // 4. Engage Injection Shield (TopmostOverlay + BlockInput)
         using var shield = KioskGuard.EngageInjectionShield();
         var blockInputGranted = shield.BlockInputGranted;
 
-        // 4. Per-Keystroke Verification & Injection
+        // 5. Per-Keystroke Verification & Injection
         var charsInjected = 0;
 
         for (var i = 0; i < passwordSpan.Length; i++)

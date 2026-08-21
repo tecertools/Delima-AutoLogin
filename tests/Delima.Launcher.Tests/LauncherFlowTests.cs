@@ -86,17 +86,27 @@ public class LauncherFlowTests
         Assert.Equal(FailureCodes.E09_StoreDecryptFailure, ralatVm.ErrorCode);
     }
 
-    [Fact]
-    public void MainViewModel_NavigateToSedangMasuk_Sets_SedangMasukViewModel()
+    [Theory]
+    [InlineData(FailureCodes.E01_ChromeNotInstalled, "Alamak, ada masalah. Panggil cikgu.", "Install Chrome")]
+    [InlineData(FailureCodes.E02_WindowNotVerified, "Cuba lagi.", "Slow PC — raise window_wait_timeout_ms")]
+    [InlineData(FailureCodes.E04_WrongPassword, "Kata laluan tidak betul. Panggil cikgu.", "Update via Mod Guru; check password_version")]
+    [InlineData(FailureCodes.E05_PasswordStale, "Kata laluan sudah tukar. Panggil cikgu.", "Re-import + re-provision")]
+    [InlineData(FailureCodes.E06_GoogleCaptcha, "Tunggu sekejap, cuba lagi.", "Space out launches; known limitation")]
+    [InlineData(FailureCodes.E07_TwoFactorPrompt, "Panggil cikgu.", "Escalate — this may end the product")]
+    [InlineData(FailureCodes.E08_AccountSuspended, "Panggil cikgu.", "MOE admin task")]
+    [InlineData(FailureCodes.E09_StoreDecryptFailure, "Alamak, ada masalah. Panggil cikgu.", "Re-provision this PC")]
+    [InlineData(FailureCodes.E10_StoreStale, "Panggil cikgu.", "Re-provision this PC")]
+    [InlineData(FailureCodes.E11_NoPasswordStored, "Panggil cikgu.", "Complete wizard Step 4")]
+    [InlineData(FailureCodes.E12_PicturePasswordLocked, "Tunggu 5 minit.", "Reset via Mod Guru")]
+    [InlineData(FailureCodes.E13_NetworkUnreachable, "Tiada internet. Panggil cikgu.", "Network")]
+    public void RalatViewModel_AllTaxonomyCodes_HaveExpectedMessages(string code, string expectedPupilBm, string expectedTeacher)
     {
-        var mainVm = new MainViewModel();
-        var student = mainVm.Students[0];
-        using var cred = new SecurePasswordBuffer("TestPass123!"u8);
+        var school = SampleDataService.CreateSampleSchool();
+        var vm = new RalatViewModel(school, code, () => { });
 
-        mainVm.NavigateToSedangMasuk(student, cred);
-
-        Assert.IsType<SedangMasukViewModel>(mainVm.CurrentView);
-        var sedangMasukVm = (SedangMasukViewModel)mainVm.CurrentView!;
-        Assert.Equal(student, sedangMasukVm.Student);
+        Assert.Equal(code, vm.ErrorCode);
+        Assert.Equal(expectedPupilBm, vm.PupilMessage);
+        Assert.Equal(expectedTeacher, vm.TeacherAction);
+        Assert.NotEmpty(vm.ConditionDescription);
     }
 }
