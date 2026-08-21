@@ -11,7 +11,7 @@ They differ in one decision — **whether the software handles the pupil's passw
 | Stores passwords | **No** | Yes, encrypted, locally |
 | Google ToS / MOE policy | Ordinary link, no gate | **Needs written sign-off** |
 | Effort | Weeks | Months |
-| Status | Specified, not built | **In build.** T0.3 passed 17 Aug 2026; `Delima.Core` and the importer built and tested |
+| Status | Specified; **primary mechanism broken** (see below) | **Built, not released.** All 15 build steps implemented; T0.2 and T0.3 passed |
 
 If only one ships, it should be Normal SSO. It is the smaller product with most of the benefit and none of the policy risk.
 
@@ -47,11 +47,17 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │       └── DELIMa_Admin_Wizard_Mockups.html   Admin Wizard (ICT coordinator), all 7 steps
 │
 ├── src/                            Application code
-│   ├── Delima.Core/                Crypto, credential store, roster, display names — cross-platform
+│   ├── Delima.Core/                Crypto, credential store, roster, audit — cross-platform
 │   ├── Delima.Import/              Roster importer (APDM parsing, dry run) — cross-platform
-│   └── Delima.Admin/               WPF wizard (not yet built)
+│   ├── Delima.Win32/               P/Invoke, injection engine, DPAPI store, kiosk guard
+│   ├── Delima.Launcher/            WPF, pupil-facing — all screens + Mod Guru
+│   ├── Delima.Admin/               WPF, the seven-step setup wizard
+│   └── Delima.Provision/           Per-lab-PC provisioning, runs from a pendrive
 │
-├── tests/                          xUnit — Delima.Core.Tests, Delima.Import.Tests
+├── tests/                          xUnit — Core, Import, Win32, Launcher
+│
+├── installer/                      Inno Setup script + assets (guides, avatars, samples)
+├── .github/workflows/release.yml   Tag-triggered build → sign → draft release
 │
 ├── InjectionSpike/                 T0.3 harness — PASSED, 17 Aug 2026 (see Visual_SSO/T0.3_Injection_Test_Protocol.md)
 │
@@ -83,26 +89,18 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 - **T0.3** — run the injection spike, 50 runs, on representative lab hardware. **Passed, 17 August 2026.** `SendInput` scored 100/100 across two independent 50-run batches on real lab hardware; the `SendKeys` control failed exactly as predicted. Full results in `Visual_SSO/T0.3_Injection_Test_Protocol.md`.
 - **T0.1** — written ToS/policy position from BSTP or state ICT on storing and replaying pupil passwords. **Not started, and no longer a blocker.** Requirement G-1 was consciously relaxed: the project publishes without it and places the responsibility on each downloading school instead, via the statement specified in PRD §8.7. Still worth pursuing — see below.
-- **T0.2** — confirm the live `d3.delima.edu.my` SSO entry URL and that `login_hint` is honoured. **Partly answered, Aug 2026.** DELIMa signs in via Google OAuth 2.0 using its own Cloud project, which confirms arch §4.5's assumption and removes the cost that made the `login_hint` route look expensive. Still open: whether any pre-fill route works, and the password-screen window title that arch §4.2 verifies against. About an hour with one account you control — `Visual_SSO/T0.2_URL_Confirmation.md`. Blocks build step 11.
-
-**Nothing blocks starting.** T0.3 answered the question the programme was contingent on. T0.1 has been routed around deliberately (PRD §2.2), and T0.2 doesn't bite until step 11.
+- **T0.2** — confirm the live SSO entry URL and whether `login_hint` is honoured. **Passed, August 2026.** DELIMa signs in via Google OAuth 2.0 on its own Cloud project. No pre-fill route works — DELIMa drops `login_hint`, and `/AccountChooser` returns 400 — so **route C was selected**: the launcher types the email, then the password. The identifier and password pages carry distinguishable window titles, so arch §4.2's verification holds. Full record in `Visual_SSO/T0.2_URL_Confirmation.md`.
+- **T0.4** — verify Chrome reports `IsPassword` through UI Automation, so §4.2 can gate on the *field* rather than only the page title. **Not started; recommended before the pilot.** Needs a lab PC and an email address — no password. `Visual_SSO/T0.4_UIA_Verification.md`.
 
 ## Next step
 
-**Start building** — `Visual_SSO/AI_Build_Guide.md` is the walkthrough, `Visual_SSO/Build_Prompts.md` the prompts. First target is `Delima.Core`: the credential store, crypto and tamper tests (arch §12 step 3), then the roster model (step 4). Neither is blocked, and both build and unit-test on macOS or Linux — arch §2 keeps `Delima.Core` free of any Win32 or UI reference precisely so it can. Windows is first needed at step 8.
+**Prompt 15a** — two fixes that would stop the first release: the CI workflow calls `iscc` without installing Inno Setup, and the installer dropped `everyone-none` from the credential-store directory permissions.
 
-**Do T0.2 in parallel.** It needs one real pupil account and an afternoon, and leaving it undone is the kind of thing that stalls step 11 for no reason.
+**Then T0.4**, which is the last technical unknown. `UiaHelper` and its gate are built and fail closed correctly, but switched off because nobody has measured whether Chrome actually reports the property. Until that runs, arch §4.2 rests on window titles alone — which works, but carries locale and redesign risk that the field check removes.
 
-**Keep pursuing T0.1 anyway.** It no longer gates anything, but an actual answer would be strictly better than a disclosure — the difference between telling schools they are responsible and telling them it is permitted. If it comes back negative, the release is withdrawn and schools are told (PRD §2.2).
+**Then, for a release:** capture the Malay-locale sign-in titles, put the T0.1 responsibility statement in all three placements (PRD §8.7), ship one unsigned release, and apply to SignPath Foundation.
 
-Optionally, round out T0.3's adversarial test to the full 5/5 (currently 2/5, both clean — see `Visual_SSO/T0.3_Injection_Test_Protocol.md`, "Actual results"), and take a quick look at the one anomalous `sendkeys` run before the pilot phase, though neither blocks moving forward.
-
-**On compiling a distributable `.exe`:** the procedure is fully specified in `Visual_SSO/Build_And_Release.md`, and the machine to run it on in `Visual_SSO/Build_Machine_Setup.md` — but it is the *last* of 15 build steps (arch §12) and the first fourteen produce code that does not exist yet.
-
-**Distribution, licence and signing are now settled** (PRD §8.5): free public download, open source, and free OV-level signing from [SignPath Foundation](https://signpath.org/). Two consequences that shape the build:
-
-- **Releases are built by GitHub Actions, not by hand.** SignPath signs only artefacts from a trusted build system whose configuration is under source control. The convenient side effect is that **no Windows machine is needed to cut a release** — only to test one.
-- **Ship one unsigned release first, then apply.** The Foundation requires a project already be released in the form to be signed, and it reviews applications. Software that stores passwords and injects keystrokes deserves a plain-spoken application; expect questions.
+**Still worth pursuing, still not blocking: T0.1.** An actual written position would be strictly better than a disclosure — the difference between telling schools they are responsible and telling them it is permitted. If it comes back negative, the release is withdrawn and schools are told (PRD §2.2).
 
 ---
 
