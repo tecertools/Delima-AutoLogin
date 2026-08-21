@@ -65,9 +65,10 @@ public sealed class ChromeSession : IDisposable
     /// <summary>
     /// Launches Chrome with a unique throwaway profile so no cookies, history, or
     /// saved credentials survive between pupils.
-    /// Always passes --force-renderer-accessibility so Chrome exposes its accessibility tree for UIA per §4.2 and §11.1.
+    /// Passes --force-renderer-accessibility by default so Chrome exposes its accessibility tree for UIA per §4.2 and §11.1.
+    /// Can be disabled via <paramref name="forceRendererAccessibility"/> for baseline timing comparison (T0.4 Q6).
     /// </summary>
-    public static ChromeSession Launch(string chromePath, string url)
+    public static ChromeSession Launch(string chromePath, string url, bool forceRendererAccessibility = true)
     {
         var profileDir = Path.Combine(Path.GetTempPath(), "delima_session_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(profileDir);
@@ -80,7 +81,10 @@ public sealed class ChromeSession : IDisposable
         psi.ArgumentList.Add($"--user-data-dir={profileDir}");
         psi.ArgumentList.Add("--no-first-run");
         psi.ArgumentList.Add("--no-default-browser-check");
-        psi.ArgumentList.Add("--force-renderer-accessibility");
+        if (forceRendererAccessibility)
+        {
+            psi.ArgumentList.Add("--force-renderer-accessibility");
+        }
         psi.ArgumentList.Add("--disable-features=PasswordManagerOnboarding,AutofillServerCommunication");
         psi.ArgumentList.Add("--password-store=basic");
         psi.ArgumentList.Add("--new-window");

@@ -255,6 +255,24 @@ public class RouteCLoginOrchestratorTests
     }
 
     [Fact]
+    public void UiaHelper_ProbeFocusedElementPassword_ReturnsTupleWithoutCrashing()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        // Verify probe returns structured tuple (FocusResolvable, IsPassword) without throwing exceptions
+        var (focusResolvable, isPassword) = UiaHelper.ProbeFocusedElementPassword();
+
+        if (focusResolvable)
+        {
+            Assert.NotNull(isPassword);
+        }
+        else
+        {
+            Assert.Null(isPassword);
+        }
+    }
+
+    [Fact]
     public void PreInjectionCheck_Failure_Aborts_With_E02_And_Zero_Keystrokes()
     {
         // §11.1 (T0.4): When UIA IsPassword or PreInjectionCheck returns false,

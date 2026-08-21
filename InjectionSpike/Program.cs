@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using Delima.Win32;
 
 namespace InjectionSpike;
 
@@ -33,6 +35,7 @@ internal static class Program
     //
     // {0} is replaced with the URL-encoded login hint.
     private const string DefaultTimingUrl = "https://d3.delima.edu.my";
+    private const string DefaultUiaUrl = "https://d3.delima.edu.my/landing";
 
     [STAThread]
     private static int Main(string[] args)
@@ -45,7 +48,10 @@ internal static class Program
         var settleMs = ParseIntArg(args, "--settle", 400);
         var charDelayMs = ParseIntArg(args, "--char-delay", 0);
         var hint = ParseStringArg(args, "--login-hint", "m-00000000@moe-dl.edu.my");
-        var timingUrl = ParseStringArg(args, "--url", DefaultTimingUrl);
+        var noAccessibility = args.Any(a => string.Equals(a, "--no-accessibility", StringComparison.OrdinalIgnoreCase));
+
+        var defaultUrl = mode == "uia" ? DefaultUiaUrl : DefaultTimingUrl;
+        var url = ParseStringArg(args, "--url", defaultUrl);
 
         // Guard against exactly the mistake that produced a mislabelled run in
         // practice: --method sendkets (typo) silently fell through the old
@@ -87,7 +93,8 @@ internal static class Program
         return mode switch
         {
             "fidelity" => RunFidelity(chromePath, runs, method, settleMs, charDelayMs),
-            "timing"   => RunTiming(chromePath, runs, timingUrl, hint),
+            "timing"   => RunTiming(chromePath, runs, url, hint),
+            "uia"      => RunUia(chromePath, runs, url, noAccessibility),
             _          => PrintHelp()
         };
     }
@@ -118,13 +125,7 @@ internal static class Program
         Console.WriteLine(new string('-', 78));
 
         // Build the run order up front, guaranteeing every password in
-        // TestPasswords appears at least once before any repeats. The previous
-        // version (runs / TestPasswords.Length + 1, stopping the outer loop the
-        // instant results.Count hit `runs`) silently dropped whichever passwords
-        // sorted last once the arithmetic didn't divide evenly -- at runs=50
-        // against 12 passwords that meant "all-reserved" and "moe-style", the
-        // two most informative cases, never ran at all. That failure was
-        // invisible in the console output; nothing said "skipped".
+        // TestPasswords appears at least once before any repeats.
         if (runs < TestPasswords.Length)
         {
             Console.WriteLine($"NOTE: --runs {runs} is fewer than the {TestPasswords.Length} test " +
@@ -165,7 +166,7 @@ internal static class Program
         int settleMs, int charDelayMs)
     {
         var url = "file:///" + pagePath.Replace('\\', '/') + "#expected=" + Uri.EscapeDataString(password);
-        using var session = ChromeSession.Launch(chromePath, url);
+        using var session = ChromeSession.Launch(chromePath, url, forceRendererAccessibility: false);
 
         var ready = session.WaitForForegroundWindow(
             t => t.StartsWith("SPIKE:", StringComparison.Ordinal),
@@ -174,9 +175,7 @@ internal static class Program
         if (ready is null)
             return new Result(label, password.Length, method, false, -1, "WINDOW_NOT_READY");
 
-        // Let the render settle so the autofocused field is genuinely accepting
-        // input. Production must do the same, but keyed off a verified window
-        // rather than a blind sleep.
+        // Let the render settle so the autofocused field is genuinely accepting input.
         Thread.Sleep(settleMs);
 
         var readyMs = (int)ready.Value.TotalMilliseconds;
@@ -192,17 +191,6 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            // SendKeys doesn't only mistype reserved characters -- for a
-            // malformed brace sequence like "{2026}" (not a recognised keyword
-            // such as {ENTER} or {TAB}), SendKeys.SendWait throws an
-            // ArgumentException outright instead of typing anything at all.
-            // Left uncaught, that exception propagates out of RunFidelity's
-            // loop and kills the whole batch before the CSV is ever written --
-            // every result measured before the crash, including the passwords
-            // that legitimately passed, would be lost with nothing saved. This
-            // is a worse failure mode than corruption, and it is itself part
-            // of the evidence against SendKeys, so it is recorded as a FAIL
-            // row rather than allowed to end the run.
             thrown = $"{ex.GetType().Name}: {ex.Message}";
         }
         finally
@@ -248,16 +236,8 @@ internal static class Program
 
         for (var i = 0; i < runs; i++)
         {
-            using var session = ChromeSession.Launch(chromePath, url);
+            using var session = ChromeSession.Launch(chromePath, url, forceRendererAccessibility: false);
 
-            // NOT "Contains(\"Google\")" -- every Chrome window's title ends in
-            // "- Google Chrome", including a blank tab before anything has
-            // loaded. That match declared victory the instant the Chrome window
-            // *appeared*, not when the destination page was actually ready, and
-            // it swallowed the real number: a school-lab run against this exact
-            // bug logged 47/50 "ready" times of ~550ms while the 3 runs where a
-            // real page title happened to win the race first showed 2.4s, 7.5s
-            // and 12.1s -- the true figures this test exists to surface.
             var ready = session.WaitForForegroundWindow(
                 t => !IsBlankChromeTitle(t) &&
                      (t.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
@@ -294,6 +274,99 @@ internal static class Program
 
         var csv = WriteCsv(results, "timing");
         Console.WriteLine($"\nCSV: {csv}");
+        return 0;
+    }
+
+    // ------------------------------------------------------------------
+    // Mode C — UI Automation Verification Probe (T0.4)
+    // Purely observational: an operator drives Chrome by hand; the probe polls
+    // every 100 ms and records focus_resolvable and is_password properties.
+    // Never automates sign-in or types credentials.
+    // ------------------------------------------------------------------
+    private static int RunUia(string chromePath, int runs, string url, bool noAccessibility)
+    {
+        Console.WriteLine($"MODE C — uia (T0.4 probe)   runs={runs}   force-accessibility={!noAccessibility}");
+        Console.WriteLine($"URL: {url}");
+        Console.WriteLine();
+        Console.WriteLine("OPERATOR INSTRUCTIONS:");
+        Console.WriteLine("  1. Probe launches Chrome at the entry URL.");
+        Console.WriteLine("  2. Click the sign-in button.");
+        Console.WriteLine("  3. Wait on identifier page (2s) -> Type your real email -> Press Enter.");
+        Console.WriteLine("  4. Wait on password page (2s). DO NOT TYPE A PASSWORD.");
+        Console.WriteLine("  5. Close the Chrome window. Probe will log the run and relaunch.");
+        Console.WriteLine(new string('-', 78));
+
+        var csvPath = ResolveSpikeResultsPath($"uia_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        var directory = Path.GetDirectoryName(csvPath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        using var writer = new StreamWriter(csvPath, false, Encoding.UTF8);
+        writer.WriteLine("run,elapsed_ms,window_title,focus_resolvable,is_password");
+        writer.Flush();
+
+        var totalSamples = 0;
+        var totalResolvedSamples = 0;
+        var totalPasswordTrueSamples = 0;
+
+        for (var run = 1; run <= runs; run++)
+        {
+            Console.WriteLine($"[{run}/{runs}] Launching Chrome...");
+            using var session = ChromeSession.Launch(chromePath, url, forceRendererAccessibility: !noAccessibility);
+            var sw = Stopwatch.StartNew();
+            var runSamples = 0;
+
+            while (!session.Process.HasExited)
+            {
+                var elapsedMs = sw.ElapsedMilliseconds;
+                var title = NativeMethods.GetForegroundTitle();
+                var (focusResolvable, isPassword) = UiaHelper.ProbeFocusedElementPassword();
+
+                var isPasswordStr = focusResolvable && isPassword.HasValue
+                    ? (isPassword.Value ? "true" : "false")
+                    : "";
+
+                var escapedTitle = title.Replace("\"", "\"\"");
+                writer.WriteLine($"{run},{elapsedMs},\"{escapedTitle}\",{(focusResolvable ? "true" : "false")},{isPasswordStr}");
+                writer.Flush();
+
+                runSamples++;
+                totalSamples++;
+                if (focusResolvable) totalResolvedSamples++;
+                if (focusResolvable && isPassword == true) totalPasswordTrueSamples++;
+
+                Thread.Sleep(100);
+            }
+
+            Console.WriteLine($"[{run}/{runs}] Window closed. Recorded {runSamples} samples ({sw.ElapsedMilliseconds} ms).");
+
+            if (run < runs)
+            {
+                Thread.Sleep(500);
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("==============================================================================");
+        Console.WriteLine("T0.4 UIA PROBE BATCH COMPLETE");
+        Console.WriteLine("==============================================================================");
+        Console.WriteLine($"Total runs completed    : {runs}");
+        Console.WriteLine($"Total samples recorded  : {totalSamples}");
+        Console.WriteLine($"Focus resolvable samples: {totalResolvedSamples}");
+        Console.WriteLine($"IsPassword=true samples : {totalPasswordTrueSamples}");
+        Console.WriteLine($"CSV Output              : {csvPath}");
+        Console.WriteLine();
+        Console.WriteLine("Refer to Visual_SSO/T0.4_UIA_Verification.md Part 3 to evaluate results:");
+        Console.WriteLine("  Q1. Focus resolvable on identifier page (>= 49/50)");
+        Console.WriteLine("  Q2. IsPassword == false on identifier page (50/50 - no false positives)");
+        Console.WriteLine("  Q3. Focus resolvable on password page (>= 49/50)");
+        Console.WriteLine("  Q4. IsPassword == true on password page (50/50 - no tolerance)");
+        Console.WriteLine("  Q5. Settle latency from page load to property readable (p50/p95)");
+        Console.WriteLine("  Q6. Accessibility flag overhead (compare with --no-accessibility)");
+        Console.WriteLine("==============================================================================");
+
         return 0;
     }
 
@@ -340,9 +413,12 @@ internal static class Program
 
     private static string WriteCsv(List<Result> results, string prefix)
     {
-        var path = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            $"{prefix}_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        var path = ResolveSpikeResultsPath($"{prefix}_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        var directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
 
         using var w = new StreamWriter(path, false, Encoding.UTF8);
         w.WriteLine("run,label,password_length,method,success,window_ready_ms,detail,machine,os");
@@ -355,6 +431,23 @@ internal static class Program
                         $"{r.WindowReadyMs},\"{r.Detail}\",{machine},\"{os}\"");
         }
         return path;
+    }
+
+    private static string ResolveSpikeResultsPath(string filename)
+    {
+        var cur = Directory.GetCurrentDirectory();
+        if (Directory.Exists(Path.Combine(cur, "spike-results")))
+        {
+            return Path.Combine(cur, "spike-results", filename);
+        }
+
+        if (Directory.Exists(Path.Combine(cur, "..", "spike-results")))
+        {
+            return Path.GetFullPath(Path.Combine(cur, "..", "spike-results", filename));
+        }
+
+        var localSpike = Path.Combine(cur, "spike-results");
+        return Path.Combine(localSpike, filename);
     }
 
     private static int ParseIntArg(string[] args, string name, int fallback)
@@ -372,32 +465,35 @@ internal static class Program
     private static int PrintHelp()
     {
         Console.WriteLine("""
-            DELIMa injection spike (T0.3)
+            DELIMa injection and UIA verification spike (T0.3 / T0.4)
 
               dotnet run -- fidelity --method sendinput --runs 50
               dotnet run -- fidelity --method sendkeys  --runs 50
               dotnet run -- timing   --runs 50 --url https://d3.delima.edu.my
+              dotnet run -- uia      --runs 50 --url https://d3.delima.edu.my/landing
+              dotnet run -- uia      --runs 50 --no-accessibility
 
-            fidelity   Local page. Verifies every character survives injection.
-                       Run both methods and compare. No network, no account.
+            fidelity          Mode A: Local page. Verifies every character survives injection.
+                              Run both methods and compare. No network, no account.
 
-            timing     Real Google sign-in page. Measures cold-start and
-                       window-detection latency. Sends no keystrokes.
+            timing            Mode B: Real Google sign-in page. Measures cold-start and
+                              window-detection latency. Sends no keystrokes.
+
+            uia               Mode C: UI Automation verification probe (T0.4).
+                              Observes whether Chrome reports IsPassword reliably.
+                              Driven manually by operator; no automated keystrokes or stored credentials.
 
             Options
-              --runs N       number of runs            (default 50)
-              --method M     sendinput | sendkeys      (default sendinput)
-              --settle MS    pause after window ready  (default 400)
-              --char-delay MS  gap between characters  (default 0)
-                             Raise to 10-20 if fast injection drops characters
-                             on lab hardware. Whatever value produces a clean
-                             sweep becomes the production setting.
-              --url U        entry URL for timing mode; {0} is replaced with
-                             the encoded login hint if present
-              --login-hint E address substituted into --url
+              --runs N            number of runs                (default 50)
+              --method M          sendinput | sendkeys          (default sendinput)
+              --settle MS         pause after window ready      (default 400)
+              --char-delay MS     gap between characters        (default 0)
+                                  Raise to 10-20 if fast injection drops characters on lab hardware.
+              --url U             entry URL (timing / uia mode)
+              --login-hint E      address substituted into --url (timing mode)
+              --no-accessibility  omit --force-renderer-accessibility in uia mode (for baseline timing)
 
-            Run on representative lab hardware, not a developer machine.
-            Do not leave the desk during a run: it drives the real keyboard.
+            Run on representative lab hardware, not a developer machine or RDP session.
             """);
         return 1;
     }

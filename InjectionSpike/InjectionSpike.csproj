@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <AssemblyName>InjectionSpike</AssemblyName>
     <RootNamespace>InjectionSpike</RootNamespace>
@@ -13,6 +14,10 @@
          one of the two injection methods under test. Production code should not
          take this dependency. -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Delima.Win32\Delima.Win32.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Fidelity target must sit next to the binary so Mode A can find it. -->

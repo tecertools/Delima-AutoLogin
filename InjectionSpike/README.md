@@ -1,130 +1,82 @@
-# T0.3 — Injection Spike
+# T0.3 & T0.4 — Injection and UIA Verification Spike
 
-Decides whether the DELIMa Smart Launcher's core mechanism is viable **before**
-anyone builds the WPF client. Two questions, two modes.
+Validates core mechanisms of the DELIMa Smart Launcher **before** production deployment.
 
-| Mode | Question | Touches Google? |
-| :-- | :-- | :-- |
-| **A — fidelity** | Do all password characters survive injection? | No |
-| **B — timing** | How long until Chrome is actually ready to receive them? | Yes (no keystrokes sent) |
+| Mode | Task | Question | Touches Google? | Credentials Typed? |
+| :-- | :-- | :-- | :-- | :-- |
+| **A — fidelity** | T0.3 | Do all password characters survive injection? | No | Synthetic in URL fragment |
+| **B — timing** | T0.3 | How long until Chrome is actually ready to receive keystrokes? | Yes | None (no keystrokes sent) |
+| **C — uia** | T0.4 | Does Chrome report `IsPassword` reliably via UI Automation? | Yes | Email only (no password typed) |
 
 ---
 
-## Why two modes
+## Modes
 
-The PRD's pipeline is `Process.Start` → `Thread.Sleep(1500)` → `SendKeys`. Two
-independent things can go wrong, and testing them together makes a failure
-impossible to attribute:
+### Mode A — Character Fidelity
+`testpage.html` receives the expected password in the URL **fragment**, which never leaves the machine. It compares what actually landed in the field and writes the verdict into `document.title`. The harness reads that with `GetWindowText`. Proves `SendInput` with `KEYEVENTF_UNICODE` against `SendKeys`.
 
-1. **Character corruption.** `SendKeys` parses `+ ^ % ~ ( ) { } [ ]` as control
-   syntax rather than literal characters. `+a` means Shift+A. `{ENTER}` is a
-   keyword. A password containing any of these is silently mistyped.
-2. **The timing race.** 1,500 ms is a guess. When Chrome takes longer, the
-   keystrokes go wherever focus happens to be — the URL bar, a Word document,
-   the desktop.
+### Mode B — Timing Race
+Measures cold-start latency against real Google sign-in pages without typing keystrokes, demonstrating why arbitrary sleeps (e.g. 1,500 ms) fail.
 
-Mode A removes Google, the network and the account from the picture entirely, so
-a failure is unambiguously a character-handling bug. Mode B measures the race
-without ever sending a keystroke, so it needs no real credentials.
-
-## How Mode A verifies without reading the browser
-
-`testpage.html` receives the expected password in the URL **fragment**, which
-never leaves the machine. It compares what actually landed in the field and
-writes the verdict into `document.title`. The harness reads that with
-`GetWindowText`. No local server, no WebSocket, no extension, no DevTools
-protocol.
-
-The title carries only `PASS` / `FAIL` plus character offsets — never the value.
-Use the synthetic passwords supplied; do not point this at a real account.
+### Mode C — UI Automation Verification Probe (T0.4)
+Observational probe for `IsPassword` field verification per `Visual_SSO/T0.4_UIA_Verification.md`.
+- **Purely observational:** The operator drives Chrome by hand (clicks sign in, types real email on identifier page, lands on password page, closes window).
+- **No password typed:** The probe only samples UI Automation state every 100 ms (`run`, `elapsed_ms`, `window_title`, `focus_resolvable`, `is_password`).
+- **Pass criteria:** 50/50 reliability on `is_password == false` (identifier page) and `is_password == true` (password page), with zero false positives.
+- References `Delima.Win32` for `UiaHelper`, `ChromeSession`, and `NativeMethods`.
 
 ---
 
 ## Running it
 
-**On a representative lab PC**, not a developer machine. Cold-start latency on
-lab hardware with a spinning disk is the entire point of Mode B.
+**On a representative lab PC**, not a developer machine. Cold-start latency and accessibility behavior on lab hardware is the entire point.
 
-Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and
-Google Chrome.
+Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and Google Chrome.
 
 ```powershell
 cd InjectionSpike
 
-# The comparison that matters — run both, diff the summaries.
+# Mode A — Character fidelity (run both to compare)
 dotnet run -- fidelity --method sendinput --runs 50
 dotnet run -- fidelity --method sendkeys  --runs 50
 
-# Cold-start and window-detection latency.
+# Mode B — Cold-start and window-detection latency
 dotnet run -- timing --runs 50 --url https://d3.delima.edu.my
+
+# Mode C — UI Automation verification probe (T0.4)
+dotnet run -- uia --runs 50 --url https://d3.delima.edu.my/landing
+
+# Mode C — Baseline comparison without accessibility flag (T0.4 Q6)
+dotnet run -- uia --runs 50 --no-accessibility
 ```
 
-Each mode writes a timestamped CSV to the working directory.
+Results are saved to `spike-results/uia_<timestamp>.csv` (or `fidelity_*.csv` / `timing_*.csv`).
 
-> **The harness drives the real keyboard.** Don't leave the desk mid-run, and
-> don't run it over Remote Desktop — `SendInput` targets the physical input
-> queue and `BlockInput` behaves differently in an RDP session.
+> **The harness drives the real keyboard in Mode A.** Don't leave the desk mid-run, and don't run it over Remote Desktop — `SendInput` targets the physical input queue and `BlockInput` behaves differently in an RDP session.
 
 ---
 
-## Reading the results
+## Reading the Results
 
-**Mode A** prints a per-password summary. The expected shape:
-
-```
-  plain-lower         5/5   passed
-  plus                0/5   passed   <-- CORRUPTED
-  caret               0/5   passed   <-- CORRUPTED
-  all-reserved        0/5   passed   <-- CORRUPTED
-```
-
-for `--method sendkeys`, and a clean sweep for `--method sendinput`. If that is
-what you see, the finding is settled: production uses `SendInput` with
-`KEYEVENTF_UNICODE`, and the PRD's `SendKeys.SendWait` would have failed silently
-on every pupil whose password contains a reserved character.
-
-If `sendinput` also fails, that is a much more interesting result — capture the
-CSV and stop before building anything else.
-
-**Mode B** prints p50 / p95 and, most usefully:
-
-```
-  runs exceeding the PRD's 1,500 ms assumption: 47/50 (94%)
-```
-
-Every one of those is a run where the PRD's design would have typed a child's
-password into the wrong window. That number is the argument for foreground-window
-verification, and it's worth putting in front of whoever signs off the design.
-
----
-
-## What this validates beyond injection
-
-The spike deliberately exercises the other mechanisms production needs, so they
-get tested for free:
-
-- **Chrome path resolution** via `App Paths` registry with 32-bit, 64-bit and
-  per-user fallbacks — the PRD hardcodes one path that fails on two common setups.
-- **Throwaway `--user-data-dir` per run**, wiped afterwards, proving session
-  isolation between pupils.
-- **Scoped process-tree teardown** — graceful `CloseMainWindow` first,
-  `taskkill /T /F /PID` only on timeout, never `/IM chrome.exe` (which would kill
-  the teacher's own browser and corrupt its profile).
-- **`BlockInput` availability** — if it is denied without elevation on your lab
-  image, Mode A reports `blockinput_denied` and you know that early.
+- **Mode A**: Evaluates character fidelity across reserved symbols.
+- **Mode B**: Measures window-ready latency percentiles (p50 / p95).
+- **Mode C**: Evaluates against the six questions in `Visual_SSO/T0.4_UIA_Verification.md` Part 3:
+  1. `focus_resolvable` on identifier page (≥ 49/50)
+  2. `is_password == false` on identifier page (50/50, zero tolerance for false positives)
+  3. `focus_resolvable` on password page (≥ 49/50)
+  4. `is_password == true` on password page (50/50, zero tolerance)
+  5. Settle latency to property readable (p50 / p95)
+  6. Accessibility flag startup overhead comparison (`--no-accessibility`)
 
 ## Files
 
 | File | Role |
 | :-- | :-- |
-| `Program.cs` | Harness, both modes, CSV output |
-| `NativeMethods.cs` | `SendInput` / `KEYEVENTF_UNICODE`, window inspection, `BlockInput` |
-| `ChromeLauncher.cs` | Path resolution, throwaway profile, window wait, teardown |
+| `Program.cs` | Harness supporting `fidelity`, `timing`, and `uia` modes |
 | `testpage.html` | Mode A fidelity target |
+| Referenced `Delima.Win32` | `UiaHelper`, `ChromeSession`, `NativeMethods` |
 
 ## Status
 
-Targets **.NET 10 (LTS, supported to November 2028)**. Originally written against
-.NET 8, retargeted before .NET 8's 10 November 2026 end-of-support date made it
-the wrong choice even for a short-lived harness. Compiled and run against a real
-lab PC; results and fixes are tracked in `../Visual_SSO/T0.3_Injection_Test_Protocol.md`.
+Targets **.NET 10 (LTS, supported to November 2028)**. Uses promoted `Delima.Win32` components.
+

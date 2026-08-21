@@ -43,4 +43,27 @@ public static class UiaHelper
             return false;
         }
     }
+
+    /// <summary>
+    /// Probes the currently focused element for UI Automation inspection (T0.4).
+    /// Returns (true, isPassword) if the focused element is resolved and IsPassword is read successfully.
+    /// Returns (false, null) if focus is unresolvable or property reading throws an exception.
+    /// </summary>
+    public static (bool FocusResolvable, bool? IsPassword) ProbeFocusedElementPassword()
+    {
+        if (!OperatingSystem.IsWindows()) return (false, null);
+
+        try
+        {
+            var element = AutomationElement.FocusedElement;
+            if (element == null) return (false, null);
+
+            var isPassword = element.Current.IsPassword;
+            return (true, isPassword);
+        }
+        catch
+        {
+            return (false, null);
+        }
+    }
 }
