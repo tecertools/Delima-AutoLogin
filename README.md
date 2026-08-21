@@ -38,6 +38,7 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
 │   ├── T0.2_URL_Confirmation.md    Sign-in route — COMPLETE, route C selected
 │   ├── T0.4_UIA_Verification.md    UIA field check — COMPLETE, passed, gate enabled
+│   ├── E2E_First_Run.md            ← next: the first end-to-end run, one pupil
 │   ├── AI_Build_Guide.md           ← start building here (novice walkthrough)
 │   ├── Build_Prompts.md            Ready-to-paste prompts for an AI coding assistant
 │   ├── Build_Machine_Setup.md      Set up a Windows PC to compile the release
@@ -79,7 +80,7 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 | 1 | **Apply the T0.4 findings + the consent step to the code.** The identifier title is still wrong, so every sign-in aborts — the launcher does not work as it stands | Prompt T0.4b |
 | 2 | **Fix the PDPA claim** in the first-run disclaimer, and add the T0.1 statement to `LESEN.rtf` and the release notes | Prompt 16 |
 | 3 | Restore `everyone-none` on the store directory in the `.iss` (the CI half of 15a is done) | Prompt 15a |
-| 4 | **End-to-end sign-in on a lab PC** — first time the whole chain runs together | arch §11 |
+| 4 | **First full run** — wizard → bundle → provision → sign-in. Nothing has ever produced a `school.dlmpack` | `E2E_First_Run.md` |
 | 5 | Tag a release, ship it unsigned, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 
 **Item 1 is not polish — it is the difference between a working product and one that aborts every sign-in.** T0.4 found the configured identifier title had a word dropped when it was transcribed from T0.2, and exact matching means it never matches. The pupil-account ACL test, the most important of the field checks, has passed.
