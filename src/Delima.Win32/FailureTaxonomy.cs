@@ -19,6 +19,7 @@ public static class FailureCodes
     public const string E11_NoPasswordStored = "E11";
     public const string E12_PicturePasswordLocked = "E12";
     public const string E13_NetworkUnreachable = "E13";
+    public const string E14_PasswordRejected = "E14";
 
     private static readonly Dictionary<string, (string Condition, string PupilMessageBm, string TeacherAction)> Taxonomy =
         new(StringComparer.OrdinalIgnoreCase)
@@ -35,7 +36,8 @@ public static class FailureCodes
             [E10_StoreStale] = ("Store stale beyond store_max_age_days", "Panggil cikgu.", "Re-provision this PC"),
             [E11_NoPasswordStored] = ("No password stored for this pupil", "Panggil cikgu.", "Complete wizard Step 4"),
             [E12_PicturePasswordLocked] = ("Picture password locked (5 failures)", "Tunggu 5 minit.", "Reset via Mod Guru"),
-            [E13_NetworkUnreachable] = ("Network unreachable", "Tiada internet. Panggil cikgu.", "Network")
+            [E13_NetworkUnreachable] = ("Network unreachable", "Tiada internet. Panggil cikgu.", "Network"),
+            [E14_PasswordRejected] = ("Password rejected by Google (stale credential)", "Kata laluan tidak diterima. Beritahu cikgu.", "Re-import in Delima.Admin")
         };
 
     public static string GetCondition(string errorCode) =>

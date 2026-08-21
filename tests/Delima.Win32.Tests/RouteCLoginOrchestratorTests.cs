@@ -309,16 +309,18 @@ public class RouteCLoginOrchestratorTests
         // Schools with Malay-locale Chrome can supply exact BM strings.
         var malayOptions = new RouteCOptions
         {
-            TitleIdentifierPage = new[] { "Log masuk - Akaun Google - Google" },
-            TitlePasswordPage = new[] { "Selamat Datang - Google Chrome" },
+            TitleIdentifierPage = new[] { "Log masuk - Akaun Google - Google Chrome" },
+            TitleConsentPage = new[] { "Log masuk - Akaun Google - Google Chrome" },
+            TitleDestinationPage = new[] { "DELIMa - Google Chrome" },
             TitleSettlePolls = 3,
             PollIntervalMs = 100,
             WindowWaitTimeout = TimeSpan.FromSeconds(30),
             CheckUiaPasswordElement = true
         };
 
-        Assert.Equal("Log masuk - Akaun Google - Google", malayOptions.TitleIdentifierPage[0]);
-        Assert.Equal("Selamat Datang - Google Chrome", malayOptions.TitlePasswordPage[0]);
+        Assert.Equal("Log masuk - Akaun Google - Google Chrome", malayOptions.TitleIdentifierPage[0]);
+        Assert.Equal("Log masuk - Akaun Google - Google Chrome", malayOptions.TitleConsentPage[0]);
+        Assert.Equal("DELIMa - Google Chrome", malayOptions.TitleDestinationPage[0]);
         Assert.True(malayOptions.CheckUiaPasswordElement);
     }
 
@@ -362,14 +364,14 @@ public class RouteCLoginOrchestratorTests
         Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage);
         Assert.Equal(2, options.TitleIdentifierPage.Count);
 
-        // 2. Generic password title
-        Assert.Contains("Welcome - Google Chrome", options.TitlePasswordPageGeneric);
-        Assert.Contains("Welcome - Google Chrome", options.TitlePasswordPage);
-
-        // 3. Consent page title
+        // 2. Consent page title
         Assert.Contains("Sign in - Google Accounts - Google Chrome", options.TitleConsentPage);
         Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleConsentPage);
         Assert.Equal(2, options.TitleConsentPage.Count);
+
+        // 3. Destination page titles (consent skipped / domain-trusted)
+        Assert.Contains("DELIMa - Google Chrome", options.TitleDestinationPage);
+        Assert.Contains("DELIMa 3.0 - Google Chrome", options.TitleDestinationPage);
 
         // 4. UIA IsPassword validation enabled by default (49/49 runs passed in T0.4)
         Assert.True(options.CheckUiaPasswordElement);
@@ -471,5 +473,162 @@ public class RouteCLoginOrchestratorTests
         Assert.Equal("Kata laluan tidak betul. Panggil cikgu.", failure.PupilMessage);
         Assert.Equal("Update via Mod Guru; check password_version", failure.TeacherAction);
         Assert.Equal(12, failure.TotalCharsInjected);
+    }
+
+    [Fact]
+    public void WaitForPostPasswordResolution_ObservesConsentPage_ReturnsConsentPageReached()
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions();
+
+        var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Ahmad - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "Sign in - Google Accounts - Google Chrome");
+
+        Assert.Equal(PostPasswordResolution.ConsentPageReached, resolution);
+    }
+
+    [Fact]
+    public void WaitForPostPasswordResolution_ObservesDestinationPage_ReturnsDestinationReached()
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions();
+
+        var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Ahmad - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "DELIMa 3.0 - Google Chrome");
+
+        Assert.Equal(PostPasswordResolution.DestinationReached, resolution);
+    }
+
+    [Fact]
+    public void WaitForPostPasswordResolution_TimeoutWhileStillOnPasswordPage_ReturnsPasswordRejected()
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions
+        {
+            WindowWaitTimeout = TimeSpan.FromMilliseconds(50),
+            PollIntervalMs = 10
+        };
+
+        // Title stays on password page across the entire timeout period
+        var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Ahmad - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "Hi Ahmad - Google Chrome");
+
+        Assert.Equal(PostPasswordResolution.PasswordRejected, resolution);
+    }
+
+    [Fact]
+    public void WaitForPostPasswordResolution_TimeoutOnUnknownPage_ReturnsUnknownState()
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions
+        {
+            WindowWaitTimeout = TimeSpan.FromMilliseconds(50),
+            PollIntervalMs = 10
+        };
+
+        // Title transitions to an unexpected page (e.g. 2SV challenge, captcha, error)
+        var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Ahmad - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "2-Step Verification - Google Accounts - Google Chrome");
+
+        Assert.Equal(PostPasswordResolution.UnknownState, resolution);
+    }
+
+    [Fact]
+    public void WaitForPostPasswordResolution_CancelledToken_ReturnsAborted()
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        var options = new RouteCOptions();
+
+        var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Ahmad - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "Hi Ahmad - Google Chrome");
+
+        Assert.Equal(PostPasswordResolution.Aborted, resolution);
+    }
+
+    [Fact]
+    public void IsPasswordPageTitle_Identifies_PasswordPageVariants_And_Rejects_NonPasswordPages()
+    {
+        var options = new RouteCOptions();
+
+        // Positive password page titles
+        Assert.True(RouteCLoginOrchestrator.IsPasswordPageTitle("Hi Nur Aisyah - Google Chrome", "Hi Nur Aisyah - Google Chrome", options));
+        Assert.True(RouteCLoginOrchestrator.IsPasswordPageTitle("Welcome - Google Chrome", null, options));
+        Assert.True(RouteCLoginOrchestrator.IsPasswordPageTitle("Custom Captured Title", "Custom Captured Title", options));
+
+        // Negative non-password titles
+        Assert.False(RouteCLoginOrchestrator.IsPasswordPageTitle("", null, options));
+        Assert.False(RouteCLoginOrchestrator.IsPasswordPageTitle(null, null, options));
+        Assert.False(RouteCLoginOrchestrator.IsPasswordPageTitle("Sign in - Google Accounts - Google Chrome", null, options));
+        Assert.False(RouteCLoginOrchestrator.IsPasswordPageTitle("DELIMa - Google Chrome", null, options));
+        Assert.False(RouteCLoginOrchestrator.IsPasswordPageTitle("DELIMa 3.0 - Google Chrome", null, options));
+    }
+
+    [Fact]
+    public void PostPasswordVerification_NeverReachingConsentOrDestination_DoesNotReturnSucceeded()
+    {
+        // Prompt 18 Requirement: Assert that a run which never reaches a consent or destination title does NOT return Succeeded.
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions
+        {
+            WindowWaitTimeout = TimeSpan.FromMilliseconds(50),
+            PollIntervalMs = 10
+        };
+
+        // 1. Stays on password page (Wrong Password) -> PasswordRejected (E14)
+        var rejectedResolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Pupil - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "Hi Pupil - Google Chrome");
+
+        Assert.NotEqual(PostPasswordResolution.ConsentPageReached, rejectedResolution);
+        Assert.NotEqual(PostPasswordResolution.DestinationReached, rejectedResolution);
+        Assert.Equal(PostPasswordResolution.PasswordRejected, rejectedResolution);
+
+        // 2. Transits to unknown page (e.g. 2FA/Suspended) -> UnknownState (E02)
+        var unknownResolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Pupil - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => "Unexpected Page - Google Chrome");
+
+        Assert.NotEqual(PostPasswordResolution.ConsentPageReached, unknownResolution);
+        Assert.NotEqual(PostPasswordResolution.DestinationReached, unknownResolution);
+        Assert.Equal(PostPasswordResolution.UnknownState, unknownResolution);
     }
 }
