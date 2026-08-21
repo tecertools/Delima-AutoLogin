@@ -286,6 +286,12 @@ Match on the title, subject to all three of:
 >
 > **`injection_settle_ms` raised 400 → 700.** T0.4 measured p50 314 ms, p95 417 ms and max 434 ms from the password page appearing to `IsPassword` becoming readable. The old 400 ms default sat below the 95th percentile, meaning roughly one sign-in in twenty would have begun typing before the field was confirmed.
 
+> **Locale — checked, August 2026: the titles do not change.** Verified on lab hardware; the sign-in page titles are the same strings regardless of the machine's locale.
+>
+> **The reason matters, because it bounds how far the finding travels.** These titles come from Google's *web page*, which follows the **Google account's language setting**, not Chrome's UI language. A Malay-language Windows or a Malay Chrome does not change them. **A pupil whose MOE account is set to Bahasa Melayu still might.** No such account was available to test.
+>
+> Keep the titles as per-locale configuration (Appendix B) rather than constants. The risk is smaller than feared but not zero, and it costs nothing to leave configurable. If a school reports sign-ins failing at `E02` on every pupil, this is the first thing to check.
+
 **Locale is a live risk.** These strings are Google's UI, and `Welcome` becomes something else on a Chrome running in Bahasa Melayu. Titles are per-locale configuration; a school whose lab images differ from the test machine must be able to correct them without a new build. **Verify the Malay-locale strings before the pilot.**
 
 **3. Recommended hardening — field identity (not blocking step 11)**

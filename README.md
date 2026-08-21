@@ -78,8 +78,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 | :-- | :--- | :--- |
 | 1 | **Apply the T0.4 findings to the code.** The identifier title in `RouteCLoginOrchestrator` is wrong, so every sign-in currently aborts — the launcher does not work as it stands | Prompt T0.4b |
 | 2 | Two installer/pipeline fixes — CI never installs Inno Setup; `everyone-none` dropped from the store ACL | Prompt 15a |
-| 3 | Capture the **Malay-locale** sign-in titles | arch §4.2, Appendix B |
-| 4 | Remaining field checks — name grid at 1366×768 with 44 pupils, cold-start on a spinning disk | arch §11.0 |
+| 3 | ~~Malay-locale titles~~ — **checked, identical.** Titles follow the *Google account* language, not the machine's | arch §4.2 |
+| 4 | Remaining field checks — name grid at 1366×768, cold-start timing. **Deferred to pilot**; neither is a safety question | arch §11.0 |
 | 5 | Ship one **unsigned** release, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 | 6 | The **T0.1 responsibility statement** in all three required placements | PRD §8.7 |
 
