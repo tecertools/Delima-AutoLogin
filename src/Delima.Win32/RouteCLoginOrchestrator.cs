@@ -46,23 +46,6 @@ public sealed record RouteCOptions
     };
 
     /// <summary>
-    /// Generic window titles for Google's password page before profile name loads (§4.2).
-    /// Used as an optional positive signal, never as a strict equality requirement.
-    /// </summary>
-    public IReadOnlyList<string> TitlePasswordPageGeneric { get; init; } = new[]
-    {
-        "Welcome - Google Chrome"
-    };
-
-    /// <summary>
-    /// Configured window titles for Google's password page. Maintained for backward compatibility.
-    /// </summary>
-    public IReadOnlyList<string> TitlePasswordPage { get; init; } = new[]
-    {
-        "Welcome - Google Chrome"
-    };
-
-    /// <summary>
     /// Window titles for Google's OAuth consent screen (§4.5, Appendix B).
     /// Guarded by state rather than string alone: Consent state may only be entered
     /// after successful password injection in the same run.
@@ -71,6 +54,18 @@ public sealed record RouteCOptions
     {
         "Sign in - Google Accounts - Google Chrome",
         "Sign in \u2013 Google accounts - Google Chrome"
+    };
+
+    /// <summary>
+    /// Window titles for destination pages when OAuth consent is skipped (e.g. domain-trusted application).
+    /// Matched as exact Ordinal equality against any entry in the list (§4.5).
+    /// </summary>
+    public IReadOnlyList<string> TitleDestinationPage { get; init; } = new[]
+    {
+        "DELIMa - Google Chrome",
+        "DELIMa 3.0 - Google Chrome",
+        "Classes - Google Classroom - Google Chrome",
+        "Google Classroom - Google Chrome"
     };
 
     /// <summary>
@@ -315,6 +310,7 @@ public static class RouteCLoginOrchestrator
             // ====================================================================
             onStateChanged?.Invoke(LoginFlowState.WaitingForPasswordPage);
 
+            string? capturedPasswordTitle = null;
             var passwordResult = await Task.Run(() =>
             {
                 onStateChanged?.Invoke(LoginFlowState.InjectingPassword);
@@ -332,7 +328,15 @@ public static class RouteCLoginOrchestrator
                 return InjectionEngine.Inject(
                     session,
                     credential.PasswordSpan,
-                    title => !string.IsNullOrWhiteSpace(title) && !options.TitleIdentifierPage.Any(idTitle => string.Equals(title, idTitle, StringComparison.Ordinal)),
+                    title =>
+                    {
+                        var matches = !string.IsNullOrWhiteSpace(title) && !options.TitleIdentifierPage.Any(idTitle => string.Equals(title, idTitle, StringComparison.Ordinal));
+                        if (matches)
+                        {
+                            capturedPasswordTitle = title;
+                        }
+                        return matches;
+                    },
                     passwordOptions,
                     cancellationToken);
             }, cancellationToken);
@@ -351,19 +355,55 @@ public static class RouteCLoginOrchestrator
             totalChars += passwordResult.CharactersInjected;
 
             // ====================================================================
-            // Step 3: OAuth Consent Screen (§4.5)
+            // Step 3: OAuth Consent Screen / Destination Verification (§4.5 & §7.1)
             // Sequence: identifier → password → consent → destination.
             // Reaching consent is the normal, successful terminal state of injection.
             // The software does NOT click Continue (pupil presses it; identity check G2).
             // Topmost overlay is already down since password injection completed.
             // Guarded by state rather than string alone: Consent state may only be entered
             // AFTER successful password injection in the same run, never from title match alone.
-            // If the title matches but no password was injected in this run, that is E02, not consent.
             // ====================================================================
-            onStateChanged?.Invoke(LoginFlowState.WaitingForConsentPage);
+            var resolution = await Task.Run(() =>
+                WaitForPostPasswordResolution(session, options, capturedPasswordTitle, cancellationToken),
+                cancellationToken);
 
-            onStateChanged?.Invoke(LoginFlowState.Completed);
-            return RouteCResult.Succeeded(session, totalChars, sw.Elapsed);
+            switch (resolution)
+            {
+                case PostPasswordResolution.ConsentPageReached:
+                    onStateChanged?.Invoke(LoginFlowState.WaitingForConsentPage);
+                    return RouteCResult.Succeeded(session, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.DestinationReached:
+                    onStateChanged?.Invoke(LoginFlowState.Completed);
+                    return RouteCResult.Succeeded(session, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.PasswordRejected:
+                    onStateChanged?.Invoke(LoginFlowState.Failed);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E14_PasswordRejected,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E14_PasswordRejected),
+                        FailureCodes.GetTeacherAction(FailureCodes.E14_PasswordRejected),
+                        null, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.Aborted:
+                    onStateChanged?.Invoke(LoginFlowState.Aborted);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E03_InjectionAborted,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E03_InjectionAborted),
+                        FailureCodes.GetTeacherAction(FailureCodes.E03_InjectionAborted),
+                        null, totalChars, sw.Elapsed);
+
+                default: // UnknownState
+                    onStateChanged?.Invoke(LoginFlowState.Failed);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E02_WindowNotVerified,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E02_WindowNotVerified),
+                        FailureCodes.GetTeacherAction(FailureCodes.E02_WindowNotVerified),
+                        null, totalChars, sw.Elapsed);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -431,4 +471,93 @@ public static class RouteCLoginOrchestrator
         CancellationToken cancellationToken,
         Func<string>? titleGetter = null) =>
         WaitForTransitionOut(session, new[] { identifierTitle }, timeout, pollIntervalMs, cancellationToken, titleGetter);
+
+    /// <summary>
+    /// Polls after password injection until consent screen or destination is reached,
+    /// or detects password rejection / timeout per §4.5 and §7.1.
+    /// </summary>
+    internal static PostPasswordResolution WaitForPostPasswordResolution(
+        ChromeSession session,
+        RouteCOptions options,
+        string? passwordPageTitle,
+        CancellationToken cancellationToken,
+        Func<string>? titleGetter = null)
+    {
+        var sw = Stopwatch.StartNew();
+        int interval = Math.Max(20, options.PollIntervalMs);
+        var getTitle = titleGetter ?? NativeMethods.GetForegroundTitle;
+
+        while (sw.Elapsed < options.WindowWaitTimeout)
+        {
+            if (cancellationToken.IsCancellationRequested) return PostPasswordResolution.Aborted;
+
+            var currentTitle = getTitle();
+
+            // 1. Consent screen reached (§4.5)
+            if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleConsentPage))
+            {
+                return PostPasswordResolution.ConsentPageReached;
+            }
+
+            // 2. Destination reached (consent skipped / domain-trusted)
+            if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleDestinationPage))
+            {
+                return PostPasswordResolution.DestinationReached;
+            }
+
+            Thread.Sleep(interval);
+        }
+
+        if (cancellationToken.IsCancellationRequested) return PostPasswordResolution.Aborted;
+
+        // 3. Check if still on a password-page title after timeout -> Password rejected (§7.1)
+        var finalTitle = getTitle();
+        if (IsPasswordPageTitle(finalTitle, passwordPageTitle, options))
+        {
+            return PostPasswordResolution.PasswordRejected;
+        }
+
+        // 4. Anything else -> Unknown state (E02)
+        return PostPasswordResolution.UnknownState;
+    }
+
+    /// <summary>
+    /// Evaluates whether the window title corresponds to Google's password page per §4.2 and §7.1.
+    /// </summary>
+    internal static bool IsPasswordPageTitle(string? currentTitle, string? passwordPageTitle, RouteCOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(currentTitle)) return false;
+
+        // Not a password page if it matches consent, destination, or identifier titles
+        if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleConsentPage)) return false;
+        if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleDestinationPage)) return false;
+        if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleIdentifierPage)) return false;
+
+        // Title is unchanged from the observed password page title during injection
+        if (!string.IsNullOrEmpty(passwordPageTitle) && string.Equals(currentTitle, passwordPageTitle, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        // Common Google password page title formats
+        if (currentTitle.StartsWith("Hi ", StringComparison.Ordinal) ||
+            currentTitle.StartsWith("Welcome", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+/// <summary>
+/// Possible resolution states after password injection in Route C (§4.5, §7.1).
+/// </summary>
+internal enum PostPasswordResolution
+{
+    ConsentPageReached,
+    DestinationReached,
+    PasswordRejected,
+    UnknownState,
+    Aborted
 }

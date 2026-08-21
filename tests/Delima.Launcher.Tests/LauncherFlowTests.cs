@@ -99,6 +99,7 @@ public class LauncherFlowTests
     [InlineData(FailureCodes.E11_NoPasswordStored, "Panggil cikgu.", "Complete wizard Step 4")]
     [InlineData(FailureCodes.E12_PicturePasswordLocked, "Tunggu 5 minit.", "Reset via Mod Guru")]
     [InlineData(FailureCodes.E13_NetworkUnreachable, "Tiada internet. Panggil cikgu.", "Network")]
+    [InlineData(FailureCodes.E14_PasswordRejected, "Kata laluan tidak diterima. Beritahu cikgu.", "Re-import in Delima.Admin")]
     public void RalatViewModel_AllTaxonomyCodes_HaveExpectedMessages(string code, string expectedPupilBm, string expectedTeacher)
     {
         var school = SampleDataService.CreateSampleSchool();
