@@ -49,9 +49,9 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 
 [Dirs]
 ; Per-machine store. Interactive users must not be able to read it (arch §3.5).
-; Inno Setup Permissions syntax only supports full, modify, readexec (Inno Setup does not support 'none').
-; We set admins-full system-full here, and explicitly strip inherited %ProgramData% permissions in [Run] and [Code].
-Name: "{commonappdata}\DELIMa Launcher"; Permissions: admins-full system-full
+; Permissions: everyone-none admins-full system-full removes inherited %ProgramData% read grants for Users between installation and first provisioning.
+; We also explicitly strip inherited %ProgramData% permissions in [Run] and [Code].
+Name: "{commonappdata}\DELIMa Launcher"; Permissions: everyone-none admins-full system-full
 
 [Icons]
 Name: "{group}\DELIMa";           Filename: "{app}\Delima.Launcher.exe"; Components: lab

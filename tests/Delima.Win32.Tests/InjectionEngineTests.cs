@@ -146,4 +146,33 @@ public class InjectionEngineTests
         using var shield = KioskGuard.EngageInjectionShield();
         Assert.NotNull(shield);
     }
+
+    [Fact]
+    public void Inject_EmptyTitlesList_Throws_ArgumentException()
+    {
+        using var cred = new SecurePasswordBuffer("Secret123!"u8);
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+
+        Assert.Throws<ArgumentException>(() =>
+            InjectionEngine.Inject(session, cred, Array.Empty<string>()));
+    }
+
+    [Fact]
+    public void MatchesAnyTitle_Returns_True_For_Exact_Ordinal_Match_Only()
+    {
+        var titles = new[]
+        {
+            "Sign in - Google Accounts - Google Chrome",
+            "Sign in \u2013 Google accounts - Google Chrome"
+        };
+
+        Assert.True(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Google Chrome", titles));
+        Assert.True(InjectionEngine.MatchesAnyTitle("Sign in \u2013 Google accounts - Google Chrome", titles));
+
+        Assert.False(InjectionEngine.MatchesAnyTitle(null, titles));
+        Assert.False(InjectionEngine.MatchesAnyTitle(string.Empty, titles));
+        Assert.False(InjectionEngine.MatchesAnyTitle("Sign in - Google accounts - Google Chrome", titles)); // lowercase accounts with hyphen
+        Assert.False(InjectionEngine.MatchesAnyTitle("Sign in \u2013 Google Accounts - Google Chrome", titles)); // uppercase Accounts with en-dash
+    }
 }

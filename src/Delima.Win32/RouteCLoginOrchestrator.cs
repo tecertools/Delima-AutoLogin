@@ -35,26 +35,43 @@ public sealed record RouteCOptions
     public string EntryUrl { get; init; } = "https://d3.delima.edu.my/landing";
 
     /// <summary>
-    /// Exact expected window title for Google's identifier (email) page.
-    /// Per-locale configuration (Appendix B). Default is "Sign in - Google Accounts - Google Chrome" measured at T0.4.
+    /// Exact expected window titles for Google's identifier (email) page.
+    /// Matched as exact Ordinal equality against any entry in the list (§4.2).
+    /// Defaults to both measured T0.4 variants (hyphen and en-dash).
     /// </summary>
-    public string TitleIdentifierPage { get; init; } = "Sign in - Google Accounts - Google Chrome";
+    public IReadOnlyList<string> TitleIdentifierPage { get; init; } = new[]
+    {
+        "Sign in - Google Accounts - Google Chrome",
+        "Sign in \u2013 Google accounts - Google Chrome"
+    };
 
     /// <summary>
-    /// Generic window title for Google's password page before profile name loads (§4.2).
+    /// Generic window titles for Google's password page before profile name loads (§4.2).
     /// Used as an optional positive signal, never as a strict equality requirement.
     /// </summary>
-    public string TitlePasswordPageGeneric { get; init; } = "Welcome - Google Chrome";
+    public IReadOnlyList<string> TitlePasswordPageGeneric { get; init; } = new[]
+    {
+        "Welcome - Google Chrome"
+    };
 
     /// <summary>
-    /// Configured window title for Google's password page. Maintained for backward compatibility.
+    /// Configured window titles for Google's password page. Maintained for backward compatibility.
     /// </summary>
-    public string TitlePasswordPage { get; init; } = "Welcome - Google Chrome";
+    public IReadOnlyList<string> TitlePasswordPage { get; init; } = new[]
+    {
+        "Welcome - Google Chrome"
+    };
 
     /// <summary>
-    /// Window title for Google's OAuth consent screen (§4.5, Appendix B).
+    /// Window titles for Google's OAuth consent screen (§4.5, Appendix B).
+    /// Guarded by state rather than string alone: Consent state may only be entered
+    /// after successful password injection in the same run.
     /// </summary>
-    public string TitleConsentPage { get; init; } = "Sign in - Google Accounts - Google Chrome";
+    public IReadOnlyList<string> TitleConsentPage { get; init; } = new[]
+    {
+        "Sign in - Google Accounts - Google Chrome",
+        "Sign in \u2013 Google accounts - Google Chrome"
+    };
 
     /// <summary>
     /// Consecutive 100 ms polls a title must hold stably before initiating injection (§4.2).
@@ -304,12 +321,12 @@ public static class RouteCLoginOrchestrator
                         : null
                 };
 
-                // §4.2: Title check degrades to sequence-and-stability (changed away from identifier title and stable for TitleSettlePolls)
+                // §4.2: Title check degrades to sequence-and-stability (changed away from identifier titles and stable for TitleSettlePolls)
                 // Primary gate is IsPassword == true via UIA PreInjectionCheck.
                 return InjectionEngine.Inject(
                     session,
                     credential.PasswordSpan,
-                    title => !string.IsNullOrWhiteSpace(title) && !string.Equals(title, options.TitleIdentifierPage, StringComparison.Ordinal),
+                    title => !string.IsNullOrWhiteSpace(title) && !options.TitleIdentifierPage.Any(idTitle => string.Equals(title, idTitle, StringComparison.Ordinal)),
                     passwordOptions,
                     cancellationToken);
             }, cancellationToken);
@@ -333,6 +350,9 @@ public static class RouteCLoginOrchestrator
             // Reaching consent is the normal, successful terminal state of injection.
             // The software does NOT click Continue (pupil presses it; identity check G2).
             // Topmost overlay is already down since password injection completed.
+            // Guarded by state rather than string alone: Consent state may only be entered
+            // AFTER successful password injection in the same run, never from title match alone.
+            // If the title matches but no password was injected in this run, that is E02, not consent.
             // ====================================================================
             onStateChanged?.Invoke(LoginFlowState.WaitingForConsentPage);
 
@@ -362,11 +382,11 @@ public static class RouteCLoginOrchestrator
     }
 
     /// <summary>
-    /// Polls until the window title leaves the identifier page title, establishing the sequence gate per §4.2.
+    /// Polls until the window title leaves all identifier page titles, establishing the sequence gate per §4.2.
     /// </summary>
     internal static bool WaitForTransitionOut(
         ChromeSession session,
-        string identifierTitle,
+        IReadOnlyList<string> identifierTitles,
         TimeSpan timeout,
         int pollIntervalMs,
         CancellationToken cancellationToken,
@@ -381,9 +401,9 @@ public static class RouteCLoginOrchestrator
             if (cancellationToken.IsCancellationRequested) return false;
 
             var currentTitle = getTitle();
-            // If the title has changed from identifier title and window is non-empty, transition observed
-            if (!string.Equals(currentTitle, identifierTitle, StringComparison.Ordinal) &&
-                !string.IsNullOrEmpty(currentTitle))
+            // If the title has changed from all identifier titles and window is non-empty, transition observed
+            if (!string.IsNullOrEmpty(currentTitle) &&
+                !identifierTitles.Any(idTitle => string.Equals(currentTitle, idTitle, StringComparison.Ordinal)))
             {
                 return true;
             }
@@ -393,4 +413,16 @@ public static class RouteCLoginOrchestrator
 
         return false;
     }
+
+    /// <summary>
+    /// Overload accepting a single identifier title for backward compatibility.
+    /// </summary>
+    internal static bool WaitForTransitionOut(
+        ChromeSession session,
+        string identifierTitle,
+        TimeSpan timeout,
+        int pollIntervalMs,
+        CancellationToken cancellationToken,
+        Func<string>? titleGetter = null) =>
+        WaitForTransitionOut(session, new[] { identifierTitle }, timeout, pollIntervalMs, cancellationToken, titleGetter);
 }

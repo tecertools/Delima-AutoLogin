@@ -66,9 +66,74 @@ public sealed record InjectionOptions
 public static class InjectionEngine
 {
     /// <summary>
+    /// Checks whether an actual window title matches any expected title in the list
+    /// under exact StringComparison.Ordinal equality (§4.2).
+    /// </summary>
+    internal static bool MatchesAnyTitle(string? actualTitle, IEnumerable<string> expectedTitles)
+    {
+        if (string.IsNullOrEmpty(actualTitle)) return false;
+        foreach (var expected in expectedTitles)
+        {
+            if (string.Equals(actualTitle, expected, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Injects credentials from an ICredential into the specified ChromeSession.
     /// Conforms to §3.4 decryption discipline: operates directly on ReadOnlySpan&lt;char&gt;
     /// without materialising a System.String.
+    /// Requires an exact full-string match against any expected title in expectedTitles per §4.2.
+    /// </summary>
+    public static InjectionResult Inject(
+        ChromeSession session,
+        ICredential credential,
+        IReadOnlyList<string> expectedTitles,
+        InjectionOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        ArgumentNullException.ThrowIfNull(credential);
+        ArgumentNullException.ThrowIfNull(expectedTitles);
+        if (expectedTitles.Count == 0)
+        {
+            throw new ArgumentException("At least one expected title must be provided.", nameof(expectedTitles));
+        }
+
+        return Inject(session, credential.PasswordSpan, expectedTitles, options, cancellationToken);
+    }
+
+    /// <summary>
+    /// Injects characters directly from a ReadOnlySpan&lt;char&gt;.
+    /// Requires an exact full-string match against any expected title in expectedTitles per §4.2.
+    /// </summary>
+    public static InjectionResult Inject(
+        ChromeSession session,
+        ReadOnlySpan<char> passwordSpan,
+        IReadOnlyList<string> expectedTitles,
+        InjectionOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        ArgumentNullException.ThrowIfNull(expectedTitles);
+        if (expectedTitles.Count == 0)
+        {
+            throw new ArgumentException("At least one expected title must be provided.", nameof(expectedTitles));
+        }
+
+        return Inject(
+            session,
+            passwordSpan,
+            title => MatchesAnyTitle(title, expectedTitles),
+            options,
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Injects credentials from an ICredential into the specified ChromeSession.
     /// Requires an exact full-string match against expectedTitle per §4.2.
     /// </summary>
     public static InjectionResult Inject(
@@ -82,7 +147,7 @@ public static class InjectionEngine
         ArgumentNullException.ThrowIfNull(credential);
         ArgumentException.ThrowIfNullOrWhiteSpace(expectedTitle);
 
-        return Inject(session, credential.PasswordSpan, expectedTitle, options, cancellationToken);
+        return Inject(session, credential.PasswordSpan, new[] { expectedTitle }, options, cancellationToken);
     }
 
     /// <summary>
@@ -99,12 +164,7 @@ public static class InjectionEngine
         ArgumentNullException.ThrowIfNull(session);
         ArgumentException.ThrowIfNullOrWhiteSpace(expectedTitle);
 
-        return Inject(
-            session,
-            passwordSpan,
-            title => string.Equals(title, expectedTitle, StringComparison.Ordinal),
-            options,
-            cancellationToken);
+        return Inject(session, passwordSpan, new[] { expectedTitle }, options, cancellationToken);
     }
 
     /// <summary>
@@ -244,6 +304,19 @@ public static class InjectionEngine
 
         sw.Stop();
         return InjectionResult.Succeeded(charsInjected, blockInputGranted, sw.Elapsed);
+    }
+
+    /// <summary>
+    /// Checks whether the current foreground window belongs to the expected Chrome process,
+    /// has the expected window class, and exactly matches any title in the expected titles list per §4.2.
+    /// </summary>
+    public static bool IsWindowVerified(
+        ChromeSession session,
+        IReadOnlyList<string> expectedTitles,
+        string expectedClassName = "Chrome_WidgetWin_1")
+    {
+        ArgumentNullException.ThrowIfNull(expectedTitles);
+        return IsWindowVerified(session, title => MatchesAnyTitle(title, expectedTitles), expectedClassName);
     }
 
     /// <summary>

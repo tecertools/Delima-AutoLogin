@@ -309,28 +309,30 @@ public class RouteCLoginOrchestratorTests
         // Schools with Malay-locale Chrome can supply exact BM strings.
         var malayOptions = new RouteCOptions
         {
-            TitleIdentifierPage = "Log masuk - Akaun Google - Google",
-            TitlePasswordPage = "Selamat Datang - Google Chrome",
+            TitleIdentifierPage = new[] { "Log masuk - Akaun Google - Google" },
+            TitlePasswordPage = new[] { "Selamat Datang - Google Chrome" },
             TitleSettlePolls = 3,
             PollIntervalMs = 100,
             WindowWaitTimeout = TimeSpan.FromSeconds(30),
             CheckUiaPasswordElement = true
         };
 
-        Assert.Equal("Log masuk - Akaun Google - Google", malayOptions.TitleIdentifierPage);
-        Assert.Equal("Selamat Datang - Google Chrome", malayOptions.TitlePasswordPage);
+        Assert.Equal("Log masuk - Akaun Google - Google", malayOptions.TitleIdentifierPage[0]);
+        Assert.Equal("Selamat Datang - Google Chrome", malayOptions.TitlePasswordPage[0]);
         Assert.True(malayOptions.CheckUiaPasswordElement);
     }
 
     [Fact]
-    public void TitleIdentifierPage_Default_ExactlyMatches_Measured_T04_Chrome_String()
+    public void TitleIdentifierPage_Default_Contains_Both_Measured_T04_Variants()
     {
-        // Regression test for T0.4 finding 1:
-        // Appendix B & T0.2 previously dropped " Chrome" ("Sign in - Google Accounts - Google")
-        // which caused exact match verification to fail 100% of the time.
-        // Assert that the default matches the measured value exactly.
+        // Regression test for T0.4 findings:
+        // T0.4 captures report two distinct titles:
+        // 1. "Sign in - Google Accounts - Google Chrome" (hyphen, capital A)
+        // 2. "Sign in – Google accounts - Google Chrome" (EN-DASH U+2013, lowercase a)
         var options = new RouteCOptions();
-        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
+        Assert.Equal(2, options.TitleIdentifierPage.Count);
+        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage[0]);
+        Assert.Equal("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage[1]);
     }
 
     [Fact]
@@ -338,15 +340,19 @@ public class RouteCLoginOrchestratorTests
     {
         var options = new RouteCOptions();
 
-        // 1. Measured identifier page title with trailing Chrome
-        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
+        // 1. Measured identifier page titles (list with exact ordinal matching)
+        Assert.Contains("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
+        Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage);
+        Assert.Equal(2, options.TitleIdentifierPage.Count);
 
         // 2. Generic password title
-        Assert.Equal("Welcome - Google Chrome", options.TitlePasswordPageGeneric);
-        Assert.Equal("Welcome - Google Chrome", options.TitlePasswordPage);
+        Assert.Contains("Welcome - Google Chrome", options.TitlePasswordPageGeneric);
+        Assert.Contains("Welcome - Google Chrome", options.TitlePasswordPage);
 
         // 3. Consent page title
-        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleConsentPage);
+        Assert.Contains("Sign in - Google Accounts - Google Chrome", options.TitleConsentPage);
+        Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleConsentPage);
+        Assert.Equal(2, options.TitleConsentPage.Count);
 
         // 4. UIA IsPassword validation enabled by default (49/49 runs passed in T0.4)
         Assert.True(options.CheckUiaPasswordElement);
@@ -354,6 +360,82 @@ public class RouteCLoginOrchestratorTests
         // 5. Sequence gate settle defaults
         Assert.Equal(3, options.TitleSettlePolls);
         Assert.Equal(100, options.PollIntervalMs);
+    }
+
+    [Fact]
+    public void ExactOrdinalEquality_Matches_Both_Seeded_Variants_And_Rejects_Unlisted_Variants()
+    {
+        var options = new RouteCOptions();
+
+        // Both measured exact strings match
+        Assert.True(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage));
+        Assert.True(InjectionEngine.MatchesAnyTitle("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage));
+
+        // Fuzzy/normalized strings do NOT match (must be exact Ordinal per §4.2)
+        Assert.False(InjectionEngine.MatchesAnyTitle("sign in - google accounts - google chrome", options.TitleIdentifierPage));
+        Assert.False(InjectionEngine.MatchesAnyTitle("Sign in - Google accounts - Google Chrome", options.TitleIdentifierPage));
+        Assert.False(InjectionEngine.MatchesAnyTitle("Sign in \u2013 Google Accounts - Google Chrome", options.TitleIdentifierPage));
+        Assert.False(InjectionEngine.MatchesAnyTitle("Sign in", options.TitleIdentifierPage));
+    }
+
+    [Fact]
+    public void SequenceGate_TransitionOut_Handles_Both_Identifier_Variants()
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions();
+
+        // 1. When title is hyphen variant, transition out returns false
+        bool trans1 = RouteCLoginOrchestrator.WaitForTransitionOut(
+            session,
+            identifierTitles: options.TitleIdentifierPage,
+            timeout: TimeSpan.FromMilliseconds(50),
+            pollIntervalMs: 10,
+            cancellationToken: cts.Token,
+            titleGetter: () => "Sign in - Google Accounts - Google Chrome");
+        Assert.False(trans1);
+
+        // 2. When title is en-dash variant, transition out returns false
+        bool trans2 = RouteCLoginOrchestrator.WaitForTransitionOut(
+            session,
+            identifierTitles: options.TitleIdentifierPage,
+            timeout: TimeSpan.FromMilliseconds(50),
+            pollIntervalMs: 10,
+            cancellationToken: cts.Token,
+            titleGetter: () => "Sign in \u2013 Google accounts - Google Chrome");
+        Assert.False(trans2);
+
+        // 3. When title transitions to another page, returns true
+        bool trans3 = RouteCLoginOrchestrator.WaitForTransitionOut(
+            session,
+            identifierTitles: options.TitleIdentifierPage,
+            timeout: TimeSpan.FromMilliseconds(100),
+            pollIntervalMs: 10,
+            cancellationToken: cts.Token,
+            titleGetter: () => "Welcome - Google Chrome");
+        Assert.True(trans3);
+    }
+
+    [Fact]
+    public async Task SequenceGate_ConsentState_GuardedByState_CannotBeEntered_WithoutSuccessfulPasswordInjection()
+    {
+        // Guarded by state rather than string alone: Consent state may only be entered
+        // AFTER successful password injection in the same run.
+        // If password injection fails / cannot verify, result is E02 failure, never Consent / Success.
+        var recordedStates = new List<LoginFlowState>();
+        using var cred = new SecurePasswordBuffer("Password123!"u8);
+
+        var result = await RouteCLoginOrchestrator.ExecuteAsync(
+            chromePath: @"C:\NonExistentDirectory\chrome.exe",
+            email: "m-10000001@moe-dl.edu.my",
+            credential: cred,
+            options: new RouteCOptions(),
+            onStateChanged: recordedStates.Add);
+
+        Assert.False(result.Success);
+        Assert.DoesNotContain(LoginFlowState.WaitingForConsentPage, recordedStates);
+        Assert.DoesNotContain(LoginFlowState.Completed, recordedStates);
     }
 
     [Fact]
