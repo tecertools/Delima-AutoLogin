@@ -569,6 +569,15 @@ If that throws, the credential store keeps whatever permissions it had, the app 
 
 ### 11.1 T0.4 — does UIA report `IsPassword` reliably?
 
+> **Implementation status, August 2026: built but inert.** `Delima.Win32/UiaHelper.cs` and the gate in `RouteCLoginOrchestrator` exist and fail closed correctly — every error path returns `false`, and the call site treats `false` as abort-to-`E02` rather than proceed. That is the right direction to fail.
+>
+> **It is switched off in two independent ways, and both must be closed together:**
+>
+> 1. `CheckUiaPasswordElement` defaults to `false`, so the gate never runs.
+> 2. `ChromeSession` does not pass `--force-renderer-accessibility`, so Chrome exposes no accessibility tree to query. Enabling the gate without adding the flag would make every password injection abort — safe, but the product would never sign anyone in.
+>
+> Anyone reading the code today would reasonably conclude the T0.4 hardening is active. It is not. Do not treat §4.2's field-identity layer as present until this spike has run and both switches are on.
+
 **Recommended, not blocking.** T0.2 confirmed the identifier and password pages carry distinguishable titles, so step 11 can proceed on title verification (§4.2) alone. This spike measures the hardening layer that removes the locale and redesign risks titles carry.
 
 **Worth doing before the pilot rather than after.** The title strings are Google's UI copy in whatever locale the lab image runs; `IsPassword` is a structural property that does not move when Google restyles a page or a school images its PCs in Malay.

@@ -266,6 +266,23 @@ This completes build step 3, which was deliberately left half-done because it ca
 
 ---
 
+## Prompt 11a — Make the UIA gate actually able to run
+
+The gate is built and correct. It is switched off twice over, and enabling only one switch breaks the product.
+
+> `Delima.Win32/UiaHelper.cs` and the `CheckUiaPasswordElement` gate in `RouteCLoginOrchestrator` are implemented and fail closed correctly — that part is right, leave the failure semantics alone. But the gate cannot currently work:
+>
+> 1. `ChromeSession` does not launch Chrome with **`--force-renderer-accessibility`**. Chrome builds its accessibility tree lazily, so `UiaGetFocusedElement` has nothing to read. Add the flag.
+> 2. `CheckUiaPasswordElement` defaults to `false`, so the gate never runs at all.
+>
+> **Add the flag first, and leave the default as `false` for now.** Turning the gate on before Chrome exposes an accessibility tree would abort every password injection — safe, but the product would never sign anyone in. The default flips to `true` only after T0.4 (arch §11.1) measures that `IsPassword` is reported reliably on lab hardware.
+>
+> Then strengthen the test. `UiaHelper_IsFocusedElementPassword_ReturnsBooleanWithoutCrashing` asserts only that the call does not throw, which is honest but proves nothing about correctness. Add a test that a known password field returns `true` and a known text field returns `false` — a WPF `PasswordBox` and `TextBox` in a test window are enough to exercise it without needing Chrome.
+>
+> Record in `Visual_SSO/T0.2_URL_Confirmation.md` or a T0.4 result section which of the two switches are on, so nobody reading the code assumes the hardening is active when it is not.
+
+---
+
 ## Prompt 10b — Stop the ACL failure being silent
 
 Small, and it protects the credential store.
