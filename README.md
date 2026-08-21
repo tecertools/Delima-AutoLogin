@@ -96,9 +96,7 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 **The first end-to-end run** — `E2E_First_Run.md`. One pupil, using an account you control, on a lab PC. Expect stage 1 or 2 to fail before the sign-in does: the wizard and provisioning have unit tests and have never met a real file, a real pendrive or a real ACL.
 
-**Then Prompt 15a** — the CI workflow calls `iscc` without installing Inno Setup, and the installer dropped `everyone-none` from the credential-store directory permissions.
-
-**Then, for a release:** capture the Malay-locale sign-in titles, put the T0.1 responsibility statement in all three placements (PRD §8.7), ship one unsigned release, and apply to SignPath Foundation.
+**Then, for a release:** tag it, ship one unsigned build, and apply to SignPath Foundation — the Foundation only signs projects already released in the form to be signed.
 
 **Still worth pursuing, still not blocking: T0.1.** An actual written position would be strictly better than a disclosure — the difference between telling schools they are responsible and telling them it is permitted. If it comes back negative, the release is withdrawn and schools are told (PRD §2.2).
 
@@ -112,4 +110,4 @@ All pupil-facing text is Bahasa Melayu. Specification documents are in English. 
 
 **GPL-3.0** — see `LICENSE`, and `Visual_SSO/PRD_Visual_SSO_v2.md` §8.5 for the reasoning. Briefly: the software is given away free, so there is no revenue to protect; an open licence is what makes free code signing available; and copyleft means a fork that weakens the credential store or drops the picture-password requirement has to publish its source, which keeps the difference visible.
 
-Still outstanding before the first public release: the T0.1 responsibility statement (PRD §8.7) on the release page, the installer licence page, and `Delima.Admin` first run.
+The T0.1 responsibility statement (PRD §8.7) is in all three required placements: the release notes, the installer licence page, and `Delima.Admin`'s first run.
