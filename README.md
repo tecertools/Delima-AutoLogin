@@ -76,12 +76,11 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 | # | Item | Where |
 | :-- | :--- | :--- |
-| 1 | **Apply the T0.4 findings to the code.** The identifier title in `RouteCLoginOrchestrator` is wrong, so every sign-in currently aborts — the launcher does not work as it stands | Prompt T0.4b |
-| 2 | Two installer/pipeline fixes — CI never installs Inno Setup; `everyone-none` dropped from the store ACL | Prompt 15a |
-| 3 | ~~Malay-locale titles~~ — **checked, identical.** Titles follow the *Google account* language, not the machine's | arch §4.2 |
-| 4 | Remaining field checks — name grid at 1366×768, cold-start timing. **Deferred to pilot**; neither is a safety question | arch §11.0 |
-| 5 | Ship one **unsigned** release, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
-| 6 | The **T0.1 responsibility statement** in all three required placements | PRD §8.7 |
+| 1 | **Apply the T0.4 findings + the consent step to the code.** The identifier title is still wrong, so every sign-in aborts — the launcher does not work as it stands | Prompt T0.4b |
+| 2 | **Fix the PDPA claim** in the first-run disclaimer, and add the T0.1 statement to `LESEN.rtf` and the release notes | Prompt 16 |
+| 3 | Restore `everyone-none` on the store directory in the `.iss` (the CI half of 15a is done) | Prompt 15a |
+| 4 | **End-to-end sign-in on a lab PC** — first time the whole chain runs together | arch §11 |
+| 5 | Tag a release, ship it unsigned, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 
 **Item 1 is not polish — it is the difference between a working product and one that aborts every sign-in.** T0.4 found the configured identifier title had a word dropped when it was transcribed from T0.2, and exact matching means it never matches. The pupil-account ACL test, the most important of the field checks, has passed.
 
