@@ -334,7 +334,7 @@
                                        Style="{DynamicResource ScreenHeadingStyle}"
                                        FontSize="22"
                                        Margin="0,0,0,6" />
-                            <TextBlock Text="Pilih murid dan masukkan kata laluan baharu sekiranya kata laluan lama tidak sah (Ralat E04)."
+                            <TextBlock Text="Pilih murid dan masukkan kata laluan baharu sekiranya kata laluan lama tidak sah (Ralat E14)."
                                        Style="{DynamicResource HelperTextStyle}"
                                        TextWrapping="Wrap"
                                        Margin="0,0,0,20" />

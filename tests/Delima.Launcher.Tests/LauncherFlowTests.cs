@@ -1,3 +1,4 @@
+using Delima.Core.Crypto;
 using Delima.Core.Roster;
 using Delima.Core.Store;
 using Delima.Launcher.Services;
@@ -89,8 +90,7 @@ public class LauncherFlowTests
     [Theory]
     [InlineData(FailureCodes.E01_ChromeNotInstalled, "Alamak, ada masalah. Panggil cikgu.", "Install Chrome")]
     [InlineData(FailureCodes.E02_WindowNotVerified, "Cuba lagi.", "Slow PC — raise window_wait_timeout_ms")]
-    [InlineData(FailureCodes.E04_WrongPassword, "Kata laluan tidak betul. Panggil cikgu.", "Update via Mod Guru; check password_version")]
-    [InlineData(FailureCodes.E05_PasswordStale, "Kata laluan sudah tukar. Panggil cikgu.", "Re-import + re-provision")]
+    [InlineData(FailureCodes.E03_InjectionAborted, "", "None")]
     [InlineData(FailureCodes.E06_GoogleCaptcha, "Tunggu sekejap, cuba lagi.", "Space out launches; known limitation")]
     [InlineData(FailureCodes.E07_TwoFactorPrompt, "Panggil cikgu.", "Escalate — this may end the product")]
     [InlineData(FailureCodes.E08_AccountSuspended, "Panggil cikgu.", "MOE admin task")]
@@ -99,7 +99,7 @@ public class LauncherFlowTests
     [InlineData(FailureCodes.E11_NoPasswordStored, "Panggil cikgu.", "Complete wizard Step 4")]
     [InlineData(FailureCodes.E12_PicturePasswordLocked, "Tunggu 5 minit.", "Reset via Mod Guru")]
     [InlineData(FailureCodes.E13_NetworkUnreachable, "Tiada internet. Panggil cikgu.", "Network")]
-    [InlineData(FailureCodes.E14_PasswordRejected, "Kata laluan tidak diterima. Beritahu cikgu.", "Re-import in Delima.Admin")]
+    [InlineData(FailureCodes.E14_PasswordRejected, "Kata laluan tidak diterima. Beritahu cikgu.", "Mod Guru for one pupil; re-import in Delima.Admin if the whole class fails")]
     public void RalatViewModel_AllTaxonomyCodes_HaveExpectedMessages(string code, string expectedPupilBm, string expectedTeacher)
     {
         var school = SampleDataService.CreateSampleSchool();
@@ -190,5 +190,41 @@ public class LauncherFlowTests
         // §4.5 & PRD §7.4: Identity check prompt on floating reset bar
         const string expectedPrompt = "Lihat nama kamu. Kalau betul, tekan butang biru di bawah.";
         Assert.Equal("Lihat nama kamu. Kalau betul, tekan butang biru di bawah.", expectedPrompt);
+    }
+
+    [Fact]
+    public async Task MainViewModel_NoPasswordStored_NavigatesToRalat_E11()
+    {
+        var school = SampleDataService.CreateSampleSchool();
+        var theme = SampleDataService.CreateSampleTheme();
+        var classes = SampleDataService.CreateSampleClasses();
+        var students = SampleDataService.CreateSampleClassStudents("2_cemerlang");
+        var store = new FakeCredentialStore(hasCredential: false);
+
+        var mainVm = new MainViewModel(school, theme, classes, students, classes[0], credentialStore: store);
+        mainVm.NavigateToKataLaluanGambar(students[0], classes[0], Argon2Parameters.FastTest);
+        var kataLaluanVm = (KataLaluanGambarViewModel)mainVm.CurrentView!;
+
+        // Enter default 3 picture-password icons: kucing, bunga, kereta
+        var icon1 = kataLaluanVm.ShuffledIcons.First(i => i.Id == "kucing");
+        var icon2 = kataLaluanVm.ShuffledIcons.First(i => i.Id == "bunga");
+        var icon3 = kataLaluanVm.ShuffledIcons.First(i => i.Id == "kereta");
+
+        await kataLaluanVm.SelectIconCommand.ExecuteAsync(icon1);
+        await kataLaluanVm.SelectIconCommand.ExecuteAsync(icon2);
+        await kataLaluanVm.SelectIconCommand.ExecuteAsync(icon3);
+
+        // Verification triggers OnPicturePasswordVerified -> navigates to Ralat E11
+        Assert.IsType<RalatViewModel>(mainVm.CurrentView);
+        var ralatVm = (RalatViewModel)mainVm.CurrentView;
+        Assert.Equal(FailureCodes.E11_NoPasswordStored, ralatVm.ErrorCode);
+    }
+
+    private sealed class FakeCredentialStore(bool hasCredential) : ICredentialStore
+    {
+        public ushort SchemaVersion => 2;
+        public bool HasCredential(string studentId) => hasCredential;
+        public ICredential OpenCredential(string studentId) => new SecurePasswordBuffer("TestPassword123!"u8);
+        public void Dispose() { }
     }
 }

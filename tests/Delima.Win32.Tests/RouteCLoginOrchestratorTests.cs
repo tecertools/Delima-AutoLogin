@@ -461,17 +461,17 @@ public class RouteCLoginOrchestratorTests
     public void RouteCResult_Failure_Factory_Preserves_Taxonomy_Information()
     {
         var failure = RouteCResult.Failure(
-            FailureCodes.E04_WrongPassword,
-            FailureCodes.GetPupilMessageBm(FailureCodes.E04_WrongPassword),
-            FailureCodes.GetTeacherAction(FailureCodes.E04_WrongPassword),
+            FailureCodes.E14_PasswordRejected,
+            FailureCodes.GetPupilMessageBm(FailureCodes.E14_PasswordRejected),
+            FailureCodes.GetTeacherAction(FailureCodes.E14_PasswordRejected),
             session: null,
             charsInjected: 12,
             elapsed: TimeSpan.FromMilliseconds(450));
 
         Assert.False(failure.Success);
-        Assert.Equal(FailureCodes.E04_WrongPassword, failure.ErrorCode);
-        Assert.Equal("Kata laluan tidak betul. Panggil cikgu.", failure.PupilMessage);
-        Assert.Equal("Update via Mod Guru; check password_version", failure.TeacherAction);
+        Assert.Equal(FailureCodes.E14_PasswordRejected, failure.ErrorCode);
+        Assert.Equal("Kata laluan tidak diterima. Beritahu cikgu.", failure.PupilMessage);
+        Assert.Equal("Mod Guru for one pupil; re-import in Delima.Admin if the whole class fails", failure.TeacherAction);
         Assert.Equal(12, failure.TotalCharsInjected);
     }
 
@@ -546,13 +546,13 @@ public class RouteCLoginOrchestratorTests
             PollIntervalMs = 10
         };
 
-        // Title transitions to an unexpected page (e.g. 2SV challenge, captcha, error)
+        // Title transitions to an unexpected unclassified page
         var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
             session,
             options,
             passwordPageTitle: "Hi Ahmad - Google Chrome",
             cancellationToken: cts.Token,
-            titleGetter: () => "2-Step Verification - Google Accounts - Google Chrome");
+            titleGetter: () => "Some Unexpected Custom Page - Google Chrome");
 
         Assert.Equal(PostPasswordResolution.UnknownState, resolution);
     }
@@ -630,5 +630,50 @@ public class RouteCLoginOrchestratorTests
         Assert.NotEqual(PostPasswordResolution.ConsentPageReached, unknownResolution);
         Assert.NotEqual(PostPasswordResolution.DestinationReached, unknownResolution);
         Assert.Equal(PostPasswordResolution.UnknownState, unknownResolution);
+    }
+
+    [Theory]
+    [InlineData("No internet - Google Chrome", FailureCodes.E13_NetworkUnreachable)]
+    [InlineData("Site can't be reached - Google Chrome", FailureCodes.E13_NetworkUnreachable)]
+    [InlineData("Chrome - ERR_INTERNET_DISCONNECTED", FailureCodes.E13_NetworkUnreachable)]
+    [InlineData("Sign in - unusual activity detected - Google Chrome", FailureCodes.E06_GoogleCaptcha)]
+    [InlineData("Google Accounts - Captcha verification", FailureCodes.E06_GoogleCaptcha)]
+    [InlineData("2-Step Verification - Google Accounts - Google Chrome", FailureCodes.E07_TwoFactorPrompt)]
+    [InlineData("Verify it's you - Google Accounts - Google Chrome", FailureCodes.E07_TwoFactorPrompt)]
+    [InlineData("Account disabled - Google Accounts", FailureCodes.E08_AccountSuspended)]
+    [InlineData("Account suspended - Google Accounts", FailureCodes.E08_AccountSuspended)]
+    [InlineData("Password expired - Google Accounts", FailureCodes.E08_AccountSuspended)]
+    [InlineData("DELIMa - Google Chrome", null)]
+    [InlineData("Sign in - Google Accounts - Google Chrome", null)]
+    public void ClassifyKnownBrowserError_Identifies_Error_Titles(string title, string? expectedCode)
+    {
+        var result = RouteCLoginOrchestrator.ClassifyKnownBrowserError(title);
+        Assert.Equal(expectedCode, result);
+    }
+
+    [Theory]
+    [InlineData("2-Step Verification - Google Accounts", PostPasswordResolution.TwoFactorPrompt)]
+    [InlineData("Captcha challenge", PostPasswordResolution.CaptchaChallenge)]
+    [InlineData("Account disabled", PostPasswordResolution.AccountSuspended)]
+    [InlineData("No internet - Google Chrome", PostPasswordResolution.NetworkUnreachable)]
+    public void WaitForPostPasswordResolution_DetectsKnownBrowserErrorsImmediately(string title, PostPasswordResolution expected)
+    {
+        using var currentProc = Process.GetCurrentProcess();
+        var session = new ChromeSession(currentProc, Path.GetTempPath());
+        using var cts = new CancellationTokenSource();
+        var options = new RouteCOptions
+        {
+            WindowWaitTimeout = TimeSpan.FromSeconds(5),
+            PollIntervalMs = 10
+        };
+
+        var resolution = RouteCLoginOrchestrator.WaitForPostPasswordResolution(
+            session,
+            options,
+            passwordPageTitle: "Hi Pupil - Google Chrome",
+            cancellationToken: cts.Token,
+            titleGetter: () => title);
+
+        Assert.Equal(expected, resolution);
     }
 }

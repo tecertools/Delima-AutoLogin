@@ -263,13 +263,22 @@ public static class RouteCLoginOrchestrator
 
             if (!emailResult.Success)
             {
-                var state = emailResult.ErrorCode == FailureCodes.E03_InjectionAborted
+                var classified = ClassifyKnownBrowserError(NativeMethods.GetForegroundTitle());
+                var finalCode = (emailResult.ErrorCode == FailureCodes.E02_WindowNotVerified && classified != null)
+                    ? classified
+                    : emailResult.ErrorCode;
+
+                var state = finalCode == FailureCodes.E03_InjectionAborted
                     ? LoginFlowState.Aborted
                     : LoginFlowState.Failed;
                 onStateChanged?.Invoke(state);
 
                 session.Dispose();
-                return RouteCResult.FromInjectionResult(emailResult, null);
+                return RouteCResult.Failure(
+                    finalCode ?? FailureCodes.E02_WindowNotVerified,
+                    emailResult.PupilMessage ?? FailureCodes.GetPupilMessageBm(finalCode ?? FailureCodes.E02_WindowNotVerified),
+                    emailResult.TeacherAction ?? FailureCodes.GetTeacherAction(finalCode ?? FailureCodes.E02_WindowNotVerified),
+                    null, emailResult.CharactersInjected, sw.Elapsed);
             }
 
             totalChars += emailResult.CharactersInjected;
@@ -296,12 +305,15 @@ public static class RouteCLoginOrchestrator
             if (!transitionVerified)
             {
                 // Title failed to transition away from identifier page within timeout
+                var classified = ClassifyKnownBrowserError(NativeMethods.GetForegroundTitle());
+                var finalCode = classified ?? FailureCodes.E02_WindowNotVerified;
+
                 onStateChanged?.Invoke(LoginFlowState.Failed);
                 session.Dispose();
                 return RouteCResult.Failure(
-                    FailureCodes.E02_WindowNotVerified,
-                    FailureCodes.GetPupilMessageBm(FailureCodes.E02_WindowNotVerified),
-                    FailureCodes.GetTeacherAction(FailureCodes.E02_WindowNotVerified),
+                    finalCode,
+                    FailureCodes.GetPupilMessageBm(finalCode),
+                    FailureCodes.GetTeacherAction(finalCode),
                     null, totalChars, sw.Elapsed);
             }
 
@@ -343,13 +355,22 @@ public static class RouteCLoginOrchestrator
 
             if (!passwordResult.Success)
             {
-                var state = passwordResult.ErrorCode == FailureCodes.E03_InjectionAborted
+                var classified = ClassifyKnownBrowserError(NativeMethods.GetForegroundTitle());
+                var finalCode = (passwordResult.ErrorCode == FailureCodes.E02_WindowNotVerified && classified != null)
+                    ? classified
+                    : passwordResult.ErrorCode;
+
+                var state = finalCode == FailureCodes.E03_InjectionAborted
                     ? LoginFlowState.Aborted
                     : LoginFlowState.Failed;
                 onStateChanged?.Invoke(state);
 
                 session.Dispose();
-                return RouteCResult.FromInjectionResult(passwordResult, null, totalChars);
+                return RouteCResult.Failure(
+                    finalCode ?? FailureCodes.E02_WindowNotVerified,
+                    passwordResult.PupilMessage ?? FailureCodes.GetPupilMessageBm(finalCode ?? FailureCodes.E02_WindowNotVerified),
+                    passwordResult.TeacherAction ?? FailureCodes.GetTeacherAction(finalCode ?? FailureCodes.E02_WindowNotVerified),
+                    null, totalChars + passwordResult.CharactersInjected, sw.Elapsed);
             }
 
             totalChars += passwordResult.CharactersInjected;
@@ -384,6 +405,42 @@ public static class RouteCLoginOrchestrator
                         FailureCodes.E14_PasswordRejected,
                         FailureCodes.GetPupilMessageBm(FailureCodes.E14_PasswordRejected),
                         FailureCodes.GetTeacherAction(FailureCodes.E14_PasswordRejected),
+                        null, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.CaptchaChallenge:
+                    onStateChanged?.Invoke(LoginFlowState.Failed);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E06_GoogleCaptcha,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E06_GoogleCaptcha),
+                        FailureCodes.GetTeacherAction(FailureCodes.E06_GoogleCaptcha),
+                        null, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.TwoFactorPrompt:
+                    onStateChanged?.Invoke(LoginFlowState.Failed);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E07_TwoFactorPrompt,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E07_TwoFactorPrompt),
+                        FailureCodes.GetTeacherAction(FailureCodes.E07_TwoFactorPrompt),
+                        null, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.AccountSuspended:
+                    onStateChanged?.Invoke(LoginFlowState.Failed);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E08_AccountSuspended,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E08_AccountSuspended),
+                        FailureCodes.GetTeacherAction(FailureCodes.E08_AccountSuspended),
+                        null, totalChars, sw.Elapsed);
+
+                case PostPasswordResolution.NetworkUnreachable:
+                    onStateChanged?.Invoke(LoginFlowState.Failed);
+                    session.Dispose();
+                    return RouteCResult.Failure(
+                        FailureCodes.E13_NetworkUnreachable,
+                        FailureCodes.GetPupilMessageBm(FailureCodes.E13_NetworkUnreachable),
+                        FailureCodes.GetTeacherAction(FailureCodes.E13_NetworkUnreachable),
                         null, totalChars, sw.Elapsed);
 
                 case PostPasswordResolution.Aborted:
@@ -425,6 +482,51 @@ public static class RouteCLoginOrchestrator
                 FailureCodes.GetTeacherAction(FailureCodes.E02_WindowNotVerified) + $": {ex.Message}",
                 null, 0, sw.Elapsed);
         }
+    }
+
+    /// <summary>
+    /// Classifies known browser error titles (CAPTCHA, 2SV, suspended account, unreachable network).
+    /// </summary>
+    internal static string? ClassifyKnownBrowserError(string? title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return null;
+
+        // E13: Network unreachable
+        if (title.StartsWith("No internet", StringComparison.OrdinalIgnoreCase) ||
+            title.StartsWith("Site can't be reached", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("ERR_INTERNET_DISCONNECTED", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("ERR_NAME_NOT_RESOLVED", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("ERR_CONNECTION_REFUSED", StringComparison.OrdinalIgnoreCase) ||
+            title.StartsWith("Privacy error", StringComparison.OrdinalIgnoreCase))
+        {
+            return FailureCodes.E13_NetworkUnreachable;
+        }
+
+        // E06: Google CAPTCHA / unusual activity
+        if (title.Contains("unusual activity", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Captcha", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("robot", StringComparison.OrdinalIgnoreCase))
+        {
+            return FailureCodes.E06_GoogleCaptcha;
+        }
+
+        // E07: 2SV prompt
+        if (title.Contains("2-Step Verification", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Verify it's you", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("2-Step", StringComparison.OrdinalIgnoreCase))
+        {
+            return FailureCodes.E07_TwoFactorPrompt;
+        }
+
+        // E08: Account suspended / password expired
+        if (title.Contains("Account disabled", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Account suspended", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Password expired", StringComparison.OrdinalIgnoreCase))
+        {
+            return FailureCodes.E08_AccountSuspended;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -505,21 +607,44 @@ public static class RouteCLoginOrchestrator
                 return PostPasswordResolution.DestinationReached;
             }
 
+            // 3. Known browser error detected
+            var knownError = ClassifyKnownBrowserError(currentTitle);
+            if (knownError != null)
+            {
+                return MapKnownErrorToResolution(knownError);
+            }
+
             Thread.Sleep(interval);
         }
 
         if (cancellationToken.IsCancellationRequested) return PostPasswordResolution.Aborted;
 
-        // 3. Check if still on a password-page title after timeout -> Password rejected (§7.1)
+        // Check if final title matches a known browser error
         var finalTitle = getTitle();
+        var finalKnownError = ClassifyKnownBrowserError(finalTitle);
+        if (finalKnownError != null)
+        {
+            return MapKnownErrorToResolution(finalKnownError);
+        }
+
+        // 4. Check if still on a password-page title after timeout -> Password rejected (§7.1)
         if (IsPasswordPageTitle(finalTitle, passwordPageTitle, options))
         {
             return PostPasswordResolution.PasswordRejected;
         }
 
-        // 4. Anything else -> Unknown state (E02)
+        // 5. Anything else -> Unknown state (E02)
         return PostPasswordResolution.UnknownState;
     }
+
+    private static PostPasswordResolution MapKnownErrorToResolution(string errorCode) => errorCode switch
+    {
+        FailureCodes.E06_GoogleCaptcha => PostPasswordResolution.CaptchaChallenge,
+        FailureCodes.E07_TwoFactorPrompt => PostPasswordResolution.TwoFactorPrompt,
+        FailureCodes.E08_AccountSuspended => PostPasswordResolution.AccountSuspended,
+        FailureCodes.E13_NetworkUnreachable => PostPasswordResolution.NetworkUnreachable,
+        _ => PostPasswordResolution.UnknownState
+    };
 
     /// <summary>
     /// Evaluates whether the window title corresponds to Google's password page per §4.2 and §7.1.
@@ -532,6 +657,9 @@ public static class RouteCLoginOrchestrator
         if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleConsentPage)) return false;
         if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleDestinationPage)) return false;
         if (InjectionEngine.MatchesAnyTitle(currentTitle, options.TitleIdentifierPage)) return false;
+
+        // Not a password page if it's a known error title
+        if (ClassifyKnownBrowserError(currentTitle) != null) return false;
 
         // Title is unchanged from the observed password page title during injection
         if (!string.IsNullOrEmpty(passwordPageTitle) && string.Equals(currentTitle, passwordPageTitle, StringComparison.Ordinal))
@@ -553,11 +681,15 @@ public static class RouteCLoginOrchestrator
 /// <summary>
 /// Possible resolution states after password injection in Route C (§4.5, §7.1).
 /// </summary>
-internal enum PostPasswordResolution
+public enum PostPasswordResolution
 {
     ConsentPageReached,
     DestinationReached,
     PasswordRejected,
+    CaptchaChallenge,
+    TwoFactorPrompt,
+    AccountSuspended,
+    NetworkUnreachable,
     UnknownState,
     Aborted
 }

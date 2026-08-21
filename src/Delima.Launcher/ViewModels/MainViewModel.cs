@@ -1,10 +1,12 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Delima.Core.Crypto;
 using Delima.Core.Roster;
 using Delima.Core.Store;
 using Delima.Launcher.Services;
 using Delima.Launcher.Views;
 using Delima.Win32;
+using Delima.Win32.Store;
 using ClassInfo = Delima.Core.Roster.ClassInfo;
 
 namespace Delima.Launcher.ViewModels;
@@ -110,7 +112,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    public void NavigateToKataLaluanGambar(Student student, ClassInfo classInfo)
+    public void NavigateToKataLaluanGambar(Student student, ClassInfo classInfo, Argon2Parameters? argon2Parameters = null)
     {
         CloseResetBar();
 
@@ -119,7 +121,8 @@ public sealed partial class MainViewModel : ObservableObject
             classInfo,
             student,
             onBackRequested: () => NavigateToCariNama(classInfo),
-            onSuccess: OnPicturePasswordVerified
+            onSuccess: OnPicturePasswordVerified,
+            argon2Parameters: argon2Parameters
         );
     }
 
@@ -128,8 +131,25 @@ public sealed partial class MainViewModel : ObservableObject
         ICredential? credential = null;
         try
         {
-            if (CredentialStore != null && CredentialStore.HasCredential(student.Id))
+            if (CredentialStore != null)
             {
+                // E10: Check if store exceeds store_max_age_days
+                if (CredentialStore is DpapiCredentialStore dpapiStore &&
+                    dpapiStore.GeneratedAt > DateTimeOffset.MinValue &&
+                    Config.StoreMaxAgeDays > 0 &&
+                    (DateTimeOffset.UtcNow - dpapiStore.GeneratedAt) > TimeSpan.FromDays(Config.StoreMaxAgeDays))
+                {
+                    NavigateToRalat(student, FailureCodes.E10_StoreStale);
+                    return;
+                }
+
+                // E11: Check if password exists for pupil
+                if (!CredentialStore.HasCredential(student.Id))
+                {
+                    NavigateToRalat(student, FailureCodes.E11_NoPasswordStored);
+                    return;
+                }
+
                 credential = CredentialStore.OpenCredential(student.Id);
             }
             else
