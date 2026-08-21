@@ -717,6 +717,7 @@ AES-256-GCM, HMAC-SHA256 and the CSPRNG come from the BCL. **No custom cryptogra
 | `title_identifier_page` | `Sign in - Google Accounts - Google Chrome` | **Per locale.** Exact full string (§4.2). Corrected by T0.4 — the earlier value omitted ` Chrome` and would never have matched |
 | `title_password_page_generic` | `Welcome - Google Chrome` | The password page **before** the account name loads |
 | `title_password_page_named` | `Hi {name} - Google Chrome` | The password page **after** it loads. `{name}` is the Google profile name, **not** the roster display name — see §4.2 |
+| `title_consent_page` | `Sign in - Google Accounts - Google Chrome` | OAuth consent screen title (§4.5). Terminal state of Route C injection; pupil prompted on floating reset bar |
 | `title_settle_polls` | `3` | Consecutive 100 ms polls a title must hold before injecting (§4.2) |
 | `store_max_age_days` | `30` | Then `E10` |
 | `force_signout` | `true` | Lab only; never at home |

@@ -103,6 +103,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
             LoginFlowState.WaitingForTransition => "Menyambung...",
             LoginFlowState.WaitingForPasswordPage => "Menyediakan akaun...",
             LoginFlowState.InjectingPassword => "Hampir siap...",
+            LoginFlowState.WaitingForConsentPage => "Mengesahkan akaun...",
             LoginFlowState.Completed => "Berjaya!",
             LoginFlowState.Aborted => "Dibatalkan.",
             LoginFlowState.Failed => "Ada masalah teknikal.",

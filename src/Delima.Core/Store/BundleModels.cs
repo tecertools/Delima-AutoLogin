@@ -65,7 +65,7 @@ public sealed class AppConfig
     public int IdleResetSeconds { get; set; } = 600;
 
     [JsonPropertyName("injection_settle_ms")]
-    public int InjectionSettleMs { get; set; } = 400;
+    public int InjectionSettleMs { get; set; } = 700;
 
     [JsonPropertyName("window_wait_timeout_ms")]
     public int WindowWaitTimeoutMs { get; set; } = 30000;

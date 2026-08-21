@@ -16,7 +16,7 @@ public class InjectionEngineTests
         Assert.Equal(TimeSpan.FromSeconds(30), options.WindowWaitTimeout);
         Assert.Equal(3, options.TitleSettlePolls);
         Assert.Equal(100, options.PollIntervalMs);
-        Assert.Equal(400, options.InjectionSettleMs);
+        Assert.Equal(700, options.InjectionSettleMs);
         Assert.Equal(0, options.PerCharDelayMs);
         Assert.False(options.SendEnter);
         Assert.Equal("Chrome_WidgetWin_1", options.ExpectedClassName);
@@ -35,7 +35,7 @@ public class InjectionEngineTests
         var result = InjectionEngine.Inject(
             session,
             cred,
-            "Sign in - Google Accounts - Google",
+            "Sign in - Google Accounts - Google Chrome",
             new InjectionOptions { WindowWaitTimeout = TimeSpan.FromMilliseconds(500) },
             cts.Token);
 

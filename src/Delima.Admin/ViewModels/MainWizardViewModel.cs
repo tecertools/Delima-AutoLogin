@@ -78,7 +78,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
 
     public string NextButtonText => CurrentStepIndex switch
     {
-        0 => "Teruskan ke Wizard →",
+        0 => "Saya Faham →",
         3 when Step3Vm.ActiveSubView == "Mapping" => "Laporan Percubaan →",
         3 when Step3Vm.ActiveSubView == "DryRun" => "Import & Sahkan →",
         4 when Step4Vm.ActiveSubView == "Consent" => "Teruskan →",

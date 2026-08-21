@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="DELIMa Floating Reset Bar"
-        Height="62" Width="440"
+        Width="480"
+        SizeToContent="Height"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -20,74 +21,97 @@
             CornerRadius="18"
             Margin="4"
             Effect="{DynamicResource CardShadow}"
-            Padding="14,6">
+            Padding="14,8">
 
-        <Grid VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <StackPanel>
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Pupil Display Information -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,12,0">
-                <Border Width="34" Height="34"
-                        CornerRadius="17"
-                        Background="{DynamicResource SoftSurfaceBrush}"
-                        BorderBrush="{DynamicResource PrimaryBrush}"
-                        BorderThickness="2"
-                        Margin="0,0,10,0">
-                    <TextBlock Text="👤"
-                               FontSize="16"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock x:Name="PupilNameText"
-                               Text="Nama Murid"
-                               FontWeight="Bold"
-                               FontSize="14"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               TextTrimming="CharacterEllipsis"
-                               MaxWidth="220" />
-                    <TextBlock Text="DELIMa 3.0"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource MutedTextBrush}" />
-                </StackPanel>
-            </StackPanel>
-
-            <!-- Red Logout / Reset Button (Selesai — Murid seterusnya) -->
-            <Button x:Name="LogoutButton"
-                    Grid.Column="1"
-                    Click="OnLogoutClicked"
-                    Background="{DynamicResource AlertBrush}"
-                    Foreground="#FFFFFF"
-                    BorderThickness="0"
-                    Padding="16,6"
-                    Cursor="Hand"
-                    VerticalAlignment="Center">
-                <Button.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="12" />
-                    </Style>
-                </Button.Resources>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="🚪 " FontSize="14" VerticalAlignment="Center" Margin="0,0,4,0" />
+                <!-- Pupil Display Information -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,12,0">
+                    <Border Width="34" Height="34"
+                            CornerRadius="17"
+                            Background="{DynamicResource SoftSurfaceBrush}"
+                            BorderBrush="{DynamicResource PrimaryBrush}"
+                            BorderThickness="2"
+                            Margin="0,0,10,0">
+                        <TextBlock Text="👤"
+                                   FontSize="16"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Selesai"
-                                   FontSize="13"
-                                   FontWeight="ExtraBold"
-                                   HorizontalAlignment="Left"
-                                   LineHeight="14" />
-                        <TextBlock Text="Murid seterusnya"
-                                   FontSize="10"
+                        <TextBlock x:Name="PupilNameText"
+                                   Text="Nama Murid"
+                                   FontWeight="Bold"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="240" />
+                        <TextBlock Text="DELIMa 3.0"
+                                   FontSize="11"
                                    FontWeight="SemiBold"
-                                   Opacity="0.9"
-                                   HorizontalAlignment="Left"
-                                   LineHeight="12" />
+                                   Foreground="{DynamicResource MutedTextBrush}" />
                     </StackPanel>
                 </StackPanel>
-            </Button>
-        </Grid>
+
+                <!-- Red Logout / Reset Button (Selesai — Murid seterusnya) -->
+                <Button x:Name="LogoutButton"
+                        Grid.Column="1"
+                        Click="OnLogoutClicked"
+                        Background="{DynamicResource AlertBrush}"
+                        Foreground="#FFFFFF"
+                        BorderThickness="0"
+                        Padding="16,6"
+                        Cursor="Hand"
+                        VerticalAlignment="Center">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="12" />
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🚪 " FontSize="14" VerticalAlignment="Center" Margin="0,0,4,0" />
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Selesai"
+                                       FontSize="13"
+                                       FontWeight="ExtraBold"
+                                       HorizontalAlignment="Left"
+                                       LineHeight="14" />
+                            <TextBlock Text="Murid seterusnya"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Opacity="0.9"
+                                       HorizontalAlignment="Left"
+                                       LineHeight="12" />
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- OAuth Consent Identity Verification Prompt Line (§4.5, PRD §7.4) -->
+            <Border x:Name="ConsentPromptBorder"
+                    Background="#EBF5FB"
+                    BorderBrush="#BEE3F8"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Margin="4,8,4,2"
+                    Padding="10,6"
+                    Visibility="Visible">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="👉 " FontSize="13" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock x:Name="ConsentPromptText"
+                               Text="Lihat nama kamu. Kalau betul, tekan butang biru di bawah."
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="#1B75BC"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
     </Border>
 </Window>

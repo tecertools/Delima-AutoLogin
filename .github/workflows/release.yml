@@ -111,16 +111,19 @@ jobs:
 
             ---
 
-            ### Makluman Penting & Tanggungjawab Dasar (T0.1)
+            ### Perakuan Tanggungjawab Sekolah
 
-            Pihak sekolah yang memuat turun dan menggunakan perisian ini perlu mengambil maklum ketetapan berikut sebelum pelaksanaan:
+            **1. Apa yang disimpan.**
+            Perisian ini menyimpan kata laluan akaun DELIMa murid pada komputer sekolah anda. Kata laluan tersebut disulitkan dan disimpan pada komputer makmal berkenaan sahaja. Tiada salinan dihantar ke mana-mana pelayan luar, dan pembangun perisian ini tidak menerima sebarang data.
 
-            1. **Penyimpanan Kata Laluan Tempatan:** Perisian ini menyimpan kata laluan murid dalam bentuk disulitkan (AES-256-GCM / DPAPI) pada storan komputer makmal sekolah ini sahaja (`%ProgramData%\DELIMa Launcher`). Tiada pelayan awan atau pangkalan data berpusat yang digunakan.
-            2. **Tiada Pendirian Rasmi Bertulis KPM/BSTP:** Pihak pembangun tidak memegang sebarang surat kelulusan atau ketetapan dasar bertulis daripada pihak BSTP atau Kementerian Pendidikan Malaysia (KPM) mengenai amalan menyimpan semula kata laluan murid.
-            3. **Sekolah Sebagai Pengawal Data (Data Controller):** Pihak sekolah yang memuat turun, memasang, dan menggunakan perisian ini adalah pengawal data mutlak di bawah Akta Perlindungan Data Peribadi 2010 (PDPA) dan bertanggungjawab sepenuhnya terhadap kebenaran serta penggunaan akaun DELIMa murid.
-            4. **Tiada Waranti & Tiada Penghantaran Data:** Perisian ini disediakan secara sumber terbuka dan percuma di bawah lesen GNU GPL-3.0 tanpa sebarang waranti. Tiada sebarang data murid, log masuk, atau maklumat sekolah dihantar kepada pembangun.
+            **2. Tiada pendirian rasmi diperoleh.**
+            Setakat ini, tiada pendirian bertulis diperoleh daripada Kementerian Pendidikan Malaysia (KPM) atau Bahagian Sumber dan Teknologi Pendidikan (BSTP) mengenai amalan menyimpan kata laluan murid dan mengisinya semula secara automatik. Ini bermakna amalan tersebut **tidak pernah disahkan, dan tidak pernah dilarang**, oleh mana-mana pihak berkuasa.
 
-            > **Peringatan:** Sila sahkan kenyataan tanggungjawab T0.1 ini sebelum menerbitkan keluaran ini secara umum.
+            **3. Tanggungjawab sekolah.**
+            Sekolah yang memasang perisian ini bertanggungjawab sepenuhnya ke atas kata laluan murid yang disimpan — termasuk keputusan untuk menggunakannya, cara ia dilindungi, dan pematuhan terhadap mana-mana dasar atau perundangan yang terpakai. Tanggungjawab untuk menilai amalan ini dan mendapatkan kelulusan daripada pihak berkuasa yang berkenaan terletak pada pihak sekolah, bukan pada pembangun perisian.
+
+            **4. Tanpa jaminan.**
+            Perisian ini diberikan secara percuma dan tanpa sebarang jaminan.
 
             ---
 

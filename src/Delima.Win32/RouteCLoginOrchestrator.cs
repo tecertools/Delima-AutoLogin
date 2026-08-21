@@ -17,6 +17,7 @@ public enum LoginFlowState
     WaitingForTransition,
     WaitingForPasswordPage,
     InjectingPassword,
+    WaitingForConsentPage,
     Completed,
     Failed,
     Aborted
@@ -35,15 +36,25 @@ public sealed record RouteCOptions
 
     /// <summary>
     /// Exact expected window title for Google's identifier (email) page.
-    /// Per-locale configuration (Appendix B). Default is English.
+    /// Per-locale configuration (Appendix B). Default is "Sign in - Google Accounts - Google Chrome" measured at T0.4.
     /// </summary>
-    public string TitleIdentifierPage { get; init; } = "Sign in - Google Accounts - Google";
+    public string TitleIdentifierPage { get; init; } = "Sign in - Google Accounts - Google Chrome";
 
     /// <summary>
-    /// Exact expected window title for Google's password page.
-    /// Per-locale configuration (Appendix B). Default is English.
+    /// Generic window title for Google's password page before profile name loads (§4.2).
+    /// Used as an optional positive signal, never as a strict equality requirement.
+    /// </summary>
+    public string TitlePasswordPageGeneric { get; init; } = "Welcome - Google Chrome";
+
+    /// <summary>
+    /// Configured window title for Google's password page. Maintained for backward compatibility.
     /// </summary>
     public string TitlePasswordPage { get; init; } = "Welcome - Google Chrome";
+
+    /// <summary>
+    /// Window title for Google's OAuth consent screen (§4.5, Appendix B).
+    /// </summary>
+    public string TitleConsentPage { get; init; } = "Sign in - Google Accounts - Google Chrome";
 
     /// <summary>
     /// Consecutive 100 ms polls a title must hold stably before initiating injection (§4.2).
@@ -74,9 +85,10 @@ public sealed record RouteCOptions
     public string ExpectedClassName { get; init; } = "Chrome_WidgetWin_1";
 
     /// <summary>
-    /// Whether to require UI Automation IsPassword == true before password injection (§11.1 T0.4).
+    /// Whether to require UI Automation IsPassword == true before password injection (§4.2, §11.1 T0.4).
+    /// Enabled (true) by default per T0.4 verification.
     /// </summary>
-    public bool CheckUiaPasswordElement { get; init; } = false;
+    public bool CheckUiaPasswordElement { get; init; } = true;
 
     /// <summary>
     /// Whether to send Enter key after typing email. Default is true.
@@ -276,7 +288,7 @@ public static class RouteCLoginOrchestrator
             }
 
             // ====================================================================
-            // Step 2: Password Injection (Sequence-Gated)
+            // Step 2: Password Injection (Sequence-Gated per §4.2 & T0.4)
             // ====================================================================
             onStateChanged?.Invoke(LoginFlowState.WaitingForPasswordPage);
 
@@ -292,10 +304,12 @@ public static class RouteCLoginOrchestrator
                         : null
                 };
 
+                // §4.2: Title check degrades to sequence-and-stability (changed away from identifier title and stable for TitleSettlePolls)
+                // Primary gate is IsPassword == true via UIA PreInjectionCheck.
                 return InjectionEngine.Inject(
                     session,
                     credential.PasswordSpan,
-                    options.TitlePasswordPage,
+                    title => !string.IsNullOrWhiteSpace(title) && !string.Equals(title, options.TitleIdentifierPage, StringComparison.Ordinal),
                     passwordOptions,
                     cancellationToken);
             }, cancellationToken);
@@ -312,6 +326,15 @@ public static class RouteCLoginOrchestrator
             }
 
             totalChars += passwordResult.CharactersInjected;
+
+            // ====================================================================
+            // Step 3: OAuth Consent Screen (§4.5)
+            // Sequence: identifier → password → consent → destination.
+            // Reaching consent is the normal, successful terminal state of injection.
+            // The software does NOT click Continue (pupil presses it; identity check G2).
+            // Topmost overlay is already down since password injection completed.
+            // ====================================================================
+            onStateChanged?.Invoke(LoginFlowState.WaitingForConsentPage);
 
             onStateChanged?.Invoke(LoginFlowState.Completed);
             return RouteCResult.Succeeded(session, totalChars, sw.Elapsed);

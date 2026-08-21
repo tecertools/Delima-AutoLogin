@@ -56,7 +56,7 @@ public class RouteCLoginOrchestratorTests
         var session = new ChromeSession(currentProc, Path.GetTempPath());
         using var cts = new CancellationTokenSource();
 
-        const string identifierTitle = "Sign in - Google Accounts - Google";
+        const string identifierTitle = "Sign in - Google Accounts - Google Chrome";
 
         // Simulate browser never leaving the identifier title
         // WaitForTransitionOut should return false (timeout)
@@ -78,7 +78,7 @@ public class RouteCLoginOrchestratorTests
         var session = new ChromeSession(currentProc, Path.GetTempPath());
         using var cts = new CancellationTokenSource();
 
-        const string identifierTitle = "Sign in - Google Accounts - Google";
+        const string identifierTitle = "Sign in - Google Accounts - Google Chrome";
 
         // Simulate title transitioning to intermediate or destination page
         bool transitioned = RouteCLoginOrchestrator.WaitForTransitionOut(
@@ -320,6 +320,40 @@ public class RouteCLoginOrchestratorTests
         Assert.Equal("Log masuk - Akaun Google - Google", malayOptions.TitleIdentifierPage);
         Assert.Equal("Selamat Datang - Google Chrome", malayOptions.TitlePasswordPage);
         Assert.True(malayOptions.CheckUiaPasswordElement);
+    }
+
+    [Fact]
+    public void TitleIdentifierPage_Default_ExactlyMatches_Measured_T04_Chrome_String()
+    {
+        // Regression test for T0.4 finding 1:
+        // Appendix B & T0.2 previously dropped " Chrome" ("Sign in - Google Accounts - Google")
+        // which caused exact match verification to fail 100% of the time.
+        // Assert that the default matches the measured value exactly.
+        var options = new RouteCOptions();
+        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
+    }
+
+    [Fact]
+    public void RouteCOptions_Defaults_Reflect_T04_Empirical_Findings()
+    {
+        var options = new RouteCOptions();
+
+        // 1. Measured identifier page title with trailing Chrome
+        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
+
+        // 2. Generic password title
+        Assert.Equal("Welcome - Google Chrome", options.TitlePasswordPageGeneric);
+        Assert.Equal("Welcome - Google Chrome", options.TitlePasswordPage);
+
+        // 3. Consent page title
+        Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleConsentPage);
+
+        // 4. UIA IsPassword validation enabled by default (49/49 runs passed in T0.4)
+        Assert.True(options.CheckUiaPasswordElement);
+
+        // 5. Sequence gate settle defaults
+        Assert.Equal(3, options.TitleSettlePolls);
+        Assert.Equal(100, options.PollIntervalMs);
     }
 
     [Fact]

@@ -160,7 +160,7 @@ public sealed class AdminWizardState
         ],
         PicturePasswordRequired = true,
         IdleResetSeconds = 600,
-        InjectionSettleMs = 400,
+        InjectionSettleMs = 700,
         WindowWaitTimeoutMs = 30000,
         StoreMaxAgeDays = 30
     };

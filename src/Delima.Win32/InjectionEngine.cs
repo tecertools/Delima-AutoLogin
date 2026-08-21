@@ -27,10 +27,10 @@ public sealed record InjectionOptions
     public int PollIntervalMs { get; init; } = 100;
 
     /// <summary>
-    /// Legacy settle delay duration in milliseconds.
+    /// Settle delay duration in milliseconds (700 ms default per T0.4 latency findings).
     /// Maintained for configuration compatibility.
     /// </summary>
-    public int InjectionSettleMs { get; init; } = 400;
+    public int InjectionSettleMs { get; init; } = 700;
 
     /// <summary>
     /// Gap between individual keystrokes in milliseconds.
