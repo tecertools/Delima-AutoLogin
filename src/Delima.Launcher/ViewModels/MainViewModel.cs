@@ -19,6 +19,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     public School School { get; private set; }
     public ThemeInfo Theme { get; private set; }
+    public AppConfig Config { get; private set; }
     public List<ClassInfo> Classes { get; private set; }
     public List<Student> Students { get; private set; }
     public ClassInfo? LastClass { get; private set; }
@@ -31,6 +32,7 @@ public sealed partial class MainViewModel : ObservableObject
         // Load default/sample school dataset
         School = SampleDataService.CreateSampleSchool();
         Theme = SampleDataService.CreateSampleTheme();
+        Config = new AppConfig();
         Classes = SampleDataService.CreateSampleClasses();
         Students = SampleDataService.CreateSampleClassStudents("2_cemerlang");
 
@@ -46,10 +48,12 @@ public sealed partial class MainViewModel : ObservableObject
         List<ClassInfo> classes,
         List<Student> students,
         ClassInfo? lastClass = null,
-        ICredentialStore? credentialStore = null)
+        ICredentialStore? credentialStore = null,
+        AppConfig? config = null)
     {
         School = school;
         Theme = theme;
+        Config = config ?? new AppConfig();
         Classes = classes;
         Students = students;
         LastClass = lastClass;
@@ -171,17 +175,21 @@ public sealed partial class MainViewModel : ObservableObject
                     Application.Current.MainWindow.WindowState = WindowState.Minimized;
                 }
 
-                _resetBarWindow = new FloatingResetBarWindow(student, session, onReset: () =>
-                {
-                    if (Application.Current?.MainWindow != null)
+                _resetBarWindow = new FloatingResetBarWindow(
+                    student,
+                    session,
+                    onReset: () =>
                     {
-                        Application.Current.MainWindow.WindowState = WindowState.Normal;
-                        Application.Current.MainWindow.Activate();
-                    }
+                        if (Application.Current?.MainWindow != null)
+                        {
+                            Application.Current.MainWindow.WindowState = WindowState.Normal;
+                            Application.Current.MainWindow.Activate();
+                        }
 
-                    if (LastClass != null) NavigateToCariNama(LastClass);
-                    else NavigateToPilihKelas();
-                });
+                        if (LastClass != null) NavigateToCariNama(LastClass);
+                        else NavigateToPilihKelas();
+                    },
+                    idleResetSeconds: Config.IdleResetSeconds);
                 _resetBarWindow.Show();
             });
         }
@@ -218,7 +226,33 @@ public sealed partial class MainViewModel : ObservableObject
             },
             student: student,
             customPupilMessage: customPupilMessage,
-            customTeacherAction: customTeacherAction
+            customTeacherAction: customTeacherAction,
+            onTeacherModeRequested: OnTeacherModeRequested
+        );
+    }
+
+    public void NavigateToModGuruPin(ObservableObject? returnView = null)
+    {
+        CloseResetBar();
+        var fallbackView = returnView ?? CurrentView ?? new PilihKelasViewModel(School, Classes, LastClass, OnClassConfirmed, OnTeacherModeRequested);
+
+        CurrentView = new ModGuruPinViewModel(
+            School,
+            onBackRequested: () => CurrentView = fallbackView,
+            onSuccess: () => NavigateToModGuruDashboard(fallbackView)
+        );
+    }
+
+    public void NavigateToModGuruDashboard(ObservableObject returnView)
+    {
+        CloseResetBar();
+
+        CurrentView = new ModGuruDashboardViewModel(
+            School,
+            Classes,
+            Students,
+            onExit: () => CurrentView = returnView,
+            credentialStore: CredentialStore
         );
     }
 
@@ -237,13 +271,12 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void OnMissingStudentRequested()
     {
-        // Escape hatch: "Nama saya tiada"
-        System.Diagnostics.Debug.WriteLine("Missing student escape hatch clicked.");
+        // Escape hatch: "Nama saya tiada" allows teacher to unlock and add pupil on the spot
+        NavigateToModGuruPin(CurrentView);
     }
 
     private void OnTeacherModeRequested()
     {
-        // Placeholder for Mod Guru PIN dialog
-        System.Diagnostics.Debug.WriteLine("Teacher mode requested.");
+        NavigateToModGuruPin(CurrentView);
     }
 }

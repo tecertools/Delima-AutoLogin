@@ -32,6 +32,34 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool BlockInput([MarshalAs(UnmanagedType.Bool)] bool fBlockIt);
 
+    // ---------- User Inactivity & Input State ----------
+
+    [DllImport("user32.dll")]
+    internal static extern short GetKeyState(int nVirtKey);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct LASTINPUTINFO
+    {
+        public uint cbSize;
+        public uint dwTime;
+    }
+
+    [DllImport("user32.dll")]
+    internal static extern bool GetLastInputInfo(ref LASTINPUTINFO plii);
+
+    internal static TimeSpan GetSystemIdleDuration()
+    {
+        var lii = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf<LASTINPUTINFO>() };
+        if (!GetLastInputInfo(ref lii))
+        {
+            return TimeSpan.Zero;
+        }
+
+        uint tickCount = (uint)Environment.TickCount;
+        uint elapsedMs = tickCount >= lii.dwTime ? tickCount - lii.dwTime : (uint.MaxValue - lii.dwTime + tickCount);
+        return TimeSpan.FromMilliseconds(elapsedMs);
+    }
+
     // ---------- Stale-window cleanup ----------
 
     internal delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
@@ -359,6 +387,7 @@ internal static class NativeMethods
     internal const uint LLKHF_ALTDOWN = 0x20;
     internal const uint VK_TAB = 0x09;
     internal const uint VK_ESCAPE = 0x1B;
+    internal const uint VK_CONTROL = 0x11;
     internal const uint VK_LWIN = 0x5B;
     internal const uint VK_RWIN = 0x5C;
     internal const uint VK_F4 = 0x73;

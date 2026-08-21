@@ -270,6 +270,7 @@ public static class ProvisionEngine
                 outWriter.WriteLine($"  - Bilangan Murid : {payload.Students.Count}");
                 outWriter.WriteLine($"  - Tarikh Storan  : {payload.GeneratedAt:yyyy-MM-dd HH:mm:ss zzz}");
                 outWriter.WriteLine($"  - Lokasi Storan  : {targetDir}");
+                outWriter.WriteLine("  - Keselamatan    : Sila pastikan dasar AppLocker/SRP telah disahkan pada akaun murid (PRD §8.3).");
             }
 
             return new ProvisionResult

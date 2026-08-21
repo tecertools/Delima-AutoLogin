@@ -27,6 +27,7 @@ public sealed partial class RalatViewModel : ObservableObject
     private string _conditionDescription;
 
     private readonly Action _onRetry;
+    private readonly Action? _onTeacherModeRequested;
 
     public RalatViewModel(
         School school,
@@ -34,12 +35,14 @@ public sealed partial class RalatViewModel : ObservableObject
         Action onRetry,
         Student? student = null,
         string? customPupilMessage = null,
-        string? customTeacherAction = null)
+        string? customTeacherAction = null,
+        Action? onTeacherModeRequested = null)
     {
         School = school;
         Student = student;
         _errorCode = errorCode;
         _onRetry = onRetry;
+        _onTeacherModeRequested = onTeacherModeRequested;
 
         _pupilMessage = customPupilMessage ?? FailureCodes.GetPupilMessageBm(errorCode);
         _teacherAction = customTeacherAction ?? FailureCodes.GetTeacherAction(errorCode);
@@ -50,5 +53,11 @@ public sealed partial class RalatViewModel : ObservableObject
     private void Retry()
     {
         _onRetry();
+    }
+
+    [RelayCommand]
+    private void OpenTeacherMode()
+    {
+        _onTeacherModeRequested?.Invoke();
     }
 }

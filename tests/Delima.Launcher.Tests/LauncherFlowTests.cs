@@ -109,4 +109,60 @@ public class LauncherFlowTests
         Assert.Equal(expectedTeacher, vm.TeacherAction);
         Assert.NotEmpty(vm.ConditionDescription);
     }
+
+    [Fact]
+    public void MainViewModel_NavigateToModGuruPin_AndThen_ToDashboard_AndReturn()
+    {
+        var mainVm = new MainViewModel();
+        Assert.IsType<PilihKelasViewModel>(mainVm.CurrentView);
+
+        // Navigate to Mod Guru PIN
+        mainVm.NavigateToModGuruPin();
+        Assert.IsType<ModGuruPinViewModel>(mainVm.CurrentView);
+        var pinVm = (ModGuruPinViewModel)mainVm.CurrentView;
+
+        // Enter valid default PIN
+        pinVm.AppendDigit("1");
+        pinVm.AppendDigit("2");
+        pinVm.AppendDigit("3");
+        pinVm.AppendDigit("4");
+
+        // Should have transitioned to Mod Guru Dashboard
+        Assert.IsType<ModGuruDashboardViewModel>(mainVm.CurrentView);
+        var dashboardVm = (ModGuruDashboardViewModel)mainVm.CurrentView;
+
+        // Exit dashboard -> returns to PilihKelasView
+        dashboardVm.ExitDashboardCommand.Execute(null);
+        Assert.IsType<PilihKelasViewModel>(mainVm.CurrentView);
+    }
+
+    [Fact]
+    public void RalatViewModel_OpenTeacherModeCommand_NavigatesToModGuruPin()
+    {
+        var mainVm = new MainViewModel();
+        var student = mainVm.Students[0];
+
+        mainVm.NavigateToRalat(student, FailureCodes.E12_PicturePasswordLocked);
+        Assert.IsType<RalatViewModel>(mainVm.CurrentView);
+        var ralatVm = (RalatViewModel)mainVm.CurrentView;
+
+        // Teacher clicks Mod Guru button on the error screen
+        ralatVm.OpenTeacherModeCommand.Execute(null);
+        Assert.IsType<ModGuruPinViewModel>(mainVm.CurrentView);
+    }
+
+    [Fact]
+    public void MainViewModel_Initializes_With_AppConfig_And_IdleResetSeconds()
+    {
+        var customConfig = new AppConfig { IdleResetSeconds = 300 };
+        var mainVm = new MainViewModel(
+            SampleDataService.CreateSampleSchool(),
+            SampleDataService.CreateSampleTheme(),
+            SampleDataService.CreateSampleClasses(),
+            SampleDataService.CreateSampleClassStudents("2_cemerlang"),
+            config: customConfig);
+
+        Assert.NotNull(mainVm.Config);
+        Assert.Equal(300, mainVm.Config.IdleResetSeconds);
+    }
 }

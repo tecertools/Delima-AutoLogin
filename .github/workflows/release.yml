@@ -1,0 +1,131 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+  actions: read
+
+jobs:
+  build-and-release:
+    name: Build, Sign and Draft Release
+    runs-on: windows-latest
+
+    steps:
+      # 1. Check out tagged commit
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup .NET 10 SDK
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # 3. Restore and compile solution
+      - name: Build solution (Release)
+        run: dotnet build -c Release
+
+      # 4. Run unit tests
+      - name: Run unit tests
+        run: dotnet test -c Release --no-build
+
+      # 5. Extract version number from tag (e.g. v2.0.0 -> 2.0.0)
+      - name: Extract version
+        id: get_version
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          Write-Output "VERSION=$tag" >> $env:GITHUB_ENV
+          Write-Output "Extracted version: $tag"
+
+      # 6. Publish three executables (self-contained single-file win-x64)
+      - name: Publish executables
+        shell: pwsh
+        run: |
+          $cfg = "-c Release -r win-x64 --self-contained true /p:PublishSingleFile=true"
+          dotnet publish src/Delima.Launcher/Delima.Launcher.csproj $cfg -o publish/Launcher
+          dotnet publish src/Delima.Admin/Delima.Admin.csproj $cfg -o publish/Admin
+          dotnet publish src/Delima.Provision/Delima.Provision.csproj $cfg -o publish/Provision
+
+      # 7. Build Inno Setup installer package
+      - name: Compile Inno Setup installer
+        shell: pwsh
+        run: |
+          iscc /DMyAppVersion=$env:VERSION installer/DelimaLauncher.iss
+
+      # 8. Upload unsigned installer artifact for SignPath origin verification
+      - name: Upload unsigned installer artifact
+        id: upload_unsigned_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-installer
+          path: dist/DELIMaLauncher-Setup-${{ env.VERSION }}.exe
+          if-no-files-found: error
+
+      # 9. Submit to SignPath Foundation for OV code signing
+      - name: Submit signing request to SignPath
+        id: signpath_sign
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'delima-launcher'
+          signing-policy-slug: 'release-signing'
+          github-artifact-id: '${{ steps.upload_unsigned_artifact.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: 'signed-dist'
+
+      # 10. Generate SHA-256 Checksums of the SIGNED installer
+      - name: Generate SHA-256 checksums of signed installer
+        shell: pwsh
+        run: |
+          Get-FileHash signed-dist/DELIMaLauncher-Setup-$env:VERSION.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } |
+            Out-File "signed-dist/DELIMaLauncher-$env:VERSION-checksums.txt" -Encoding ascii
+          Get-Content "signed-dist/DELIMaLauncher-$env:VERSION-checksums.txt"
+
+      # 11. Create Draft GitHub Release with T0.1 responsibility statement
+      - name: Create Draft GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: false
+          name: "DELIMa Smart Launcher v${{ env.VERSION }}"
+          body: |
+            ## DELIMa Smart Launcher v${{ env.VERSION }}
+
+            Pemasang rasmi DELIMa Smart Launcher bagi makmal komputer sekolah rendah (SK Seksyen 24).
+
+            ---
+
+            ### Makluman Penting & Tanggungjawab Dasar (T0.1)
+
+            Pihak sekolah yang memuat turun dan menggunakan perisian ini perlu mengambil maklum ketetapan berikut sebelum pelaksanaan:
+
+            1. **Penyimpanan Kata Laluan Tempatan:** Perisian ini menyimpan kata laluan murid dalam bentuk disulitkan (AES-256-GCM / DPAPI) pada storan komputer makmal sekolah ini sahaja (`%ProgramData%\DELIMa Launcher`). Tiada pelayan awan atau pangkalan data berpusat yang digunakan.
+            2. **Tiada Pendirian Rasmi Bertulis KPM/BSTP:** Pihak pembangun tidak memegang sebarang surat kelulusan atau ketetapan dasar bertulis daripada pihak BSTP atau Kementerian Pendidikan Malaysia (KPM) mengenai amalan menyimpan semula kata laluan murid.
+            3. **Sekolah Sebagai Pengawal Data (Data Controller):** Pihak sekolah yang memuat turun, memasang, dan menggunakan perisian ini adalah pengawal data mutlak di bawah Akta Perlindungan Data Peribadi 2010 (PDPA) dan bertanggungjawab sepenuhnya terhadap kebenaran serta penggunaan akaun DELIMa murid.
+            4. **Tiada Waranti & Tiada Penghantaran Data:** Perisian ini disediakan secara sumber terbuka dan percuma di bawah lesen GNU GPL-3.0 tanpa sebarang waranti. Tiada sebarang data murid, log masuk, atau maklumat sekolah dihantar kepada pembangun.
+
+            > **Peringatan:** Sila sahkan kenyataan tanggungjawab T0.1 ini sebelum menerbitkan keluaran ini secara umum.
+
+            ---
+
+            ### Senarai Fail Muat Turun
+            - `DELIMaLauncher-Setup-${{ env.VERSION }}.exe` — Pemasang Windows tunggal bertandatangan (Inno Setup / SignPath)
+            - `DELIMaLauncher-${{ env.VERSION }}-checksums.txt` — Hash integriti SHA-256 bagi fail pemasang bertandatangan
+            - `Panduan_Pemasangan.pdf` — Panduan persediaan makmal komputer (10 muka surat BM)
+            - `Panduan_Import.pdf` — Panduan format dan pengimportan data murid/kata laluan
+            - `contoh_roster.csv` & `contoh_kata_laluan.csv` — Templat CSV APDM
+          files: |
+            signed-dist/DELIMaLauncher-Setup-${{ env.VERSION }}.exe
+            signed-dist/DELIMaLauncher-${{ env.VERSION }}-checksums.txt
+            installer/assets/Panduan_Pemasangan.pdf
+            installer/assets/Panduan_Import.pdf
+            installer/assets/contoh_roster.csv
+            installer/assets/contoh_kata_laluan.csv

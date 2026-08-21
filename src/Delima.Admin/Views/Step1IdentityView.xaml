@@ -1,0 +1,104 @@
+<UserControl x:Class="Delima.Admin.Views.Step1IdentityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:Delima.Admin.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="700">
+    <UserControl.Resources>
+        <conv:HexToBrushConverter x:Key="HexToBrushConv" />
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Text="Identiti Sekolah" Style="{StaticResource StepHeading}" />
+            <TextBlock Text="Ini menentukan apa yang menjadikan pemasangan ini milik sekolah anda. Tiada apa dikodkan terus ke dalam perisian." Style="{StaticResource StepSubHeading}" />
+
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Kod Sekolah" Style="{StaticResource FieldLabel}" />
+                    <TextBox Text="{Binding SchoolCode, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Domain E-mel MOE" Style="{StaticResource FieldLabel}" />
+                    <TextBox Text="{Binding Domain, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Margin="0,0,0,14">
+                <TextBlock Text="Nama Sekolah" Style="{StaticResource FieldLabel}" />
+                <TextBox Text="{Binding SchoolName, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Margin="0,0,0,14">
+                <TextBlock Text="Moto (pilihan)" Style="{StaticResource FieldLabel}" />
+                <TextBox Text="{Binding Motto, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Margin="0,0,0,18">
+                <TextBlock Text="Lambang Sekolah" Style="{StaticResource FieldLabel}" />
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Muat Naik Lambang…" Style="{StaticResource SmallButton}" Click="OnSelectCrestClick" />
+                    <TextBlock Text="{Binding CrestPath, FallbackValue='(Tiada fail dipilih — guna lambang lalai)'}" Foreground="{StaticResource Ink2Brush}" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="12"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,0,10">
+                <TextBlock Text="Palet Jenama — kontras disahkan secara langsung (FR-S1.4)" Style="{StaticResource FieldLabel}" />
+                <TextBlock Text="Setiap warna mesti melepasi nisbah kontras sekurang-kurangnya 4.5:1 terhadap teks yang dibawanya." Foreground="{StaticResource Ink2Brush}" FontSize="11.5" Margin="0,0,0,10" />
+
+                <ItemsControl ItemsSource="{Binding Swatches}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="110" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,10,10" Background="#FFFFFF">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <Border Width="92" Height="28" CornerRadius="4" Background="{Binding HexCode, Converter={StaticResource HexToBrushConv}}" Margin="0,0,0,6" />
+                                    <TextBlock Text="{Binding Label}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Ink2Brush}" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                    <TextBox Text="{Binding HexCode, UpdateSourceTrigger=LostFocus}" FontSize="10.5" Height="26" HorizontalContentAlignment="Center" Margin="0,0,0,4"/>
+                                    <Border CornerRadius="4" Padding="4,2" HorizontalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#E5F2EA" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPass}" Value="False">
+                                                        <Setter Property="Background" Value="{StaticResource DangerBgBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding TagLabel}" FontSize="9.5" FontWeight="ExtraBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{StaticResource PrimaryGreenBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsPass}" Value="False">
+                                                            <Setter Property="Foreground" Value="{StaticResource DangerTextBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
