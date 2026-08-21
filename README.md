@@ -36,7 +36,8 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 │   ├── Technical_Architecture_Visual_SSO.md
 │   ├── T0.3_Tutorial_Step_By_Step.md     ← then do this (full walkthrough)
 │   ├── T0.3_Injection_Test_Protocol.md   ← the short version, once you've done it
-│   ├── T0.2_URL_Confirmation.md    ← the remaining blocker, ~1 hour in a browser
+│   ├── T0.2_URL_Confirmation.md    Sign-in route — COMPLETE, route C selected
+│   ├── T0.4_UIA_Verification.md    ← next: verify UIA IsPassword on lab hardware
 │   ├── AI_Build_Guide.md           ← start building here (novice walkthrough)
 │   ├── Build_Prompts.md            Ready-to-paste prompts for an AI coding assistant
 │   ├── Build_Machine_Setup.md      Set up a Windows PC to compile the release

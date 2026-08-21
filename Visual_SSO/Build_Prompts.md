@@ -393,6 +393,27 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt T0.4 — Build the UIA probe
+
+Small observational tool. Procedure and pass conditions are in `Visual_SSO/T0.4_UIA_Verification.md`.
+
+> Add a `uia` mode to `InjectionSpike`, or a small separate console project if that is cleaner — it needs to reference `Delima.Win32` for `UiaHelper` and `NativeMethods`.
+>
+> **It does not automate the sign-in.** An operator drives Chrome by hand; the probe only observes and records. This is deliberate: reaching the password page requires entering a real email address, and automating that adds failure modes without adding information.
+>
+> Behaviour, per iteration:
+>
+> 1. Launch Chrome at a configurable URL, defaulting to `https://d3.delima.edu.my/landing`, **with `--force-renderer-accessibility`** — without it Chrome exposes no accessibility tree and every sample is meaningless
+> 2. Poll every 100 ms until the window closes, appending one CSV row per sample: `run`, `elapsed_ms`, `window_title`, `focus_resolvable`, `is_password`
+> 3. `focus_resolvable` is whether UIA returned a focused element at all; `is_password` is the property value, left **blank** when unresolvable — do not write `false` for "could not tell", since questions 2 and 4 depend on telling those apart
+> 4. When the operator closes the window, finish the run and relaunch, up to `--runs` (default 50)
+>
+> Also add a `--no-accessibility` switch that omits the flag, so question 6 — whether forcing accessibility slows Chrome's start — can be measured by comparison.
+>
+> Write the CSV to `spike-results/uia_<timestamp>.csv`. **No password is ever typed by this tool or by the operator**, so it needs no credential handling at all — do not add any.
+
+---
+
 ## Prompt 15a — Two fixes in the installer and pipeline
 
 Both small, both would bite on the first real release.

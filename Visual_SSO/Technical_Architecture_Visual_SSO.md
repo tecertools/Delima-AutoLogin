@@ -582,7 +582,9 @@ If that throws, the credential store keeps whatever permissions it had, the app 
 
 **Worth doing before the pilot rather than after.** The title strings are Google's UI copy in whatever locale the lab image runs; `IsPassword` is a structural property that does not move when Google restyles a page or a school images its PCs in Malay.
 
-Extend `InjectionSpike` with a `uia` mode. On **representative lab hardware**, against the real DELIMa flow, launching Chrome with `--force-renderer-accessibility`:
+**No password is typed to run this**, which was not obvious when this section was written. Google's identifier page advances to the password page as soon as it recognises a valid address, so both pages can be reached and sampled with an email alone. That removes the rate-limiting constraint that capped T0.2's timing test at ten runs, and means T0.4 touches no credential and raises none of T0.1's questions.
+
+Procedure and pass criteria: `T0.4_UIA_Verification.md`. Extend `InjectionSpike` with a `uia` mode. On **representative lab hardware**, against the real DELIMa flow, launching Chrome with `--force-renderer-accessibility`:
 
 | # | Question | Pass condition |
 | :-- | :--- | :--- |
