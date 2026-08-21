@@ -49,8 +49,8 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 
 [Dirs]
 ; Per-machine store. Interactive users must not be able to read it (arch §3.5).
-; Inno Setup Permissions syntax only supports full, modify, readexec (not none).
-; Inheritance removal and Murid/Admin/SYSTEM DACLs are applied by StoreAclConfigurator.
+; Inno Setup Permissions syntax only supports full, modify, readexec (Inno Setup does not support 'none').
+; We set admins-full system-full here, and explicitly strip inherited %ProgramData% permissions in [Run] and [Code].
 Name: "{commonappdata}\DELIMa Launcher"; Permissions: admins-full system-full
 
 [Icons]
@@ -74,4 +74,17 @@ Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
 
 [Run]
 ; Strip inherited permissions from %ProgramData% immediately upon install to close the exposure window before first launch
-Filename: "icacls.exe"; Parameters: """{commonappdata}\DELIMa Launcher"" /inheritance:r /grant:r ""*S-1-5-18:(OI)(CI)F"" /grant:r ""*S-1-5-32-544:(OI)(CI)F"""; Flags: runhidden
+Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\DELIMa Launcher"" /inheritance:r /grant:r ""*S-1-5-18:(OI)(CI)F"" /grant:r ""*S-1-5-32-544:(OI)(CI)F"""; Flags: runhidden
+
+[Code]
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    Exec(ExpandConstant('{sys}\icacls.exe'),
+      Format('"%s" /inheritance:r /grant:r "*S-1-5-18:(OI)(CI)F" /grant:r "*S-1-5-32-544:(OI)(CI)F"', [ExpandConstant('{commonappdata}\DELIMa Launcher')]),
+      '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+end;
