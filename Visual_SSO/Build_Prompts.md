@@ -411,6 +411,29 @@ Small observational tool. Procedure and pass conditions are in `Visual_SSO/T0.4_
 > Also add a `--no-accessibility` switch that omits the flag, so question 6 — whether forcing accessibility slows Chrome's start — can be measured by comparison.
 >
 > Write the CSV to `spike-results/uia_<timestamp>.csv`. **No password is ever typed by this tool or by the operator**, so it needs no credential handling at all — do not add any.
+>
+> **Then have the probe answer the six questions itself**, printed as a summary block when the last run finishes and appended to the CSV folder as `uia_<timestamp>_summary.txt`. Reading 50 runs × ~200 samples by hand in a computer lab is how mistakes get made.
+>
+> Take the two expected titles from `Appendix B` config keys `title_identifier_page` and `title_password_page` (arch §4.2), matched exactly, so the summary uses the same strings the product will:
+>
+> ```
+> T0.4 — UIA IsPassword verification
+> Runs: 50    Chrome: <version>    Accessibility flag: on
+>
+> Q1  Focus resolvable, identifier page ......  50/50   PASS  (need >= 49)
+> Q2  IsPassword == false there .............   50/50   PASS  (need 50, no tolerance)
+> Q3  Focus resolvable, password page .......   49/50   PASS  (need >= 49)
+> Q4  IsPassword == true there ..............   50/50   PASS  (need 50, no tolerance)
+> Q5  Page load -> property readable ........   p50 180 ms   p95 340 ms
+> Q6  Launch -> first title, flag on/off ....   1240 ms / 1190 ms  (+50 ms)
+>
+> VERDICT: PASS — enable CheckUiaPasswordElement
+> ```
+>
+> **Two rules for the summary, both about not flattering the result:**
+>
+> - A run where the page was never reached at all is **excluded from the denominator and reported separately** as an incomplete run. It is operator error, not a UIA failure, and folding it in either way distorts the answer.
+> - **Any `is_password=true` observed on a title that is not the password page is a hard fail**, reported on its own line regardless of the counts. That is the one outcome that means a password could be typed into a visible field, and it must not be averaged into a percentage.
 
 ---
 
