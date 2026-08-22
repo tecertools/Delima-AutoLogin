@@ -19,6 +19,7 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
     private string _filePath = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ValidationMessage))]
     private string _activeSubView = "Mapping"; // "Mapping" or "DryRun"
 
     [ObservableProperty]
@@ -108,7 +109,7 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
         if (!File.Exists(path)) return;
 
         FilePath = path;
-        using var stream = File.OpenRead(path);
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         string fileName = Path.GetFileName(path);
 
         var (headers, rows, totalRaw) = DataFileReader.ReadFile(stream, fileName);
@@ -133,9 +134,11 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
         SelectedRegisterNoCol = auto.RegisterNoColumn;
 
         // Sniff encoding and sample diacritics
-        if (fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+        if (fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) ||
+            fileName.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase) ||
+            fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
         {
-            using var encStream = File.OpenRead(path);
+            using var encStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             var encoding = FileEncodingDetector.DetectEncoding(encStream);
             DetectedEncoding = encoding.EncodingName;
         }
@@ -239,6 +242,11 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
         return true;
     }
 
+    public void SaveTemplate(string targetPath)
+    {
+        TemplateGenerator.SaveRosterTemplate(targetPath);
+    }
+
     public void RunDryRunAnalysis()
     {
         if (!ValidateMapping(out _) || !HasFileLoaded) return;
@@ -252,7 +260,7 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
             RegisterNoColumn = SelectedRegisterNoCol
         };
 
-        using var stream = File.OpenRead(FilePath);
+        using var stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         string fileName = Path.GetFileName(FilePath);
 
         var existingRosterStudents = _state.RosterStudents.Count > 0

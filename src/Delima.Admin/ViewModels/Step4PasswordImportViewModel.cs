@@ -14,6 +14,7 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
     private DispatcherTimer? _reMaskTimer;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanProceed))]
     private string _activeSubView = "Consent"; // "Consent" or "Grid"
 
     [ObservableProperty]
@@ -109,11 +110,16 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         OnPropertyChanged(nameof(CanProceed));
     }
 
+    public void SavePasswordTemplate(string targetPath)
+    {
+        TemplateGenerator.SavePasswordTemplate(targetPath, _state.RosterStudents);
+    }
+
     public void LoadPasswordFile(string filePath)
     {
         if (!File.Exists(filePath)) return;
 
-        using var stream = File.OpenRead(filePath);
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         string fileName = Path.GetFileName(filePath);
         var (headers, rows, _) = DataFileReader.ReadFile(stream, fileName);
 
@@ -121,6 +127,7 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         string? delimaCol = mapping.DelimaIdColumn;
         string? passCol = mapping.PasswordColumn;
         string? regCol = mapping.RegisterNoColumn;
+        string? nameCol = mapping.FullNameColumn;
 
         // If not detected, look for any column containing 'kata_laluan' or 'password'
         if (passCol == null)
@@ -135,12 +142,14 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
 
         var passwordsByDelima = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var passwordsByReg = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var passwordsByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var r in rows)
         {
             string rawDelima = r.GetValue(delimaCol);
             string rawPass = r.GetValue(passCol);
             string rawReg = r.GetValue(regCol);
+            string rawName = r.GetValue(nameCol);
 
             var (digits, _) = RosterImporter.NormalizeDelimaId(rawDelima);
             if (digits != null && !string.IsNullOrWhiteSpace(rawPass))
@@ -148,6 +157,9 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
 
             if (!string.IsNullOrWhiteSpace(rawReg) && !string.IsNullOrWhiteSpace(rawPass))
                 passwordsByReg[rawReg] = rawPass;
+
+            if (!string.IsNullOrWhiteSpace(rawName) && !string.IsNullOrWhiteSpace(rawPass))
+                passwordsByName[rawName] = rawPass;
         }
 
         // Apply to items
@@ -162,6 +174,11 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
             {
                 item.RawPassword = pwdReg;
                 _state.StudentPasswords[item.StudentId] = pwdReg;
+            }
+            else if (passwordsByName.TryGetValue(item.StudentName, out var pwdName))
+            {
+                item.RawPassword = pwdName;
+                _state.StudentPasswords[item.StudentId] = pwdName;
             }
         }
 

@@ -79,10 +79,10 @@ g-41360438,PasswordSebenarAnda
 On your own PC, from the repository root:
 
 ```powershell
-$cfg = "-c Release -r win-x64 --self-contained true /p:PublishSingleFile=true"
-dotnet publish src\Delima.Admin\Delima.Admin.csproj         $cfg -o publish\Admin
-dotnet publish src\Delima.Launcher\Delima.Launcher.csproj   $cfg -o publish\Launcher
-dotnet publish src\Delima.Provision\Delima.Provision.csproj $cfg -o publish\Provision
+$cfg = @("-c", "Release", "-r", "win-x64", "--self-contained", "true", "/p:PublishSingleFile=true")
+dotnet publish src\Delima.Admin\Delima.Admin.csproj         @cfg -o publish\Admin
+dotnet publish src\Delima.Launcher\Delima.Launcher.csproj   @cfg -o publish\Launcher
+dotnet publish src\Delima.Provision\Delima.Provision.csproj @cfg -o publish\Provision
 ```
 
 **Checkpoint.** Each folder should contain essentially **one** `.exe`, tens of megabytes. Dozens of loose `.dll` files means single-file publishing is misconfigured — see `Build_And_Release.md` §3.
@@ -98,7 +98,7 @@ Run `publish\Admin\Delima.Admin.exe`.
 **Step 1 — Identiti Sekolah.** School code `UJIAN`, any school name, skip the crest. Note the contrast checker on the colour palette — that is FR-S1.4 working.
 
 **Step 2 — Kata Laluan Pentadbir.** Set the passphrase. **Write it down now.**
-
+(admin_delimasks24)
 **Step 3 — Import Senarai Murid.** Choose `roster.csv`.
 
 - The **column mapper** shows five target fields with dropdowns. Check its guesses — `NAMA MURID` → Nama penuh, `ID PENGGUNA DELIMA` → ID DELIMa. Correct any it got wrong.

@@ -30,10 +30,31 @@ public sealed class AvatarTemplateSelector : DataTemplateSelector
 
     public static string NormalizeAvatarKey(string key)
     {
-        string lower = key.Trim().ToLowerInvariant();
+        string lower = key.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_");
         return lower switch
         {
             "kucing" or "cat" => "cat",
+            "buaya" or "crocodile" => "crocodile",
+            "helang" or "eagle" => "eagle",
+            "gajah" or "elephant" => "elephant",
+            "memerang" or "otter" => "otter",
+            "rakun" or "raccoon" => "raccoon",
+            "kuda_belang" or "kudabelang" or "zebra" => "zebra",
+            "semut" or "ant" => "ant",
+            "bizon" or "bison" or "seladang" => "bison",
+            "ayam" or "chicken" => "chicken",
+            "anjing" or "dog" or "puppy" => "dog",
+            "doraemon" => "doraemon",
+            "itik" or "duck" => "duck",
+            "musang" or "fox" or "rubah" => "fox",
+            "zirafah" or "giraffe" => "giraffe",
+            "koala" => "koala",
+            "harimau_bintang" or "harimaubintang" or "leopard" => "leopard",
+            "tikus" or "mouse" => "mouse",
+            "penguin" => "penguin",
+            "pikachu" => "pikachu",
+            "biri_biri" or "biribiri" or "sheep" or "kambing" => "sheep",
+            "sloth" => "sloth",
             "ikan" or "fish" => "fish",
             "bunga" or "flower" => "flower",
             "kereta" or "car" => "car",
@@ -41,7 +62,7 @@ public sealed class AvatarTemplateSelector : DataTemplateSelector
             "epal" or "apple" => "apple",
             "belon" or "balloon" => "balloon",
             "payung" or "umbrella" => "umbrella",
-            "layang" or "layang-layang" or "kite" => "kite",
+            "layang" or "layang_layang" or "kite" => "kite",
             "penyu" or "turtle" => "turtle",
             "missing" or "tiada" or "?" => "missing",
             _ => "cat"

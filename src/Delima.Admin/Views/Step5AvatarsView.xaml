@@ -26,31 +26,31 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Tapis Mengikut Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
                 <ComboBox Grid.Column="2" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" />
-                <Button Grid.Column="4" Content="Cetak Helaian Avatar Kelas" Style="{StaticResource SmallButton}" Click="OnPrintAvatarSheetClick" />
+                <Button Grid.Column="4" Content="🖨️ Cetak Helaian Avatar Kelas" Style="{StaticResource SmallButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak atau jana helaian avatar murid untuk kelas yang dipilih" />
             </Grid>
 
             <!-- Avatar List for Selected Class -->
             <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Padding="14,10" Margin="0,0,0,18">
-                <ItemsControl ItemsSource="{Binding AvatarItems}">
+                <ItemsControl ItemsSource="{Binding FilteredAvatarItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="#EEECE4" BorderThickness="0,0,0,1" Padding="0,7">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="32"/>
+                                        <ColumnDefinition Width="36"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <!-- Mini Avatar Circle -->
-                                    <Border Grid.Column="0" Width="26" Height="26" CornerRadius="13" Background="{StaticResource AmberBgBrush}" VerticalAlignment="Center">
-                                        <TextBlock Text="👤" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Border Grid.Column="0" Width="30" Height="30" CornerRadius="15" Background="{StaticResource AmberBgBrush}" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding AvatarEmoji}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                                         <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13"/>
-                                        <TextBlock Text="{Binding Avatar, StringFormat=' — {0}'}" Foreground="{StaticResource Ink2Brush}" FontSize="13"/>
+                                        <TextBlock Text="{Binding AvatarDisplay, StringFormat=' — {0}'}" Foreground="{StaticResource Ink2Brush}" FontSize="13"/>
                                         <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="#8A8676" FontSize="12"/>
                                     </StackPanel>
-                                    <Button Grid.Column="2" Content="Tukar" Style="{StaticResource SmallButton}" Background="Transparent" BorderThickness="0" Foreground="{StaticResource PrimaryGreenBrush}" FontWeight="Bold" Click="OnCycleAvatarClick" />
+                                    <Button Grid.Column="2" Content="Tukar ↻" Style="{StaticResource SmallButton}" Background="Transparent" BorderThickness="0" Foreground="{StaticResource PrimaryGreenBrush}" FontWeight="Bold" Click="OnCycleAvatarClick" ToolTip="Tukar ke avatar seterusnya" />
                                 </Grid>
                             </Border>
                         </DataTemplate>

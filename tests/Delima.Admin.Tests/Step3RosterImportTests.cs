@@ -86,4 +86,25 @@ public class Step3RosterImportTests
             if (File.Exists(rejectOutPath)) File.Delete(rejectOutPath);
         }
     }
+
+    [Fact]
+    public void SaveTemplate_CreatesValidCsvFile()
+    {
+        var state = new AdminWizardState();
+        var vm = new Step3RosterImportViewModel(state);
+
+        string templatePath = Path.Combine(Path.GetTempPath(), $"roster_template_{Guid.NewGuid():N}.csv");
+        try
+        {
+            vm.SaveTemplate(templatePath);
+            Assert.True(File.Exists(templatePath));
+            string content = File.ReadAllText(templatePath);
+            Assert.Contains("NAMA MURID", content);
+            Assert.Contains("ID DELIMA", content);
+        }
+        finally
+        {
+            if (File.Exists(templatePath)) File.Delete(templatePath);
+        }
+    }
 }

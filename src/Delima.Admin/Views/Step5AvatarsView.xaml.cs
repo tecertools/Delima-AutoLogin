@@ -21,6 +21,19 @@ public partial class Step5AvatarsView : UserControl
 
     private void OnPrintAvatarSheetClick(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Helaian avatar kelas sedia dicetak untuk dinding kelas.", "Cetak Helaian Avatar", MessageBoxButton.OK, MessageBoxImage.Information);
+        if (DataContext is Step5AvatarsViewModel vm)
+        {
+            try
+            {
+                string path = vm.PrintAvatarSheet();
+                MessageBox.Show($"Helaian avatar kelas telah dibuka di pelayar untuk dicetak.\n\nLokasi fail:\n{path}",
+                    "Cetak Helaian Avatar", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ralat semasa menjana helaian cetakan avatar: {ex.Message}",
+                    "Ralat Cetakan", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

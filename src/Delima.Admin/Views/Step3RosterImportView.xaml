@@ -28,22 +28,32 @@
 
             <!-- SUB-VIEW 3A: COLUMN MAPPING -->
             <StackPanel Visibility="{Binding ActiveSubView, Converter={StaticResource EqToVisConv}, ConverterParameter=Mapping}">
-                <!-- File Picker Row -->
+                <!-- File Picker & Template Actions Header -->
                 <Grid Margin="0,0,0,14">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Fail Roster APDM (.csv, .xlsx, .xls)" Style="{StaticResource FieldLabel}" />
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="0" Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding FilePath, Mode=OneWay}" IsReadOnly="True" />
-                        <Button Grid.Column="2" Content="Pilih Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" />
+                        <TextBlock Grid.Column="0" Text="Fail Roster APDM (.csv, .xlsx, .xls, .tsv)" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="📥 Muat Turun Templat (CSV)" Style="{StaticResource SmallButton}" Click="OnDownloadTemplateClick" />
                     </Grid>
+                    <Border Grid.Row="1" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Background="#FAFAFA" Padding="6"
+                            AllowDrop="True" DragOver="OnFileDragOver" Drop="OnFileDrop">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding FilePath, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Center" />
+                            <Button Grid.Column="2" Content="Pilih Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" />
+                        </Grid>
+                    </Border>
                 </Grid>
 
                 <!-- Encoding & Diacritic Sniffing Banner -->

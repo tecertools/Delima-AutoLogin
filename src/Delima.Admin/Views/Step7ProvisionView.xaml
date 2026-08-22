@@ -121,7 +121,7 @@
                 <StackPanel>
                     <TextBlock Text="Skrip Automasi PowerShell (PDQ / GPO / RMM)" FontWeight="Bold" Margin="0,0,0,4" />
                     <TextBlock Text="Kata laluan pentadbir ditanya secara interaktif dalam memori dan tidak disimpan di dalam fail skrip." FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8" />
-                    <TextBox Text="{Binding PowerShellScript}" Height="120" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Style="{StaticResource MonoText}" Margin="0,0,0,10" />
+                    <TextBox Text="{Binding PowerShellScript}" Height="120" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Style="{StaticResource MonoTextBox}" Margin="0,0,0,10" />
                     <Button Content="Salin Skrip ke Papan Keratan" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnCopyScriptClick" />
                 </StackPanel>
             </Border>

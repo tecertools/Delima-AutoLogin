@@ -58,24 +58,29 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
         Swatches.Clear();
 
         // Primary
-        var primary = new ColorSwatchItem { HexCode = _state.Theme.Primary, Label = "Utama" };
-        primary.Recalculate();
-        Swatches.Add(primary);
+        AddSwatch(new ColorSwatchItem { HexCode = _state.Theme.Primary, Label = "Utama" });
 
         // Accent
-        var accent = new ColorSwatchItem { HexCode = _state.Theme.Accent, Label = "Aksen" };
-        accent.Recalculate();
-        Swatches.Add(accent);
+        AddSwatch(new ColorSwatchItem { HexCode = _state.Theme.Accent, Label = "Aksen" });
 
         // Class colours
         int idx = 1;
         foreach (var col in _state.Theme.ClassColours)
         {
             if (Swatches.Count >= 8) break;
-            var swatch = new ColorSwatchItem { HexCode = col, Label = $"Kelas {idx++}" };
-            swatch.Recalculate();
-            Swatches.Add(swatch);
+            AddSwatch(new ColorSwatchItem { HexCode = col, Label = $"Kelas {idx++}" });
         }
+    }
+
+    private void AddSwatch(ColorSwatchItem swatch)
+    {
+        swatch.Recalculate();
+        swatch.PropertyChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(CanProceed));
+            OnPropertyChanged(nameof(ValidationMessage));
+        };
+        Swatches.Add(swatch);
     }
 
     public void UpdateSwatchColor(int index, string newHex)
@@ -83,9 +88,6 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
         if (index >= 0 && index < Swatches.Count)
         {
             Swatches[index].HexCode = newHex;
-            Swatches[index].Recalculate();
-            OnPropertyChanged(nameof(CanProceed));
-            OnPropertyChanged(nameof(ValidationMessage));
         }
     }
 

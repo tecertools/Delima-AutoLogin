@@ -103,13 +103,14 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
         foreach (var student in _state.RosterStudents)
         {
             string? pwd = _state.StudentPasswords.TryGetValue(student.Id, out var p) ? p : null;
+            string avatar = _state.StudentAvatars.TryGetValue(student.Id, out var av) && !string.IsNullOrWhiteSpace(av) ? av : "kucing";
             payload.Students.Add(new StudentInfo
             {
                 Id = student.Id,
                 Name = student.FullName,
                 ClassId = student.ClassName,
                 EmailLocal = student.EmailLocal,
-                Avatar = "kucing",
+                Avatar = avatar,
                 Password = pwd,
                 Active = true,
                 UpdatedAt = DateTimeOffset.UtcNow

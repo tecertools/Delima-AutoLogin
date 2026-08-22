@@ -10,11 +10,11 @@ namespace Delima.Import;
 public static partial class RosterImporter
 {
     private static readonly Regex DelimaIdRegex = new(
-        @"^(?:m-)?(\d{8})(?:@.*)?$",
+        @"^(?:[mgd]\s*-?\s*)?(\d{8})(?:@.*)?$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex GradeExtractRegex = new(
-        @"(?:tahun\s*|darjah\s*|tingkatan\s*|year\s*|grade\s*)?([1-6])(?!\d)",
+        @"(?:tahun\s*|darjah\s*|tingkatan\s*|year\s*|grade\s*|t\s*|d\s*)?([1-6])(?!\d)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public static (string? DelimaDigits, string? EmailLocal) NormalizeDelimaId(string rawInput)
@@ -22,7 +22,15 @@ public static partial class RosterImporter
         if (string.IsNullOrWhiteSpace(rawInput))
             return (null, null);
 
-        string trimmed = rawInput.Trim().ToLowerInvariant();
+        string trimmed = rawInput.Trim().ToLowerInvariant()
+            .Replace("\u00A0", " ")
+            .Replace("\u200B", "");
+
+        if (trimmed.EndsWith(".0", StringComparison.Ordinal) && double.TryParse(trimmed, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out _))
+        {
+            trimmed = trimmed[..^2];
+        }
+
         var match = DelimaIdRegex.Match(trimmed);
         if (match.Success)
         {
@@ -44,9 +52,7 @@ public static partial class RosterImporter
         // 1. Try explicit grade column first
         if (!string.IsNullOrWhiteSpace(rawGrade))
         {
-            var matchGrade = GradeExtractRegex.Match(rawGrade.Trim());
-            if (matchGrade.Success && int.TryParse(matchGrade.Groups[1].Value, out int g))
-                grade = g;
+            grade = ParseGradeString(rawGrade.Trim());
         }
 
         string cleanClass = rawClass.Trim();
@@ -54,13 +60,30 @@ public static partial class RosterImporter
         // 2. Derive grade from class name if not yet found (e.g. "2 Cemerlang", "2C", "Tahun 2")
         if (grade == 0)
         {
-            var matchClass = GradeExtractRegex.Match(cleanClass);
-            if (matchClass.Success && int.TryParse(matchClass.Groups[1].Value, out int g))
-                grade = g;
+            grade = ParseGradeString(cleanClass);
         }
 
         bool gradeKnown = grade >= 1 && grade <= 6;
         return (grade, cleanClass, gradeKnown);
+    }
+
+    private static int ParseGradeString(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return 0;
+        string upper = text.Trim().ToUpperInvariant();
+
+        if (upper == "1" || upper == "I" || upper == "SATU" || upper == "ONE" || upper == "T1" || upper == "D1") return 1;
+        if (upper == "2" || upper == "II" || upper == "DUA" || upper == "TWO" || upper == "T2" || upper == "D2") return 2;
+        if (upper == "3" || upper == "III" || upper == "TIGA" || upper == "THREE" || upper == "T3" || upper == "D3") return 3;
+        if (upper == "4" || upper == "IV" || upper == "EMPAT" || upper == "FOUR" || upper == "T4" || upper == "D4") return 4;
+        if (upper == "5" || upper == "V" || upper == "LIMA" || upper == "FIVE" || upper == "T5" || upper == "D5") return 5;
+        if (upper == "6" || upper == "VI" || upper == "ENAM" || upper == "SIX" || upper == "T6" || upper == "D6") return 6;
+
+        var match = GradeExtractRegex.Match(text);
+        if (match.Success && int.TryParse(match.Groups[1].Value, out int g) && g >= 1 && g <= 6)
+            return g;
+
+        return 0;
     }
 
     public static DryRunReport AnalyzeDryRun(

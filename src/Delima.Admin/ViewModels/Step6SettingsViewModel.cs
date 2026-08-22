@@ -64,6 +64,8 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
             Destinations.Add(new DestinationConfig { Id = "delima", Label = "DELIMa 3.0", Url = "https://d3.delima.edu.my/" });
             Destinations.Add(new DestinationConfig { Id = "classroom", Label = "Google Classroom", Url = "https://classroom.google.com/" });
         }
+
+        Destinations.CollectionChanged += (s, e) => OnPropertyChanged(nameof(CanProceed));
     }
 
     public void AddDestination()

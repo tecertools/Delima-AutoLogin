@@ -8,6 +8,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWizardViewModel();
+        var vm = new MainWizardViewModel();
+        vm.RequestClose = () => Close();
+        DataContext = vm;
     }
 }

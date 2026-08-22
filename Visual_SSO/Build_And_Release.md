@@ -76,11 +76,11 @@ The store carries its own schema version independent of the app version (arch §
 Three programs ship (arch §2): `Delima.Launcher`, `Delima.Admin`, `Delima.Provision`. `Delima.Core` and `Delima.Win32` are libraries and are not published separately; they are compiled into the three above.
 
 ```powershell
-$cfg = "-c Release -r win-x64 --self-contained true /p:PublishSingleFile=true"
+$cfg = @("-c", "Release", "-r", "win-x64", "--self-contained", "true", "/p:PublishSingleFile=true")
 
-dotnet publish src\Delima.Launcher\Delima.Launcher.csproj  $cfg -o publish\Launcher
-dotnet publish src\Delima.Admin\Delima.Admin.csproj        $cfg -o publish\Admin
-dotnet publish src\Delima.Provision\Delima.Provision.csproj $cfg -o publish\Provision
+dotnet publish src\Delima.Launcher\Delima.Launcher.csproj  @cfg -o publish\Launcher
+dotnet publish src\Delima.Admin\Delima.Admin.csproj        @cfg -o publish\Admin
+dotnet publish src\Delima.Provision\Delima.Provision.csproj @cfg -o publish\Provision
 ```
 
 Set the rest in each `.csproj`, not on the command line, so a hand-typed build cannot differ from a scripted one:

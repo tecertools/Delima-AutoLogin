@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delima.Admin.Models;
@@ -34,6 +35,16 @@ public sealed partial class MainWizardViewModel : ObservableObject
     [ObservableProperty]
     private string _schoolNameDisplay = "SK Seksyen 24";
 
+    /// <summary>
+    /// Optional action to trigger when wizard completes and requests the application/window to close.
+    /// </summary>
+    public Action? RequestClose { get; set; }
+
+    /// <summary>
+    /// Optional delegate to display a friendly completion message to the user.
+    /// </summary>
+    public Action<string, string>? ShowCompletionMessage { get; set; }
+
     public bool IsFirstRun => !State.IsSetupCompletedOnce;
 
     public bool CanGoBack => CurrentStepIndex > 1;
@@ -48,7 +59,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
                 1 => Step1Vm.CanProceed,
                 2 => Step2Vm.CanProceed,
                 3 => Step3Vm.ActiveSubView == "DryRun" ? Step3Vm.CanApplyImport : Step3Vm.CanProceedToDryRun,
-                4 => Step4Vm.CanProceed,
+                4 => Step4Vm.ActiveSubView == "Consent" ? Step4Vm.CanProceedConsent : true,
                 5 => Step5Vm.CanProceed,
                 6 => Step6Vm.CanProceed,
                 7 => true,
@@ -69,7 +80,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
                 3 => Step3Vm.ValidationMessage,
                 4 => Step4Vm.ActiveSubView == "Consent" ? Step4Vm.ConsentValidationMessage : "",
                 5 => "",
-                6 => Step6Vm.Destinations.Count == 0 ? "Sekurang-kurangnya satu destinasi diperlukan." : "",
+                6 => Step6Vm.CanProceed ? "" : "Sekurang-kurangnya satu destinasi diperlukan.",
                 7 => "",
                 _ => ""
             };
@@ -99,6 +110,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
         Step6Vm = new Step6SettingsViewModel(State);
         Step7Vm = new Step7ProvisionViewModel(State);
 
+        HookChildViewModels();
         InitializeStepNavigationItems();
 
         if (!State.HasAcknowledgedDisclaimer)
@@ -112,6 +124,23 @@ public sealed partial class MainWizardViewModel : ObservableObject
             _currentStepViewModel = Step1Vm;
         }
 
+        UpdateNavigationState();
+    }
+
+    private void HookChildViewModels()
+    {
+        DisclaimerVm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step1Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step2Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step3Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step4Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step5Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step6Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+        Step7Vm.PropertyChanged += OnChildViewModelPropertyChanged;
+    }
+
+    private void OnChildViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
         UpdateNavigationState();
     }
 
@@ -129,8 +158,8 @@ public sealed partial class MainWizardViewModel : ObservableObject
 
     public void UpdateNavigationState()
     {
-        SchoolCodeDisplay = string.IsNullOrEmpty(State.School.Code) ? "SK" : State.School.Code;
-        SchoolNameDisplay = string.IsNullOrEmpty(State.School.Name) ? "DELIMa Admin" : State.School.Name;
+        SchoolCodeDisplay = string.IsNullOrWhiteSpace(Step1Vm.SchoolCode) ? (string.IsNullOrEmpty(State.School.Code) ? "SK" : State.School.Code) : Step1Vm.SchoolCode;
+        SchoolNameDisplay = string.IsNullOrWhiteSpace(Step1Vm.SchoolName) ? (string.IsNullOrEmpty(State.School.Name) ? "DELIMa Admin" : State.School.Name) : Step1Vm.SchoolName;
 
         for (int i = 0; i < Steps.Count; i++)
         {
@@ -195,6 +224,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
     {
         if (CurrentStepIndex == 0)
         {
+            if (!DisclaimerVm.CanProceed) return;
             DisclaimerVm.Acknowledge();
             CurrentStepIndex = 1;
             CurrentStepViewModel = Step1Vm;
@@ -204,6 +234,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
 
         if (CurrentStepIndex == 3 && Step3Vm.ActiveSubView == "Mapping")
         {
+            if (!Step3Vm.CanProceedToDryRun) return;
             Step3Vm.RunDryRunAnalysis();
             UpdateNavigationState();
             return;
@@ -211,6 +242,7 @@ public sealed partial class MainWizardViewModel : ObservableObject
 
         if (CurrentStepIndex == 4 && Step4Vm.ActiveSubView == "Consent")
         {
+            if (!Step4Vm.CanProceedConsent) return;
             Step4Vm.AcknowledgeConsent();
             UpdateNavigationState();
             return;
@@ -237,14 +269,41 @@ public sealed partial class MainWizardViewModel : ObservableObject
         {
             CurrentStepIndex++;
             CurrentStepViewModel = GetViewModelForStep(CurrentStepIndex);
+            UpdateNavigationState();
         }
         else
         {
             // Step 7 complete -> setup has completed once!
             State.IsSetupCompletedOnce = true;
-        }
+            UpdateNavigationState();
 
-        UpdateNavigationState();
+            const string title = "Konfigurasi Selesai";
+            const string message = "Tahniah! Persediaan DELIMa Smart Launcher untuk sekolah anda telah berjaya diselesaikan.\n\n"
+                                 + "Fail bungkusan dan tetapan telah disimpan dengan selamat. Anda kini boleh mengagihkan fail konfigurasi ke PC makmal.\n\n"
+                                 + "Terima kasih!";
+
+            if (ShowCompletionMessage != null)
+            {
+                ShowCompletionMessage(message, title);
+            }
+            else if (Application.Current != null)
+            {
+                MessageBox.Show(
+                    message,
+                    title,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+
+            if (RequestClose != null)
+            {
+                RequestClose();
+            }
+            else if (Application.Current != null)
+            {
+                Application.Current.Shutdown();
+            }
+        }
     }
 
     [RelayCommand]

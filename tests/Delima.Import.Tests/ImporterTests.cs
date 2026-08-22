@@ -310,4 +310,149 @@ public class ImporterTests
         Assert.DoesNotContain("010101-14-1234", student.Name);
         Assert.DoesNotContain("010101-14-1234", student.EmailLocal);
     }
+
+    // ---------------------------------------------------------------------------
+    // 11. ColumnMapping: "Nama Kelas" does not steal FullNameColumn
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void ColumnMapping_AutoDetect_NamaKelasDoesNotStealFullName()
+    {
+        var headers = new List<string> { "Bil", "Nama Kelas", "Nama Murid", "ID DELIMa" };
+        var mapping = ColumnMapping.AutoDetect(headers);
+
+        Assert.Equal("Nama Murid", mapping.FullNameColumn);
+        Assert.Equal("Nama Kelas", mapping.ClassNameColumn);
+        Assert.Equal("ID DELIMa", mapping.DelimaIdColumn);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 12. Delimiter detection: Semicolon and Tab delimited CSV/TSV
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void DataFileReader_DetectsSemicolonAndTabDelimiters()
+    {
+        string semicolonCsv = "Bil;Nama Murid;Kelas;ID DELIMa\n1;Danial Rahim;2 Cemerlang;m-12345678\n2;Aisyah Ahmad;2 Cemerlang;m-12345679\n";
+        using var semiStream = FromString(semicolonCsv);
+        var (semiHeaders, semiRows, _) = DataFileReader.ReadCsv(semiStream);
+
+        Assert.Equal(4, semiHeaders.Count);
+        Assert.Equal("Nama Murid", semiHeaders[1]);
+        Assert.Equal(2, semiRows.Count);
+        Assert.Equal("Danial Rahim", semiRows[0].GetValue("Nama Murid"));
+
+        string tsv = "Bil\tNama Murid\tKelas\tID DELIMa\n1\tDanial Rahim\t2 Cemerlang\tm-12345678\n";
+        using var tsvStream = FromString(tsv);
+        var (tsvHeaders, tsvRows, _) = DataFileReader.ReadCsv(tsvStream);
+
+        Assert.Equal(4, tsvHeaders.Count);
+        Assert.Single(tsvRows);
+        Assert.Equal("Danial Rahim", tsvRows[0].GetValue("Nama Murid"));
+    }
+
+    // ---------------------------------------------------------------------------
+    // 13. Smart header detection: Skipping metadata title rows
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void DataFileReader_SkipsMetadataTitleRowsBeforeHeader()
+    {
+        string messyCsv =
+            "KEMENTERIAN PENDIDIKAN MALAYSIA\n" +
+            "SEKOLAH KEBANGSAAN SERI BINTANG UTARA\n" +
+            "SENARAI NAMA MURID APDM 2026\n" +
+            "\n" +
+            "Bil,Nama Murid,Kelas,Tahun,ID DELIMa\n" +
+            "1,Muhammad Danial,1 Cemerlang,1,m-12345678\n" +
+            "2,Nur Aishah,1 Cemerlang,1,m-12345679\n";
+
+        using var stream = FromString(messyCsv);
+        var (headers, rows, totalRaw) = DataFileReader.ReadCsv(stream);
+
+        Assert.Equal(5, headers.Count);
+        Assert.Equal("Nama Murid", headers[1]);
+        Assert.Equal("Kelas", headers[2]);
+        Assert.Equal(2, rows.Count);
+        Assert.Equal("Muhammad Danial", rows[0].GetValue("Nama Murid"));
+    }
+
+    // ---------------------------------------------------------------------------
+    // 14. TemplateGenerator: Roster template generates valid parsable content
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void TemplateGenerator_ProducesValidParsableRosterTemplate()
+    {
+        string content = TemplateGenerator.GenerateRosterTemplateContent();
+        using var stream = FromString(content);
+        var (headers, rows, _) = DataFileReader.ReadCsv(stream);
+
+        var mapping = ColumnMapping.AutoDetect(headers);
+        Assert.True(mapping.HasRequiredMappings);
+        Assert.Equal("NAMA MURID", mapping.FullNameColumn);
+        Assert.Equal("KELAS", mapping.ClassNameColumn);
+        Assert.Equal("ID DELIMA", mapping.DelimaIdColumn);
+
+        using var stream2 = FromString(content);
+        var report = RosterImporter.AnalyzeDryRun(stream2, "template.csv", mapping);
+        Assert.Equal(5, report.ValidCount);
+        Assert.Empty(report.Rejects);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 15. TemplateGenerator: Password template pre-populated with roster
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void TemplateGenerator_ProducesValidPasswordTemplateWithRoster()
+    {
+        var roster = new List<ImportedStudent>
+        {
+            new() { Id = "s_12345678", FullName = "Danial", ClassName = "2C", EmailLocal = "m-12345678", DelimaDigits = "12345678", RegisterNoJoinKey = "170101-10-1234" },
+            new() { Id = "s_12345679", FullName = "Aishah", ClassName = "2C", EmailLocal = "m-12345679", DelimaDigits = "12345679", RegisterNoJoinKey = "170202-10-2345" }
+        };
+
+        string content = TemplateGenerator.GeneratePasswordTemplateContent(roster);
+        Assert.Contains("Danial", content);
+        Assert.Contains("Aishah", content);
+        Assert.Contains("m-12345678", content);
+
+        using var stream = FromString(content);
+        var (headers, rows, _) = DataFileReader.ReadCsv(stream);
+        Assert.Contains("KATA LALUAN", headers);
+        Assert.Equal(2, rows.Count);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 16. DELIMa ID normalisation: Supports without hyphen, spaces, and .0
+    // ---------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("m12345678", "12345678", "m-12345678")]
+    [InlineData("M12345678", "12345678", "m-12345678")]
+    [InlineData("m - 12345678", "12345678", "m-12345678")]
+    [InlineData("12345678.0", "12345678", "m-12345678")]
+    public void RosterImporter_NormalizeDelimaId_EnhancedFormats(string raw, string? expectedDigits, string? expectedLocal)
+    {
+        var (digits, local) = RosterImporter.NormalizeDelimaId(raw);
+        Assert.Equal(expectedDigits, digits);
+        Assert.Equal(expectedLocal, local);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 17. Class and Grade normalisation: Words, Roman Numerals, T1/T2
+    // ---------------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("1 Cemerlang", "SATU", 1, "1 Cemerlang", true)]
+    [InlineData("2 Amanah", "II", 2, "2 Amanah", true)]
+    [InlineData("T3 Bestari", null, 3, "T3 Bestari", true)]
+    public void RosterImporter_NormalizeClassAndGrade_EnhancedInputs(string rawClass, string? rawGrade, int expectedGrade, string expectedClass, bool expectedKnown)
+    {
+        var (grade, cleanClass, gradeKnown) = RosterImporter.NormalizeClassAndGrade(rawClass, rawGrade);
+        Assert.Equal(expectedGrade, grade);
+        Assert.Equal(expectedClass, cleanClass);
+        Assert.Equal(expectedKnown, gradeKnown);
+    }
 }

@@ -106,6 +106,11 @@ public sealed partial class ColorSwatchItem : ObservableObject
         IsPass = result.IsPass;
         TagLabel = result.Label;
     }
+
+    partial void OnHexCodeChanged(string value)
+    {
+        Recalculate();
+    }
 }
 
 public sealed class RecoverySheetInfo
@@ -171,6 +176,7 @@ public sealed class AdminWizardState
     public List<ImportedStudent> RosterStudents { get; set; } = [];
     public DryRunReport? LastDryRunReport { get; set; }
     public Dictionary<string, string> StudentPasswords { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, string> StudentAvatars { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public bool HasAcknowledgedDisclaimer { get; set; }
     public bool HasAcknowledgedConsent { get; set; }

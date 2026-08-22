@@ -107,4 +107,30 @@ public class Step4PasswordImportTests
         Assert.Equal("StudentPass999!", item.MaskedText);
         Assert.Equal(10, item.RevealCountdownSeconds);
     }
+
+    [Fact]
+    public void SavePasswordTemplate_CreatesValidCsvWithRosterPrepopulated()
+    {
+        var state = new AdminWizardState
+        {
+            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24" }
+        };
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_12345678", FullName = "Danial", ClassName = "2C", DelimaDigits = "12345678", EmailLocal = "m-12345678", RegisterNoJoinKey = "170101-10-1234" });
+
+        var vm = new Step4PasswordImportViewModel(state);
+        string pwdTemplatePath = Path.Combine(Path.GetTempPath(), $"pwd_template_{Guid.NewGuid():N}.csv");
+        try
+        {
+            vm.SavePasswordTemplate(pwdTemplatePath);
+            Assert.True(File.Exists(pwdTemplatePath));
+            string content = File.ReadAllText(pwdTemplatePath);
+            Assert.Contains("KATA LALUAN", content);
+            Assert.Contains("Danial", content);
+            Assert.Contains("m-12345678", content);
+        }
+        finally
+        {
+            if (File.Exists(pwdTemplatePath)) File.Delete(pwdTemplatePath);
+        }
+    }
 }
