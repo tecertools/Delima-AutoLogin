@@ -6,7 +6,7 @@
 
 The prompts themselves live in `Build_Prompts.md`. This document is the workflow around them: what to install, what order to work in, and — the part most guides skip — **how to tell whether the code you got is any good when you can't read all of it yourself.**
 
-> **Current status:** All 15 build steps and Prompts 0–19 have now been implemented and tested in this codebase. This guide remains the reference for the assistant-driven development methodology used to build the solution.
+> **Current status:** All 15 build steps and Prompts 0–20 have now been implemented and tested in this codebase. This guide remains the reference for the assistant-driven development methodology used to build the solution.
 
 ---
 

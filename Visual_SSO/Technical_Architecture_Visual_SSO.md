@@ -769,15 +769,17 @@ AES-256-GCM, HMAC-SHA256 and the CSPRNG come from the BCL. **No custom cryptogra
 
 | Key | Default | Notes |
 | :--- | :--- | :--- |
+| `preferred_browser` | `auto` | `auto` (prefers Edge, fallback Chrome) \| `edge` \| `chrome` (§4.4.1). Injected browser logged in audit trail. |
 | `picture_password_required` | `true` | `false` reintroduces blocker B1; warned and logged |
 | `idle_reset_seconds` | `600` | Auto-logout, profile wipe |
 | `injection_settle_ms` | `700` | After window verification, before first keystroke. **Raised from 400 by T0.4** — measured p95 to `IsPassword` readable was 417 ms and max 434 ms, so 400 sat below the 95th percentile |
 | `window_wait_timeout_ms` | `30000` | Then `E02` |
 | `entry_url` | `https://d3.delima.edu.my/landing` | Confirmed by T0.2 |
-| `title_identifier_page` | `Sign in - Google Accounts - Google Chrome` | **Per locale.** Exact full string match against accepted list (§4.2). Includes en-dash variant `Sign in – Google accounts - Google Chrome` |
+| `title_identifier_page` | Per browser/locale | Exact full string match against per-browser accepted list (§4.2, §4.4.1). Chrome includes measured strings; Edge empty (unmeasured, fails closed). |
 | `title_password_page_generic` | `Welcome - Google Chrome` | The password page **before** the account name loads |
 | `title_password_page_named` | `Hi {name} - Google Chrome` | The password page **after** it loads. `{name}` is the Google profile name, **not** the roster display name — see §4.2 |
-| `title_consent_page` | `Sign in - Google Accounts - Google Chrome` | OAuth consent screen title (§4.5). Terminal state of Route C injection; guarded by sequence transition after password injection |
+| `title_consent_page` | Per browser/locale | OAuth consent screen title (§4.5, §4.4.1). Terminal state of Route C injection; guarded by sequence transition after password injection. |
+| `title_destination_page` | Per browser/locale | Destination titles if OAuth consent is skipped (e.g. `DELIMa - Google Chrome`, `DELIMa 3.0 - Google Chrome`). |
 | `title_settle_polls` | `3` | Consecutive 100 ms polls a title must hold before injecting (§4.2) |
 | `store_max_age_days` | `30` | Then `E10` |
 | `force_signout` | `true` | Lab only; never at home |

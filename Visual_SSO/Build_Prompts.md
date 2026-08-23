@@ -411,6 +411,8 @@ The E2E run found this. The teardown is right; the destination is wrong.
 
 ## Prompt 20 — Support Edge as well as Chrome
 
+> **Status: Implemented and verified.** All 5 sub-tasks complete: `BrowserSession` (browser-agnostic launch, resolution, throwaway profiles, scoped PID teardown), per-browser exact titles with fail-closed unmeasured Edge lists, `BrowserPolicyConfigurator` (Edge `InPrivateModeAvailability` & Chrome `IncognitoModeAvailability`), `E01_NoBrowserFound` taxonomy rename, and `preferred_browser` bundle config (`auto`, `edge`, `chrome`). All 405 unit & integration tests passing.
+
 **Run this after the E2E first run, not before.** You are one step from the first time this has ever worked end to end; changing the browser first means a stage-2 failure could be the seam or could be the browser, and you would not know which.
 
 > Make the launcher work with **Microsoft Edge or Google Chrome**, preferring Edge, per the revised arch §4.4.

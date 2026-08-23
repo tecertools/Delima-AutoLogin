@@ -77,7 +77,7 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 | # | Item | Where |
 | :-- | :--- | :--- |
-| ~~1–3~~ | ~~T0.4 findings, consent step, T0.1 statement, installer ACL, title lists, post-password verification, failure taxonomy~~ — **all done** | Prompts T0.4b, 15a, 16–19 |
+| ~~1–3~~ | ~~T0.4 findings, consent step, T0.1 statement, installer ACL, title lists, post-password verification, failure taxonomy, Edge & Chrome support (Prompt 20)~~ — **all done** | Prompts T0.4b, 15a, 16–20 |
 | **4** | **First full run** — wizard → bundle → provision → sign-in. Nothing has ever produced a `school.dlmpack` | `E2E_First_Run.md` |
 | 5 | Tag a release, ship it unsigned, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 
