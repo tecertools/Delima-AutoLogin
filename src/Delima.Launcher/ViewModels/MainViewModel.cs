@@ -198,6 +198,14 @@ public sealed partial class MainViewModel : ObservableObject
 
     public void NavigateToSedangMasuk(Student student, ICredential credential)
     {
+        var routeCOptions = new RouteCOptions
+        {
+            WindowWaitTimeout = TimeSpan.FromMilliseconds(Config.WindowWaitTimeoutMs > 0 ? Config.WindowWaitTimeoutMs : 30000),
+            InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 700,
+            SendEnterAfterEmail = true,
+            SendEnterAfterPassword = true
+        };
+
         CurrentView = new SedangMasukViewModel(
             School,
             student,
@@ -208,7 +216,8 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 if (LastClass != null) NavigateToCariNama(LastClass);
                 else NavigateToPilihKelas();
-            }
+            },
+            options: routeCOptions
         );
     }
 

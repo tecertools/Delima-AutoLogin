@@ -302,6 +302,20 @@ public class LauncherFlowTests
         }
     }
 
+    [Fact]
+    public void MainViewModel_NavigateToSedangMasuk_Sets_SedangMasukViewModel()
+    {
+        var mainVm = new MainViewModel();
+        var student = mainVm.Students[0];
+        using var cred = new SecurePasswordBuffer("Test1234!"u8);
+
+        mainVm.NavigateToSedangMasuk(student, cred);
+
+        Assert.IsType<SedangMasukViewModel>(mainVm.CurrentView);
+        var sedangVm = (SedangMasukViewModel)mainVm.CurrentView!;
+        Assert.Equal(student, sedangVm.Student);
+    }
+
     private sealed class FakeCredentialStore(bool hasCredential) : ICredentialStore
     {
         public ushort SchemaVersion => 2;

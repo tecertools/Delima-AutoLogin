@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using Delima.Core.Roster;
 using Delima.Win32;
 
@@ -12,6 +13,10 @@ public partial class FloatingResetBarWindow : Window
     private readonly int _idleResetSeconds;
     private SessionWatchdog? _watchdog;
     private Timer? _titleWatcherTimer;
+    private bool _isCompact = false;
+    private string? _savedPrompt;
+
+    public bool IsCompact => _isCompact;
 
     public FloatingResetBarWindow(
         Student student,
@@ -25,6 +30,7 @@ public partial class FloatingResetBarWindow : Window
         _session = session;
         _onReset = onReset;
         _idleResetSeconds = idleResetSeconds > 0 ? idleResetSeconds : 600;
+        _savedPrompt = initialPrompt;
 
         PupilNameText.Text = student.DisplayName;
         SetPromptMessage(initialPrompt);
@@ -33,7 +39,7 @@ public partial class FloatingResetBarWindow : Window
         {
             // Position at top center of screen with 16px margin per PRD §7.4
             var screenWidth = SystemParameters.PrimaryScreenWidth;
-            Left = (screenWidth - Width) / 2;
+            Left = (screenWidth - ActualWidth) / 2;
             Top = 16;
 
             // Start idle reset watchdog per Architecture §9 and Appendix B
@@ -68,12 +74,57 @@ public partial class FloatingResetBarWindow : Window
         };
     }
 
+    private void OnBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ButtonState == MouseButtonState.Pressed)
+        {
+            try
+            {
+                DragMove();
+            }
+            catch
+            {
+                // Ignore drag exceptions (e.g. rapid double clicks)
+            }
+        }
+    }
+
+    private void OnToggleCollapseClicked(object sender, RoutedEventArgs e)
+    {
+        SetCompactMode(!_isCompact);
+    }
+
+    public void SetCompactMode(bool compact)
+    {
+        _isCompact = compact;
+        if (_isCompact)
+        {
+            SubtitleText.Visibility = Visibility.Collapsed;
+            ConsentPromptBorder.Visibility = Visibility.Collapsed;
+            ToggleIcon.Text = "▼";
+            ToggleCollapseButton.ToolTip = "Besarkan bar";
+            PupilNameText.MaxWidth = 120;
+        }
+        else
+        {
+            SubtitleText.Visibility = Visibility.Visible;
+            if (!string.IsNullOrWhiteSpace(_savedPrompt))
+            {
+                ConsentPromptBorder.Visibility = Visibility.Visible;
+            }
+            ToggleIcon.Text = "▲";
+            ToggleCollapseButton.ToolTip = "Kecilkan bar";
+            PupilNameText.MaxWidth = 200;
+        }
+    }
+
     /// <summary>
     /// Sets or clears the prompt message line on the floating reset bar (§4.5, PRD §7.4).
     /// </summary>
     public void SetPromptMessage(string? message)
     {
-        if (string.IsNullOrWhiteSpace(message))
+        _savedPrompt = message;
+        if (string.IsNullOrWhiteSpace(message) || _isCompact)
         {
             ConsentPromptBorder.Visibility = Visibility.Collapsed;
         }
@@ -100,7 +151,12 @@ public partial class FloatingResetBarWindow : Window
                  !title.Contains("Google Accounts", StringComparison.OrdinalIgnoreCase) &&
                  !title.Contains("Welcome", StringComparison.OrdinalIgnoreCase)))
             {
-                Dispatcher.Invoke(() => SetPromptMessage(null));
+                Dispatcher.Invoke(() =>
+                {
+                    SetPromptMessage(null);
+                    // Automatically switch to compact mode once DELIMa destination is reached for continuous pupil use
+                    SetCompactMode(true);
+                });
                 _titleWatcherTimer?.Change(Timeout.Infinite, Timeout.Infinite);
             }
         }

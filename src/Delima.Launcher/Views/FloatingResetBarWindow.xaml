@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="DELIMa Floating Reset Bar"
-        Width="480"
-        SizeToContent="Height"
+        SizeToContent="WidthAndHeight"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -15,31 +14,37 @@
         WindowStartupLocation="Manual"
         ResizeMode="NoResize">
 
-    <Border Background="{DynamicResource SurfaceBrush}"
+    <Border x:Name="MainBorder"
+            Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="1.5"
             CornerRadius="18"
             Margin="4"
             Effect="{DynamicResource CardShadow}"
-            Padding="14,8">
+            Padding="12,6"
+            MouseLeftButtonDown="OnBarMouseLeftButtonDown"
+            Cursor="SizeAll"
+            ToolTip="Tarik untuk alihkan bar ini">
 
-        <StackPanel>
+        <StackPanel x:Name="BarStackPanel">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Pupil Display Information -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,12,0">
-                    <Border Width="34" Height="34"
-                            CornerRadius="17"
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,10,0">
+                    <Border x:Name="AvatarBorder"
+                            Width="32" Height="32"
+                            CornerRadius="16"
                             Background="{DynamicResource SoftSurfaceBrush}"
                             BorderBrush="{DynamicResource PrimaryBrush}"
                             BorderThickness="2"
-                            Margin="0,0,10,0">
+                            Margin="0,0,8,0">
                         <TextBlock Text="👤"
-                                   FontSize="16"
+                                   FontSize="15"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center" />
                     </Border>
@@ -47,12 +52,13 @@
                         <TextBlock x:Name="PupilNameText"
                                    Text="Nama Murid"
                                    FontWeight="Bold"
-                                   FontSize="14"
+                                   FontSize="13"
                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                    TextTrimming="CharacterEllipsis"
-                                   MaxWidth="240" />
-                        <TextBlock Text="DELIMa 3.0"
-                                   FontSize="11"
+                                   MaxWidth="200" />
+                        <TextBlock x:Name="SubtitleText"
+                                   Text="DELIMa 3.0"
+                                   FontSize="10"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource MutedTextBrush}" />
                     </StackPanel>
@@ -65,30 +71,49 @@
                         Background="{DynamicResource AlertBrush}"
                         Foreground="#FFFFFF"
                         BorderThickness="0"
-                        Padding="16,6"
+                        Padding="12,5"
                         Cursor="Hand"
-                        VerticalAlignment="Center">
+                        VerticalAlignment="Center"
+                        Margin="4,0">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
-                            <Setter Property="CornerRadius" Value="12" />
+                            <Setter Property="CornerRadius" Value="10" />
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="🚪 " FontSize="14" VerticalAlignment="Center" Margin="0,0,4,0" />
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Selesai"
-                                       FontSize="13"
-                                       FontWeight="ExtraBold"
-                                       HorizontalAlignment="Left"
-                                       LineHeight="14" />
-                            <TextBlock Text="Murid seterusnya"
-                                       FontSize="10"
-                                       FontWeight="SemiBold"
-                                       Opacity="0.9"
-                                       HorizontalAlignment="Left"
-                                       LineHeight="12" />
-                        </StackPanel>
+                        <TextBlock Text="🚪 " FontSize="13" VerticalAlignment="Center" Margin="0,0,2,0" />
+                        <TextBlock x:Name="LogoutText"
+                                   Text="Selesai"
+                                   FontSize="12"
+                                   FontWeight="ExtraBold"
+                                   VerticalAlignment="Center" />
                     </StackPanel>
+                </Button>
+
+                <!-- Collapse / Expand Toggle Button -->
+                <Button x:Name="ToggleCollapseButton"
+                        Grid.Column="2"
+                        Click="OnToggleCollapseClicked"
+                        Background="{DynamicResource SoftSurfaceBrush}"
+                        Foreground="{DynamicResource MutedTextBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        Width="28" Height="28"
+                        Padding="0"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"
+                        ToolTip="Kecilkan / Besarkan bar">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="14" />
+                        </Style>
+                    </Button.Resources>
+                    <TextBlock x:Name="ToggleIcon"
+                               Text="▲"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
                 </Button>
             </Grid>
 
@@ -98,14 +123,14 @@
                     BorderBrush="#BEE3F8"
                     BorderThickness="1"
                     CornerRadius="10"
-                    Margin="4,8,4,2"
-                    Padding="10,6"
+                    Margin="4,6,4,2"
+                    Padding="10,5"
                     Visibility="Visible">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="👉 " FontSize="13" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock Text="👉 " FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0" />
                     <TextBlock x:Name="ConsentPromptText"
                                Text="Lihat nama kamu. Kalau betul, tekan butang biru di bawah."
-                               FontSize="12"
+                               FontSize="11.5"
                                FontWeight="Bold"
                                Foreground="#1B75BC"
                                TextWrapping="Wrap"

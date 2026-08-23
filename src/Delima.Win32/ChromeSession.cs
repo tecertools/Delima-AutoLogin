@@ -81,6 +81,9 @@ public sealed class ChromeSession : IDisposable
         psi.ArgumentList.Add($"--user-data-dir={profileDir}");
         psi.ArgumentList.Add("--no-first-run");
         psi.ArgumentList.Add("--no-default-browser-check");
+        psi.ArgumentList.Add("--disable-extensions");
+        psi.ArgumentList.Add("--disable-component-extensions-with-background-pages");
+        psi.ArgumentList.Add("--disable-default-apps");
         if (forceRendererAccessibility)
         {
             psi.ArgumentList.Add("--force-renderer-accessibility");

@@ -160,17 +160,17 @@ Still signed in as the **pupil account**, run `Delima.Launcher.exe` (from `C:\Pr
 
 ## Part 7 — Stage 4: the sign-in
 
-Watch closely and do not touch anything. In order:
+Watch closely. In order:
 
-1. Chrome reaches the Google sign-in page
+1. Chrome reaches the DELIMa portal / Google sign-in page. (If starting on `https://d3.delima.edu.my/landing`, click the blue **Log Masuk ke DELIMa** button to proceed to Google sign-in).
 2. **Your email is typed**, character by character
 3. Enter is pressed; the password page appears
 4. **Your password is typed** — masked
-5. Enter is pressed
+5. Enter is pressed automatically
 6. **The consent screen appears** — your name and email, **Cancel** and **Continue**
 7. **Injection stops here.** The floating bar shows *"Lihat nama kamu. Kalau betul, tekan butang biru di bawah."*
-8. **You press Continue.** The launcher must not press it
-9. DELIMa loads. Stop the stopwatch
+8. **You press Continue.** The launcher does not press it.
+9. DELIMa loads. The floating bar automatically collapses into a compact pill (or can be dragged/toggled). Stop the stopwatch.
 
 **Checkpoint — the four things that matter more than "it worked":**
 
