@@ -98,7 +98,7 @@ Run `publish\Admin\Delima.Admin.exe`.
 **Step 1 — Identiti Sekolah.** School code `UJIAN`, any school name, skip the crest. Note the contrast checker on the colour palette — that is FR-S1.4 working.
 
 **Step 2 — Kata Laluan Pentadbir.** Set the passphrase. **Write it down now.**
-
+(admin_delimasks24)
 **Step 3 — Import Senarai Murid.** Choose `roster.csv`.
 
 - The **column mapper** shows five target fields with dropdowns. Check its guesses — `NAMA MURID` → Nama penuh, `ID PENGGUNA DELIMA` → ID DELIMa. Correct any it got wrong.
@@ -133,23 +133,28 @@ Enter the admin passphrase when prompted.
 
 **Checkpoint — three things, and the third is the one that matters.**
 
-1. It exits without error
-2. `%ProgramData%\DELIMa Launcher\credentials.dat` exists
-3. **Sign out. Sign in as the standard pupil account.** Try to open that file in Notepad.
+1. It exits without error.
+2. `%ProgramData%\DELIMa Launcher\credentials.dat` exists.
+3. **Sign out. Sign in as the standard pupil account (e.g. `Murid`).** Press `Win+R` and try to open that file in Notepad:
+   ```cmd
+   notepad "C:\ProgramData\DELIMa Launcher\credentials.dat"
+   ```
 
-**You want "Access is denied."** Anything else means the ACL did not apply on this machine, and the credential store is readable by every pupil — arch §3.5 is not in force. Stop and fix it before going further.
+**You want "Access is denied."** 
+- *Why:* `credentials.dat` is encrypted with DPAPI at `LocalMachine` scope. That protects against data extraction if the disk is stolen, but any process running on that specific PC with file-read access can unprotect the entire database. The NTFS Access Control List (ACL) applied per arch §3.5 is the exact barrier preventing pupils from reading or copying the store.
+- Anything else (e.g. Notepad opening with binary gibberish) means the ACL did not apply on this machine, and the credential store is readable by every pupil. Stop and fix it before going further.
 
 ---
 
 ## Part 6 — Stage 3: the launcher
 
-Still signed in as the **pupil account**, run `Delima.Launcher.exe`.
+Still signed in as the **pupil account**, run `Delima.Launcher.exe` (from `C:\Program Files\DELIMa Launcher\` or your publish folder).
 
-1. **Pilih Kelas** — Tahun 2 → 2 Ujian
-2. **Cari Nama** — your name should be on a card. If it is truncated oddly, that is the display-name logic meeting a real name
-3. **Kata Laluan Gambar** — press the pictures from the sheet you saved in stage 1
+1. **Pilih Kelas** — Tahun 2 → 2 Ujian (select the grade and class created in Stage 1).
+2. **Cari Nama** — your name should be on a card. If it is truncated oddly, that is the display-name logic meeting a real Malaysian name (e.g., long names with `bin`/`binti`).
+3. **Kata Laluan Gambar** — press the 3 pictures in sequence from the avatar sheet saved/printed in stage 1.
 
-**Checkpoint.** Chrome opens. **Start a stopwatch when you press the last picture** — that number is the first real data against G1.
+**Checkpoint.** Chrome opens. **Start a stopwatch the moment you press the 3rd picture** — that number is the first real performance data against **G1** (PRD §4 goal: class-wide time-to-signed-in under 3 minutes, verifying launch speed on lab hardware).
 
 ---
 
