@@ -10,7 +10,7 @@
 AppId={{D37E6F18-49A1-4F23-9B2E-6E84218C1D54}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-AppPublisher=SK Seksyen 24
+AppPublisher=tecertools Digital Solutions
 DefaultDirName={autopf}\DELIMa Launcher
 DefaultGroupName=DELIMa Launcher
 OutputDir=..\dist
@@ -21,6 +21,8 @@ PrivilegesRequired=admin
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=..\icon.ico
+UninstallIconFile=..\icon.ico
 LicenseFile=assets\LESEN.rtf
 ; Windows 10 1809 (build 17763) or later per PRD §8
 MinVersion=10.0.17763
@@ -54,9 +56,11 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 Name: "{commonappdata}\DELIMa Launcher"; Permissions: everyone-none admins-full system-full
 
 [Icons]
-Name: "{group}\DELIMa";           Filename: "{app}\Delima.Launcher.exe"; Components: lab
-Name: "{group}\Alat Pentadbir";   Filename: "{app}\Delima.Admin.exe";    Components: admin
-Name: "{commonstartup}\DELIMa";   Filename: "{app}\Delima.Launcher.exe"; Components: lab; Tasks: startup
+Name: "{group}\DELIMa";             Filename: "{app}\Delima.Launcher.exe"; Components: lab
+Name: "{commondesktop}\DELIMa";      Filename: "{app}\Delima.Launcher.exe"; Components: lab
+Name: "{group}\Sediakan PC Makmal"; Filename: "{app}\Delima.Provision.exe"; Components: lab
+Name: "{group}\Alat Pentadbir";     Filename: "{app}\Delima.Admin.exe";    Components: admin
+Name: "{commonstartup}\DELIMa";     Filename: "{app}\Delima.Launcher.exe"; Components: lab; Tasks: startup
 
 [Tasks]
 Name: "startup";      Description: "Mulakan semasa log masuk (mod kiosk)"; Components: lab; Flags: unchecked

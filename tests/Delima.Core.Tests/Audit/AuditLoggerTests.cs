@@ -99,7 +99,7 @@ public class AuditLoggerTests : IDisposable
         string targetFile = Path.Combine(_testDirectory, "credentials.dat");
         string errorMsg = "Access is denied (5)";
 
-        AuditLogger.RecordAclFailure(targetFile, errorMsg, pupilAccount: "Murid", auditDirectory: _testDirectory, schoolCode: "SKS24");
+        AuditLogger.RecordAclFailure(targetFile, errorMsg, pupilAccount: "Murid", auditDirectory: _testDirectory, schoolCode: "BBA1234");
 
         string logPath = AuditLogger.GetAuditLogFilePath(DateTimeOffset.UtcNow, _testDirectory);
         Assert.True(File.Exists(logPath));
@@ -110,7 +110,7 @@ public class AuditLoggerTests : IDisposable
         Assert.Contains("\"outcome_code\":\"ACL_DENIED\"", content);
         Assert.Contains(errorMsg, content);
         Assert.Contains("Murid", content);
-        Assert.Contains("SKS24", content);
+        Assert.Contains("BBA1234", content);
     }
 
     [Fact]
@@ -160,5 +160,26 @@ public class AuditLoggerTests : IDisposable
             using var doc = JsonDocument.Parse(line);
             Assert.StartsWith("concurrent_event_", doc.RootElement.GetProperty("event").GetString()!);
         }
+    }
+
+    [Fact]
+    public void RecordConsentRefused_WritesExpectedEntry()
+    {
+        AuditLogger.RecordConsentRefused(
+            studentId: "s_01",
+            pupilAccount: "g-12345",
+            schoolCode: "SK01",
+            auditDirectory: _testDirectory);
+
+        string logPath = AuditLogger.GetAuditLogFilePath(DateTimeOffset.UtcNow, _testDirectory);
+        Assert.True(File.Exists(logPath));
+
+        string content = File.ReadAllText(logPath);
+        Assert.Contains("\"event\":\"consent_refused\"", content);
+        Assert.Contains("\"outcome\":\"REFUSED\"", content);
+        Assert.Contains("\"outcome_code\":\"G2_CONSENT_REFUSED\"", content);
+        Assert.Contains("\"student_id\":\"s_01\"", content);
+        Assert.Contains("\"pupil_account\":\"g-12345\"", content);
+        Assert.Contains("\"school_code\":\"SK01\"", content);
     }
 }

@@ -13,7 +13,7 @@ public class Step4PasswordImportTests
     {
         var state = new AdminWizardState
         {
-            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24" }
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" }
         };
 
         var vm = new Step4PasswordImportViewModel(state);
@@ -24,7 +24,7 @@ public class Step4PasswordImportTests
         vm.ConsentTypedCode = "WRONG";
         Assert.False(vm.CanProceedConsent);
 
-        vm.ConsentTypedCode = "SKS24";
+        vm.ConsentTypedCode = "BBA1234";
         Assert.True(vm.CanProceedConsent);
 
         vm.AcknowledgeConsent();
@@ -37,7 +37,7 @@ public class Step4PasswordImportTests
     {
         var state = new AdminWizardState
         {
-            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24" },
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" },
             HasAcknowledgedConsent = true,
             AdminPassphrase = "SecretPassphrase2026!"
         };
@@ -79,7 +79,7 @@ public class Step4PasswordImportTests
     {
         var state = new AdminWizardState
         {
-            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24" },
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" },
             HasAcknowledgedConsent = true,
             AdminPassphrase = "MasterSecret1234!"
         };
@@ -113,7 +113,7 @@ public class Step4PasswordImportTests
     {
         var state = new AdminWizardState
         {
-            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24" }
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" }
         };
         state.RosterStudents.Add(new ImportedStudent { Id = "s_12345678", FullName = "Danial", ClassName = "2C", DelimaDigits = "12345678", EmailLocal = "m-12345678", RegisterNoJoinKey = "170101-10-1234" });
 

@@ -13,44 +13,48 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="Avatar &amp; Kata Laluan Gambar" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Avatar diberikan secara automatik, unik dalam setiap kelas." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Avatar visual dijana unik untuk setiap murid dalam kelas bagi memudahkan pengecaman." Style="{StaticResource StepSubHeading}" />
 
-            <!-- Class Filter Dropdown -->
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Tapis Mengikut Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
-                <ComboBox Grid.Column="2" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" />
-                <Button Grid.Column="4" Content="🖨️ Cetak Helaian Avatar Kelas" Style="{StaticResource SmallButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak atau jana helaian avatar murid untuk kelas yang dipilih" />
-            </Grid>
+            <!-- Filter & Action Toolbar Card -->
+            <Border Style="{StaticResource SettingsCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Tapis Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
+                    <ComboBox Grid.Column="2" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" />
+                    <Button Grid.Column="4" Content="🖨️ Cetak Helaian Avatar Kelas" Style="{StaticResource SecondaryButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak atau jana helaian avatar murid untuk kelas yang dipilih" />
+                </Grid>
+            </Border>
 
-            <!-- Avatar List for Selected Class -->
-            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Padding="14,10" Margin="0,0,0,18">
+            <!-- Avatar List Container -->
+            <Border Style="{StaticResource SettingsCard}" Padding="16,10">
                 <ItemsControl ItemsSource="{Binding FilteredAvatarItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="#EEECE4" BorderThickness="0,0,0,1" Padding="0,7">
+                            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="4,8">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="36"/>
+                                        <ColumnDefinition Width="38"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <!-- Mini Avatar Circle -->
-                                    <Border Grid.Column="0" Width="30" Height="30" CornerRadius="15" Background="{StaticResource AmberBgBrush}" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding AvatarEmoji}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <!-- DiceBear Critter Avatar Circle -->
+                                    <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18" Background="#F1F3F5" VerticalAlignment="Center" ClipToBounds="True">
+                                        <Image Source="{Binding AvatarUrl}"
+                                               Width="36" Height="36"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Stretch="UniformToFill" />
                                     </Border>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
                                         <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13"/>
-                                        <TextBlock Text="{Binding AvatarDisplay, StringFormat=' — {0}'}" Foreground="{StaticResource Ink2Brush}" FontSize="13"/>
-                                        <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="#8A8676" FontSize="12"/>
+                                        <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="{StaticResource Ink3Brush}" FontSize="12"/>
                                     </StackPanel>
-                                    <Button Grid.Column="2" Content="Tukar ↻" Style="{StaticResource SmallButton}" Background="Transparent" BorderThickness="0" Foreground="{StaticResource PrimaryGreenBrush}" FontWeight="Bold" Click="OnCycleAvatarClick" ToolTip="Tukar ke avatar seterusnya" />
+                                    <Button Grid.Column="2" Content="Tukar ↻" Style="{StaticResource SmallButton}" Click="OnCycleAvatarClick" ToolTip="Jana avatar unik baharu secara rawak" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -58,18 +62,18 @@
                 </ItemsControl>
             </Border>
 
-            <!-- Picture Password Policy Toggle Switch -->
-            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="{StaticResource StripeBgBrush}" Padding="14">
+            <!-- Picture Password Policy Card -->
+            <Border Style="{StaticResource SettingsCard}" Margin="0,4,0,0">
                 <StackPanel>
-                    <CheckBox IsChecked="{Binding PicturePasswordRequired, Mode=TwoWay}" VerticalContentAlignment="Center">
-                        <TextBlock Text="Kata Laluan Gambar (3-ikon) diperlukan untuk setiap murid" FontWeight="Bold" FontSize="13" Margin="8,0,0,0" />
+                    <CheckBox IsChecked="{Binding PicturePasswordRequired, Mode=TwoWay}" VerticalContentAlignment="Center" Cursor="Hand">
+                        <TextBlock Text="Wajibkan Kata Laluan Gambar (3-ikon) untuk setiap murid" FontWeight="SemiBold" FontSize="13" Margin="8,0,0,0" />
                     </CheckBox>
 
-                    <!-- Warning Box if Disabled -->
-                    <Border Background="{StaticResource DangerBgBrush}" BorderBrush="#F0C0C0" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,12,0,0"
+                    <!-- WinUI 3 Warning Banner if Disabled -->
+                    <Border Style="{StaticResource InfoBarDanger}" Margin="0,12,0,0"
                             Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVisConv}}">
-                        <TextBlock Text="AMARAN: Melumpuhkan ini mendedahkan semula risiko B1 — sebarang murid boleh log masuk sebagai rakan sekelas dengan hanya menekan kad nama. Pilihan ini direkodkan dalam log audit." 
-                                   TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{StaticResource DangerTextBrush}" FontSize="12" />
+                        <TextBlock Text="AMARAN: Melumpuhkan ciri ini mendedahkan risiko keselamatan — mana-mana murid boleh log masuk sebagai rakan sekelas dengan hanya menekan kad nama. Pilihan ini akan direkodkan dalam log audit." 
+                                   TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{StaticResource DangerTextBrush}" FontSize="12.5" />
                     </Border>
                 </StackPanel>
             </Border>

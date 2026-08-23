@@ -1,0 +1,208 @@
+<Window x:Class="Delima.Provision.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Delima.Provision.ViewModels"
+        mc:Ignorable="d"
+        Title="Penyediaan PC Makmal — DELIMa Smart Launcher"
+        Height="730" Width="630"
+        MinHeight="650" MinWidth="580"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource StageBgBrush}">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Width="48" Height="48" Background="{StaticResource PrimaryGreenBrush}" CornerRadius="10" Margin="0,0,14,0">
+                <TextBlock Text="⚡" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFFFF"/>
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="Penyediaan Pantas PC Makmal" Style="{StaticResource Heading1}" />
+                <TextBlock Text="Konfigurasi automatik satu klik untuk Pelancar Pintar DELIMa" Style="{StaticResource SubHeading}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Content Area -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!-- State 1: Input Form (when not busy and not success) -->
+                <StackPanel Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}">
+                    
+                    <!-- Error InfoBar -->
+                    <Border Style="{StaticResource InfoBarDanger}" Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚠️ " FontWeight="Bold" Foreground="{StaticResource DangerTextBrush}"/>
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerTextBrush}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card 1: Package Source -->
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Fail Bungkusan Sekolah (school.dlmpack)" Style="{StaticResource FieldLabel}"/>
+                                <Border Grid.Column="1" Background="{StaticResource SuccessBgBrush}" CornerRadius="4" Padding="6,2" 
+                                        Visibility="{Binding PackFound, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="✓ Dikesan Automatik" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SuccessTextBrush}"/>
+                                </Border>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding PackPath, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                                <Button Grid.Column="2" Content="Tukar Fail…" Style="{StaticResource SecondaryButton}" Command="{Binding BrowsePackCommand}"/>
+                            </Grid>
+                            <TextBlock Text="Fail ini dieksport dari langkah terakhir Alat Pentadbir." FontSize="11.5" Foreground="{StaticResource Ink3Brush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card 2: Passphrase -->
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="Kata Laluan Pentadbir (Admin Passphrase)" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Masukkan kata laluan induk yang telah anda tetapkan semasa membina pakej." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- PasswordBox (masked) -->
+                                <PasswordBox x:Name="AdminPasswordBox" Grid.Column="0" PasswordChanged="OnPasswordChanged"
+                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"/>
+                                
+                                <!-- TextBox (revealed) -->
+                                <TextBox Grid.Column="0" Text="{Binding Passphrase, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVis}}"/>
+
+                                <Button Grid.Column="2" Content="👁" Width="36" Style="{StaticResource SecondaryButton}" 
+                                        ToolTip="Papar / Sembunyi Kata Laluan" Command="{Binding TogglePasswordVisibilityCommand}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card 3: Browser Selection -->
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="Pilihan Pelayar Web (Web Browser)" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Pilih pelayar yang akan digunakan oleh murid semasa log masuk:" FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8"/>
+                            
+                            <ComboBox ItemsSource="{Binding BrowserOptionsList}" 
+                                      SelectedItem="{Binding SelectedBrowser}"
+                                      Height="36"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card 4: Options -->
+                    <Border Style="{StaticResource SettingsCard}">
+                        <StackPanel>
+                            <TextBlock Text="Pilihan Persediaan Sistem" Style="{StaticResource FieldLabel}" Margin="0,0,0,8"/>
+                            <CheckBox Content="Pasang aplikasi Pelancar ke Program Files (Delima.Launcher.exe)" 
+                                      IsChecked="{Binding InstallLauncher}"/>
+                            <CheckBox Content="Cipta ikon pintasan pada Desktop untuk semua murid (Public Desktop)" 
+                                      IsChecked="{Binding CreateDesktopShortcut}"/>
+                            <CheckBox Content="Mulakan secara automatik semasa murid log masuk (Mod Kiosk)" 
+                                      IsChecked="{Binding EnableKioskStartup}"/>
+                            <CheckBox Content="Kuatkuasakan dasar keselamatan pelayar makmal (sekat popup simpan kata laluan &amp; DevTools)" 
+                                      IsChecked="{Binding ApplyBrowserPolicies}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Execution Progress (when busy) -->
+                    <Border Style="{StaticResource SettingsCard}" Background="#FAFAFA" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+                        <StackPanel>
+                            <TextBlock Text="Sedang Menyediakan Komputer..." FontWeight="SemiBold" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding CurrentStepDescription}" FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8"/>
+                            <ProgressBar Value="{Binding ProgressPercentage}" Maximum="100" Height="8" Foreground="{StaticResource PrimaryGreenBrush}" Background="{StaticResource LineBrush}" BorderThickness="0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Main Action Button -->
+                    <Button Content="🚀 Sediakan Komputer Ini Sekarang" 
+                            Style="{StaticResource PrimaryButton}" 
+                            Height="46" FontSize="15" Margin="0,8,0,0"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                            Command="{Binding ExecuteProvisioningCommand}"/>
+                </StackPanel>
+
+                <!-- State 2: Success Card (when provisioned) -->
+                <StackPanel Visibility="{Binding IsSuccess, Converter={StaticResource BoolToVis}}">
+                    <Border Background="#FFFFFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="10" Padding="24" Effect="{StaticResource FluentCardShadow}">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" Background="{StaticResource SuccessBgBrush}" CornerRadius="32" HorizontalAlignment="Center" Margin="0,0,0,14">
+                                <TextBlock Text="✓" FontSize="32" FontWeight="Bold" Foreground="{StaticResource SuccessTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="PC Makmal Berjaya Disediakan!" FontSize="20" FontWeight="Bold" Foreground="{StaticResource InkBrush}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="Komputer ini telah dikonfigurasikan sepenuhnya dan sedia digunakan oleh murid." FontSize="13" Foreground="{StaticResource Ink2Brush}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,18"/>
+
+                            <!-- Summary Details Box -->
+                            <Border Background="#F9FBF9" BorderBrush="#D1E7DD" BorderThickness="1" CornerRadius="6" Padding="16" Width="440" Margin="0,0,0,20">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,6">
+                                        <TextBlock Text="Sekolah:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}"/>
+                                        <TextBlock Text="{Binding ResultSchoolName}" FontWeight="Bold" HorizontalAlignment="Right" Foreground="{StaticResource InkBrush}"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,6">
+                                        <TextBlock Text="Kod Sekolah:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}"/>
+                                        <TextBlock Text="{Binding ResultSchoolCode}" FontFamily="{StaticResource MonoFontFamily}" HorizontalAlignment="Right" Foreground="{StaticResource InkBrush}"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,6">
+                                        <TextBlock Text="Bilangan Murid:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}"/>
+                                        <TextBlock Text="{Binding ResultStudentCount, StringFormat='{}{0} Orang Murid'}" FontWeight="Bold" Foreground="{StaticResource PrimaryGreenBrush}" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,6">
+                                        <TextBlock Text="Pelayar Dipilih:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}"/>
+                                        <TextBlock Text="{Binding ResultBrowserName}" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="{StaticResource InkBrush}"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,6">
+                                        <TextBlock Text="Tarikh Storan:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}"/>
+                                        <TextBlock Text="{Binding ResultStoreDate}" HorizontalAlignment="Right" Foreground="{StaticResource InkBrush}"/>
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Pintasan Desktop:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}"/>
+                                        <TextBlock Text="Public Desktop (Semua Murid)" FontWeight="SemiBold" HorizontalAlignment="Right" Foreground="{StaticResource SuccessTextBrush}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Success Buttons -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="▶ Buka Pelancar Sekarang" Style="{StaticResource PrimaryButton}" Margin="0,0,12,0" Padding="18,10" Command="{Binding LaunchLauncherCommand}"/>
+                                <Button Content="✓ Selesai &amp; Keluar" Style="{StaticResource SecondaryButton}" Padding="18,10" Command="{Binding CloseApplicationCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

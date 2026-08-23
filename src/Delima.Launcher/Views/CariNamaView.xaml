@@ -2,16 +2,18 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Delima.Launcher.ViewModels"
              xmlns:theming="clr-namespace:Delima.Launcher.Theming"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance Type=vm:CariNamaViewModel}"
+             d:DataContext="{d:DesignInstance Type=vm:PupilCardViewModel}"
              d:DesignHeight="768" d:DesignWidth="1366"
              Background="{DynamicResource PageBackgroundBrush}">
 
     <UserControl.Resources>
-        <theming:AvatarTemplateSelector x:Key="AvatarSelector" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <!-- DiceBear Critter image converter (seed → BitmapImage) -->
+        <theming:AvatarSeedToImageConverter x:Key="AvatarConverter" />
 
         <!-- DataTemplate for Pupil Cards in Grid -->
         <DataTemplate DataType="{x:Type vm:PupilCardViewModel}">
@@ -29,9 +31,9 @@
                                         <ControlTemplate TargetType="{x:Type Button}">
                                             <Border x:Name="missingBorder"
                                                     Background="Transparent"
-                                                    BorderBrush="#C9C4B0"
-                                                    BorderThickness="2"
-                                                    CornerRadius="16"
+                                                    BorderBrush="{DynamicResource BorderBrush}"
+                                                    BorderThickness="1.5"
+                                                    CornerRadius="8"
                                                     Padding="6,8"
                                                     SnapsToDevicePixels="True">
                                                 <ContentPresenter HorizontalAlignment="Center"
@@ -63,19 +65,25 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- Avatar Icon -->
-                    <ContentControl Grid.Row="0"
-                                    Content="{Binding AvatarKey}"
-                                    ContentTemplateSelector="{StaticResource AvatarSelector}"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,0,0,6" />
+                    <!-- DiceBear Critter Avatar -->
+                    <Border Grid.Row="0"
+                            Width="52" Height="52" CornerRadius="26"
+                            Background="{DynamicResource SoftSurfaceBrush}"
+                            ClipToBounds="True"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,6">
+                        <Image Source="{Binding AvatarKey, Converter={StaticResource AvatarConverter}}"
+                               Width="52" Height="52"
+                               Stretch="UniformToFill"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Border>
 
-                    <!-- Pupil Name Label (Max 2 lines, Never Truncated with Ellipsis) -->
+                    <!-- Pupil Name Label (Max 2 lines) -->
                     <TextBlock Grid.Row="1"
                                Text="{Binding DisplayName}"
                                FontFamily="{DynamicResource NunitoFont}"
-                               FontSize="14"
-                               FontWeight="Bold"
+                               FontSize="13.5"
+                               FontWeight="SemiBold"
                                TextAlignment="Center"
                                TextWrapping="Wrap"
                                LineHeight="16"
@@ -88,15 +96,15 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Topbar (68px) -->
-            <RowDefinition Height="68" />
+            <!-- Topbar (64px) -->
+            <RowDefinition Height="64" />
             <!-- Main Content Area -->
             <RowDefinition Height="*" />
-            <!-- Footer (44px) -->
-            <RowDefinition Height="44" />
+            <!-- Footer (40px) -->
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <!-- TOPBAR (Compact 68px header with Kembali, Class Pill, and Crest) -->
+        <!-- TOPBAR (Windows 11 Surface Bar) -->
         <Border Grid.Row="0"
                 Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
@@ -115,13 +123,13 @@
                         Command="{Binding BackCommand}"
                         AutomationProperties.Name="Kembali ke pemilihan kelas">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="◂ "
+                        <TextBlock Text="← "
                                    FontWeight="Bold"
-                                   FontSize="14"
+                                   FontSize="13"
                                    VerticalAlignment="Center" />
                         <TextBlock Text="Kembali"
-                                   FontWeight="Bold"
-                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
                                    VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -129,30 +137,30 @@
                 <!-- Center: Class Pill -->
                 <Border Grid.Column="1"
                         Background="{Binding ClassColourBrush}"
-                        CornerRadius="999"
-                        Padding="24,8"
+                        CornerRadius="6"
+                        Padding="20,6"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         AutomationProperties.Name="{Binding ClassName, StringFormat='Kelas {0}'}">
                     <TextBlock Text="{Binding ClassName}"
                                Foreground="#FFFFFF"
                                FontFamily="{DynamicResource Baloo2Font}"
-                               FontWeight="Bold"
-                               FontSize="16"
+                               FontWeight="SemiBold"
+                               FontSize="15"
                                HorizontalAlignment="Center" />
                 </Border>
 
                 <!-- Right: Compact School Crest -->
                 <Border Grid.Column="2"
-                        Width="36" Height="36"
-                        CornerRadius="10"
-                        Background="{DynamicResource AccentBrush}"
+                        Width="34" Height="34"
+                        CornerRadius="6"
+                        Background="{DynamicResource PrimaryBrush}"
                         AutomationProperties.Name="Lencana Sekolah">
                     <TextBlock Text="{Binding SchoolCode}"
                                FontFamily="{DynamicResource Baloo2Font}"
                                FontWeight="Bold"
-                               FontSize="12"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               FontSize="11"
+                               Foreground="#FFFFFF"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>
@@ -169,22 +177,48 @@
             </Grid.RowDefinitions>
 
             <!-- Heading & Search Row -->
-            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,10">
+            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,12">
                 <TextBlock Text="Cari Nama Anda"
                            Style="{StaticResource ScreenHeadingStyle}"
                            FontSize="22"
                            TextAlignment="Center"
                            Margin="0,0,0,8" />
 
-                <!-- Teacher Search Input -->
-                <TextBox Style="{StaticResource SearchTextBoxStyle}"
-                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
-                         Tag="Taip nama…"
-                         Width="340"
-                         AutomationProperties.Name="Carian nama murid" />
+                <!-- Search Input with Clear Button -->
+                <Grid Width="350" HorizontalAlignment="Center">
+                    <TextBox Style="{StaticResource SearchTextBoxStyle}"
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                             Tag="🔍 Taip nama murid…"
+                             Padding="14,10,36,10"
+                             AutomationProperties.Name="Carian nama murid" />
+                    <Button Command="{Binding ClearSearchCommand}"
+                            Visibility="{Binding HasSearchQuery, Converter={StaticResource BoolToVisConverter}}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Margin="0,0,8,0"
+                            Width="24" Height="24"
+                            Cursor="Hand"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            ToolTip="Padam carian">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="b" Background="#E0E0E0" CornerRadius="12">
+                                    <TextBlock Text="✕" FontSize="11" FontWeight="Bold" Foreground="#6E6E6E" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="b" Property="Background" Value="#CCCCCC" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
             </StackPanel>
 
-            <!-- Adaptive Card Grid (UniformGrid with computed ColumnCount, Scrollable on narrow viewports) -->
+            <!-- Adaptive Card Grid (UniformGrid with computed ColumnCount) -->
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
@@ -207,11 +241,16 @@
                 Padding="24,0">
             <Grid VerticalAlignment="Center">
                 <TextBlock Text="{Binding UpdatedDateText}"
-                           FontSize="12"
+                           FontSize="11.5"
                            Foreground="{DynamicResource SecondaryTextBrush}"
                            HorizontalAlignment="Left" />
-                <TextBlock Text="Masalah? Panggil cikgu."
-                           FontSize="12"
+                <TextBlock Text="tecertools Digital Solutions"
+                           FontSize="11"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Opacity="0.65"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Masalah log masuk? Sila maklumkan kepada guru bertugas."
+                           FontSize="11.5"
                            Foreground="{DynamicResource SecondaryTextBrush}"
                            HorizontalAlignment="Right" />
             </Grid>

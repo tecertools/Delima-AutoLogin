@@ -13,11 +13,12 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
 
+        <!-- WinUI 3 Navigation Tab Button Style -->
         <Style x:Key="TabNavButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="52" />
-            <Setter Property="Margin" Value="0,0,0,8" />
-            <Setter Property="Padding" Value="16,0" />
-            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontSize" Value="13.5" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -30,18 +31,20 @@
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="12"
+                                CornerRadius="6"
                                 Padding="{TemplateBinding Padding}"
                                 SnapsToDevicePixels="True">
-                            <ContentPresenter VerticalAlignment="Center" />
+                            <Grid>
+                                <!-- Left Indicator Pill for active tab -->
+                                <Border x:Name="activeIndicator" Width="3" Height="16" Background="{DynamicResource PrimaryBrush}"
+                                        HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2"
+                                        Visibility="Collapsed" Margin="-8,0,0,0" />
+                                <ContentPresenter VerticalAlignment="Center" Margin="4,0,0,0" />
+                            </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                <Setter TargetName="border" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="border" Property="Background" Value="#F1F3F5" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -52,19 +55,19 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Header (78px) -->
-            <RowDefinition Height="78" />
+            <!-- Header (64px) -->
+            <RowDefinition Height="64" />
             <!-- Main Content -->
             <RowDefinition Height="*" />
-            <!-- Footer (44px) -->
-            <RowDefinition Height="44" />
+            <!-- Footer (40px) -->
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <!-- TOP BAR -->
+        <!-- TOP BAR (Windows 11 Surface Header) -->
         <Border Grid.Row="0"
                 Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource AlertBrush}"
-                BorderThickness="0,0,0,3"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
                 Padding="32,0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -75,13 +78,13 @@
 
                 <!-- Left: Exit Button -->
                 <Button Grid.Column="0"
-                        Style="{StaticResource OutlineButtonStyle}"
+                        Style="{StaticResource BackButtonStyle}"
                         Command="{Binding ExitDashboardCommand}"
                         TabIndex="20"
                         AutomationProperties.Name="Keluar dari Mod Guru dan kembali ke skrin murid">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="◂ " FontSize="16" FontWeight="Bold" />
-                        <TextBlock Text="Kembali ke Murid" FontSize="15" FontWeight="Bold" />
+                        <TextBlock Text="← " FontSize="13" FontWeight="Bold" />
+                        <TextBlock Text="Kembali ke Murid" FontSize="13" FontWeight="SemiBold" />
                     </StackPanel>
                 </Button>
 
@@ -89,40 +92,40 @@
                 <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Border Background="{DynamicResource PrimaryBrush}"
-                                CornerRadius="999"
-                                Padding="12,4"
+                                CornerRadius="4"
+                                Padding="8,2"
                                 Margin="0,0,8,0">
                             <TextBlock Text="Mod Guru"
                                        Foreground="#FFFFFF"
                                        FontWeight="Bold"
-                                       FontSize="13" />
+                                       FontSize="11.5" />
                         </Border>
-                        <TextBlock Text="Kawalan &amp; Tetapan Guru"
+                        <TextBlock Text="Panel Kawalan &amp; Tetapan Guru"
                                    FontFamily="{DynamicResource Baloo2Font}"
-                                   FontWeight="Bold"
-                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   FontSize="17"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource PrimaryTextBrush}" />
                     </StackPanel>
                     <TextBlock Text="{Binding SchoolName}"
                                FontFamily="{DynamicResource NunitoFont}"
-                               FontSize="12"
+                               FontSize="11.5"
                                Foreground="{DynamicResource SecondaryTextBrush}"
                                HorizontalAlignment="Center"
-                               Margin="0,2,0,0" />
+                               Margin="0,1,0,0" />
                 </StackPanel>
 
                 <!-- Right: School Crest -->
                 <Border Grid.Column="2"
-                        Width="46" Height="46"
-                        CornerRadius="12"
-                        Background="{DynamicResource AccentBrush}"
+                        Width="34" Height="34"
+                        CornerRadius="6"
+                        Background="{DynamicResource PrimaryBrush}"
                         AutomationProperties.Name="Lencana Sekolah">
                     <TextBlock Text="{Binding SchoolCode}"
                                FontFamily="{DynamicResource Baloo2Font}"
                                FontWeight="Bold"
-                               FontSize="15"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               FontSize="11"
+                               Foreground="#FFFFFF"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>
@@ -132,24 +135,24 @@
         <!-- MAIN CONTENT (2 COLUMNS: NAV TABS + DETAILS PANEL) -->
         <Grid Grid.Row="1" Margin="32,20,32,16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280" />
-                <ColumnDefinition Width="24" />
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="20" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT SIDEBAR: TOOL TABS -->
+            <!-- LEFT SIDEBAR: TOOL TABS (Windows 11 NavigationView Style) -->
             <Border Grid.Column="0"
                     Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="16"
-                    Padding="16,20"
+                    CornerRadius="8"
+                    Padding="12,16"
                     Effect="{StaticResource CardShadow}">
                 <StackPanel>
                     <TextBlock Text="Pilihan Kawalan"
                                Style="{DynamicResource SectionHeadingStyle}"
-                               FontSize="16"
-                               Margin="8,0,0,16" />
+                               FontSize="14"
+                               Margin="8,0,0,12" />
 
                     <!-- Tab 1: Kata Laluan -->
                     <Button Command="{Binding SelectTabCommand}"
@@ -160,17 +163,15 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="Password">
-                                        <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="Background" Value="#F1F3F5" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🔑 " FontSize="16" Margin="0,0,8,0" />
-                            <TextBlock Text="Kata Laluan" FontSize="15" />
+                            <TextBlock Text="🔑 " FontSize="14" Margin="0,0,8,0" />
+                            <TextBlock Text="Kata Laluan" FontSize="13.5" />
                         </StackPanel>
                     </Button>
 
@@ -183,17 +184,15 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="Picture">
-                                        <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="Background" Value="#F1F3F5" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🖼️ " FontSize="16" Margin="0,0,8,0" />
-                            <TextBlock Text="Kunci Gambar" FontSize="15" />
+                            <TextBlock Text="🖼️ " FontSize="14" Margin="0,0,8,0" />
+                            <TextBlock Text="Kunci Gambar" FontSize="13.5" />
                         </StackPanel>
                     </Button>
 
@@ -206,17 +205,15 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="AddPupil">
-                                        <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="Background" Value="#F1F3F5" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="➕ " FontSize="16" Margin="0,0,8,0" />
-                            <TextBlock Text="Tambah Murid" FontSize="15" />
+                            <TextBlock Text="➕ " FontSize="14" Margin="0,0,8,0" />
+                            <TextBlock Text="Tambah Murid" FontSize="13.5" />
                         </StackPanel>
                     </Button>
 
@@ -229,17 +226,15 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="ResetAll">
-                                        <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="Background" Value="#F1F3F5" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🔓 " FontSize="16" Margin="0,0,8,0" />
-                            <TextBlock Text="Batal Kunci Semua" FontSize="15" />
+                            <TextBlock Text="🔓 " FontSize="14" Margin="0,0,8,0" />
+                            <TextBlock Text="Batal Kunci Semua" FontSize="13.5" />
                         </StackPanel>
                     </Button>
 
@@ -252,62 +247,60 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="Diagnostics">
-                                        <Setter Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="Background" Value="#F1F3F5" />
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📊 " FontSize="16" Margin="0,0,8,0" />
-                            <TextBlock Text="Diagnostik" FontSize="15" />
+                            <TextBlock Text="📊 " FontSize="14" Margin="0,0,8,0" />
+                            <TextBlock Text="Diagnostik" FontSize="13.5" />
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </Border>
 
-            <!-- RIGHT DETAILS PANE -->
+            <!-- RIGHT DETAILS PANE (Windows 11 Surface Card) -->
             <Border Grid.Column="2"
                     Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="16"
+                    CornerRadius="8"
                     Padding="32,24"
                     Effect="{StaticResource CardShadow}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
 
-                        <!-- FEEDBACK BANNER -->
+                        <!-- FEEDBACK BANNER (WinUI 3 InfoBar Style) -->
                         <Border Visibility="{Binding HasFeedback, Converter={StaticResource BoolToVisConverter}}"
-                                Margin="0,0,0,20"
-                                Padding="16,12"
-                                CornerRadius="10">
+                                Margin="0,0,0,18"
+                                Padding="14,10"
+                                CornerRadius="6">
                             <Border.Style>
                                 <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#EAF5EE" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                    <Setter Property="Background" Value="#DFF6DD" />
+                                    <Setter Property="BorderBrush" Value="#107C10" />
                                     <Setter Property="BorderThickness" Value="1" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsFeedbackError}" Value="True">
-                                            <Setter Property="Background" Value="#FDF0ED" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource AlertBrush}" />
+                                            <Setter Property="Background" Value="#FDE7E9" />
+                                            <Setter Property="BorderBrush" Value="#A80000" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
                             <TextBlock Text="{Binding FeedbackMessage}"
-                                       FontWeight="Bold"
-                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
                                        TextWrapping="Wrap">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+                                        <Setter Property="Foreground" Value="#107C10" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsFeedbackError}" Value="True">
-                                                <Setter Property="Foreground" Value="{DynamicResource AlertBrush}" />
+                                                <Setter Property="Foreground" Value="#A80000" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -332,20 +325,20 @@
 
                             <TextBlock Text="Kemas Kini Kata Laluan Murid"
                                        Style="{DynamicResource ScreenHeadingStyle}"
-                                       FontSize="22"
-                                       Margin="0,0,0,6" />
+                                       FontSize="20"
+                                       Margin="0,0,0,4" />
                             <TextBlock Text="Pilih murid dan masukkan kata laluan baharu sekiranya kata laluan lama tidak sah (Ralat E14)."
                                        Style="{DynamicResource HelperTextStyle}"
                                        TextWrapping="Wrap"
-                                       Margin="0,0,0,20" />
+                                       Margin="0,0,0,18" />
 
                             <!-- Search Filter -->
                             <TextBlock Text="Cari Nama / ID Murid" Style="{DynamicResource FieldLabelStyle}" />
                             <TextBox Text="{Binding PasswordSearchQuery, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="44"
-                                     FontSize="16"
-                                     Padding="12,8"
-                                     Margin="0,0,0,16"
+                                     Height="38"
+                                     FontSize="14"
+                                     Padding="10,6"
+                                     Margin="0,0,0,14"
                                      TabIndex="10"
                                      AutomationProperties.Name="Cari murid untuk kemas kini kata laluan" />
 
@@ -353,9 +346,9 @@
                             <TextBlock Text="Pilih Murid" Style="{DynamicResource FieldLabelStyle}" />
                             <ComboBox ItemsSource="{Binding FilteredPasswordStudents}"
                                       SelectedItem="{Binding SelectedPasswordStudent}"
-                                      Height="44"
-                                      FontSize="16"
-                                      Margin="0,0,0,16"
+                                      Height="38"
+                                      FontSize="14"
+                                      Margin="0,0,0,14"
                                       TabIndex="11"
                                       AutomationProperties.Name="Senarai pilihan murid">
                                 <ComboBox.ItemTemplate>
@@ -369,10 +362,10 @@
                             <!-- New Password Input -->
                             <TextBlock Text="Kata Laluan Baharu" Style="{DynamicResource FieldLabelStyle}" />
                             <TextBox Text="{Binding NewPasswordText, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="44"
-                                     FontSize="16"
-                                     Padding="12,8"
-                                     Margin="0,0,0,24"
+                                     Height="38"
+                                     FontSize="14"
+                                     Padding="10,6"
+                                     Margin="0,0,0,20"
                                      TabIndex="12"
                                      AutomationProperties.Name="Masukkan kata laluan baharu" />
 
@@ -380,10 +373,10 @@
                             <Button Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding UpdatePasswordCommand}"
                                     Content="Simpan Kata Laluan Baharu"
-                                    Height="48"
+                                    Height="42"
                                     TabIndex="13"
                                     HorizontalAlignment="Left"
-                                    Padding="24,0"
+                                    Padding="22,0"
                                     AutomationProperties.Name="Simpan kata laluan baharu murid" />
                         </StackPanel>
 
@@ -404,20 +397,20 @@
 
                             <TextBlock Text="Set Semula Kata Laluan Gambar"
                                        Style="{DynamicResource ScreenHeadingStyle}"
-                                       FontSize="22"
-                                       Margin="0,0,0,6" />
+                                       FontSize="20"
+                                       Margin="0,0,0,4" />
                             <TextBlock Text="Buka kunci murid yang tersekat selepas 5 percubaan gagal (Ralat E12) dan set semula ikon gambar."
                                        Style="{DynamicResource HelperTextStyle}"
                                        TextWrapping="Wrap"
-                                       Margin="0,0,0,20" />
+                                       Margin="0,0,0,18" />
 
                             <!-- Search Filter -->
                             <TextBlock Text="Cari Nama / ID Murid" Style="{DynamicResource FieldLabelStyle}" />
                             <TextBox Text="{Binding PictureSearchQuery, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="44"
-                                     FontSize="16"
-                                     Padding="12,8"
-                                     Margin="0,0,0,16"
+                                     Height="38"
+                                     FontSize="14"
+                                     Padding="10,6"
+                                     Margin="0,0,0,14"
                                      TabIndex="10"
                                      AutomationProperties.Name="Cari murid untuk buka kunci gambar" />
 
@@ -425,9 +418,9 @@
                             <TextBlock Text="Pilih Murid" Style="{DynamicResource FieldLabelStyle}" />
                             <ComboBox ItemsSource="{Binding FilteredPictureStudents}"
                                       SelectedItem="{Binding SelectedPictureStudent}"
-                                      Height="44"
-                                      FontSize="16"
-                                      Margin="0,0,0,16"
+                                      Height="38"
+                                      FontSize="14"
+                                      Margin="0,0,0,14"
                                       TabIndex="11"
                                       AutomationProperties.Name="Senarai pilihan murid untuk buka kunci">
                                 <ComboBox.ItemTemplate>
@@ -439,20 +432,20 @@
                             </ComboBox>
 
                             <!-- Lockout Status Card -->
-                            <Border Background="{DynamicResource SoftSurfaceBrush}"
+                            <Border Background="#F8F9FA"
                                     BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="10"
-                                    Padding="16,14"
-                                    Margin="0,0,0,24">
+                                    CornerRadius="6"
+                                    Padding="14,10"
+                                    Margin="0,0,0,20">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Status Kunci Gambar: "
-                                               FontWeight="Bold"
-                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               FontSize="13"
                                                Foreground="{DynamicResource SecondaryTextBrush}" />
                                     <TextBlock Text="{Binding StudentLockoutStatusText}"
                                                FontWeight="Bold"
-                                               FontSize="14"
+                                               FontSize="13"
                                                Foreground="{DynamicResource PrimaryTextBrush}" />
                                 </StackPanel>
                             </Border>
@@ -461,10 +454,10 @@
                             <Button Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding ResetPicturePasswordCommand}"
                                     Content="Buka Kunci &amp; Set Semula Ikon"
-                                    Height="48"
+                                    Height="42"
                                     TabIndex="12"
                                     HorizontalAlignment="Left"
-                                    Padding="24,0"
+                                    Padding="22,0"
                                     AutomationProperties.Name="Buka kunci murid dan set semula kata laluan gambar" />
                         </StackPanel>
 
@@ -485,30 +478,30 @@
 
                             <TextBlock Text="Tambah Murid Baharu"
                                        Style="{DynamicResource ScreenHeadingStyle}"
-                                       FontSize="22"
-                                       Margin="0,0,0,6" />
+                                       FontSize="20"
+                                       Margin="0,0,0,4" />
                             <TextBlock Text="Daftarkan murid yang baru berpindah atau tiada dalam senarai untuk digunakan serta-merta."
                                        Style="{DynamicResource HelperTextStyle}"
                                        TextWrapping="Wrap"
-                                       Margin="0,0,0,20" />
+                                       Margin="0,0,0,18" />
 
                             <!-- Pupil Name -->
                             <TextBlock Text="Nama Penuh Murid" Style="{DynamicResource FieldLabelStyle}" />
                             <TextBox Text="{Binding NewPupilName, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="44"
-                                     FontSize="16"
-                                     Padding="12,8"
-                                     Margin="0,0,0,16"
+                                     Height="38"
+                                     FontSize="14"
+                                     Padding="10,6"
+                                     Margin="0,0,0,14"
                                      TabIndex="10"
                                      AutomationProperties.Name="Nama penuh murid baharu" />
 
                             <!-- Pupil ID DELIMa -->
                             <TextBlock Text="ID DELIMa (contoh: m-12345678)" Style="{DynamicResource FieldLabelStyle}" />
                             <TextBox Text="{Binding NewPupilId, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="44"
-                                     FontSize="16"
-                                     Padding="12,8"
-                                     Margin="0,0,0,16"
+                                     Height="38"
+                                     FontSize="14"
+                                     Padding="10,6"
+                                     Margin="0,0,0,14"
                                      TabIndex="11"
                                      AutomationProperties.Name="ID DELIMa murid baharu" />
 
@@ -516,9 +509,9 @@
                             <TextBlock Text="Pilih Kelas" Style="{DynamicResource FieldLabelStyle}" />
                             <ComboBox ItemsSource="{Binding AllClasses}"
                                       SelectedItem="{Binding NewPupilClass}"
-                                      Height="44"
-                                      FontSize="16"
-                                      Margin="0,0,0,16"
+                                      Height="38"
+                                      FontSize="14"
+                                      Margin="0,0,0,14"
                                       TabIndex="12"
                                       AutomationProperties.Name="Pilih kelas murid baharu">
                                 <ComboBox.ItemTemplate>
@@ -532,10 +525,10 @@
                             <!-- Initial Password -->
                             <TextBlock Text="Kata Laluan Awal" Style="{DynamicResource FieldLabelStyle}" />
                             <TextBox Text="{Binding NewPupilPassword, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="44"
-                                     FontSize="16"
-                                     Padding="12,8"
-                                     Margin="0,0,0,16"
+                                     Height="38"
+                                     FontSize="14"
+                                     Padding="10,6"
+                                     Margin="0,0,0,14"
                                      TabIndex="13"
                                      AutomationProperties.Name="Kata laluan awal murid baharu" />
 
@@ -543,9 +536,9 @@
                             <TextBlock Text="Pilih Avatar" Style="{DynamicResource FieldLabelStyle}" />
                             <ComboBox ItemsSource="{Binding AvailableAvatars}"
                                       SelectedItem="{Binding NewPupilAvatar}"
-                                      Height="44"
-                                      FontSize="16"
-                                      Margin="0,0,0,24"
+                                      Height="38"
+                                      FontSize="14"
+                                      Margin="0,0,0,20"
                                       TabIndex="14"
                                       AutomationProperties.Name="Pilih avatar murid" />
 
@@ -553,10 +546,10 @@
                             <Button Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding AddNewPupilCommand}"
                                     Content="Daftar Murid Baharu"
-                                    Height="48"
+                                    Height="42"
                                     TabIndex="15"
                                     HorizontalAlignment="Left"
-                                    Padding="24,0"
+                                    Padding="22,0"
                                     AutomationProperties.Name="Daftar murid baharu ke dalam senarai" />
                         </StackPanel>
 
@@ -577,27 +570,27 @@
 
                             <TextBlock Text="Batal Semua Kunci Murid"
                                        Style="{DynamicResource ScreenHeadingStyle}"
-                                       FontSize="22"
-                                       Margin="0,0,0,6" />
+                                       FontSize="20"
+                                       Margin="0,0,0,4" />
                             <TextBlock Text="Tindakan ini akan membatalkan semua sekatan cubaan gambar murid yang terkunci di komputer kiosk ini."
                                        Style="{DynamicResource HelperTextStyle}"
                                        TextWrapping="Wrap"
-                                       Margin="0,0,0,20" />
+                                       Margin="0,0,0,18" />
 
-                            <!-- Warning Box -->
-                            <Border Background="#FDF0ED"
-                                    BorderBrush="{DynamicResource AlertBrush}"
+                            <!-- WinUI 3 Warning Banner -->
+                            <Border Background="#FFF4CE"
+                                    BorderBrush="#797673"
                                     BorderThickness="1"
-                                    CornerRadius="12"
-                                    Padding="20,16"
-                                    Margin="0,0,0,24">
+                                    CornerRadius="6"
+                                    Padding="16,12"
+                                    Margin="0,0,0,20">
                                 <StackPanel>
-                                    <TextBlock Text="Perhatian"
-                                               FontWeight="Bold"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource AlertBrush}"
-                                               Margin="0,0,0,6" />
-                                    <TextBlock Text="Gunakan fungsi ini sekiranya ramai murid tersalah memilih gambar dan terkunci semasa kelas bermula."
+                                    <TextBlock Text="⚠️ Perhatian"
+                                               FontWeight="SemiBold"
+                                               FontSize="14"
+                                               Foreground="#4C4A48"
+                                               Margin="0,0,0,4" />
+                                    <TextBlock Text="Gunakan fungsi ini sekiranya ramai murid tersalah memilih gambar dan terkunci semasa waktu kelas bermula."
                                                Style="{DynamicResource HelperTextStyle}"
                                                TextWrapping="Wrap" />
                                 </StackPanel>
@@ -609,17 +602,17 @@
                                     Background="{DynamicResource AlertBrush}"
                                     Foreground="#FFFFFF"
                                     BorderThickness="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Height="48"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Height="42"
                                     TabIndex="10"
                                     HorizontalAlignment="Left"
-                                    Padding="24,0"
+                                    Padding="22,0"
                                     Cursor="Hand"
                                     AutomationProperties.Name="Batal semua sekatan kunci murid sekarang">
                                 <Button.Resources>
                                     <Style TargetType="Border">
-                                        <Setter Property="CornerRadius" Value="14" />
+                                        <Setter Property="CornerRadius" Value="6" />
                                     </Style>
                                 </Button.Resources>
                             </Button>
@@ -642,24 +635,24 @@
 
                             <TextBlock Text="Laporan Diagnostik Kiosk"
                                        Style="{DynamicResource ScreenHeadingStyle}"
-                                       FontSize="22"
-                                       Margin="0,0,0,6" />
+                                       FontSize="20"
+                                       Margin="0,0,0,4" />
                             <TextBlock Text="Maklumat teknikal peranti dan arkib log untuk dihantar kepada penyelaras ICT sekolah sekiranya terdapat masalah."
                                        Style="{DynamicResource HelperTextStyle}"
                                        TextWrapping="Wrap"
-                                       Margin="0,0,0,20" />
+                                       Margin="0,0,0,18" />
 
                             <!-- Diagnostic Info Display -->
-                            <Border Background="{DynamicResource SoftSurfaceBrush}"
+                            <Border Background="#F8F9FA"
                                     BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="10"
-                                    Padding="16,14"
-                                    Margin="0,0,0,20">
+                                    CornerRadius="6"
+                                    Padding="14,12"
+                                    Margin="0,0,0,18">
                                 <TextBlock Text="{Binding DiagnosticsSummary}"
                                            FontFamily="Consolas"
-                                           FontSize="13"
-                                           LineHeight="20"
+                                           FontSize="12.5"
+                                           LineHeight="18"
                                            Foreground="{DynamicResource PrimaryTextBrush}"
                                            TextWrapping="Wrap" />
                             </Border>
@@ -668,10 +661,10 @@
                             <Button Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding ExportDiagnosticsCommand}"
                                     Content="Eksport Laporan Diagnostik"
-                                    Height="48"
+                                    Height="42"
                                     TabIndex="10"
                                     HorizontalAlignment="Left"
-                                    Padding="24,0"
+                                    Padding="22,0"
                                     AutomationProperties.Name="Eksport laporan diagnostik ke fail" />
                         </StackPanel>
 
@@ -689,11 +682,16 @@
             <Grid VerticalAlignment="Center">
                 <TextBlock Text="Mod Guru — Kawalan Kiosk"
                            Style="{DynamicResource HelperTextStyle}"
-                           FontSize="13"
+                           FontSize="11.5"
                            HorizontalAlignment="Left" />
+                <TextBlock Text="tecertools Digital Solutions"
+                           FontSize="11"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Opacity="0.65"
+                           HorizontalAlignment="Center" />
                 <TextBlock Text="Semua tindakan direkodkan dalam log audit setempat."
                            Style="{DynamicResource HelperTextStyle}"
-                           FontSize="13"
+                           FontSize="11.5"
                            HorizontalAlignment="Right" />
             </Grid>
         </Border>

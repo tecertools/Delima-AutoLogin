@@ -205,7 +205,7 @@ public class ModGuruViewModelTests : IDisposable
         vm.NewPupilId = "m-99887766";
         vm.NewPupilClass = _classes[0];
         vm.NewPupilPassword = "InitialPassword123!";
-        vm.NewPupilAvatar = "avatar3";
+        // NewPupilAvatar removed: avatars are now auto-assigned via DiceBear
 
         vm.AddNewPupilCommand.Execute(null);
 
@@ -214,7 +214,8 @@ public class ModGuruViewModelTests : IDisposable
         Assert.NotNull(added);
         Assert.Equal("Muhammad Haziq", added.Name);
         Assert.Equal(_classes[0].Id, added.ClassId);
-        Assert.Equal("avatar3", added.Avatar);
+        // Avatar is blank; DiceBear resolves to student.Id as seed at display time
+        Assert.Equal("", added.Avatar);
 
         string logFile = AuditLogger.GetAuditLogFilePath(DateTimeOffset.UtcNow, _testAuditDir);
         string logContent = File.ReadAllText(logFile);

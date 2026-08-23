@@ -22,7 +22,7 @@ public static class PasswordStrengthEvaluator
         "qwertyuiop12",
         "letmein123456",
         "password1234",
-        "skseksyen2424",
+        "sekolah12345",
         "delima1234567",
         "cikgupassword",
         "pentadbir1234"

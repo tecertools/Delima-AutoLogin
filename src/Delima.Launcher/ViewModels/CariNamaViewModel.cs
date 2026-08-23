@@ -32,7 +32,13 @@ public sealed partial class CariNamaViewModel : ObservableObject
     private Brush _classColourBrush;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSearchQuery))]
     private string _searchQuery = "";
+
+    public bool HasSearchQuery => !string.IsNullOrWhiteSpace(SearchQuery);
+
+    [RelayCommand]
+    private void ClearSearch() => SearchQuery = "";
 
     [ObservableProperty]
     private int _columnCount = 7;

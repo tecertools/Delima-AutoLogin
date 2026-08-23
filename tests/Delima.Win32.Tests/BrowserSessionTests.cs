@@ -73,25 +73,35 @@ public class BrowserSessionTests
     }
 
     [Fact]
-    public void BrowserTitles_Edge_Is_Empty_And_Unmeasured_Per_Section441()
+    public void BrowserTitles_Edge_Contains_Empirical_Part6_Strings()
     {
-        // §4.4.1 & Requirement 2: Leave Edge lists empty with comment saying they are unmeasured
-        // so an unmeasured browser fails closed rather than silently matching nothing.
-        Assert.Empty(BrowserTitles.Edge.Identifier);
-        Assert.Empty(BrowserTitles.Edge.Consent);
-        Assert.Empty(BrowserTitles.Edge.Destination);
+        // §4.4.1 & Part 6: Empirically measured Edge title lists containing \u200b
+        Assert.NotEmpty(BrowserTitles.Edge.Identifier);
+        Assert.Contains("Sign in - Google Accounts - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
+        Assert.Contains("Sign in - Google Accounts - Profile 1 - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
+        Assert.Contains("Sign in - Google Accounts - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
+
+        Assert.NotEmpty(BrowserTitles.Edge.Consent);
+        Assert.Contains("Sign in - Google Accounts - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Consent);
+
+        Assert.NotEmpty(BrowserTitles.Edge.Destination);
+        Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
+        Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Profile 1 - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
+        Assert.Contains("DELIMa - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
     }
 
     [Fact]
-    public void RouteCOptions_For_Edge_FailsClosed_With_Empty_IdentifierTitles()
+    public void RouteCOptions_For_Edge_Uses_Measured_IdentifierTitles()
     {
         var edgeOptions = new RouteCOptions { TargetBrowser = BrowserKind.Edge };
 
-        Assert.Empty(edgeOptions.TitleIdentifierPage);
-        Assert.Empty(edgeOptions.TitleConsentPage);
-        Assert.Empty(edgeOptions.TitleDestinationPage);
+        Assert.NotEmpty(edgeOptions.TitleIdentifierPage);
+        Assert.NotEmpty(edgeOptions.TitleConsentPage);
+        Assert.NotEmpty(edgeOptions.TitleDestinationPage);
 
-        // Fails closed: nothing matches empty identifier title list
+        // Matches measured exact strings
+        Assert.True(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Personal - Microsoft\u200b Edge", edgeOptions.TitleIdentifierPage));
+        // Does not match chrome title or string without \u200b
         Assert.False(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Microsoft Edge", edgeOptions.TitleIdentifierPage));
         Assert.False(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Google Chrome", edgeOptions.TitleIdentifierPage));
     }

@@ -25,9 +25,10 @@ public class Step5AvatarsTests
         var vm = new Step5AvatarsViewModel(state);
 
         Assert.Equal(22, vm.AvatarItems.Count);
-        // All 22 avatars should be distinct within this 22-pupil class
-        var distinctAvatars = vm.AvatarItems.Select(a => a.Avatar).Distinct().Count();
-        Assert.Equal(22, distinctAvatars);
+        // With DiceBear, each student's effective seed defaults to their unique StudentId
+        // so all DiceBear seeds are distinct within the class.
+        var distinctSeeds = vm.AvatarItems.Select(a => a.DiceBearSeed).Distinct().Count();
+        Assert.Equal(22, distinctSeeds);
     }
 
     [Fact]
@@ -78,21 +79,24 @@ public class Step5AvatarsTests
     {
         var state = new AdminWizardState
         {
-            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24", Name = "SK Seksyen 24" }
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234", Name = "SK Contoh" }
         };
         state.RosterStudents.Add(new ImportedStudent { Id = "s_101", FullName = "Nur Aishah", ClassName = "2 Cemerlang", EmailLocal = "m-12345678" });
 
         var vm = new Step5AvatarsViewModel(state);
         string html = vm.GenerateAvatarSheetHtml("2 Cemerlang");
 
-        Assert.Contains("SKS24", html);
-        Assert.Contains("SK Seksyen 24", html);
+        Assert.Contains("BBA1234", html);
+        Assert.Contains("SK Contoh", html);
         Assert.Contains("2 Cemerlang", html);
         Assert.Contains("Nur Aishah", html);
         Assert.Contains("m-12345678", html);
         Assert.Contains("pic-pw-tag", html);
         Assert.Contains("🔑", html);
         Assert.Contains("window.print()", html);
+        // DiceBear: avatar circle now uses an <img> tag pointing to the DiceBear API
+        Assert.Contains("api.dicebear.com", html);
+        Assert.Contains("<img", html);
     }
 
     [Fact]
@@ -113,21 +117,37 @@ public class Step5AvatarsTests
     }
 
     [Fact]
-    public void CycleAvatar_And_SaveToState_PersistsChangesToAdminWizardState()
+    public void RandomizeAvatar_And_SaveToState_PersistsChangesToAdminWizardState()
     {
         var state = new AdminWizardState();
         state.RosterStudents.Add(new ImportedStudent { Id = "s_201", FullName = "Farhan", ClassName = "2 Cemerlang", EmailLocal = "m-201" });
 
         var vm = new Step5AvatarsViewModel(state);
         var item = vm.AvatarItems[0];
-        string initialAvatar = item.Avatar;
+        string initialSeed = item.DiceBearSeed;   // defaults to student.Id
 
-        vm.CycleAvatar(item);
-        string cycledAvatar = item.Avatar;
-        Assert.NotEqual(initialAvatar, cycledAvatar);
+        // Randomize gives the student a new, GUID-style DiceBear seed
+        vm.RandomizeAvatar(item);
+        string newSeed = item.DiceBearSeed;
+        Assert.NotEqual(initialSeed, newSeed);
+        Assert.NotEmpty(item.Avatar);             // new seed is stored in Avatar field
 
         vm.SaveToState();
         Assert.True(state.StudentAvatars.ContainsKey("s_201"));
-        Assert.Equal(cycledAvatar, state.StudentAvatars["s_201"]);
+        Assert.Equal(item.Avatar, state.StudentAvatars["s_201"]);
+    }
+
+    [Fact]
+    public void CycleAvatar_DelegatesToRandomizeAvatar()
+    {
+        var state = new AdminWizardState();
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_202", FullName = "Zara", ClassName = "2 Cemerlang", EmailLocal = "m-202" });
+
+        var vm = new Step5AvatarsViewModel(state);
+        var item = vm.AvatarItems[0];
+        string before = item.DiceBearSeed;
+
+        vm.CycleAvatar(item);   // backward-compat alias
+        Assert.NotEqual(before, item.DiceBearSeed);
     }
 }

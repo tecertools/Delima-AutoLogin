@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- SK Seksyen 24 Fallback Palette (PROMPT.txt and PRD §7.1) -->
+    <!-- Neutral Fallback Palette (PROMPT.txt and PRD §7.1) -->
     <SolidColorBrush x:Key="PageBackgroundBrush" Color="#FFFDF7" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="SoftSurfaceBrush" Color="#FDF9DC" />

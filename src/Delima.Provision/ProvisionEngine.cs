@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Delima.Core.Store;
+using Delima.Win32;
 using Delima.Win32.Store;
 
 namespace Delima.Provision;
@@ -18,14 +19,16 @@ public sealed class ProvisionResult
     public int ExitCode { get; set; }
     public string? ErrorMessage { get; set; }
     public string? SchoolCode { get; set; }
+    public string? SchoolName { get; set; }
     public string? DeviceId { get; set; }
     public int StudentCount { get; set; }
     public DateTimeOffset StoreGeneratedAt { get; set; }
     public bool ChecklistUpdated { get; set; }
+    public string? InstalledLauncherPath { get; set; }
 }
 
 /// <summary>
-/// Implements the 7-step provisioning workflow specified in Technical Architecture §10.
+/// Implements the streamlined provisioning and setup workflow.
 /// </summary>
 public static class ProvisionEngine
 {
@@ -35,14 +38,15 @@ public static class ProvisionEngine
     public const int ExitStoreWriteFailed = 3;
 
     /// <summary>
-    /// Executes the 7-step provisioning workflow.
+    /// Executes the provisioning workflow with optional progress reporting.
     /// </summary>
     [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public static ProvisionResult Execute(
         ProvisionOptions options,
         TextReader? inReader = null,
         TextWriter? outWriter = null,
-        TextWriter? errWriter = null)
+        TextWriter? errWriter = null,
+        Action<int, string>? progressCallback = null)
     {
         ArgumentNullException.ThrowIfNull(options);
 
@@ -59,6 +63,8 @@ public static class ProvisionEngine
         // ====================================================================
         // Step 1: Read school.dlmpack from USB, local path, or UNC path
         // ====================================================================
+        progressCallback?.Invoke(1, "Mencari dan membaca fail bungkusan 'school.dlmpack'...");
+
         string? packPath = ResolvePackPath(options, inReader, outWriter);
         if (string.IsNullOrWhiteSpace(packPath) || !File.Exists(packPath))
         {
@@ -67,7 +73,7 @@ public static class ProvisionEngine
             {
                 Success = false,
                 ExitCode = ExitInvalidArgsOrNotFound,
-                ErrorMessage = $"Pack file not found: {packPath ?? "school.dlmpack"}"
+                ErrorMessage = $"Fail bungkusan 'school.dlmpack' tidak dijumpai: {packPath ?? "school.dlmpack"}"
             };
         }
 
@@ -83,7 +89,7 @@ public static class ProvisionEngine
             {
                 Success = false,
                 ExitCode = ExitInvalidArgsOrNotFound,
-                ErrorMessage = $"Failed to read pack file: {ex.Message}"
+                ErrorMessage = $"Gagal membaca fail pakej '{packPath}': {ex.Message}"
             };
         }
 
@@ -91,9 +97,15 @@ public static class ProvisionEngine
         try
         {
             // ================================================================
-            // Step 2: Prompt for admin passphrase (memory only, zeroed on exit)
+            // Step 2: Prompt / get admin passphrase (memory only, zeroed on exit)
             // ================================================================
-            if (options.PassphraseStdin)
+            progressCallback?.Invoke(2, "Mengesahkan kata laluan pentadbir...");
+
+            if (!string.IsNullOrEmpty(options.Passphrase))
+            {
+                passphraseBuffer = new SecurePasswordBuffer(options.Passphrase);
+            }
+            else if (options.PassphraseStdin)
             {
                 string? line = inReader.ReadLine();
                 if (line == null)
@@ -103,7 +115,7 @@ public static class ProvisionEngine
                     {
                         Success = false,
                         ExitCode = ExitInvalidArgsOrNotFound,
-                        ErrorMessage = "No passphrase provided via stdin."
+                        ErrorMessage = "Tiada kata laluan dibekalkan melalui stdin."
                     };
                 }
 
@@ -115,7 +127,7 @@ public static class ProvisionEngine
                     {
                         Success = false,
                         ExitCode = ExitInvalidArgsOrNotFound,
-                        ErrorMessage = "Empty passphrase received from stdin."
+                        ErrorMessage = "Kata laluan dari stdin adalah kosong."
                     };
                 }
 
@@ -125,12 +137,12 @@ public static class ProvisionEngine
             {
                 if (options.Quiet)
                 {
-                    errWriter.WriteLine("[RALAT] Mod senyap (--quiet) memerlukan --passphrase-stdin.");
+                    errWriter.WriteLine("[RALAT] Mod senyap (--quiet) memerlukan --passphrase-stdin atau pilihan Passphrase.");
                     return new ProvisionResult
                     {
                         Success = false,
                         ExitCode = ExitInvalidArgsOrNotFound,
-                        ErrorMessage = "Quiet mode requires --passphrase-stdin."
+                        ErrorMessage = "Mod senyap memerlukan kata laluan dibekalkan."
                     };
                 }
 
@@ -142,7 +154,7 @@ public static class ProvisionEngine
                     {
                         Success = false,
                         ExitCode = ExitInvalidArgsOrNotFound,
-                        ErrorMessage = "Passphrase cannot be empty."
+                        ErrorMessage = "Kata laluan tidak boleh kosong."
                     };
                 }
             }
@@ -154,6 +166,7 @@ public static class ProvisionEngine
             {
                 outWriter.WriteLine("[1/5] Menyahsulit dan mengesahkan pakej induk (Argon2id + AES-256-GCM)...");
             }
+            progressCallback?.Invoke(3, "Menyahsulit dan mengesahkan data sekolah (AES-256-GCM)...");
 
             MasterBundlePayload payload;
             try
@@ -167,7 +180,7 @@ public static class ProvisionEngine
                 {
                     Success = false,
                     ExitCode = ExitAuthenticationFailed,
-                    ErrorMessage = "Authentication failed: invalid passphrase or corrupted bundle."
+                    ErrorMessage = "Kata laluan pentadbir tidak sah atau fail pakej rosak."
                 };
             }
             catch (Exception ex)
@@ -177,7 +190,7 @@ public static class ProvisionEngine
                 {
                     Success = false,
                     ExitCode = ExitAuthenticationFailed,
-                    ErrorMessage = $"Failed to decrypt bundle: {ex.Message}"
+                    ErrorMessage = $"Gagal menyahsulit pakej: {ex.Message}"
                 };
             }
 
@@ -188,8 +201,14 @@ public static class ProvisionEngine
                 {
                     Success = false,
                     ExitCode = ExitAuthenticationFailed,
-                    ErrorMessage = "Invalid school code in decrypted bundle."
+                    ErrorMessage = "Pakej tidak mengandungi kod sekolah yang sah."
                 };
+            }
+
+            // Override preferred browser if explicitly selected by the administrator during setup
+            if (!string.IsNullOrWhiteSpace(options.PreferredBrowser))
+            {
+                payload.Config.PreferredBrowser = options.PreferredBrowser.ToLowerInvariant();
             }
 
             string targetDir = options.TargetDirectory ?? DpapiCredentialStore.GetDefaultStoreDirectory();
@@ -201,6 +220,7 @@ public static class ProvisionEngine
             {
                 outWriter.WriteLine($"[2/5] Menulis storan per-PC DPAPI (LocalMachine) untuk sekolah {payload.School.Code} ({payload.Students.Count} murid)...");
             }
+            progressCallback?.Invoke(4, $"Menyimpan storan selamat DPAPI untuk {payload.Students.Count} orang murid...");
 
             if (!options.DryRun)
             {
@@ -215,7 +235,7 @@ public static class ProvisionEngine
                     {
                         Success = false,
                         ExitCode = ExitStoreWriteFailed,
-                        ErrorMessage = $"Failed to write DPAPI store: {ex.Message}"
+                        ErrorMessage = $"Gagal menulis storan DPAPI: {ex.Message}"
                     };
                 }
             }
@@ -244,12 +264,30 @@ public static class ProvisionEngine
                 {
                     Success = false,
                     ExitCode = ExitStoreWriteFailed,
-                    ErrorMessage = $"Failed to write device or provision metadata: {ex.Message}"
+                    ErrorMessage = $"Gagal menguruskan metadata peranti: {ex.Message}"
                 };
             }
 
             // ================================================================
-            // Step 6: Append to the lab checklist file on the share, if present
+            // Step 6: Install Delima.Launcher & Create Desktop Shortcuts / Policies
+            // ================================================================
+            progressCallback?.Invoke(5, "Memasang Pelancar DELIMa & menyediakan pintasan Desktop...");
+
+            string? installedLauncherPath = null;
+            if (!options.DryRun)
+            {
+                try
+                {
+                    installedLauncherPath = SetupLauncherAndShortcuts(options, packPath, outWriter);
+                }
+                catch (Exception ex)
+                {
+                    outWriter.WriteLine($"[AMARAN] Ralat semasa persediaan pintasan/aplikasi: {ex.Message}");
+                }
+            }
+
+            // ================================================================
+            // Step 7: Append to the lab checklist file on the share, if present
             // ================================================================
             if (!options.Quiet)
             {
@@ -259,29 +297,36 @@ public static class ProvisionEngine
             bool checklistUpdated = UpdateLabChecklist(options, packPath, deviceId, payload.School.Code, payload.GeneratedAt, outWriter, errWriter);
 
             // ================================================================
-            // Step 7: Zero everything. Exit code 0/non-zero for scripting.
+            // Step 8: Complete and clean up
             // ================================================================
             if (!options.Quiet)
             {
                 outWriter.WriteLine("[5/5] Selesai membersihkan memori.");
                 outWriter.WriteLine();
                 outWriter.WriteLine($"[BERJAYA] Komputer ini berjaya diprovisikan untuk {payload.School.Name} ({payload.School.Code}).");
-                outWriter.WriteLine($"  - Device ID      : {deviceId}");
-                outWriter.WriteLine($"  - Bilangan Murid : {payload.Students.Count}");
-                outWriter.WriteLine($"  - Tarikh Storan  : {payload.GeneratedAt:yyyy-MM-dd HH:mm:ss zzz}");
-                outWriter.WriteLine($"  - Lokasi Storan  : {targetDir}");
-                outWriter.WriteLine("  - Keselamatan    : Sila pastikan dasar AppLocker/SRP telah disahkan pada akaun murid (PRD §8.3).");
+                outWriter.WriteLine($"  - Device ID       : {deviceId}");
+                outWriter.WriteLine($"  - Bilangan Murid  : {payload.Students.Count}");
+                outWriter.WriteLine($"  - Tarikh Storan   : {payload.GeneratedAt:yyyy-MM-dd HH:mm:ss zzz}");
+                outWriter.WriteLine($"  - Lokasi Storan   : {targetDir}");
+                if (!string.IsNullOrEmpty(installedLauncherPath))
+                {
+                    outWriter.WriteLine($"  - Lokasi Pelancar : {installedLauncherPath}");
+                }
             }
+
+            progressCallback?.Invoke(6, "Persediaan berjaya diselesaikan!");
 
             return new ProvisionResult
             {
                 Success = true,
                 ExitCode = ExitSuccess,
                 SchoolCode = payload.School.Code,
+                SchoolName = payload.School.Name,
                 DeviceId = deviceId,
                 StudentCount = payload.Students.Count,
                 StoreGeneratedAt = payload.GeneratedAt,
-                ChecklistUpdated = checklistUpdated
+                ChecklistUpdated = checklistUpdated,
+                InstalledLauncherPath = installedLauncherPath
             };
         }
         finally
@@ -292,7 +337,180 @@ public static class ProvisionEngine
         }
     }
 
-    private static string? ResolvePackPath(ProvisionOptions options, TextReader inReader, TextWriter outWriter)
+    /// <summary>
+    /// Installs the Launcher executable and creates Desktop / Start Menu shortcuts.
+    /// </summary>
+    public static string? SetupLauncherAndShortcuts(ProvisionOptions options, string? packPath, TextWriter outWriter)
+    {
+        string defaultProgramFiles = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+            "DELIMa Launcher");
+
+        string installDir = options.InstallDestinationPath ?? defaultProgramFiles;
+        string targetExePath = Path.Combine(installDir, "Delima.Launcher.exe");
+
+        // 1. Locate source Delima.Launcher.exe
+        string? sourceExe = ResolveLauncherSourceExe(options, packPath);
+
+        if (options.InstallLauncher && !string.IsNullOrEmpty(sourceExe) && File.Exists(sourceExe))
+        {
+            try
+            {
+                if (!Directory.Exists(installDir))
+                {
+                    Directory.CreateDirectory(installDir);
+                }
+
+                // Copy executable if source and target are different
+                if (!string.Equals(Path.GetFullPath(sourceExe), Path.GetFullPath(targetExePath), StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Copy(sourceExe, targetExePath, overwrite: true);
+                }
+
+                // Copy avatars folder if exists in source directory
+                string? sourceDir = Path.GetDirectoryName(sourceExe);
+                if (!string.IsNullOrEmpty(sourceDir))
+                {
+                    string sourceAvatars = Path.Combine(sourceDir, "avatars");
+                    string destAvatars = Path.Combine(installDir, "avatars");
+
+                    if (Directory.Exists(sourceAvatars) && !string.Equals(Path.GetFullPath(sourceAvatars), Path.GetFullPath(destAvatars), StringComparison.OrdinalIgnoreCase))
+                    {
+                        CopyDirectory(sourceAvatars, destAvatars);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                outWriter.WriteLine($"[AMARAN] Gagal menyalin fail aplikasi pelancar: {ex.Message}");
+            }
+        }
+
+        // Determine the actual executable path to point shortcuts to
+        string executableToLink = File.Exists(targetExePath)
+            ? targetExePath
+            : (sourceExe ?? targetExePath);
+
+        if (File.Exists(executableToLink))
+        {
+            // 2. Create Desktop Shortcut
+            if (options.CreateDesktopShortcut)
+            {
+                try
+                {
+                    ShortcutHelper.CreateDesktopShortcut(
+                        targetPath: executableToLink,
+                        shortcutName: "DELIMa Smart Launcher",
+                        publicDesktop: true,
+                        arguments: options.EnableKioskStartup ? "--kiosk" : null);
+
+                    ShortcutHelper.CreateStartMenuShortcut(
+                        targetPath: executableToLink,
+                        shortcutName: "DELIMa Smart Launcher",
+                        subFolder: "DELIMa Launcher",
+                        publicStartMenu: true);
+                }
+                catch (Exception ex)
+                {
+                    outWriter.WriteLine($"[AMARAN] Gagal mencipta pintasan Desktop: {ex.Message}");
+                }
+            }
+
+            // 3. Configure Kiosk Startup
+            if (options.EnableKioskStartup)
+            {
+                try
+                {
+                    LaunchAtLogonConfigurator.Enable(
+                        executablePath: executableToLink,
+                        arguments: "--kiosk",
+                        machineWide: true);
+                }
+                catch (Exception ex)
+                {
+                    outWriter.WriteLine($"[AMARAN] Gagal mendaftarkan Mod Kiosk semasa log masuk: {ex.Message}");
+                }
+            }
+        }
+
+        // 4. Configure Browser Policies
+        if (options.ApplyBrowserPolicies)
+        {
+            try
+            {
+                BrowserPolicyConfigurator.ApplyPolicies(BrowserKind.Chrome);
+                BrowserPolicyConfigurator.ApplyPolicies(BrowserKind.Edge);
+            }
+            catch (Exception ex)
+            {
+                outWriter.WriteLine($"[AMARAN] Gagal menetapkan dasar pelayar: {ex.Message}");
+            }
+        }
+
+        return File.Exists(executableToLink) ? executableToLink : null;
+    }
+
+    private static string? ResolveLauncherSourceExe(ProvisionOptions options, string? packPath)
+    {
+        if (!string.IsNullOrWhiteSpace(options.LauncherSourcePath) && File.Exists(options.LauncherSourcePath))
+        {
+            return Path.GetFullPath(options.LauncherSourcePath);
+        }
+
+        List<string> candidateDirs =
+        [
+            AppDomain.CurrentDomain.BaseDirectory,
+            Environment.CurrentDirectory,
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Launcher"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "publish", "Launcher")
+        ];
+
+        if (!string.IsNullOrWhiteSpace(packPath))
+        {
+            string? packDir = Path.GetDirectoryName(packPath);
+            if (!string.IsNullOrEmpty(packDir) && !candidateDirs.Contains(packDir))
+            {
+                candidateDirs.Insert(0, packDir);
+                candidateDirs.Insert(1, Path.Combine(packDir, "Launcher"));
+            }
+        }
+
+        foreach (var dir in candidateDirs)
+        {
+            if (Directory.Exists(dir))
+            {
+                string candidate = Path.Combine(dir, "Delima.Launcher.exe");
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static void CopyDirectory(string sourceDir, string destinationDir)
+    {
+        var dir = new DirectoryInfo(sourceDir);
+        if (!dir.Exists) return;
+
+        Directory.CreateDirectory(destinationDir);
+
+        foreach (var file in dir.GetFiles("*", SearchOption.AllDirectories))
+        {
+            string relativePath = Path.GetRelativePath(sourceDir, file.FullName);
+            string destFile = Path.Combine(destinationDir, relativePath);
+            string? destSubDir = Path.GetDirectoryName(destFile);
+            if (!string.IsNullOrEmpty(destSubDir) && !Directory.Exists(destSubDir))
+            {
+                Directory.CreateDirectory(destSubDir);
+            }
+            file.CopyTo(destFile, true);
+        }
+    }
+
+    public static string? ResolvePackPath(ProvisionOptions options, TextReader? inReader = null, TextWriter? outWriter = null)
     {
         if (!string.IsNullOrWhiteSpace(options.PackPath))
         {
@@ -313,7 +531,7 @@ public static class ProvisionEngine
             return appDlm;
         }
 
-        // Search for any *.dlmpack in current directory
+        // Search for any *.dlmpack in current directory or base directory
         try
         {
             var files = Directory.GetFiles(Environment.CurrentDirectory, "*.dlmpack");
@@ -321,14 +539,39 @@ public static class ProvisionEngine
             {
                 return files[0];
             }
+
+            var appFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dlmpack");
+            if (appFiles.Length == 1)
+            {
+                return appFiles[0];
+            }
+
+            // Search attached removable USB drives
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (drive.IsReady && drive.DriveType == DriveType.Removable)
+                {
+                    string usbDlm = Path.Combine(drive.RootDirectory.FullName, "school.dlmpack");
+                    if (File.Exists(usbDlm))
+                    {
+                        return usbDlm;
+                    }
+
+                    var usbFiles = Directory.GetFiles(drive.RootDirectory.FullName, "*.dlmpack");
+                    if (usbFiles.Length == 1)
+                    {
+                        return usbFiles[0];
+                    }
+                }
+            }
         }
         catch
         {
             // Fall through
         }
 
-        // If interactive mode, prompt user for path
-        if (!options.Quiet)
+        // If interactive console mode, prompt user for path
+        if (!options.Quiet && inReader != null && outWriter != null)
         {
             outWriter.Write("Masukkan laluan fail school.dlmpack: ");
             string? input = inReader.ReadLine()?.Trim('\"', ' ');
@@ -350,14 +593,14 @@ public static class ProvisionEngine
 
         while (true)
         {
-            ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
 
-            if (key.Key == ConsoleKey.Enter)
+            if (keyInfo.Key == ConsoleKey.Enter)
             {
                 outWriter.WriteLine();
                 break;
             }
-            else if (key.Key == ConsoleKey.Backspace)
+            else if (keyInfo.Key == ConsoleKey.Backspace)
             {
                 if (length > 0)
                 {
@@ -366,76 +609,57 @@ public static class ProvisionEngine
                     outWriter.Write("\b \b");
                 }
             }
-            else if (key.Key == ConsoleKey.Escape)
-            {
-                while (length > 0)
-                {
-                    length--;
-                    buffer[length] = '\0';
-                    outWriter.Write("\b \b");
-                }
-            }
-            else if (!char.IsControl(key.KeyChar))
+            else if (!char.IsControl(keyInfo.KeyChar))
             {
                 if (length < buffer.Length)
                 {
-                    buffer[length++] = key.KeyChar;
+                    buffer[length++] = keyInfo.KeyChar;
                     outWriter.Write('*');
                 }
             }
         }
 
-        try
-        {
-            return new SecurePasswordBuffer(buffer.AsSpan(0, length));
-        }
-        finally
-        {
-            CryptographicOperations.ZeroMemory(MemoryMarshal.AsBytes(buffer.AsSpan()));
-        }
+        var secureBuffer = new SecurePasswordBuffer(buffer.AsSpan(0, length));
+        Array.Clear(buffer, 0, buffer.Length);
+        return secureBuffer;
     }
 
     private static string ManageDeviceId(string targetDir, string pupilAccount, bool dryRun, bool applyAcls)
     {
-        string deviceIdFile = Path.Combine(targetDir, "device.id");
-        string altDeviceIdFile = Path.Combine(targetDir, "device_id");
+        string deviceIdPath = Path.Combine(targetDir, "device.id");
+        string legacyDeviceIdPath = Path.Combine(targetDir, "device_id");
+        string deviceId;
 
-        try
+        if (File.Exists(deviceIdPath))
         {
-            if (File.Exists(deviceIdFile))
+            deviceId = File.ReadAllText(deviceIdPath).Trim();
+        }
+        else if (File.Exists(legacyDeviceIdPath))
+        {
+            deviceId = File.ReadAllText(legacyDeviceIdPath).Trim();
+        }
+        else
+        {
+            deviceId = Guid.NewGuid().ToString("D").ToUpperInvariant();
+            if (!dryRun)
             {
-                string existing = File.ReadAllText(deviceIdFile).Trim();
-                if (Guid.TryParse(existing, out var guid))
+                File.WriteAllText(deviceIdPath, deviceId, Encoding.UTF8);
+
+                if (applyAcls)
                 {
-                    return guid.ToString("D");
+                    try
+                    {
+                        StoreAclConfigurator.ApplyStoreFileAcls(deviceIdPath, pupilAccount);
+                    }
+                    catch
+                    {
+                        // Ignore ACL failure on device_id if already protected
+                    }
                 }
             }
-            else if (File.Exists(altDeviceIdFile))
-            {
-                string existing = File.ReadAllText(altDeviceIdFile).Trim();
-                if (Guid.TryParse(existing, out var guid))
-                {
-                    return guid.ToString("D");
-                }
-            }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // If restricted by ACL, proceed with generating/preserving ID
         }
 
-        // First run on this machine -> generate new unique GUID
-        string newId = Guid.NewGuid().ToString("D");
-        if (!dryRun)
-        {
-            Directory.CreateDirectory(targetDir);
-            File.WriteAllText(deviceIdFile, newId);
-            if (applyAcls && OperatingSystem.IsWindows())
-            {
-                StoreAclConfigurator.ApplyStoreFileAcls(deviceIdFile, pupilAccount);
-            }
-        }
-        return newId;
+        return deviceId;
     }
 
     private static void WriteProvisionMetadata(string targetDir, string deviceId, MasterBundlePayload payload, string pupilAccount, bool applyAcls)
@@ -443,21 +667,29 @@ public static class ProvisionEngine
         string metaPath = Path.Combine(targetDir, "provision.json");
         var meta = new
         {
-            device_id = deviceId,
-            school_code = payload.School.Code,
-            school_name = payload.School.Name,
             schema_version = payload.SchemaVersion,
-            bundle_generated_at = payload.GeneratedAt,
+            device_id = deviceId,
+            school_code = payload.School?.Code,
+            school_name = payload.School?.Name,
+            student_count = payload.Students?.Count ?? 0,
             provisioned_at = DateTimeOffset.UtcNow,
-            student_count = payload.Students.Count,
-            app_version = typeof(ProvisionEngine).Assembly.GetName().Version?.ToString(3) ?? "2.0.0"
+            bundle_generated_at = payload.GeneratedAt,
+            software_version = "2.0.0"
         };
 
         string json = JsonSerializer.Serialize(meta, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(metaPath, json);
-        if (applyAcls && OperatingSystem.IsWindows())
+        File.WriteAllText(metaPath, json, Encoding.UTF8);
+
+        if (applyAcls)
         {
-            StoreAclConfigurator.ApplyStoreFileAcls(metaPath, pupilAccount);
+            try
+            {
+                StoreAclConfigurator.ApplyStoreFileAcls(metaPath, pupilAccount);
+            }
+            catch
+            {
+                // Fall through
+            }
         }
     }
 
@@ -466,104 +698,55 @@ public static class ProvisionEngine
         string packPath,
         string deviceId,
         string schoolCode,
-        DateTimeOffset bundleDate,
+        DateTimeOffset storeDate,
         TextWriter outWriter,
         TextWriter errWriter)
     {
-        string? checklistFile = null;
+        string? checklistPath = options.ChecklistPath;
 
-        if (!string.IsNullOrWhiteSpace(options.ChecklistPath))
-        {
-            checklistFile = Path.GetFullPath(options.ChecklistPath);
-        }
-        else
+        if (string.IsNullOrWhiteSpace(checklistPath))
         {
             string? packDir = Path.GetDirectoryName(packPath);
-            if (!string.IsNullOrEmpty(packDir))
+            if (!string.IsNullOrWhiteSpace(packDir))
             {
-                string candidate1 = Path.Combine(packDir, "lab_checklist.csv");
-                string candidate2 = Path.Combine(packDir, "lab-checklist.csv");
-                string candidate3 = Path.Combine(packDir, "checklist.csv");
-
-                if (File.Exists(candidate1)) checklistFile = candidate1;
-                else if (File.Exists(candidate2)) checklistFile = candidate2;
-                else if (File.Exists(candidate3)) checklistFile = candidate3;
-                else if (Directory.Exists(packDir))
+                string candidate = Path.Combine(packDir, "lab_checklist.csv");
+                if (File.Exists(candidate))
                 {
-                    checklistFile = candidate1;
+                    checklistPath = candidate;
                 }
             }
         }
 
-        if (string.IsNullOrEmpty(checklistFile))
+        if (string.IsNullOrWhiteSpace(checklistPath))
         {
             return false;
         }
 
-        string machineName = Environment.MachineName;
-        string appVersion = typeof(ProvisionEngine).Assembly.GetName().Version?.ToString(3) ?? "2.0.0";
-        string timestamp = DateTimeOffset.UtcNow.ToString("O");
-        string storeDate = bundleDate.ToString("O");
-
-        string header = "Timestamp,PC_Name,Device_ID,School_Code,Software_Version,Store_Date,Status\r\n";
-        string row = $"{timestamp},{EscapeCsv(machineName)},{deviceId},{EscapeCsv(schoolCode)},{appVersion},{storeDate},SUCCESS\r\n";
-
-        const int maxRetries = 5;
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        try
         {
-            try
-            {
-                string? dir = Path.GetDirectoryName(checklistFile);
-                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
+            const string header = "Timestamp,PC_Name,Device_ID,School_Code,Software_Version,Store_Date,Status";
+            string machineName = Environment.MachineName;
+            string newEntry = $"{DateTimeOffset.UtcNow:yyyy-MM-dd HH:mm:ss},{machineName},{deviceId},{schoolCode},2.0.0,{storeDate:yyyy-MM-dd HH:mm:ss},SUCCESS";
 
-                bool needsHeader = !File.Exists(checklistFile) || new FileInfo(checklistFile).Length == 0;
+            bool fileExists = File.Exists(checklistPath);
+            bool needHeader = !fileExists || new FileInfo(checklistPath).Length == 0;
 
-                using (var stream = new FileStream(checklistFile, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+            using (var sw = new StreamWriter(checklistPath, append: true, Encoding.UTF8))
+            {
+                if (needHeader)
                 {
-                    stream.Seek(0, SeekOrigin.End);
-                    using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
-                    {
-                        if (needsHeader)
-                        {
-                            writer.Write(header);
-                        }
-                        writer.Write(row);
-                        writer.Flush();
-                    }
+                    sw.WriteLine(header);
                 }
+                sw.WriteLine(newEntry);
+            }
 
-                if (!options.Quiet)
-                {
-                    outWriter.WriteLine($"  Senarai semak dikemas kini: {checklistFile}");
-                }
-                return true;
-            }
-            catch (IOException) when (attempt < maxRetries)
-            {
-                Thread.Sleep(Random.Shared.Next(50, 200 * attempt));
-            }
-            catch (Exception ex)
-            {
-                if (!options.Quiet)
-                {
-                    errWriter.WriteLine($"  [Amaran] Tidak dapat mengemas kini fail senarai semak '{checklistFile}': {ex.Message}");
-                }
-                return false;
-            }
+            outWriter.WriteLine($"  - Senarai Semak   : Dikemas kini ({checklistPath})");
+            return true;
         }
-
-        return false;
-    }
-
-    private static string EscapeCsv(string field)
-    {
-        if (field.Contains(',') || field.Contains('\"') || field.Contains('\n') || field.Contains('\r'))
+        catch (Exception ex)
         {
-            return $"\"{field.Replace("\"", "\"\"")}\"";
+            errWriter.WriteLine($"[AMARAN] Gagal mengemas kini senarai semak makmal: {ex.Message}");
+            return false;
         }
-        return field;
     }
 }

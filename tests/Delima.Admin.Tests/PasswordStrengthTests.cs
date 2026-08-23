@@ -39,9 +39,9 @@ public class PasswordStrengthTests
     [Fact]
     public void RecoverySheetInfo_ComputeKeyCheckValue_ReturnsDeterministicFingerprint()
     {
-        string kcv1 = RecoverySheetInfo.ComputeKeyCheckValue("MakmalKomputer2026!", "SKS24");
-        string kcv2 = RecoverySheetInfo.ComputeKeyCheckValue("MakmalKomputer2026!", "SKS24");
-        string kcvOther = RecoverySheetInfo.ComputeKeyCheckValue("OtherPassword123!", "SKS24");
+        string kcv1 = RecoverySheetInfo.ComputeKeyCheckValue("MakmalKomputer2026!", "BBA1234");
+        string kcv2 = RecoverySheetInfo.ComputeKeyCheckValue("MakmalKomputer2026!", "BBA1234");
+        string kcvOther = RecoverySheetInfo.ComputeKeyCheckValue("OtherPassword123!", "BBA1234");
 
         Assert.Equal(8, kcv1.Length);
         Assert.Equal(kcv1, kcv2);

@@ -9,8 +9,8 @@ public class KataLaluanGambarViewModelTests
 {
     private static School CreateTestSchool() => new()
     {
-        Code = "SKS24",
-        Name = "SK Seksyen 24 Shah Alam",
+        Code = "BBA1234",
+        Name = "Sekolah Kebangsaan Contoh",
         Domain = "moe-dl.edu.my"
     };
 

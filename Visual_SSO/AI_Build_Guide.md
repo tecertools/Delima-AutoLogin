@@ -64,7 +64,7 @@ You want a `10.` version.
 ## Part 2 — Open the project
 
 ```bash
-cd "/Users/rajazrien/z.Dev Space/SSO Sks24"
+cd "Delima-AutoLogin"
 gemini
 ```
 

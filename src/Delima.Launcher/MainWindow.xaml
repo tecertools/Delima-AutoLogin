@@ -7,6 +7,7 @@
         xmlns:views="clr-namespace:Delima.Launcher.Views"
         mc:Ignorable="d"
         Title="DELIMa Smart Launcher"
+        Icon="icon.ico"
         Width="1366" Height="768"
         MinWidth="1024" MinHeight="600"
         WindowStartupLocation="CenterScreen"

@@ -1,19 +1,37 @@
 namespace Delima.Provision;
 
 /// <summary>
-/// Command-line options for Delima.Provision per Technical Architecture §10.
+/// Command-line and GUI options for Delima.Provision per Technical Architecture §10.
 /// </summary>
 public sealed class ProvisionOptions
 {
     public string? PackPath { get; set; }
     public bool Quiet { get; set; }
     public bool PassphraseStdin { get; set; }
+    public string? Passphrase { get; set; }
     public string? TargetDirectory { get; set; }
     public string? ChecklistPath { get; set; }
     public string PupilAccount { get; set; } = "Murid";
     public bool ApplyAcls { get; set; } = true;
     public bool DryRun { get; set; }
     public bool ShowHelp { get; set; }
+
+    // Streamlined Installation & Shortcut Options
+    public bool InstallLauncher { get; set; } = true;
+    public bool CreateDesktopShortcut { get; set; } = true;
+    public bool EnableKioskStartup { get; set; } = false;
+    public bool ApplyBrowserPolicies { get; set; } = true;
+    public string PreferredBrowser { get; set; } = "chrome"; // "chrome", "edge", "auto"
+    public string? LauncherSourcePath { get; set; }
+    public string? InstallDestinationPath { get; set; }
+
+    /// <summary>
+    /// Checks if any command line arguments were provided.
+    /// </summary>
+    public static bool HasCommandLineArgs(string[] args)
+    {
+        return args != null && args.Length > 0;
+    }
 
     /// <summary>
     /// Parses command line arguments into ProvisionOptions.
@@ -51,6 +69,27 @@ public sealed class ProvisionOptions
             {
                 options.ApplyAcls = false;
             }
+            else if (arg.Equals("--no-install", StringComparison.OrdinalIgnoreCase))
+            {
+                options.InstallLauncher = false;
+            }
+            else if (arg.Equals("--no-shortcut", StringComparison.OrdinalIgnoreCase))
+            {
+                options.CreateDesktopShortcut = false;
+            }
+            else if (arg.Equals("--kiosk", StringComparison.OrdinalIgnoreCase))
+            {
+                options.EnableKioskStartup = true;
+            }
+            else if (arg.Equals("--no-policy", StringComparison.OrdinalIgnoreCase))
+            {
+                options.ApplyBrowserPolicies = false;
+            }
+            else if ((arg.Equals("--browser", StringComparison.OrdinalIgnoreCase) ||
+                      arg.Equals("-b", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+            {
+                options.PreferredBrowser = args[++i].ToLowerInvariant();
+            }
             else if ((arg.Equals("--pack", StringComparison.OrdinalIgnoreCase) ||
                       arg.Equals("-p", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
             {
@@ -60,6 +99,10 @@ public sealed class ProvisionOptions
                       arg.Equals("-t", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
             {
                 options.TargetDirectory = args[++i];
+            }
+            else if ((arg.Equals("--install-dir", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+            {
+                options.InstallDestinationPath = args[++i];
             }
             else if ((arg.Equals("--checklist", StringComparison.OrdinalIgnoreCase) ||
                       arg.Equals("-c", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
@@ -90,19 +133,28 @@ public sealed class ProvisionOptions
 
             Pilihan / Options:
               --pack, -p <laluan>         Laluan ke fail school.dlmpack (USB atau perkongsian fail / UNC path)
+              --browser, -b <nama>        Pilihan pelayar: chrome, edge, atau auto (lalai: chrome)
               --quiet, -q                 Mod senyap (tiada prompt, kod keluar 0 jika berjaya)
               --passphrase-stdin          Baca kata laluan pentadbir daripada stdin (bukan argumen baris perintah)
               --target-dir, -t <laluan>   Direktori storan setempat (lalai: %ProgramData%\DELIMa Launcher)
+              --install-dir <laluan>      Direktori pemasangan aplikasi (lalai: %ProgramFiles%\DELIMa Launcher)
+              --no-install                Jangan pasang/salin Delima.Launcher.exe ke Program Files
+              --no-shortcut               Jangan cipta pintasan pada Desktop
+              --kiosk                     Daftar autostart semasa log masuk (Mod Kiosk)
+              --no-policy                 Jangan kuatkuasakan dasar keselamatan pelayar makmal
               --checklist, -c <laluan>    Laluan ke fail senarai semak makmal (lab_checklist.csv)
               --pupil-account, -a <nama>  Nama akaun murid Windows untuk ACL (lalai: Murid)
               --dry-run                   Nyahsulit dan sahkan pakej tanpa menulis storan ke cakera
               --help, -h                  Papar bantuan ini
 
             Contoh / Examples:
-              # Interaktif dari pemacu USB / Interactive from USB:
-              Delima.Provision.exe --pack E:\school.dlmpack
+              # Interaktif (Antaramuka GUI secara automatik jika dilancarkan tanpa argumen)
+              Delima.Provision.exe
 
-              # Skrip PDQ / GPO senyap melalui stdin / Silent scripting via stdin:
+              # Mod baris perintah menggunakan Google Chrome:
+              Delima.Provision.exe --pack E:\school.dlmpack --browser chrome
+
+              # Skrip PDQ / GPO senyap melalui stdin:
               type pass.txt | Delima.Provision.exe --quiet --pack "\\share\dlm\school.dlmpack" --passphrase-stdin
             """;
     }

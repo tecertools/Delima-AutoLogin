@@ -90,14 +90,8 @@ public sealed partial class ModGuruDashboardViewModel : ObservableObject
     [ObservableProperty]
     private string _newPupilPassword = "";
 
-    [ObservableProperty]
-    private string _newPupilAvatar = "avatar1";
-
-    public ObservableCollection<string> AvailableAvatars { get; } =
-    [
-        "avatar1", "avatar2", "avatar3", "avatar4",
-        "avatar5", "avatar6", "avatar7", "avatar8"
-    ];
+    // AvailableAvatars removed: avatars are now generated automatically via DiceBear Critters
+    // based on each student's ID. No manual avatar selection is needed.
 
     // --- Tab 5: Diagnostik ---
     [ObservableProperty]
@@ -372,7 +366,7 @@ public sealed partial class ModGuruDashboardViewModel : ObservableObject
             DisplayName = nameTrimmed,
             ClassId = NewPupilClass.Id,
             EmailLocal = cleanId,
-            Avatar = string.IsNullOrWhiteSpace(NewPupilAvatar) ? "avatar1" : NewPupilAvatar,
+            Avatar = "",   // DiceBear resolves to student.Id as seed automatically
             PasswordVersion = 1,
             Active = true,
             PicturePassword = PicturePasswordHasher.CreatePicturePassword(

@@ -35,7 +35,7 @@ public class TeacherPinServiceTests : IDisposable
     {
         var service = new TeacherPinService();
 
-        bool result = service.VerifyPin("1234", "SKS24", _testAuditDir);
+        bool result = service.VerifyPin("1234", "TEST01", _testAuditDir);
 
         Assert.True(result);
         Assert.Equal(5, service.GetRemainingAttempts());
@@ -45,7 +45,7 @@ public class TeacherPinServiceTests : IDisposable
         Assert.True(File.Exists(logFile));
         string logContent = File.ReadAllText(logFile);
         Assert.Contains("teacher_pin_success", logContent);
-        Assert.Contains("SKS24", logContent);
+        Assert.Contains("TEST01", logContent);
         Assert.DoesNotContain("1234", logContent); // Never log the PIN!
     }
 
@@ -55,7 +55,7 @@ public class TeacherPinServiceTests : IDisposable
         DateTimeOffset fixedTime = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
         var service = new TeacherPinService("5678", timeProvider: () => fixedTime);
 
-        bool result = service.VerifyPin("1111", "SKS24", _testAuditDir);
+        bool result = service.VerifyPin("1111", "TEST01", _testAuditDir);
 
         Assert.False(result);
         Assert.Equal(4, service.GetRemainingAttempts());
@@ -82,21 +82,21 @@ public class TeacherPinServiceTests : IDisposable
 
         for (int i = 0; i < 4; i++)
         {
-            bool res = service.VerifyPin("0000", "SKS24", _testAuditDir);
+            bool res = service.VerifyPin("0000", "TEST01", _testAuditDir);
             Assert.False(res);
             Assert.Equal(4 - i, service.GetRemainingAttempts());
             Assert.False(service.IsLockedOut(out _));
         }
 
         // 5th failed attempt -> locks out
-        bool fifthRes = service.VerifyPin("0000", "SKS24", _testAuditDir);
+        bool fifthRes = service.VerifyPin("0000", "TEST01", _testAuditDir);
         Assert.False(fifthRes);
         Assert.Equal(0, service.GetRemainingAttempts());
         Assert.True(service.IsLockedOut(out TimeSpan remaining));
         Assert.Equal(TimeSpan.FromMinutes(5), remaining);
 
         // Subsequent attempt with correct PIN is denied during lockout
-        bool lockedAttempt = service.VerifyPin("9999", "SKS24", _testAuditDir);
+        bool lockedAttempt = service.VerifyPin("9999", "TEST01", _testAuditDir);
         Assert.False(lockedAttempt);
 
         string logFile = AuditLogger.GetAuditLogFilePath(now, _testAuditDir);
@@ -117,7 +117,7 @@ public class TeacherPinServiceTests : IDisposable
         // Lock out
         for (int i = 0; i < 5; i++)
         {
-            service.VerifyPin("0000", "SKS24", _testAuditDir);
+            service.VerifyPin("0000", "TEST01", _testAuditDir);
         }
 
         Assert.True(service.IsLockedOut(out _));
@@ -129,7 +129,7 @@ public class TeacherPinServiceTests : IDisposable
         Assert.Equal(5, service.GetRemainingAttempts());
 
         // Correct PIN now succeeds
-        bool success = service.VerifyPin("4321", "SKS24", _testAuditDir);
+        bool success = service.VerifyPin("4321", "TEST01", _testAuditDir);
         Assert.True(success);
     }
 
@@ -139,7 +139,7 @@ public class TeacherPinServiceTests : IDisposable
         var service = new TeacherPinService("1234");
         for (int i = 0; i < 5; i++)
         {
-            service.VerifyPin("0000", "SKS24", _testAuditDir);
+            service.VerifyPin("0000", "TEST01", _testAuditDir);
         }
 
         Assert.True(service.IsLockedOut(out _));
@@ -148,6 +148,6 @@ public class TeacherPinServiceTests : IDisposable
 
         Assert.False(service.IsLockedOut(out _));
         Assert.Equal(5, service.GetRemainingAttempts());
-        Assert.True(service.VerifyPin("1234", "SKS24", _testAuditDir));
+        Assert.True(service.VerifyPin("1234", "TEST01", _testAuditDir));
     }
 }

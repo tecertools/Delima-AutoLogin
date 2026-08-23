@@ -30,10 +30,13 @@ public sealed partial class MainWizardViewModel : ObservableObject
     public Step7ProvisionViewModel Step7Vm { get; }
 
     [ObservableProperty]
-    private string _schoolCodeDisplay = "SKS24";
+    private string _schoolCodeDisplay = "SK";
 
     [ObservableProperty]
-    private string _schoolNameDisplay = "SK Seksyen 24";
+    private string _schoolNameDisplay = "DELIMa Admin";
+
+    [ObservableProperty]
+    private bool _isDonationModalOpen;
 
     /// <summary>
     /// Optional action to trigger when wizard completes and requests the application/window to close.
@@ -358,6 +361,18 @@ public sealed partial class MainWizardViewModel : ObservableObject
                 Step6Vm.SaveToState();
                 break;
         }
+    }
+
+    [RelayCommand]
+    public void OpenDonationModal()
+    {
+        IsDonationModalOpen = true;
+    }
+
+    [RelayCommand]
+    public void CloseDonationModal()
+    {
+        IsDonationModalOpen = false;
     }
 
     private ObservableObject GetViewModelForStep(int stepNum) => stepNum switch

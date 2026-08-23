@@ -14,91 +14,122 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="Identiti Sekolah" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Ini menentukan apa yang menjadikan pemasangan ini milik sekolah anda. Tiada apa dikodkan terus ke dalam perisian." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Tetapkan maklumat rasmi sekolah anda. Maklumat ini diperibadikan untuk makmal anda tanpa sebarang pengkodan kekal." Style="{StaticResource StepSubHeading}" />
 
-            <Grid Margin="0,0,0,14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
+            <!-- School Identifiers Card -->
+            <Border Style="{StaticResource SettingsCard}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Kod Sekolah" Style="{StaticResource FieldLabel}" />
-                    <TextBox Text="{Binding SchoolCode, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="2">
-                    <TextBlock Text="Domain E-mel MOE" Style="{StaticResource FieldLabel}" />
-                    <TextBox Text="{Binding Domain, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </Grid>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Kod Sekolah" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding SchoolCode, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
 
-            <StackPanel Margin="0,0,0,14">
-                <TextBlock Text="Nama Sekolah" Style="{StaticResource FieldLabel}" />
-                <TextBox Text="{Binding SchoolName, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Domain E-mel MOE" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding Domain, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
 
-            <StackPanel Margin="0,0,0,14">
-                <TextBlock Text="Moto (pilihan)" Style="{StaticResource FieldLabel}" />
-                <TextBox Text="{Binding Motto, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
 
-            <StackPanel Margin="0,0,0,18">
-                <TextBlock Text="Lambang Sekolah" Style="{StaticResource FieldLabel}" />
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Muat Naik Lambang…" Style="{StaticResource SmallButton}" Click="OnSelectCrestClick" />
-                    <TextBlock Text="{Binding CrestPath, FallbackValue='(Tiada fail dipilih — guna lambang lalai)'}" Foreground="{StaticResource Ink2Brush}" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="12"/>
-                </StackPanel>
-            </StackPanel>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Nama Sekolah" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding SchoolName, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
 
-            <StackPanel Margin="0,0,0,10">
-                <TextBlock Text="Palet Jenama — kontras disahkan secara langsung (FR-S1.4)" Style="{StaticResource FieldLabel}" />
-                <TextBlock Text="Setiap warna mesti melepasi nisbah kontras sekurang-kurangnya 4.5:1 terhadap teks yang dibawanya." Foreground="{StaticResource Ink2Brush}" FontSize="11.5" Margin="0,0,0,10" />
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Moto Sekolah (pilihan)" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding Motto, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
 
-                <ItemsControl ItemsSource="{Binding Swatches}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Width="110" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,10,10" Background="#FFFFFF">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Border Width="92" Height="28" CornerRadius="4" Background="{Binding HexCode, Converter={StaticResource HexToBrushConv}}" Margin="0,0,0,6" />
-                                    <TextBlock Text="{Binding Label}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Ink2Brush}" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                                    <TextBox Text="{Binding HexCode, UpdateSourceTrigger=LostFocus}" FontSize="10.5" Height="26" HorizontalContentAlignment="Center" Margin="0,0,0,4"/>
-                                    <Border CornerRadius="4" Padding="4,2" HorizontalAlignment="Center">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#E5F2EA" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsPass}" Value="False">
-                                                        <Setter Property="Background" Value="{StaticResource DangerBgBrush}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <TextBlock Text="{Binding TagLabel}" FontSize="9.5" FontWeight="ExtraBold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="{StaticResource PrimaryGreenBrush}" />
+            <!-- School Crest Card -->
+            <Border Style="{StaticResource SettingsCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Lambang / Lencana Sekolah" Style="{StaticResource FieldLabel}" />
+                        <TextBlock Text="{Binding CrestPath, FallbackValue='(Tiada fail dipilih — guna lambang piawai)'}" Foreground="{StaticResource Ink2Brush}" FontSize="12"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Muat Naik Lambang…" Style="{StaticResource SmallButton}" Click="OnSelectCrestClick" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Brand Palette Swatches Section -->
+            <Border Style="{StaticResource SettingsCard}" Margin="0,4,0,0">
+                <StackPanel>
+                    <TextBlock Text="Palet Warna Jenama (Pengesahan Kontras Langsung)" Style="{StaticResource FieldLabel}" />
+                    <TextBlock Text="Setiap warna disahkan mematuhi nisbah kontras WCAG sekurang-kurangnya 4.5:1 untuk keterbacaan murid." Foreground="{StaticResource Ink2Brush}" FontSize="12" Margin="0,0,0,12" />
+
+                    <ItemsControl ItemsSource="{Binding Swatches}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="116" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,10,10" Background="#FAFAFA">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <Border Width="100" Height="26" CornerRadius="4" Background="{Binding HexCode, Converter={StaticResource HexToBrushConv}}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{Binding Label}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                        <TextBox Text="{Binding HexCode, UpdateSourceTrigger=LostFocus}" FontSize="11" Height="26" HorizontalContentAlignment="Center" Margin="0,0,0,6" Padding="0"/>
+                                        
+                                        <!-- WinUI 3 InfoBadge for Contrast Status -->
+                                        <Border CornerRadius="10" Padding="6,2" HorizontalAlignment="Center">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="{StaticResource SuccessBgBrush}" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsPass}" Value="False">
-                                                            <Setter Property="Foreground" Value="{StaticResource DangerTextBrush}" />
+                                                            <Setter Property="Background" Value="{StaticResource DangerBgBrush}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Border>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding TagLabel}" FontSize="9.5" FontWeight="Bold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource SuccessTextBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPass}" Value="False">
+                                                                <Setter Property="Foreground" Value="{StaticResource DangerTextBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -7,7 +7,7 @@ namespace Delima.Launcher.Tests;
 public class ThemeBuilderTests
 {
     [Fact]
-    public void ValidateTheme_WithDefaultSKS24Theme_ReturnsValid()
+    public void ValidateTheme_WithDefaultTheme_ReturnsValid()
     {
         var theme = new ThemeInfo
         {

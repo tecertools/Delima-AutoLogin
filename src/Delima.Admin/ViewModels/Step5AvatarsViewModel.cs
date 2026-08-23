@@ -5,6 +5,7 @@ using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Admin.Models;
 using Delima.Core.Audit;
+using Delima.Core.Services;
 
 namespace Delima.Admin.ViewModels;
 
@@ -16,21 +17,27 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     public string EmailLocal { get; init; } = "";
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AvatarEmoji))]
-    [NotifyPropertyChangedFor(nameof(AvatarDisplay))]
-    private string _avatar = "kucing";
+    [NotifyPropertyChangedFor(nameof(AvatarUrl))]
+    private string _avatar = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PicturePasswordDisplay))]
     private List<string> _picturePassword = ["kucing", "bunga", "kereta"];
 
-    public string AvatarEmoji => GetAvatarEmoji(Avatar);
-    public string AvatarDisplayName => GetAvatarDisplayName(Avatar);
-    public string AvatarDisplay => $"{AvatarEmoji} {AvatarDisplayName}";
+    /// <summary>
+    /// The effective DiceBear seed — falls back to StudentId for blank/legacy animal keys.
+    /// </summary>
+    public string DiceBearSeed => DiceBearService.ResolveSeed(Avatar, StudentId);
 
-    public string PicturePasswordDisplay => string.Join(" ➔ ", PicturePassword.Select(p => $"{GetAvatarEmoji(p)} {GetAvatarDisplayName(p)}"));
+    /// <summary>
+    /// Full HTTPS URL to the student's Critters avatar PNG.
+    /// </summary>
+    public string AvatarUrl => DiceBearService.GetAvatarUrl(DiceBearSeed);
 
-    public static string GetAvatarEmoji(string avatar) => (avatar?.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_")) switch
+    public string PicturePasswordDisplay => string.Join(" ➔ ", PicturePassword.Select(GetPictureIconEmoji));
+
+    /// <summary>Returns emoji for picture-password icons only (not used for student avatars).</summary>
+    public static string GetPictureIconEmoji(string icon) => (icon?.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_")) switch
     {
         "kucing" or "cat" => "🐱",
         "buaya" or "crocodile" => "🐊",
@@ -70,7 +77,12 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
         "kapal" or "ship" => "🚢",
         "bulan" or "moon" => "🌙",
         "rumah" or "house" => "🏠",
-        _ => "👤"
+        "payung" => "☂️",
+        "belon" => "🎈",
+        "pisang" => "🍌",
+        "jam" => "⏰",
+        "topi" => "🎩",
+        _ => "🎴"
     };
 
     public static string GetAvatarDisplayName(string avatar) => (avatar?.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_")) switch
@@ -120,14 +132,6 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
 public sealed partial class Step5AvatarsViewModel : ObservableObject
 {
     private readonly AdminWizardState _state;
-
-    public static readonly string[] StandardAvatars =
-    [
-        "kucing", "buaya", "helang", "gajah", "memerang", "rakun", "kuda_belang",
-        "semut", "bizon", "ayam", "anjing", "doraemon", "itik", "musang",
-        "zirafah", "koala", "harimau_bintang", "tikus", "penguin", "pikachu",
-        "biri_biri", "sloth"
-    ];
 
     public static readonly string[] StandardPicturePasswordIcons =
     [
@@ -199,14 +203,14 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             int avatarIdx = 0;
             foreach (var student in group)
             {
-                string avatar;
-                if (_state.StudentAvatars.TryGetValue(student.Id, out var existingAvatar) && !string.IsNullOrWhiteSpace(existingAvatar))
+                // Use the stored avatar only if it is a new-style seed (not a legacy animal key).
+                // Legacy keys & blank values are left empty so DiceBearSeed auto-resolves to student.Id.
+                string avatar = "";
+                if (_state.StudentAvatars.TryGetValue(student.Id, out var existingAvatar)
+                    && !string.IsNullOrWhiteSpace(existingAvatar)
+                    && !DiceBearService.IsLegacyKey(existingAvatar))
                 {
                     avatar = existingAvatar;
-                }
-                else
-                {
-                    avatar = StandardAvatars[avatarIdx % StandardAvatars.Length];
                 }
 
                 List<string> picPassword;
@@ -247,16 +251,24 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         {
             UpdateFilteredAvatarItems();
         }
+
+        // Pre-cache all avatar PNGs in the background (best-effort, non-blocking)
+        var seeds = AvatarItems.Select(a => a.DiceBearSeed).ToList();
+        _ = DiceBearService.PreCacheBatchAsync(seeds);
     }
 
-    public void CycleAvatar(AvatarAssignmentItem item)
+    /// <summary>
+    /// Assigns a new random DiceBear seed to the student, giving them a different critter.
+    /// </summary>
+    public void RandomizeAvatar(AvatarAssignmentItem item)
     {
-        int currIdx = Array.IndexOf(StandardAvatars, item.Avatar.ToLowerInvariant());
-        if (currIdx < 0) currIdx = 0;
-        int nextIdx = (currIdx + 1) % StandardAvatars.Length;
-        item.Avatar = StandardAvatars[nextIdx];
+        item.Avatar = Guid.NewGuid().ToString("N")[..10];
+        _ = DiceBearService.EnsureCachedAsync(item.DiceBearSeed);
         SaveToState();
     }
+
+    // Kept for backward compatibility with any remaining callers
+    public void CycleAvatar(AvatarAssignmentItem item) => RandomizeAvatar(item);
 
     public void TogglePicturePasswordPolicy(bool isRequired)
     {
@@ -318,7 +330,8 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("    .info-bar strong { color: #0F172A; }");
         sb.AppendLine("    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 32px; }");
         sb.AppendLine("    .card { border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; background: #FFFFFF; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; }");
-        sb.AppendLine("    .avatar-circle { width: 52px; height: 52px; border-radius: 50%; background: #FEF3C7; border: 2px solid #F59E0B; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }");
+        sb.AppendLine("    .avatar-circle { width: 56px; height: 56px; border-radius: 50%; background: #F1F5F9; border: 2px solid #CBD5E1; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }");
+        sb.AppendLine("    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }");
         sb.AppendLine("    .student-info { overflow: hidden; }");
         sb.AppendLine("    .student-name { font-weight: 700; font-size: 14px; color: #0F172A; line-height: 1.3; margin-bottom: 2px; }");
         sb.AppendLine("    .student-id { font-size: 12px; color: #64748B; font-family: monospace; }");
@@ -359,12 +372,13 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
 
         foreach (var s in students)
         {
+            string avatarImgUrl = DiceBearService.GetAvatarUrl(s.DiceBearSeed);
             sb.AppendLine("      <div class=\"card\">");
-            sb.AppendLine($"        <div class=\"avatar-circle\" title=\"{s.Avatar}\">{s.AvatarEmoji}</div>");
+            sb.AppendLine($"        <div class=\"avatar-circle\"><img src=\"{avatarImgUrl}\" alt=\"Avatar\" loading=\"lazy\" /></div>");
             sb.AppendLine("        <div class=\"student-info\">");
             sb.AppendLine($"          <div class=\"student-name\">{s.StudentName}</div>");
             sb.AppendLine($"          <div class=\"student-id\">{(string.IsNullOrWhiteSpace(s.EmailLocal) ? s.StudentId : s.EmailLocal)}</div>");
-            sb.AppendLine($"          <div class=\"avatar-tag\">{s.AvatarEmoji} {s.Avatar} • {s.ClassName}</div>");
+            sb.AppendLine($"          <div class=\"avatar-tag\">🐾 {s.ClassName}</div>");
             if (PicturePasswordRequired)
             {
                 sb.AppendLine($"          <div class=\"pic-pw-tag\">🔑 {s.PicturePasswordDisplay}</div>");

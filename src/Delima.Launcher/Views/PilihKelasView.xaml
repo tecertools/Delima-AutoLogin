@@ -2,7 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Delima.Launcher.ViewModels"
              xmlns:roster="clr-namespace:Delima.Core.Roster;assembly=Delima.Core"
              mc:Ignorable="d" 
@@ -16,19 +16,19 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Header (78px) -->
-            <RowDefinition Height="78" />
+            <!-- Header (72px) -->
+            <RowDefinition Height="72" />
             <!-- Main Content -->
             <RowDefinition Height="*" />
-            <!-- Footer (44px) -->
-            <RowDefinition Height="44" />
+            <!-- Footer (40px) -->
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <!-- HEADER -->
+        <!-- HEADER (Windows 11 Surface Header) -->
         <Border Grid.Row="0"
                 Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource AlertBrush}"
-                BorderThickness="0,0,0,3"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
                 Padding="32,0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -36,32 +36,32 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Left: School Crest + Name + Motto -->
+                <!-- Left: School Badge + Name + Motto -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Width="46" Height="46"
-                            CornerRadius="12"
-                            Background="{DynamicResource AccentBrush}"
+                    <Border Width="42" Height="42"
+                            CornerRadius="8"
+                            Background="{DynamicResource PrimaryBrush}"
                             Margin="0,0,14,0"
                             AutomationProperties.Name="Lencana Sekolah">
                         <TextBlock Text="{Binding SchoolCode}"
                                    FontFamily="{DynamicResource Baloo2Font}"
                                    FontWeight="Bold"
-                                   FontSize="15"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   FontSize="13"
+                                   Foreground="#FFFFFF"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{Binding SchoolName}"
                                    FontFamily="{DynamicResource Baloo2Font}"
-                                   FontWeight="Bold"
-                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   FontSize="17"
                                    Foreground="{DynamicResource PrimaryTextBrush}" />
                         <TextBlock Text="{Binding SchoolMotto}"
                                    FontFamily="{DynamicResource NunitoFont}"
-                                   FontSize="12"
+                                   FontSize="11.5"
                                    Foreground="{DynamicResource SecondaryTextBrush}"
-                                   Margin="0,2,0,0" />
+                                   Margin="0,1,0,0" />
                     </StackPanel>
                 </StackPanel>
 
@@ -70,30 +70,30 @@
                     <!-- Segmented Toggle -->
                     <Border BorderBrush="{DynamicResource BorderBrush}"
                             BorderThickness="1"
-                            CornerRadius="999"
-                            Height="44"
-                            Margin="0,0,12,0"
+                            CornerRadius="6"
+                            Height="38"
+                            Margin="0,0,10,0"
                             Background="{DynamicResource SurfaceBrush}">
                         <Button Style="{StaticResource OutlineButtonStyle}"
                                 Command="{Binding ToggleLanguageCommand}"
                                 BorderThickness="0"
-                                Padding="14,0"
-                                Height="42"
+                                Padding="12,0"
+                                Height="36"
                                 AutomationProperties.Name="Pilih bahasa BM atau EN">
                             <StackPanel Orientation="Horizontal">
                                 <Border Background="{DynamicResource PrimaryBrush}"
-                                        CornerRadius="999"
-                                        Padding="10,4"
+                                        CornerRadius="4"
+                                        Padding="8,2"
                                         Margin="0,0,4,0">
                                     <TextBlock Text="BM"
                                                Foreground="#FFFFFF"
                                                FontWeight="Bold"
-                                               FontSize="12" />
+                                               FontSize="11.5" />
                                 </Border>
                                 <TextBlock Text="EN"
                                            Foreground="{DynamicResource SecondaryTextBrush}"
-                                           FontWeight="Bold"
-                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           FontSize="11.5"
                                            VerticalAlignment="Center"
                                            Margin="4,0,0,0" />
                             </StackPanel>
@@ -103,7 +103,7 @@
                     <!-- Guru Button -->
                     <Button Style="{StaticResource OutlineButtonStyle}"
                             Command="{Binding OpenTeacherModeCommand}"
-                            Content="Guru"
+                            Content="⚙️ Mod Guru"
                             TabIndex="10"
                             AutomationProperties.Name="Buka Mod Guru" />
                 </StackPanel>
@@ -113,9 +113,9 @@
         <!-- MAIN BODY: 2 COLUMNS (Left 45%, Right 55%) -->
         <Grid Grid.Row="1" Margin="32,24,32,16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.85*" MinWidth="380" />
-                <ColumnDefinition Width="48" />
-                <ColumnDefinition Width="1.1*" MinWidth="420" />
+                <ColumnDefinition Width="0.88*" MinWidth="380" />
+                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="1.12*" MinWidth="420" />
             </Grid.ColumnDefinitions>
 
             <!-- LEFT COLUMN: Selection Form -->
@@ -130,7 +130,7 @@
                     <!-- Kelas Terakhir Shortcut Card (if available) -->
                     <StackPanel Visibility="{Binding HasLastClass, Converter={StaticResource BoolToVisConverter}}"
                                 Margin="0,0,0,14">
-                        <TextBlock Text="Kelas Terakhir"
+                        <TextBlock Text="Kelas Terakhir Digunakan"
                                    Style="{StaticResource FieldLabelStyle}" />
                         <Button Style="{StaticResource KelasTerakhirButtonStyle}"
                                 Background="{DynamicResource ClassColour0}"
@@ -155,8 +155,8 @@
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding StringFormat='Tahun {0}'}"
-                                           FontSize="18"
-                                           FontWeight="Bold"
+                                           FontSize="17"
+                                           FontWeight="SemiBold"
                                            VerticalAlignment="Center" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -175,12 +175,12 @@
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type roster:ClassInfo}">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Ellipse Width="18" Height="18"
+                                    <Ellipse Width="14" Height="14"
                                              Fill="{DynamicResource ClassColour0}"
-                                             Margin="0,0,12,0" />
+                                             Margin="0,0,10,0" />
                                     <TextBlock Text="{Binding Name}"
-                                               FontSize="18"
-                                               FontWeight="Bold"
+                                               FontSize="17"
+                                               FontWeight="SemiBold"
                                                VerticalAlignment="Center" />
                                 </StackPanel>
                             </DataTemplate>
@@ -198,15 +198,17 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <!-- RIGHT COLUMN: Information Panel for Adults -->
+            <!-- RIGHT COLUMN: Information Panel (Windows 11 Layered Card) -->
             <Border Grid.Column="2"
-                    Background="{DynamicResource SoftSurfaceBrush}"
-                    CornerRadius="20"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
                     Padding="32,28"
                     SnapsToDevicePixels="True"
                     Effect="{StaticResource CardShadow}">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Apa itu laman ini?"
+                    <TextBlock Text="Panduan Pelancar Makmal"
                                Style="{StaticResource SectionHeadingStyle}"
                                Margin="0,0,0,8" />
                     <TextBlock Text="Masuk ke DELIMa dan Google Classroom tanpa perlu menaip alamat e-mel yang panjang."
@@ -216,67 +218,67 @@
 
                     <!-- 3 Numbered Steps -->
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                        <Border Width="28" Height="28"
-                                CornerRadius="14"
-                                Background="{DynamicResource AccentBrush}"
+                        <Border Width="24" Height="24"
+                                CornerRadius="12"
+                                Background="{DynamicResource PrimaryBrush}"
                                 Margin="0,0,12,0">
                             <TextBlock Text="1"
                                        FontWeight="Bold"
-                                       FontSize="14"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       FontSize="12"
+                                       Foreground="#FFFFFF"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
                         </Border>
-                        <TextBlock Text="Pilih kelas anda"
-                                   FontSize="15"
+                        <TextBlock Text="Pilih tahun dan nama kelas anda"
+                                   FontSize="14.5"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                        <Border Width="28" Height="28"
-                                CornerRadius="14"
-                                Background="{DynamicResource AccentBrush}"
+                        <Border Width="24" Height="24"
+                                CornerRadius="12"
+                                Background="{DynamicResource PrimaryBrush}"
                                 Margin="0,0,12,0">
                             <TextBlock Text="2"
                                        FontWeight="Bold"
-                                       FontSize="14"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       FontSize="12"
+                                       Foreground="#FFFFFF"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
                         </Border>
-                        <TextBlock Text="Cari nama anda"
-                                   FontSize="15"
+                        <TextBlock Text="Cari dan tekan kad nama anda"
+                                   FontSize="14.5"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
-                        <Border Width="28" Height="28"
-                                CornerRadius="14"
-                                Background="{DynamicResource AccentBrush}"
+                        <Border Width="24" Height="24"
+                                CornerRadius="12"
+                                Background="{DynamicResource PrimaryBrush}"
                                 Margin="0,0,12,0">
                             <TextBlock Text="3"
                                        FontWeight="Bold"
-                                       FontSize="14"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       FontSize="12"
+                                       Foreground="#FFFFFF"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
                         </Border>
                         <TextBlock Text="Pilih DELIMa atau Google Classroom"
-                                   FontSize="15"
+                                   FontSize="14.5"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Reassurance Block -->
-                    <Border Background="{DynamicResource SurfaceBrush}"
+                    <!-- Reassurance InfoBar -->
+                    <Border Background="#F4FAF6"
                             BorderBrush="{DynamicResource PrimaryBrush}"
-                            BorderThickness="4,0,0,0"
-                            CornerRadius="0,12,12,0"
+                            BorderThickness="3,0,0,0"
+                            CornerRadius="0,6,6,0"
                             Padding="16,12"
                             Margin="0,0,0,18">
-                        <TextBlock Text="Laman ini tidak menyimpan kata laluan. Anda akan menaip kata laluan di halaman rasmi Google."
+                        <TextBlock Text="🔒 Selamat &amp; Terlindung: Sistem ini membantu log masuk automatik ke laman rasmi Kementerian Pendidikan Malaysia."
                                    Style="{StaticResource HelperTextStyle}"
                                    TextWrapping="Wrap" />
                     </Border>
@@ -290,26 +292,26 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0"
-                                Background="{DynamicResource SurfaceBrush}"
+                                Background="#F8F9FA"
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="12"
+                                CornerRadius="6"
                                 Padding="12,10">
                             <TextBlock Text="DELIMa 3.0"
-                                       FontWeight="Bold"
-                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       FontSize="13.5"
                                        HorizontalAlignment="Center" />
                         </Border>
 
                         <Border Grid.Column="2"
-                                Background="{DynamicResource SurfaceBrush}"
+                                Background="#F8F9FA"
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="12"
+                                CornerRadius="6"
                                 Padding="12,10">
                             <TextBlock Text="Classroom"
-                                       FontWeight="Bold"
-                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       FontSize="13.5"
                                        HorizontalAlignment="Center" />
                         </Border>
                     </Grid>
@@ -324,11 +326,16 @@
                 Padding="32,0">
             <Grid VerticalAlignment="Center">
                 <TextBlock Text="{Binding UpdatedDateText}"
-                           FontSize="12"
+                           FontSize="11.5"
                            Foreground="{DynamicResource SecondaryTextBrush}"
                            HorizontalAlignment="Left" />
-                <TextBlock Text="Masalah? Panggil cikgu."
-                           FontSize="12"
+                <TextBlock Text="tecertools Digital Solutions"
+                           FontSize="11"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Opacity="0.65"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Masalah log masuk? Sila maklumkan kepada guru bertugas."
+                           FontSize="11.5"
                            Foreground="{DynamicResource SecondaryTextBrush}"
                            HorizontalAlignment="Right" />
             </Grid>

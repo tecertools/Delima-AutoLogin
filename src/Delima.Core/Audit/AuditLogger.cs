@@ -151,4 +151,43 @@ public static class AuditLogger
 
         RecordEntry(entry, auditDirectory);
     }
+
+    /// <summary>
+    /// Records a pupil OAuth consent refusal event (G2 identity check) to the audit log per Technical Architecture §8.
+    /// </summary>
+    public static void RecordConsentRefused(
+        string studentId,
+        string pupilAccount,
+        string? schoolCode = null,
+        string? deviceId = null,
+        string? details = null,
+        string? auditDirectory = null)
+    {
+        string? currentUserName = null;
+        try
+        {
+            currentUserName = Environment.UserName;
+        }
+        catch
+        {
+            // Ignore environment query failure
+        }
+
+        var entry = new AuditLogEntry
+        {
+            Timestamp = DateTimeOffset.UtcNow,
+            Event = "consent_refused",
+            Outcome = "REFUSED",
+            OutcomeCode = "G2_CONSENT_REFUSED",
+            StudentId = studentId,
+            PupilAccount = pupilAccount,
+            SchoolCode = schoolCode,
+            DeviceId = deviceId,
+            WindowsUser = currentUserName,
+            SoftwareVersion = "2.0.0",
+            Details = details ?? "Pupil pressed Cancel on OAuth consent screen (identity check G2). Session torn down and returned to Pilih Kelas."
+        };
+
+        RecordEntry(entry, auditDirectory);
+    }
 }

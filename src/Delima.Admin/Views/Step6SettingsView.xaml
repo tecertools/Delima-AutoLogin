@@ -9,99 +9,115 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="Destinasi &amp; Tetapan" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Konfigurasi portal destinasi, tempoh sesi dan keselamatan aplikasi." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Konfigurasi portal destinasi, had tempoh sesi dan tetapan pelayar web makmal." Style="{StaticResource StepSubHeading}" />
 
-            <!-- Destinations List -->
-            <StackPanel Margin="0,0,0,18">
-                <TextBlock Text="Destinasi Pelancaran" Style="{StaticResource FieldLabel}" />
+            <!-- Destinations Card -->
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="Destinasi Pelancaran" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,8" />
 
-                <ItemsControl ItemsSource="{Binding Destinations}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type store:DestinationConfig}">
-                            <Grid Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="180"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox Grid.Column="2" Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}" />
-                                <Button Grid.Column="4" Content="✕" Style="{StaticResource DangerButton}" Click="OnRemoveDestinationClick" />
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    <ItemsControl ItemsSource="{Binding Destinations}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type store:DestinationConfig}">
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Grid.Column="2" Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Grid.Column="4" Content="✕" Style="{StaticResource DangerButton}" Click="OnRemoveDestinationClick" ToolTip="Padam destinasi ini" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                <!-- Add Destination Row -->
-                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Background="{StaticResource StripeBgBrush}" Padding="10" Margin="0,4,0,0">
-                    <Grid>
+                    <!-- Add Destination Row -->
+                    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Background="#F8F9FA" Padding="10" Margin="0,4,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding NewDestLabel, UpdateSourceTrigger=PropertyChanged}" Tag="Nama Portal (cth. Frog VLE)" />
+                            <TextBox Grid.Column="2" Text="{Binding NewDestUrl, UpdateSourceTrigger=PropertyChanged}" Tag="https://..." />
+                            <Button Grid.Column="4" Content="+ Tambah" Style="{StaticResource SmallPrimaryButton}" Click="OnAddDestinationClick" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- General Settings (SettingsCard Group) -->
+            <Border Style="{StaticResource SettingsCard}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="14"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="14"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding NewDestLabel, UpdateSourceTrigger=PropertyChanged}" Tag="Nama Portal (cth. Frog VLE)" />
-                        <TextBox Grid.Column="2" Text="{Binding NewDestUrl, UpdateSourceTrigger=PropertyChanged}" Tag="https://..." />
-                        <Button Grid.Column="4" Content="+ Tambah" Style="{StaticResource SmallPrimaryButton}" Click="OnAddDestinationClick" />
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Tempoh Tidak Aktif (saat)" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding IdleResetSeconds, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Masa sebelum sesi pelancar tamat dan profil dipadam secara automatik." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Dasar PIN Mod Guru" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding PinPolicyOptions}" SelectedItem="{Binding TeacherPinPolicy, Mode=TwoWay}" />
+                            <TextBlock Text="Ketetapan kawalan guru di makmal komputer." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
+                        </StackPanel>
                     </Grid>
-                </Border>
-            </StackPanel>
 
-            <Grid Margin="0,0,0,16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Tempoh Tidak Aktif (saat)" Style="{StaticResource FieldLabel}" />
-                    <TextBox Text="{Binding IdleResetSeconds, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="Masa sebelum sesi pelancar tamat dan profil dipadam secara automatik." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
-                </StackPanel>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Bahasa Lalai Antara Muka" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" />
+                        </StackPanel>
 
-                <StackPanel Grid.Column="2">
-                    <TextBlock Text="Dasar PIN Mod Guru" Style="{StaticResource FieldLabel}" />
-                    <ComboBox ItemsSource="{Binding PinPolicyOptions}" SelectedItem="{Binding TeacherPinPolicy, Mode=TwoWay}" />
-                </StackPanel>
-            </Grid>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Had Usia Storan (Hari)" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding StoreMaxAgeDays, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="Pelancar menolak bungkusan yang melebihi usia ini untuk elak data usang." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Grid>
 
-            <Grid Margin="0,0,0,16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Bahasa Lalai" Style="{StaticResource FieldLabel}" />
-                    <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" />
-                </StackPanel>
-
-                <StackPanel Grid.Column="2">
-                    <TextBlock Text="Had Usia Storan (Hari)" Style="{StaticResource FieldLabel}" />
-                    <TextBox Text="{Binding StoreMaxAgeDays, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="Pelancar menolak storan melebihi tempoh ini untuk elak data usang." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
-                </StackPanel>
-            </Grid>
-
-            <Grid Margin="0,0,0,16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Pelayar Web Pilihan" Style="{StaticResource FieldLabel}" />
-                    <ComboBox ItemsSource="{Binding BrowserOptions}" SelectedItem="{Binding SelectedBrowser, Mode=TwoWay}" />
-                    <TextBlock Text="Edge disyorkan kerana dipasang secara lalai pada Windows 10/11." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
-                </StackPanel>
-            </Grid>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Pelayar Web Pilihan" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding BrowserOptions}" SelectedItem="{Binding SelectedBrowser, Mode=TwoWay}" />
+                            <TextBlock Text="Microsoft Edge disyorkan kerana dipasang secara piawai pada Windows 10/11." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

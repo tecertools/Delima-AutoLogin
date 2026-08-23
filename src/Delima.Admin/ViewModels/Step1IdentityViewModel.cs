@@ -11,15 +11,15 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanProceed))]
     [NotifyPropertyChangedFor(nameof(ValidationMessage))]
-    private string _schoolCode = "SKS24";
+    private string _schoolCode = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanProceed))]
     [NotifyPropertyChangedFor(nameof(ValidationMessage))]
-    private string _schoolName = "SK Seksyen 24 Shah Alam";
+    private string _schoolName = "";
 
     [ObservableProperty]
-    private string _motto = "Berilmu Berdisiplin";
+    private string _motto = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanProceed))]
@@ -95,7 +95,7 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(SchoolCode))
         {
-            message = "Kod Sekolah diperlukan (contoh: SKS24).";
+            message = "Kod Sekolah diperlukan (contoh: ABC1234).";
             return false;
         }
 
