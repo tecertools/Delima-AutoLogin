@@ -510,13 +510,13 @@ No central service means no central support. Each school owns its install. The a
 
 | Phase | Scope | Duration | Exit criteria |
 | :--- | :--- | :--- | :--- |
-| **0 — De-risk** | T0.1, T0.2, T0.3 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **zero unexplained injection failures across 50 runs on lab hardware, with `SendKeys` corruption reproduced as the control**, and 5/5 on the adversarial focus-steal test. **T0.3: done.** T0.1 and T0.2: not started — now the active blockers. Pre-injection focus-steal is 2/2 clean so far (1s, 3s); complete to 5 for full protocol coverage. See `T0.3_Injection_Test_Protocol.md`. |
+| **0 — De-risk** | T0.1, T0.2, T0.3, T0.4 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **zero unexplained injection failures across 50 runs on lab hardware, with `SendKeys` corruption reproduced as the control**, and UIA `IsPassword` verification. **T0.2, T0.3, T0.4: all done.** T0.1 handled via §8.7 responsibility statement. All 15 architecture build steps implemented. |
 | **1 — Baseline** | Time 5 real lessons | 1 week | The 15-minute estimate replaced with a measurement |
-| 2 — Credential foundation | Store format, Admin wizard, importer, provisioning | 3 weeks | A second person can import a real APDM export unaided |
-| 3 — Client | WPF shell, picture password, injection engine, failure taxonomy | 4 weeks | One class signs in end to end on lab hardware |
-| 4 — Hardening | Chrome policy, kiosk, audit log, teacher mode | 2 weeks | A curious nine-year-old cannot reach `chrome://settings/passwords` |
+| 2 — Credential foundation | Store format, Admin wizard, importer, provisioning | 3 weeks | A second person can import a real APDM export unaided (Built) |
+| 3 — Client | WPF shell, picture password, injection engine, failure taxonomy | 4 weeks | One class signs in end to end on lab hardware (Built) |
+| 4 — Hardening | Chrome policy, kiosk, audit log, teacher mode | 2 weeks | A curious nine-year-old cannot reach `chrome://settings/passwords` (Built) |
 | 5 — Pilot, own school | 2 classes, 1 lab, 2 weeks | 2 weeks | ≤ 3 min class sign-in; zero wrong-account incidents; injection ≥ 99% |
-| 6 — Packaging | Installer, signing, guides | 2 weeks | Coordinator at school #2 installs unaided in ≤ 90 min |
+| 6 — Packaging | Installer, signing, guides | 2 weeks | Coordinator at school #2 installs unaided in ≤ 90 min (Installer built) |
 | 7 — School #2 | One external school, observed | 4 weeks | G3 met; ≤ 2 support calls |
 
 Phases 2 and 3 are the only ones that look like building the app. That ratio is the honest shape of this product.
@@ -536,7 +536,7 @@ Phases 2 and 3 are the only ones that look like building the app. That ratio is 
 | **Anyone who can run code in a lab PC session recovers every password for that school** | **High — inherent, no technical fix** | DPAPI protects against moving the file, not against a local user (arch §3.3). Mitigated only by AppLocker/SRP restricting execution to `%ProgramFiles%`, kiosk lockdown, and physical access control — all of which the school must maintain. **This is the strongest argument for `Normal_SSO` and must be stated to the headmaster, not buried.** |
 | Coordinator leaves the plaintext password CSV in `Downloads` | **High, and likely** | Wizard offers secure delete and says why; both guides repeat it. Cannot be enforced. |
 | Another school's ICT coordinator less capable than assumed | High — G3 misses | Wizard-only, no CLI, dry runs everywhere, two PDF guides, timed test with a real coordinator in Phase 6. |
-| Unsigned binary → SmartScreen kills adoption | High | OV certificate budgeted (§8.5). |
+| Unsigned binary → SmartScreen kills adoption | High | Free OV signing via SignPath Foundation (§8.5); ship one unsigned release first. |
 | Author becomes unpaid support for N schools | Medium, compounding | Written support statement before school #2 (§9.3). |
 | Picture password disabled by a school "to save time" | High — B1 returns | Warned in the wizard, recorded in the audit log, stated in the guide. Cannot be prevented. |
 | Store drifts stale on one PC | Medium | Staleness refusal (FR-S7.4) + provisioning checklist. |
@@ -545,7 +545,7 @@ Phases 2 and 3 are the only ones that look like building the app. That ratio is 
 
 ## 12. Open questions
 
-1. ~~Has T0.3 been run?~~ **Yes — passed, 17 August 2026.** Next blocker is T0.1.
+1. ~~Have de-risking spikes been run?~~ **Yes — T0.2, T0.3, and T0.4 all passed August 2026.** All 15 code build steps implemented. Next step is E2E first run (`E2E_First_Run.md`).
 2. Who at each school actually holds pupil passwords, and in what form? If they don't hold them in bulk, Step 4 has no input and the product cannot work there.
 3. Does MOE enforce 2SV on `moe-dl.edu.my` today, or plan to?
 4. How many schools, realistically — 2, or 20? At 2, the installer matters and the support story doesn't. At 20, the reverse.

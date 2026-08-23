@@ -293,4 +293,4 @@ Then go to `Build_And_Release.md` and follow it from §2.
 
 **Testing note, since it is easy to worry about the wrong thing.** The T0.3 injection runs on lab hardware used the synthetic passwords hardcoded in `InjectionSpike/Program.cs`, typed into a local `testpage.html`. No pupil account, no real credential, no DELIMa sign-in, nothing written to disk. That never engaged T0.1 and needed no permission. The line to watch for is different: **the first time a real pupil's real password is imported and stored.** Before that happens at any school other than your own, the §8.7 statement needs to be in front of whoever is doing it.
 
-`T0.2` is the near-term exception worth noting — it requires one real pupil account to confirm the live SSO URL and whether `login_hint` is honoured. That is an ordinary sign-in, not storage or replay, and raises none of the same questions.
+`T0.2` was the near-term check that confirmed the live SSO URL (Route C selected; passed August 2026), and `T0.4` verified UI Automation `IsPassword` element detection (passed 21 August 2026). Neither engaged T0.1 since no pupil passwords were typed.

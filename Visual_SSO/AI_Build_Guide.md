@@ -6,6 +6,8 @@
 
 The prompts themselves live in `Build_Prompts.md`. This document is the workflow around them: what to install, what order to work in, and — the part most guides skip — **how to tell whether the code you got is any good when you can't read all of it yourself.**
 
+> **Current status:** All 15 build steps and Prompts 0–19 have now been implemented and tested in this codebase. This guide remains the reference for the assistant-driven development methodology used to build the solution.
+
 ---
 
 ## Part 0 — What you are actually doing
@@ -225,6 +227,6 @@ You have finished the part you can do on a Mac when all of these are true:
 - [ ] The importer handles a UTF-8 BOM file, a UTF-16 file, duplicate IDs and malformed IDs
 - [ ] No real pupil data anywhere in the repository
 - [ ] `git status --short` is empty — everything committed
-- [ ] T0.2 is answered, or at least scheduled
+- [ ] T0.2 is answered (passed August 2026; Route C selected)
 
 Then you need a Windows machine, and `Build_Machine_Setup.md` takes over.

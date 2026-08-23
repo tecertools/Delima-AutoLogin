@@ -631,16 +631,18 @@ Paste any of these when you see the relevant mistake:
 
 ---
 
-## What not to ask for yet
+## Current Build Status
 
-These depend on work not done, or on decisions not made. Asking early produces code you will throw away.
+**All 15 build steps and Prompts 0 through 19 are implemented.**
 
-| Not yet | Why | Unblocked by |
+| Component / Prompt | Scope | Status |
 | :--- | :--- | :--- |
-| The injection flow (Prompt 11) | Needs the confirmed live SSO URL | **T0.2** |
-| Audit log, Mod Guru, kiosk hardening | Need the injection flow working first | Steps 12–14 |
-| The Inno Setup script | It is already written out in `Build_And_Release.md` §5 — copy it, don't generate it | Step 15 |
-| The GitHub Actions workflow | Needed only for the first release | Step 15 |
-| The SignPath application | The Foundation requires the project already be released in the form to be signed | One unsigned release |
+| **Prompts 0–4b** | `Delima.Core`, credential store, roster, display names, `Delima.Import` | Complete & tested |
+| **Prompts 5–8, 10b** | `Delima.Win32`, DPAPI per-PC store, `Delima.Provision`, ACL hardening | Complete & tested |
+| **Prompts 9–10** | `Delima.Launcher` shell, Pilih Kelas, Cari Nama, Picture Password | Complete & tested |
+| **Prompts 10a, 11, 11a, T0.4b** | Route C injection orchestrator, UIA password gate (`CheckUiaPasswordElement = true`) | Complete & tested |
+| **Prompts 12–14** | `Delima.Admin` 7-step wizard, Mod Guru, Kiosk hardening & Chrome policies | Complete & tested |
+| **Prompts 15, 15a** | `installer/DelimaLauncher.iss`, `.github/workflows/release.yml` | Complete & tested |
+| **Prompts 16–19** | T0.1 statement in all 3 placements, exact title lists, post-password consent polling & failure taxonomy | Complete & tested |
 
-**T0.2 is the one to do now** — one real pupil account, an afternoon, and it is the only thing standing between you and Prompt 11. If you are travelling to a school for a Windows machine anyway, do both on the same trip.
+**Next step:** The first full end-to-end run on real lab hardware (`E2E_First_Run.md`).

@@ -520,8 +520,6 @@ Gap Analysis §3 requires this and v1 has none. Every failure gets a calm BM mes
 | `E01` | Chrome not installed / path unresolvable | Alamak, ada masalah. Panggil cikgu. | Install Chrome |
 | `E02` | Window not verified before timeout | Cuba lagi. | Slow PC — raise `window_wait_timeout_ms` |
 | `E03` | Injection aborted by pupil | *(returns to name grid)* | None |
-| `E04` | Wrong password at Google | Kata laluan tidak betul. Panggil cikgu. | Update via Mod Guru; check `password_version` |
-| `E05` | Password stale (`password_version` behind bundle) | Kata laluan sudah tukar. Panggil cikgu. | Re-import + re-provision |
 | `E06` | Google CAPTCHA / "unusual activity" | Tunggu sekejap, cuba lagi. | Space out launches; known limitation |
 | `E07` | 2SV prompt | Panggil cikgu. | Escalate — this may end the product |
 | `E08` | Account suspended / password expired | Panggil cikgu. | MOE admin task |
@@ -530,6 +528,7 @@ Gap Analysis §3 requires this and v1 has none. Every failure gets a calm BM mes
 | `E11` | No password stored for this pupil | Panggil cikgu. | Complete wizard Step 4 |
 | `E12` | Picture password locked (5 failures) | Tunggu 5 minit. | Reset via Mod Guru |
 | `E13` | Network unreachable | Tiada internet. Panggil cikgu. | Network |
+| `E14` | Password rejected by Google (stale credential) | Kata laluan tidak diterima. Beritahu cikgu. | Mod Guru for one pupil; re-import in Delima.Admin if whole class fails |
 
 `E06` and `E07` are the two the product cannot engineer around. They are listed so their appearance is a legible finding rather than a mystery.
 
@@ -746,10 +745,10 @@ AES-256-GCM, HMAC-SHA256 and the CSPRNG come from the BCL. **No custom cryptogra
 | `injection_settle_ms` | `700` | After window verification, before first keystroke. **Raised from 400 by T0.4** — measured p95 to `IsPassword` readable was 417 ms and max 434 ms, so 400 sat below the 95th percentile |
 | `window_wait_timeout_ms` | `30000` | Then `E02` |
 | `entry_url` | `https://d3.delima.edu.my/landing` | Confirmed by T0.2 |
-| `title_identifier_page` | `Sign in - Google Accounts - Google Chrome` | **Per locale.** Exact full string (§4.2). Corrected by T0.4 — the earlier value omitted ` Chrome` and would never have matched |
+| `title_identifier_page` | `Sign in - Google Accounts - Google Chrome` | **Per locale.** Exact full string match against accepted list (§4.2). Includes en-dash variant `Sign in – Google accounts - Google Chrome` |
 | `title_password_page_generic` | `Welcome - Google Chrome` | The password page **before** the account name loads |
 | `title_password_page_named` | `Hi {name} - Google Chrome` | The password page **after** it loads. `{name}` is the Google profile name, **not** the roster display name — see §4.2 |
-| `title_consent_page` | `Sign in - Google Accounts - Google Chrome` | OAuth consent screen title (§4.5). Terminal state of Route C injection; pupil prompted on floating reset bar |
+| `title_consent_page` | `Sign in - Google Accounts - Google Chrome` | OAuth consent screen title (§4.5). Terminal state of Route C injection; guarded by sequence transition after password injection |
 | `title_settle_polls` | `3` | Consecutive 100 ms polls a title must hold before injecting (§4.2) |
 | `store_max_age_days` | `30` | Then `E10` |
 | `force_signout` | `true` | Lab only; never at home |

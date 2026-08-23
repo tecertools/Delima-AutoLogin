@@ -3,7 +3,7 @@
 **Status:** Not started
 **Needs:** a Windows PC you control, a Windows lab PC, a pendrive, and **one Google account you personally control**
 **Time:** three hours for the first attempt. It will not go smoothly, and that is the point.
-**Prerequisite:** Prompt 17
+**Prerequisites:** Prompts 17–19 (exact title lists, post-password consent verification, failure taxonomy)
 
 This is the first time the whole chain runs as one thing. Every component has been tested alone; none have been tested together, and the seams between them are where this will fail.
 
@@ -30,7 +30,7 @@ This is the first time the whole chain runs as one thing. Every component has be
 
 Tick all of these first.
 
-- [ ] **Prompt 17 has been run**, otherwise stage 4's result will not mean what it appears to mean
+- [ ] **Prompts 17–19 have been run**, otherwise stage 4's result will not mean what it appears to mean
 - [ ] `dotnet build -c Release` succeeds and `dotnet test` passes
 - [ ] A **Windows PC you control** — for stage 1
 - [ ] A **Windows lab PC** — for stages 2–4, ideally the slowest one
@@ -98,7 +98,7 @@ Run `publish\Admin\Delima.Admin.exe`.
 **Step 1 — Identiti Sekolah.** School code `UJIAN`, any school name, skip the crest. Note the contrast checker on the colour palette — that is FR-S1.4 working.
 
 **Step 2 — Kata Laluan Pentadbir.** Set the passphrase. **Write it down now.**
-(admin_delimasks24)
+
 **Step 3 — Import Senarai Murid.** Choose `roster.csv`.
 
 - The **column mapper** shows five target fields with dropdowns. Check its guesses — `NAMA MURID` → Nama penuh, `ID PENGGUNA DELIMA` → ID DELIMa. Correct any it got wrong.

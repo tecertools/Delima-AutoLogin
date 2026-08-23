@@ -4,7 +4,7 @@
 **Packaging:** Inno Setup 6 → one signed `.exe`
 **Audience of this document:** whoever runs the build. Not the ICT coordinator — see `Panduan_Pemasangan.pdf` for them.
 
-This is **step 15 of 15** in `Technical_Architecture_Visual_SSO.md` §12. Nothing here can be executed until steps 1–14 produce the projects in arch §2. It is written now, ahead of the code, so that packaging is a checklist at the end rather than a week of surprises — single-file WPF, code signing and per-machine ACLs each have a failure mode that is much cheaper to design around than to discover.
+This is **step 15 of 15** in `Technical_Architecture_Visual_SSO.md` §12. All 15 build steps are now implemented across the repository, producing the projects in arch §2. This document specifies packaging, code signing, single-file WPF publishing flags, and the pre-release checklist.
 
 For setting up the machine that runs these commands, see `Build_Machine_Setup.md`.
 
@@ -183,7 +183,7 @@ One workflow, triggered by pushing a `v*` tag, running on `windows-latest`:
 8. **Generate SHA-256 checksums** of the *signed* installer (§6) — order matters, since signing changes the file.
 9. **Create a draft GitHub Release**, attaching installer, checksums, and the two BM guides.
 
-**Leave it as a draft.** A human should read the release notes and confirm the T0.1 responsibility statement (PRD §8.5) is present on the release page before it goes public. Everything upstream of that is automated; the decision to publish is not.
+**Leave it as a draft.** A human should read the release notes and confirm the T0.1 responsibility statement (PRD §8.7) is present on the release page before it goes public. Everything upstream of that is automated; the decision to publish is not.
 
 **Three properties this pipeline must preserve**, because they are what SignPath's origin verification is checking:
 
@@ -275,7 +275,7 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 
 [Dirs]
 ; Per-machine store. Interactive users must not be able to read it (arch §3.5).
-Name: "{commonappdata}\DELIMa Launcher"; Permissions: everyone-none admins-full
+Name: "{commonappdata}\DELIMa Launcher"; Permissions: everyone-none admins-full system-full
 
 [Icons]
 Name: "{group}\DELIMa";           Filename: "{app}\Delima.Launcher.exe"; Components: lab
@@ -300,7 +300,7 @@ Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
 
 - **`AppId` is a fixed GUID, generated once, never changed.** It is how Windows knows 2.0.1 is an upgrade of 2.0.0 rather than a second product. Change it and every school ends up with two installations and one orphaned credential store. Generate it once, paste it in, and add a comment saying never to touch it.
 - **`{commonappdata}`, never `{userappdata}`.** The store is per-machine (arch §3.3) — a per-user path would give every pupil profile its own broken copy.
-- **`Permissions: everyone-none admins-full`** is the ACL from arch §3.5 expressed in Inno's syntax. Be honest about what it buys: it stops a pupil browsing to the file in Explorer. It does not stop someone who can run arbitrary code in a lab session. That is what AppLocker is for, and AppLocker is not in this script — see below.
+- **`Permissions: everyone-none admins-full system-full`** is the ACL from arch §3.5 expressed in Inno's syntax. Be honest about what it buys: it stops a pupil browsing to the file in Explorer. It does not stop someone who can run arbitrary code in a lab session. That is what AppLocker is for, and AppLocker is not in this script — see below.
 - **The Chrome policy task is `unchecked` by default and its description says it affects the whole PC.** It writes to `HKLM` and changes Chrome for every user on the machine, including the teacher's own browsing. A checkbox that quietly does that is not acceptable; the wording is the mitigation.
 - **`isreadme` on the install guide** means a coordinator finishing setup is offered the PDF. G3 — 90 minutes, unaided (PRD §4) — is not reachable without it.
 - **AppLocker is deliberately absent.** Restricting which programs the pupil account may run is what actually protects the store (PRD §8.3, arch §9), but it depends on the school's Windows edition and existing group policy. A checkbox that silently fails on Windows Home would be worse than no checkbox, because the coordinator would believe he was protected. It ships as a documented snippet and a **required** line on the lab checklist.
@@ -352,7 +352,7 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 | 10 | Injection still passes on lab hardware, ≥ 50 runs | Never regress T0.3 |
 | 11 | **Download the installer from the release page** and install from there | The real path a school takes; catches Mark-of-the-Web and signature problems together (§4.1) |
 | 12 | Scan the installer with the antivirus the target schools actually run | Self-contained single-file exes draw false positives even signed (§4.5) |
-| 13 | Release page carries the T0.1 responsibility statement | PRD §8.5 — the duty-shift only works if it is actually there |
+| 13 | Release page carries the T0.1 responsibility statement | PRD §8.7 — the duty-shift only works if it is actually there |
 
 **Checks 3 and 10 need real hardware or a real VM.** Both have already bitten this project once — the .NET runtime assumption and the injection behaviour are exactly where a developer machine lies to you (arch §11: *never on a developer machine, never over RDP*).
 
@@ -377,7 +377,7 @@ Do not skip this because the build succeeded. A build succeeding proves the comp
 
 ## 9. The T0.1 obligation on every release
 
-**T0.1 — a written MOE/BSTP position on storing and replaying pupil passwords — remains unanswered** (PRD §2.1, README). The project has chosen to publish anyway, and to place the policy responsibility explicitly on each downloading school (PRD §8.5).
+**T0.1 — a written MOE/BSTP position on storing and replaying pupil passwords — remains unanswered** (PRD §2.1, README). The project has chosen to publish anyway, and to place the policy responsibility explicitly on each downloading school (PRD §8.7).
 
 That choice only works if the statement is actually in front of people. **Three placements are required on every release, and check 13 in §7 exists to enforce the first:**
 

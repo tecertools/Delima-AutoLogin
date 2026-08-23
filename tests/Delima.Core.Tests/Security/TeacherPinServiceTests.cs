@@ -52,7 +52,8 @@ public class TeacherPinServiceTests : IDisposable
     [Fact]
     public void VerifyPin_WrongPin_DecrementsAttemptsAndRecordsFailure()
     {
-        var service = new TeacherPinService("5678");
+        DateTimeOffset fixedTime = new DateTimeOffset(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+        var service = new TeacherPinService("5678", timeProvider: () => fixedTime);
 
         bool result = service.VerifyPin("1111", "SKS24", _testAuditDir);
 
@@ -60,7 +61,7 @@ public class TeacherPinServiceTests : IDisposable
         Assert.Equal(4, service.GetRemainingAttempts());
         Assert.False(service.IsLockedOut(out _));
 
-        string logFile = AuditLogger.GetAuditLogFilePath(DateTimeOffset.UtcNow, _testAuditDir);
+        string logFile = AuditLogger.GetAuditLogFilePath(fixedTime, _testAuditDir);
         Assert.True(File.Exists(logFile));
         string logContent = File.ReadAllText(logFile);
         Assert.Contains("teacher_pin_failure", logContent);
