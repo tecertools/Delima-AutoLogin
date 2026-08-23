@@ -46,6 +46,8 @@ public class Step7PackagingTests
         Assert.Single(payload.Students);
         Assert.Equal("Nur Aishah Binti Ahmad", payload.Students[0].Name);
         Assert.Equal("SecretPassword123!", payload.Students[0].Password);
+        Assert.NotNull(payload.Students[0].PicturePassword);
+        Assert.True(PicturePasswordHasher.VerifyPicturePassword(["kucing", "bunga", "kereta"], payload.Students[0].PicturePassword));
     }
 
     [Fact]

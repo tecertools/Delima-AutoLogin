@@ -3,7 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Delima.Core.Store;
 using Delima.Launcher.Theming;
+using Delima.Launcher.ViewModels;
+using Delima.Win32.Store;
 
 namespace Delima.Launcher;
 
@@ -44,8 +47,42 @@ public partial class App : Application
             args.SetObserved();
         };
 
-        // Apply default theme to Application resources at startup
-        ThemeBuilder.ApplyTheme(Resources, null);
+        string? storeDir = null;
+        if (e.Args != null)
+        {
+            for (int i = 0; i < e.Args.Length; i++)
+            {
+                if ((string.Equals(e.Args[i], "--store-dir", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(e.Args[i], "-s", StringComparison.OrdinalIgnoreCase)) && i + 1 < e.Args.Length)
+                {
+                    storeDir = e.Args[i + 1];
+                    i++;
+                }
+            }
+        }
+
+        string effectiveStoreDir = storeDir ?? DpapiCredentialStore.GetDefaultStoreDirectory();
+        ThemeInfo? customTheme = null;
+        if (DpapiCredentialStore.StoreExists(effectiveStoreDir))
+        {
+            try
+            {
+                using var store = DpapiCredentialStore.Open(effectiveStoreDir);
+                customTheme = store.Theme;
+            }
+            catch
+            {
+                // Fallback to default theme on error
+            }
+        }
+
+        // Apply theme to Application resources at startup
+        ThemeBuilder.ApplyTheme(Resources, customTheme);
+
+        var mainVm = new MainViewModel(storeDir);
+        var mainWindow = new MainWindow { DataContext = mainVm };
+        MainWindow = mainWindow;
+        mainWindow.Show();
     }
 
     private static string GetLogFilePath()

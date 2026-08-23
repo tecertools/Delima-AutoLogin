@@ -177,6 +177,7 @@ public sealed class AdminWizardState
     public DryRunReport? LastDryRunReport { get; set; }
     public Dictionary<string, string> StudentPasswords { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, string> StudentAvatars { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, List<string>> StudentPicturePasswords { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public bool HasAcknowledgedDisclaimer { get; set; }
     public bool HasAcknowledgedConsent { get; set; }

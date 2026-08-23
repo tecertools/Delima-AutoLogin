@@ -90,7 +90,26 @@ public class Step5AvatarsTests
         Assert.Contains("2 Cemerlang", html);
         Assert.Contains("Nur Aishah", html);
         Assert.Contains("m-12345678", html);
+        Assert.Contains("pic-pw-tag", html);
+        Assert.Contains("🔑", html);
         Assert.Contains("window.print()", html);
+    }
+
+    [Fact]
+    public void InitializeAvatars_AssignsThreeIconPicturePasswordSequence_And_PersistsToState()
+    {
+        var state = new AdminWizardState();
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_101", FullName = "Nur Aishah", ClassName = "2 Cemerlang", EmailLocal = "m-12345678" });
+
+        var vm = new Step5AvatarsViewModel(state);
+        var item = vm.AvatarItems[0];
+
+        Assert.Equal(3, item.PicturePassword.Count);
+        Assert.NotEmpty(item.PicturePasswordDisplay);
+
+        vm.SaveToState();
+        Assert.True(state.StudentPicturePasswords.ContainsKey("s_101"));
+        Assert.Equal(item.PicturePassword, state.StudentPicturePasswords["s_101"]);
     }
 
     [Fact]

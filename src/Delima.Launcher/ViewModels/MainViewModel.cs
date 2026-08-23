@@ -29,9 +29,35 @@ public sealed partial class MainViewModel : ObservableObject
 
     private FloatingResetBarWindow? _resetBarWindow;
 
-    public MainViewModel()
+    public MainViewModel() : this(storeDirectory: null)
     {
-        // Load default/sample school dataset
+    }
+
+    public MainViewModel(string? storeDirectory)
+    {
+        string baseDir = storeDirectory ?? DpapiCredentialStore.GetDefaultStoreDirectory();
+        if (DpapiCredentialStore.StoreExists(baseDir))
+        {
+            try
+            {
+                var store = DpapiCredentialStore.Open(baseDir);
+                CredentialStore = store;
+                School = store.School;
+                Theme = store.Theme;
+                Config = store.Config;
+                Classes = store.Classes.ToList();
+                Students = store.Students.ToList();
+                LastClass = Classes.FirstOrDefault();
+                NavigateToPilihKelas();
+                return;
+            }
+            catch (Exception)
+            {
+                // Fallback to sample data on decryption error or corrupt store
+            }
+        }
+
+        // Fallback sample school dataset if no store is provisioned
         School = SampleDataService.CreateSampleSchool();
         Theme = SampleDataService.CreateSampleTheme();
         Config = new AppConfig();
@@ -81,9 +107,12 @@ public sealed partial class MainViewModel : ObservableObject
     {
         CloseResetBar();
 
-        // Filter students for this class or create sample students
-        var classStudents = Students.Where(s => s.ClassId == classInfo.Id).ToList();
-        if (classStudents.Count == 0)
+        // Filter students for this class with case-insensitive matching against class Id and Name
+        var classStudents = Students.Where(s =>
+            string.Equals(s.ClassId?.Trim(), classInfo.Id?.Trim(), StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(s.ClassId?.Trim(), classInfo.Name?.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (classStudents.Count == 0 && CredentialStore == null)
         {
             classStudents = SampleDataService.CreateSampleClassStudents(classInfo.Id);
         }
