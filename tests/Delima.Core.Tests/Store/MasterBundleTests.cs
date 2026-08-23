@@ -34,7 +34,8 @@ public class MasterBundleTests
                 IdleResetSeconds = 600,
                 InjectionSettleMs = 400,
                 WindowWaitTimeoutMs = 30000,
-                StoreMaxAgeDays = 30
+                StoreMaxAgeDays = 30,
+                PreferredBrowser = "edge"
             },
             Classes = [
                 new ClassInfo { Id = "c_1", Name = "1 Cemerlang", Grade = 1, ColourIndex = 0 },
@@ -86,6 +87,7 @@ public class MasterBundleTests
         Assert.Equal(payload.Students[0].Name, restored.Students[0].Name);
         Assert.Equal(payload.Students[0].Password, restored.Students[0].Password);
         Assert.Equal(payload.Config.Destinations.Count, restored.Config.Destinations.Count);
+        Assert.Equal("edge", restored.Config.PreferredBrowser);
     }
 
     [Fact]

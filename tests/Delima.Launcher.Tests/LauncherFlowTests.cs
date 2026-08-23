@@ -62,14 +62,14 @@ public class LauncherFlowTests
 
         var vm = new RalatViewModel(
             school,
-            FailureCodes.E01_ChromeNotInstalled,
+            FailureCodes.E01_NoBrowserFound,
             onRetry: () => retryCalled = true,
             student: student);
 
-        Assert.Equal(FailureCodes.E01_ChromeNotInstalled, vm.ErrorCode);
+        Assert.Equal(FailureCodes.E01_NoBrowserFound, vm.ErrorCode);
         Assert.Equal("Alamak, ada masalah. Panggil cikgu.", vm.PupilMessage);
-        Assert.Equal("Install Chrome", vm.TeacherAction);
-        Assert.Equal("Chrome not installed / path unresolvable", vm.ConditionDescription);
+        Assert.Equal("Install Microsoft Edge or Google Chrome", vm.TeacherAction);
+        Assert.Equal("No supported browser found (Edge or Chrome)", vm.ConditionDescription);
 
         vm.RetryCommand.Execute(null);
         Assert.True(retryCalled);
@@ -89,7 +89,7 @@ public class LauncherFlowTests
     }
 
     [Theory]
-    [InlineData(FailureCodes.E01_ChromeNotInstalled, "Alamak, ada masalah. Panggil cikgu.", "Install Chrome")]
+    [InlineData(FailureCodes.E01_NoBrowserFound, "Alamak, ada masalah. Panggil cikgu.", "Install Microsoft Edge or Google Chrome")]
     [InlineData(FailureCodes.E02_WindowNotVerified, "Cuba lagi.", "Slow PC — raise window_wait_timeout_ms")]
     [InlineData(FailureCodes.E03_InjectionAborted, "", "None")]
     [InlineData(FailureCodes.E06_GoogleCaptcha, "Tunggu sekejap, cuba lagi.", "Space out launches; known limitation")]

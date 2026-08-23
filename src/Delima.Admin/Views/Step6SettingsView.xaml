@@ -88,6 +88,20 @@
                     <TextBlock Text="Pelancar menolak storan melebihi tempoh ini untuk elak data usang." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
                 </StackPanel>
             </Grid>
+
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Pelayar Web Pilihan" Style="{StaticResource FieldLabel}" />
+                    <ComboBox ItemsSource="{Binding BrowserOptions}" SelectedItem="{Binding SelectedBrowser, Mode=TwoWay}" />
+                    <TextBlock Text="Edge disyorkan kerana dipasang secara lalai pada Windows 10/11." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

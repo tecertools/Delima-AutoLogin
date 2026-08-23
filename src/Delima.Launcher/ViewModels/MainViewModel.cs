@@ -200,6 +200,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var routeCOptions = new RouteCOptions
         {
+            PreferredBrowser = Config.PreferredBrowser ?? "auto",
             WindowWaitTimeout = TimeSpan.FromMilliseconds(Config.WindowWaitTimeoutMs > 0 ? Config.WindowWaitTimeoutMs : 30000),
             InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 800,
             PerCharDelayMs = 15,
@@ -223,7 +224,7 @@ public sealed partial class MainViewModel : ObservableObject
         );
     }
 
-    private void OnInjectionSucceeded(Student student, ChromeSession session)
+    private void OnInjectionSucceeded(Student student, BrowserSession session)
     {
         // Display Floating Reset Bar (PRD §7.4) and minimize Launcher window
         try

@@ -6,7 +6,11 @@ namespace Delima.Win32;
 /// </summary>
 public static class FailureCodes
 {
-    public const string E01_ChromeNotInstalled = "E01";
+    public const string E01_NoBrowserFound = "E01";
+
+    [Obsolete("Use E01_NoBrowserFound instead.")]
+    public const string E01_ChromeNotInstalled = E01_NoBrowserFound;
+
     public const string E02_WindowNotVerified = "E02";
     public const string E03_InjectionAborted = "E03";
     public const string E06_GoogleCaptcha = "E06";
@@ -22,7 +26,7 @@ public static class FailureCodes
     private static readonly Dictionary<string, (string Condition, string PupilMessageBm, string TeacherAction)> Taxonomy =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            [E01_ChromeNotInstalled] = ("Chrome not installed / path unresolvable", "Alamak, ada masalah. Panggil cikgu.", "Install Chrome"),
+            [E01_NoBrowserFound] = ("No supported browser found (Edge or Chrome)", "Alamak, ada masalah. Panggil cikgu.", "Install Microsoft Edge or Google Chrome"),
             [E02_WindowNotVerified] = ("Window not verified before timeout", "Cuba lagi.", "Slow PC — raise window_wait_timeout_ms"),
             [E03_InjectionAborted] = ("Injection aborted by pupil", "", "None"),
             [E06_GoogleCaptcha] = ("Google CAPTCHA / \"unusual activity\"", "Tunggu sekejap, cuba lagi.", "Space out launches; known limitation"),

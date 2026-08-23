@@ -55,16 +55,19 @@ public sealed record InjectionResult
             Elapsed = elapsed
         };
 
-    public static InjectionResult ChromeNotFound() =>
+    public static InjectionResult BrowserNotFound() =>
         new()
         {
             Success = false,
-            ErrorCode = FailureCodes.E01_ChromeNotInstalled,
-            PupilMessage = FailureCodes.GetPupilMessageBm(FailureCodes.E01_ChromeNotInstalled),
-            TeacherAction = FailureCodes.GetTeacherAction(FailureCodes.E01_ChromeNotInstalled),
+            ErrorCode = FailureCodes.E01_NoBrowserFound,
+            PupilMessage = FailureCodes.GetPupilMessageBm(FailureCodes.E01_NoBrowserFound),
+            TeacherAction = FailureCodes.GetTeacherAction(FailureCodes.E01_NoBrowserFound),
             CharactersInjected = 0,
             Elapsed = TimeSpan.Zero
         };
+
+    [Obsolete("Use BrowserNotFound() instead.")]
+    public static InjectionResult ChromeNotFound() => BrowserNotFound();
 
     public static InjectionResult Failure(string errorCode, int charsInjected, bool blockInputGranted, TimeSpan elapsed) =>
         new()

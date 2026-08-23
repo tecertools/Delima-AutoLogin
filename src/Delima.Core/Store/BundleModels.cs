@@ -72,6 +72,9 @@ public sealed class AppConfig
 
     [JsonPropertyName("store_max_age_days")]
     public int StoreMaxAgeDays { get; set; } = 30;
+
+    [JsonPropertyName("preferred_browser")]
+    public string PreferredBrowser { get; set; } = "auto";
 }
 
 public sealed class DestinationConfig

@@ -24,7 +24,7 @@ public enum LoginFlowState
 }
 
 /// <summary>
-/// Configuration options for the Route C login flow per Technical Architecture §3.2, §4.2, §4.5, and Appendix B.
+/// Configuration options for the Route C login flow per Technical Architecture §3.2, §4.2, §4.4.1, §4.5, and Appendix B.
 /// </summary>
 public sealed record RouteCOptions
 {
@@ -35,38 +35,54 @@ public sealed record RouteCOptions
     public string EntryUrl { get; init; } = "https://d3.delima.edu.my/landing";
 
     /// <summary>
-    /// Exact expected window titles for Google's identifier (email) page.
-    /// Matched as exact Ordinal equality against any entry in the list (§4.2).
-    /// Defaults to both measured T0.4 variants (hyphen and en-dash).
+    /// Preferred browser configuration key ("auto", "edge", or "chrome").
+    /// Default is "auto" (prefers Edge, fallback to Chrome) per §4.4.1.
     /// </summary>
-    public IReadOnlyList<string> TitleIdentifierPage { get; init; } = new[]
+    public string PreferredBrowser { get; init; } = "auto";
+
+    /// <summary>
+    /// Target browser kind for title defaults. If not explicitly set, defaults to Chrome titles
+    /// for backward compatibility or is inferred during RouteCLoginOrchestrator execution.
+    /// </summary>
+    public BrowserKind? TargetBrowser { get; init; }
+
+    private readonly IReadOnlyList<string>? _titleIdentifierPage;
+
+    /// <summary>
+    /// Exact expected window titles for Google's identifier (email) page.
+    /// Matched as exact Ordinal equality against any entry in the list (§4.2). Substring matching is forbidden.
+    /// Defaults to measured per-browser lists. For Edge, defaults to an empty unmeasured list that fails closed.
+    /// </summary>
+    public IReadOnlyList<string> TitleIdentifierPage
     {
-        "Sign in - Google Accounts - Google Chrome",
-        "Sign in \u2013 Google accounts - Google Chrome"
-    };
+        get => _titleIdentifierPage ?? (TargetBrowser == BrowserKind.Edge ? BrowserTitles.Edge.Identifier : BrowserTitles.Chrome.Identifier);
+        init => _titleIdentifierPage = value;
+    }
+
+    private readonly IReadOnlyList<string>? _titleConsentPage;
 
     /// <summary>
     /// Window titles for Google's OAuth consent screen (§4.5, Appendix B).
     /// Guarded by state rather than string alone: Consent state may only be entered
     /// after successful password injection in the same run.
     /// </summary>
-    public IReadOnlyList<string> TitleConsentPage { get; init; } = new[]
+    public IReadOnlyList<string> TitleConsentPage
     {
-        "Sign in - Google Accounts - Google Chrome",
-        "Sign in \u2013 Google accounts - Google Chrome"
-    };
+        get => _titleConsentPage ?? (TargetBrowser == BrowserKind.Edge ? BrowserTitles.Edge.Consent : BrowserTitles.Chrome.Consent);
+        init => _titleConsentPage = value;
+    }
+
+    private readonly IReadOnlyList<string>? _titleDestinationPage;
 
     /// <summary>
     /// Window titles for destination pages when OAuth consent is skipped (e.g. domain-trusted application).
     /// Matched as exact Ordinal equality against any entry in the list (§4.5).
     /// </summary>
-    public IReadOnlyList<string> TitleDestinationPage { get; init; } = new[]
+    public IReadOnlyList<string> TitleDestinationPage
     {
-        "DELIMa - Google Chrome",
-        "DELIMa 3.0 - Google Chrome",
-        "Classes - Google Classroom - Google Chrome",
-        "Google Classroom - Google Chrome"
-    };
+        get => _titleDestinationPage ?? (TargetBrowser == BrowserKind.Edge ? BrowserTitles.Edge.Destination : BrowserTitles.Chrome.Destination);
+        init => _titleDestinationPage = value;
+    }
 
     /// <summary>
     /// Settle delay duration in milliseconds after window verification (800 ms default to ensure input autofocus).
@@ -97,7 +113,9 @@ public sealed record RouteCOptions
     public TimeSpan TransitionTimeout { get; init; } = TimeSpan.FromSeconds(15);
 
     /// <summary>
-    /// Expected Chrome window class name. Default is "Chrome_WidgetWin_1".
+    /// Expected Chromium window class name. Default is "Chrome_WidgetWin_1".
+    /// Note per §4.2 &amp; §4.4.1: Edge and Chrome both report "Chrome_WidgetWin_1", so the class check
+    /// cannot distinguish the two browsers and the PID check is doing all the work.
     /// </summary>
     public string ExpectedClassName { get; init; } = "Chrome_WidgetWin_1";
 
@@ -144,11 +162,13 @@ public sealed record RouteCResult
     public string? ErrorCode { get; init; }
     public string? PupilMessage { get; init; }
     public string? TeacherAction { get; init; }
-    public ChromeSession? Session { get; init; }
+    public BrowserSession? Session { get; init; }
     public int TotalCharsInjected { get; init; }
     public TimeSpan Elapsed { get; init; }
 
-    public static RouteCResult Succeeded(ChromeSession session, int charsInjected, TimeSpan elapsed) =>
+    public ChromeSession? ChromeSession => Session as ChromeSession ?? (Session != null ? new ChromeSession(Session.Process, Session.ProfileDir, Session.ExecutablePath) : null);
+
+    public static RouteCResult Succeeded(BrowserSession session, int charsInjected, TimeSpan elapsed) =>
         new()
         {
             Success = true,
@@ -161,7 +181,7 @@ public sealed record RouteCResult
         string errorCode,
         string pupilMessage,
         string teacherAction,
-        ChromeSession? session,
+        BrowserSession? session,
         int charsInjected,
         TimeSpan elapsed) =>
         new()
@@ -175,7 +195,7 @@ public sealed record RouteCResult
             Elapsed = elapsed
         };
 
-    public static RouteCResult FromInjectionResult(InjectionResult ir, ChromeSession? session, int priorChars = 0) =>
+    public static RouteCResult FromInjectionResult(InjectionResult ir, BrowserSession? session, int priorChars = 0) =>
         new()
         {
             Success = ir.Success,
@@ -189,16 +209,17 @@ public sealed record RouteCResult
 }
 
 /// <summary>
-/// Orchestrates the two-stage visual SSO login flow (Route C) per Technical Architecture §4.2, §4.4, §4.5, and §7.
+/// Orchestrates the two-stage visual SSO login flow (Route C) per Technical Architecture §4.2, §4.4.1, §4.5, and §7.
 /// Sequence-gated: Password injection cannot fire without a preceding verified transition out of the identifier page.
 /// </summary>
 public static class RouteCLoginOrchestrator
 {
     /// <summary>
     /// Executes the full Route C two-step injection flow for a pupil session.
+    /// Supports Microsoft Edge and Google Chrome, preferring Edge per §4.4.1.
     /// </summary>
     public static async Task<RouteCResult> ExecuteAsync(
-        string? chromePath,
+        string? browserPath,
         string email,
         ICredential credential,
         RouteCOptions? options = null,
@@ -211,19 +232,53 @@ public static class RouteCLoginOrchestrator
         options ??= new RouteCOptions();
         var sw = Stopwatch.StartNew();
 
-        // 1. Resolve Chrome executable path
-        var resolvedChrome = chromePath ?? ChromeSession.ResolveChromePath();
-        if (string.IsNullOrEmpty(resolvedChrome) || !File.Exists(resolvedChrome))
+        // 1. Resolve browser executable path honoring preference (auto | edge | chrome)
+        (BrowserKind Kind, string Path)? resolvedBrowser = null;
+        if (!string.IsNullOrWhiteSpace(browserPath))
         {
+            if (File.Exists(browserPath))
+            {
+                resolvedBrowser = (BrowserSession.DetectBrowserKind(browserPath), browserPath);
+            }
+        }
+        else
+        {
+            resolvedBrowser = BrowserSession.ResolveBrowser(options.PreferredBrowser);
+        }
+
+        if (resolvedBrowser == null || !File.Exists(resolvedBrowser.Value.Path))
+        {
+            AuditLogger.RecordEntry(new AuditLogEntry
+            {
+                Timestamp = DateTimeOffset.UtcNow,
+                Event = "browser_resolution_failed",
+                Outcome = "FAILURE",
+                OutcomeCode = FailureCodes.E01_NoBrowserFound,
+                Details = $"No supported browser found (preference: {options.PreferredBrowser}).",
+                SoftwareVersion = "2.0.0",
+                WindowsUser = Environment.UserName
+            });
+
             onStateChanged?.Invoke(LoginFlowState.Failed);
             return RouteCResult.Failure(
-                FailureCodes.E01_ChromeNotInstalled,
-                FailureCodes.GetPupilMessageBm(FailureCodes.E01_ChromeNotInstalled),
-                FailureCodes.GetTeacherAction(FailureCodes.E01_ChromeNotInstalled),
+                FailureCodes.E01_NoBrowserFound,
+                FailureCodes.GetPupilMessageBm(FailureCodes.E01_NoBrowserFound),
+                FailureCodes.GetTeacherAction(FailureCodes.E01_NoBrowserFound),
                 session: null,
                 charsInjected: 0,
                 sw.Elapsed);
         }
+
+        // Record resolved browser in audit log (§4.4.1)
+        AuditLogger.RecordEntry(new AuditLogEntry
+        {
+            Timestamp = DateTimeOffset.UtcNow,
+            Event = "browser_resolved",
+            Outcome = "SUCCESS",
+            Details = $"Resolved browser {resolvedBrowser.Value.Kind} at '{resolvedBrowser.Value.Path}' (preference: {options.PreferredBrowser}).",
+            SoftwareVersion = "2.0.0",
+            WindowsUser = Environment.UserName
+        });
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -237,29 +292,38 @@ public static class RouteCLoginOrchestrator
                 sw.Elapsed);
         }
 
-        // 2. Launch Chrome session with throwaway profile
+        // Configure effective options with resolved TargetBrowser if not explicitly set
+        var effectiveOptions = options.TargetBrowser == null
+            ? options with { TargetBrowser = resolvedBrowser.Value.Kind }
+            : options;
+
+        // 2. Launch browser session with throwaway profile
         onStateChanged?.Invoke(LoginFlowState.LaunchingBrowser);
-        ChromeSession? session = null;
+        BrowserSession? session = null;
 
         try
         {
-            session = ChromeSession.Launch(resolvedChrome, options.EntryUrl);
+            session = BrowserSession.Launch(
+                resolvedBrowser.Value.Path,
+                effectiveOptions.EntryUrl,
+                forceRendererAccessibility: true,
+                browserKind: resolvedBrowser.Value.Kind);
 
             var injectionOptions = new InjectionOptions
             {
-                WindowWaitTimeout = options.WindowWaitTimeout,
-                TitleSettlePolls = options.TitleSettlePolls,
-                PollIntervalMs = options.PollIntervalMs,
-                InjectionSettleMs = options.InjectionSettleMs,
-                PerCharDelayMs = options.PerCharDelayMs,
-                ExpectedClassName = options.ExpectedClassName
+                WindowWaitTimeout = effectiveOptions.WindowWaitTimeout,
+                TitleSettlePolls = effectiveOptions.TitleSettlePolls,
+                PollIntervalMs = effectiveOptions.PollIntervalMs,
+                InjectionSettleMs = effectiveOptions.InjectionSettleMs,
+                PerCharDelayMs = effectiveOptions.PerCharDelayMs,
+                ExpectedClassName = effectiveOptions.ExpectedClassName
             };
 
             int totalChars = 0;
 
             // If auto-clicking landing page button is enabled, start background UIA watcher
             CancellationTokenSource? landingCts = null;
-            if (options.AutoClickLandingButton && OperatingSystem.IsWindows())
+            if (effectiveOptions.AutoClickLandingButton && OperatingSystem.IsWindows())
             {
                 landingCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 var landingToken = landingCts.Token;
@@ -267,7 +331,7 @@ public static class RouteCLoginOrchestrator
                 {
                     try
                     {
-                        UiaHelper.TryInvokeButtonInForeground(options.LandingButtonText, options.WindowWaitTimeout, landingToken);
+                        UiaHelper.TryInvokeButtonInForeground(effectiveOptions.LandingButtonText, effectiveOptions.WindowWaitTimeout, landingToken);
                     }
                     catch
                     {
@@ -287,8 +351,8 @@ public static class RouteCLoginOrchestrator
                 return InjectionEngine.Inject(
                     session,
                     email.AsSpan(),
-                    options.TitleIdentifierPage,
-                    injectionOptions with { SendEnter = options.SendEnterAfterEmail },
+                    effectiveOptions.TitleIdentifierPage,
+                    injectionOptions with { SendEnter = effectiveOptions.SendEnterAfterEmail },
                     cancellationToken);
             }, cancellationToken);
 
@@ -322,7 +386,7 @@ public static class RouteCLoginOrchestrator
             // ====================================================================
             onStateChanged?.Invoke(LoginFlowState.WaitingForTransition);
             var transitionVerified = await Task.Run(() =>
-                WaitForTransitionOut(session, options.TitleIdentifierPage, options.TransitionTimeout, options.PollIntervalMs, cancellationToken),
+                WaitForTransitionOut(session, effectiveOptions.TitleIdentifierPage, effectiveOptions.TransitionTimeout, effectiveOptions.PollIntervalMs, cancellationToken),
                 cancellationToken);
 
             if (cancellationToken.IsCancellationRequested)
@@ -363,8 +427,8 @@ public static class RouteCLoginOrchestrator
 
                 var passwordOptions = injectionOptions with
                 {
-                    SendEnter = options.SendEnterAfterPassword,
-                    PreInjectionCheck = options.CheckUiaPasswordElement && OperatingSystem.IsWindows()
+                    SendEnter = effectiveOptions.SendEnterAfterPassword,
+                    PreInjectionCheck = effectiveOptions.CheckUiaPasswordElement && OperatingSystem.IsWindows()
                         ? () => UiaHelper.IsFocusedElementPassword()
                         : null
                 };
@@ -376,7 +440,7 @@ public static class RouteCLoginOrchestrator
                     credential.PasswordSpan,
                     title =>
                     {
-                        var matches = !string.IsNullOrWhiteSpace(title) && !options.TitleIdentifierPage.Any(idTitle => string.Equals(title, idTitle, StringComparison.Ordinal));
+                        var matches = !string.IsNullOrWhiteSpace(title) && !effectiveOptions.TitleIdentifierPage.Any(idTitle => string.Equals(title, idTitle, StringComparison.Ordinal));
                         if (matches)
                         {
                             capturedPasswordTitle = title;
@@ -419,7 +483,7 @@ public static class RouteCLoginOrchestrator
             // AFTER successful password injection in the same run, never from title match alone.
             // ====================================================================
             var resolution = await Task.Run(() =>
-                WaitForPostPasswordResolution(session, options, capturedPasswordTitle, cancellationToken),
+                WaitForPostPasswordResolution(session, effectiveOptions, capturedPasswordTitle, cancellationToken),
                 cancellationToken);
 
             switch (resolution)
@@ -567,7 +631,7 @@ public static class RouteCLoginOrchestrator
     /// Polls until the window title leaves all identifier page titles, establishing the sequence gate per §4.2.
     /// </summary>
     internal static bool WaitForTransitionOut(
-        ChromeSession session,
+        BrowserSession session,
         IReadOnlyList<string> identifierTitles,
         TimeSpan timeout,
         int pollIntervalMs,
@@ -600,7 +664,7 @@ public static class RouteCLoginOrchestrator
     /// Overload accepting a single identifier title for backward compatibility.
     /// </summary>
     internal static bool WaitForTransitionOut(
-        ChromeSession session,
+        BrowserSession session,
         string identifierTitle,
         TimeSpan timeout,
         int pollIntervalMs,
@@ -613,7 +677,7 @@ public static class RouteCLoginOrchestrator
     /// or detects password rejection / timeout per §4.5 and §7.1.
     /// </summary>
     internal static PostPasswordResolution WaitForPostPasswordResolution(
-        ChromeSession session,
+        BrowserSession session,
         RouteCOptions options,
         string? passwordPageTitle,
         CancellationToken cancellationToken,

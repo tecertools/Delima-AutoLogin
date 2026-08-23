@@ -368,7 +368,7 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 | `SendInput` injection (T0.3) | Carries over — browser-agnostic |
 | UIA `IsPassword` (T0.4) | Very likely — Edge shares Chromium's accessibility layer — but confirm in the same pass |
 | Window titles | **Must be re-measured**, twenty runs, per `T0.4_UIA_Verification.md` |
-| Window class `Chrome_WidgetWin_1` | **Verify.** Edge probably reports the same, in which case the class check cannot distinguish the browsers and the PID check is carrying the whole burden |
+| Window class `Chrome_WidgetWin_1` | **Verified.** Edge reports the same class name (`Chrome_WidgetWin_1`). Therefore, the class check cannot distinguish the two browsers and the **PID check is doing all the work**. |
 | Enterprise policy path | Differs — `Policies\Microsoft\Edge`, and `InPrivateModeAvailability` rather than `IncognitoModeAvailability` |
 
 ---
@@ -546,7 +546,7 @@ Gap Analysis §3 requires this and v1 has none. Every failure gets a calm BM mes
 
 | Code | Condition | Pupil sees (BM) | Teacher action |
 | :--- | :--- | :--- | :--- |
-| `E01` | Chrome not installed / path unresolvable | Alamak, ada masalah. Panggil cikgu. | Install Chrome |
+| `E01` | No supported browser found (Edge or Chrome) | Alamak, ada masalah. Panggil cikgu. | Install Microsoft Edge or Google Chrome |
 | `E02` | Window not verified before timeout | Cuba lagi. | Slow PC — raise `window_wait_timeout_ms` |
 | `E03` | Injection aborted by pupil | *(returns to name grid)* | None |
 | `E06` | Google CAPTCHA / "unusual activity" | Tunggu sekejap, cuba lagi. | Space out launches; known limitation |

@@ -138,7 +138,7 @@ public sealed class IdleTracker : IDisposable
 /// </summary>
 public sealed class SessionWatchdog : IDisposable
 {
-    private readonly ChromeSession? _session;
+    private readonly BrowserSession? _session;
     private readonly Student? _student;
     private readonly ICredential? _credential;
     private readonly Action? _onResetAction;
@@ -152,7 +152,7 @@ public sealed class SessionWatchdog : IDisposable
 
     public SessionWatchdog(
         TimeSpan idleThreshold,
-        ChromeSession? session = null,
+        BrowserSession? session = null,
         Student? student = null,
         ICredential? credential = null,
         Action? onResetAction = null,

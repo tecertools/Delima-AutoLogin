@@ -29,6 +29,9 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
     [ObservableProperty]
     private int _storeMaxAgeDays = 30;
 
+    [ObservableProperty]
+    private string _selectedBrowser = "Automatik (Utamakan Edge)";
+
     public ObservableCollection<string> PinPolicyOptions { get; } =
     [
         "4 digit, kunci selepas 5 percubaan",
@@ -41,6 +44,13 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
         "English"
     ];
 
+    public ObservableCollection<string> BrowserOptions { get; } =
+    [
+        "Automatik (Utamakan Edge)",
+        "Microsoft Edge",
+        "Google Chrome"
+    ];
+
     public bool CanProceed => Destinations.Count > 0;
 
     public Step6SettingsViewModel(AdminWizardState state)
@@ -48,6 +58,12 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
         _state = state;
         _idleResetSeconds = state.Config.IdleResetSeconds;
         _storeMaxAgeDays = state.Config.StoreMaxAgeDays;
+        _selectedBrowser = state.Config.PreferredBrowser switch
+        {
+            "edge" => "Microsoft Edge",
+            "chrome" => "Google Chrome",
+            _ => "Automatik (Utamakan Edge)"
+        };
 
         foreach (var dest in state.Config.Destinations)
         {
@@ -97,5 +113,11 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
         _state.Config.Destinations = Destinations.ToList();
         _state.Config.IdleResetSeconds = IdleResetSeconds;
         _state.Config.StoreMaxAgeDays = StoreMaxAgeDays;
+        _state.Config.PreferredBrowser = SelectedBrowser switch
+        {
+            "Microsoft Edge" => "edge",
+            "Google Chrome" => "chrome",
+            _ => "auto"
+        };
     }
 }

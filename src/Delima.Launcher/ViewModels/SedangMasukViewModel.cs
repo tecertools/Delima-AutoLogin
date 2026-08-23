@@ -22,7 +22,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy = true;
 
-    private readonly Action<ChromeSession> _onSuccess;
+    private readonly Action<BrowserSession> _onSuccess;
     private readonly Action<RouteCResult> _onFailure;
     private readonly Action _onCancel;
 
@@ -30,7 +30,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         School school,
         Student student,
         ICredential credential,
-        Action<ChromeSession> onSuccess,
+        Action<BrowserSession> onSuccess,
         Action<RouteCResult> onFailure,
         Action onCancel,
         string? customEmail = null,
@@ -54,7 +54,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         try
         {
             var result = await RouteCLoginOrchestrator.ExecuteAsync(
-                chromePath: null,
+                browserPath: null,
                 email: email,
                 credential: credential,
                 options: options,

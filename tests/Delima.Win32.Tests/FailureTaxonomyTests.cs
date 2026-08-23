@@ -5,7 +5,7 @@ namespace Delima.Win32.Tests;
 public class FailureTaxonomyTests
 {
     [Theory]
-    [InlineData("E01", "Chrome not installed / path unresolvable", "Install Chrome")]
+    [InlineData("E01", "No supported browser found (Edge or Chrome)", "Install Microsoft Edge or Google Chrome")]
     [InlineData("E02", "Window not verified before timeout", "Slow PC — raise window_wait_timeout_ms")]
     [InlineData("E03", "Injection aborted by pupil", "None")]
     [InlineData("E06", "Google CAPTCHA / \"unusual activity\"", "Space out launches; known limitation")]

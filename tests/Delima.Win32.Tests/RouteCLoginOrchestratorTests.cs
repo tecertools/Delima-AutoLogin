@@ -11,18 +11,18 @@ namespace Delima.Win32.Tests;
 public class RouteCLoginOrchestratorTests
 {
     [Fact]
-    public async Task RouteCOrchestrator_MissingChrome_Returns_E01_ChromeNotInstalled()
+    public async Task RouteCOrchestrator_MissingBrowser_Returns_E01_NoBrowserFound()
     {
         using var cred = new SecurePasswordBuffer("Password123!"u8);
 
         var result = await RouteCLoginOrchestrator.ExecuteAsync(
-            chromePath: @"C:\NonExistentDirectory\chrome.exe",
+            browserPath: @"C:\NonExistentDirectory\chrome.exe",
             email: "m-10000001@moe-dl.edu.my",
             credential: cred,
             options: new RouteCOptions { WindowWaitTimeout = TimeSpan.FromMilliseconds(200) });
 
         Assert.False(result.Success);
-        Assert.Equal(FailureCodes.E01_ChromeNotInstalled, result.ErrorCode);
+        Assert.Equal(FailureCodes.E01_NoBrowserFound, result.ErrorCode);
         Assert.Equal(0, result.TotalCharsInjected);
     }
 
@@ -35,7 +35,7 @@ public class RouteCLoginOrchestratorTests
         using var cred = new SecurePasswordBuffer("Password123!"u8);
 
         var result = await RouteCLoginOrchestrator.ExecuteAsync(
-            chromePath: @"C:\NonExistentDirectory\chrome.exe",
+            browserPath: @"C:\NonExistentDirectory\chrome.exe",
             email: "m-10000001@moe-dl.edu.my",
             credential: cred,
             options: new RouteCOptions(),
@@ -446,7 +446,7 @@ public class RouteCLoginOrchestratorTests
         using var cred = new SecurePasswordBuffer("Password123!"u8);
 
         var result = await RouteCLoginOrchestrator.ExecuteAsync(
-            chromePath: @"C:\NonExistentDirectory\chrome.exe",
+            browserPath: @"C:\NonExistentDirectory\chrome.exe",
             email: "m-10000001@moe-dl.edu.my",
             credential: cred,
             options: new RouteCOptions(),

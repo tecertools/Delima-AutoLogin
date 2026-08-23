@@ -8,7 +8,7 @@ namespace Delima.Launcher.Views;
 public partial class FloatingResetBarWindow : Window
 {
     private readonly Student _student;
-    private readonly ChromeSession? _session;
+    private readonly BrowserSession? _session;
     private readonly Action _onReset;
     private readonly int _idleResetSeconds;
     private SessionWatchdog? _watchdog;
@@ -20,7 +20,7 @@ public partial class FloatingResetBarWindow : Window
 
     public FloatingResetBarWindow(
         Student student,
-        ChromeSession? session,
+        BrowserSession? session,
         Action onReset,
         int idleResetSeconds = 600,
         string? initialPrompt = "Lihat nama kamu. Kalau betul, tekan butang biru di bawah.")

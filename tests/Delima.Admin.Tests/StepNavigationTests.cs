@@ -193,6 +193,27 @@ public class StepNavigationTests
     }
 
     [Fact]
+    public void Step6_PreferredBrowser_Setting_PersistsToConfig()
+    {
+        var state = new AdminWizardState();
+        var vm = new Step6SettingsViewModel(state);
+
+        Assert.Equal("Automatik (Utamakan Edge)", vm.SelectedBrowser);
+
+        vm.SelectedBrowser = "Microsoft Edge";
+        vm.SaveToState();
+        Assert.Equal("edge", state.Config.PreferredBrowser);
+
+        vm.SelectedBrowser = "Google Chrome";
+        vm.SaveToState();
+        Assert.Equal("chrome", state.Config.PreferredBrowser);
+
+        vm.SelectedBrowser = "Automatik (Utamakan Edge)";
+        vm.SaveToState();
+        Assert.Equal("auto", state.Config.PreferredBrowser);
+    }
+
+    [Fact]
     public void FullWizard_HappyPath_Step0ThroughStep7_CompletesSetup()
     {
         var state = new AdminWizardState

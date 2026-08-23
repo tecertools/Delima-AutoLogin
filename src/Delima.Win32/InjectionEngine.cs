@@ -89,7 +89,7 @@ public static class InjectionEngine
     /// Requires an exact full-string match against any expected title in expectedTitles per §4.2.
     /// </summary>
     public static InjectionResult Inject(
-        ChromeSession session,
+        BrowserSession session,
         ICredential credential,
         IReadOnlyList<string> expectedTitles,
         InjectionOptions? options = null,
@@ -100,7 +100,7 @@ public static class InjectionEngine
         ArgumentNullException.ThrowIfNull(expectedTitles);
         if (expectedTitles.Count == 0)
         {
-            throw new ArgumentException("At least one expected title must be provided.", nameof(expectedTitles));
+            throw new ArgumentException("At least one expected title must be provided. Microsoft Edge titles must be measured per T0.4_UIA_Verification.md before use.", nameof(expectedTitles));
         }
 
         return Inject(session, credential.PasswordSpan, expectedTitles, options, cancellationToken);
@@ -111,7 +111,7 @@ public static class InjectionEngine
     /// Requires an exact full-string match against any expected title in expectedTitles per §4.2.
     /// </summary>
     public static InjectionResult Inject(
-        ChromeSession session,
+        BrowserSession session,
         ReadOnlySpan<char> passwordSpan,
         IReadOnlyList<string> expectedTitles,
         InjectionOptions? options = null,
@@ -121,7 +121,7 @@ public static class InjectionEngine
         ArgumentNullException.ThrowIfNull(expectedTitles);
         if (expectedTitles.Count == 0)
         {
-            throw new ArgumentException("At least one expected title must be provided.", nameof(expectedTitles));
+            throw new ArgumentException("At least one expected title must be provided. Microsoft Edge titles must be measured per T0.4_UIA_Verification.md before use.", nameof(expectedTitles));
         }
 
         return Inject(
@@ -137,7 +137,7 @@ public static class InjectionEngine
     /// Requires an exact full-string match against expectedTitle per §4.2.
     /// </summary>
     public static InjectionResult Inject(
-        ChromeSession session,
+        BrowserSession session,
         ICredential credential,
         string expectedTitle,
         InjectionOptions? options = null,
@@ -155,7 +155,7 @@ public static class InjectionEngine
     /// Requires an exact full-string match against expectedTitle per §4.2.
     /// </summary>
     public static InjectionResult Inject(
-        ChromeSession session,
+        BrowserSession session,
         ReadOnlySpan<char> passwordSpan,
         string expectedTitle,
         InjectionOptions? options = null,
@@ -172,7 +172,7 @@ public static class InjectionEngine
     /// Kept internal to prevent public callers from using loose substring checks per §4.2.
     /// </summary>
     internal static InjectionResult Inject(
-        ChromeSession session,
+        BrowserSession session,
         ICredential credential,
         Func<string, bool> titlePredicate,
         InjectionOptions? options = null,
@@ -189,7 +189,7 @@ public static class InjectionEngine
     /// Internal injection overload accepting a title predicate for testing dynamic title transitions.
     /// </summary>
     internal static InjectionResult Inject(
-        ChromeSession session,
+        BrowserSession session,
         ReadOnlySpan<char> passwordSpan,
         Func<string, bool> titlePredicate,
         InjectionOptions? options = null,
@@ -321,7 +321,7 @@ public static class InjectionEngine
     /// has the expected window class, and exactly matches any title in the expected titles list per §4.2.
     /// </summary>
     public static bool IsWindowVerified(
-        ChromeSession session,
+        BrowserSession session,
         IReadOnlyList<string> expectedTitles,
         string expectedClassName = "Chrome_WidgetWin_1")
     {
@@ -334,7 +334,7 @@ public static class InjectionEngine
     /// has the expected window class, and exactly matches the expected title per §4.2.
     /// </summary>
     public static bool IsWindowVerified(
-        ChromeSession session,
+        BrowserSession session,
         string expectedTitle,
         string expectedClassName = "Chrome_WidgetWin_1")
     {
@@ -346,7 +346,7 @@ public static class InjectionEngine
     /// Internal verification method accepting a title predicate for testing.
     /// </summary>
     internal static bool IsWindowVerified(
-        ChromeSession session,
+        BrowserSession session,
         Func<string, bool> titlePredicate,
         string expectedClassName = "Chrome_WidgetWin_1")
     {
@@ -374,7 +374,7 @@ public static class InjectionEngine
     /// Aborts to false if the required stability is not reached within timeout.
     /// </summary>
     internal static bool WaitForVerifiedAndSettledWindow(
-        ChromeSession session,
+        BrowserSession session,
         Func<string, bool> titlePredicate,
         string expectedClassName,
         TimeSpan timeout,

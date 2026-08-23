@@ -60,9 +60,19 @@ Name: "{commonstartup}\DELIMa";   Filename: "{app}\Delima.Launcher.exe"; Compone
 
 [Tasks]
 Name: "startup";      Description: "Mulakan semasa log masuk (mod kiosk)"; Components: lab; Flags: unchecked
+Name: "edgepolicy";   Description: "Guna dasar Edge sekolah — melumpuhkan pengurus kata laluan, DevTools dan mod InPrivate pada SELURUH PC ini"; Components: lab; Flags: unchecked
 Name: "chromepolicy"; Description: "Guna dasar Chrome sekolah — melumpuhkan pengurus kata laluan, DevTools dan mod inkognito pada SELURUH PC ini"; Components: lab; Flags: unchecked
 
 [Registry]
+Root: HKLM; Subkey: "SOFTWARE\Policies\Microsoft\Edge"; ValueType: dword; \
+  ValueName: "PasswordManagerEnabled"; ValueData: 0; Tasks: edgepolicy; Flags: uninsdeletevalue
+Root: HKLM; Subkey: "SOFTWARE\Policies\Microsoft\Edge"; ValueType: dword; \
+  ValueName: "DeveloperToolsAvailability"; ValueData: 2; Tasks: edgepolicy; Flags: uninsdeletevalue
+Root: HKLM; Subkey: "SOFTWARE\Policies\Microsoft\Edge"; ValueType: dword; \
+  ValueName: "InPrivateModeAvailability"; ValueData: 1; Tasks: edgepolicy; Flags: uninsdeletevalue
+Root: HKLM; Subkey: "SOFTWARE\Policies\Microsoft\Edge"; ValueType: dword; \
+  ValueName: "BrowserSignin"; ValueData: 0; Tasks: edgepolicy; Flags: uninsdeletevalue
+
 Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
   ValueName: "PasswordManagerEnabled"; ValueData: 0; Tasks: chromepolicy; Flags: uninsdeletevalue
 Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
