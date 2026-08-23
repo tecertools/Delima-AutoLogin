@@ -77,13 +77,15 @@ If only one ships, it should be Normal SSO. It is the smaller product with most 
 
 | # | Item | Where |
 | :-- | :--- | :--- |
-| ~~1–3~~ | ~~T0.4 findings, consent step, T0.1 statement, installer ACL, title lists, post-password verification, failure taxonomy, Edge & Chrome support (Prompt 20)~~ — **all done** | Prompts T0.4b, 15a, 16–20 |
-| **4** | **First full run** — wizard → bundle → provision → sign-in. Nothing has ever produced a `school.dlmpack` | `E2E_First_Run.md` |
+| **1** | **Cleanup after the E2E run** — `katalaluan.csv` holds a plaintext password; change the test account's password | `E2E_First_Run.md` Part 11 |
+| **2** | Cancel on the consent screen quits the launcher — must return to `Pilih Kelas`, never exit in kiosk mode | Prompt 21 |
+| **3** | **Measure Edge's window titles.** The lists ship empty and fail closed, so Edge does not work yet | `T0.4_UIA_Verification.md`, 20 runs |
+| **4** | Outstanding measurements — Chrome consent title, G1 timing, cold start, audit-log verification | `E2E_First_Run.md` Part 9 |
 | 5 | Tag a release, ship it unsigned, then apply to SignPath Foundation | `Build_And_Release.md` §4 |
 
-**Every code path the specs call for is now implemented and verified.** The pupil-account ACL test has passed on real hardware, and the failure taxonomy has no dead codes.
+**The whole chain has now run end to end on real lab hardware** — wizard → bundle → provision → sign-in → consent — with all six deliberate failure paths behaving correctly. The Alt-Tab test is the one that matters: T0.3 proved that stealing focus mid-injection leaks keystrokes, and §4.2's answer held against a live attempt.
 
-**What has never happened is the whole thing running as one thing.** No `school.dlmpack` has ever been produced, so the wizard, provisioning, the launcher and the injection chain have only ever been tested apart. Item 4 is where that changes, and where the seams will show.
+**Chrome works. Edge does not yet** — Prompt 20 built the support but its title lists are deliberately empty until measured, so Edge fails closed rather than guessing.
 
 Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
@@ -94,7 +96,9 @@ Three de-risking tasks were defined in `PRD_Gap_Analysis.md` §5:
 
 ## Next step
 
-**The first end-to-end run** — `E2E_First_Run.md`. One pupil, using an account you control, on a lab PC. Expect stage 1 or 2 to fail before the sign-in does: the wizard and provisioning have unit tests and have never met a real file, a real pendrive or a real ACL.
+**Cleanup first.** The E2E run left a plaintext password in `katalaluan.csv`, and the test account has been through software on its first ever run — change it. `E2E_First_Run.md` Part 11.
+
+**Then Prompt 21**, which is a kiosk-mode defect rather than a cosmetic one: pressing Cancel on the consent screen quits the launcher, and in launch-at-logon mode that hands a seven-year-old the Windows desktop.
 
 **Then, for a release:** tag it, ship one unsigned build, and apply to SignPath Foundation — the Foundation only signs projects already released in the form to be signed.
 
