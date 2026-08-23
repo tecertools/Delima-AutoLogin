@@ -249,6 +249,16 @@ public static class InjectionEngine
         using var shield = KioskGuard.EngageInjectionShield();
         var blockInputGranted = shield.BlockInputGranted;
 
+        // Settle delay: Allow browser renderer and input focus to fully settle before sending keystrokes
+        if (options.InjectionSettleMs > 0)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return InjectionResult.Aborted(0, sw.Elapsed);
+            }
+            Thread.Sleep(options.InjectionSettleMs);
+        }
+
         // 5. Per-Keystroke Verification & Injection
         var charsInjected = 0;
 

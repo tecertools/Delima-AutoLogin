@@ -69,9 +69,9 @@ public sealed record RouteCOptions
     };
 
     /// <summary>
-    /// Settle delay duration in milliseconds after window verification (700 ms default per T0.4 latency findings).
+    /// Settle delay duration in milliseconds after window verification (800 ms default to ensure input autofocus).
     /// </summary>
-    public int InjectionSettleMs { get; init; } = 700;
+    public int InjectionSettleMs { get; init; } = 800;
 
     /// <summary>
     /// Consecutive 100 ms polls a title must hold stably before initiating injection (§4.2).
@@ -118,9 +118,9 @@ public sealed record RouteCOptions
     public bool SendEnterAfterPassword { get; init; } = true;
 
     /// <summary>
-    /// Delay between keystrokes in ms. Default is 0 ms.
+    /// Delay between keystrokes in ms. Default is 15 ms.
     /// </summary>
-    public int PerCharDelayMs { get; init; } = 0;
+    public int PerCharDelayMs { get; init; } = 15;
 
     /// <summary>
     /// Whether to automatically find and click the landing page button (e.g. "Log Masuk ke DELIMa") via UI Automation.

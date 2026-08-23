@@ -201,9 +201,11 @@ public sealed partial class MainViewModel : ObservableObject
         var routeCOptions = new RouteCOptions
         {
             WindowWaitTimeout = TimeSpan.FromMilliseconds(Config.WindowWaitTimeoutMs > 0 ? Config.WindowWaitTimeoutMs : 30000),
-            InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 700,
+            InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 800,
+            PerCharDelayMs = 15,
             SendEnterAfterEmail = true,
-            SendEnterAfterPassword = true
+            SendEnterAfterPassword = true,
+            AutoClickLandingButton = true
         };
 
         CurrentView = new SedangMasukViewModel(
