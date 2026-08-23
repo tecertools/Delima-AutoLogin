@@ -393,6 +393,32 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 20 — Support Edge as well as Chrome
+
+**Run this after the E2E first run, not before.** You are one step from the first time this has ever worked end to end; changing the browser first means a stage-2 failure could be the seam or could be the browser, and you would not know which.
+
+> Make the launcher work with **Microsoft Edge or Google Chrome**, preferring Edge, per the revised arch §4.4.
+>
+> **Why Edge is preferred, not merely supported.** It ships with every Windows 10 1809+ and Windows 11 machine, so `E01` — no browser found — stops being a realistic failure at a school that has never installed Chrome. It also separates the launcher's browser from the teacher's: §4.4 warns never to `taskkill /IM chrome.exe` because it destroys her session, and driving a different binary entirely removes most of that risk.
+>
+> **1. Generalise the session.** `ChromeSession` becomes browser-agnostic — resolve Edge first, then Chrome, honouring a `preferred_browser` config key (`auto` | `edge` | `chrome`, default `auto`). Record which browser was resolved in the audit log; when a school reports a fault you will want to know.
+>
+> Edge is Chromium, so the existing flags carry over unchanged: `--user-data-dir`, `--no-first-run`, `--no-default-browser-check`, `--new-window`, `--force-renderer-accessibility`.
+>
+> **2. Titles become per-browser, and must be measured, not guessed.** T0.4's strings all end `- Google Chrome`; Edge produces its own suffix. **Do not solve this by matching the page portion and ignoring the suffix** — that is substring matching, which §4.2 forbids and which caused T0.3's 47 false ready-states. Keep exact `Ordinal` matching against per-browser lists.
+>
+> Leave the Edge lists **empty with a comment saying they are unmeasured**, so an unmeasured browser fails closed rather than silently matching nothing in a way that looks like a bug. `T0.4_UIA_Verification.md` is the procedure; twenty runs is enough.
+>
+> **3. Policy registry differs.** The installer writes `HKLM\SOFTWARE\Policies\Google\Chrome`; Edge is `HKLM\SOFTWARE\Policies\Microsoft\Edge`, and the value names are not identical — Edge uses `InPrivateModeAvailability` where Chrome uses `IncognitoModeAvailability`. Write whichever applies to the browser actually in use, and keep both opt-in with the whole-PC warning (PRD §8.3).
+>
+> **4. Rename `E01_ChromeNotInstalled` to `E01_NoBrowserFound`** and update its Bahasa Melayu message. It should now only fire when neither browser exists, which on a supported Windows version should be never.
+>
+> **5. Verify rather than assume the window class.** Edge is Chromium and very likely also reports `Chrome_WidgetWin_1`, but that is exactly the kind of assumption this project has been caught by twice. Measure it, and if it does report the same class, note in §4.2 that the class check therefore cannot distinguish the two browsers and the **PID check is doing all the work**.
+>
+> **What carries over untouched:** T0.3's `SendInput` result is browser-agnostic. UIA `IsPassword` very likely behaves identically since Edge shares Chromium's accessibility implementation — but confirm it in the same twenty-run pass rather than assuming.
+
+---
+
 ## Prompt 19 — Three password failure codes, one observable state
 
 Small, and it matters because the failure taxonomy is what a teacher reads at 8:40 in the morning with a class waiting.

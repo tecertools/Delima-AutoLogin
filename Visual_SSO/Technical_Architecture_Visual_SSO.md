@@ -344,6 +344,35 @@ Straight from Gap Analysis §1.5, and already implemented in the spike:
 - **Teardown:** `CloseMainWindow()` first; `taskkill /T /F /PID <pid>` only on timeout. **Never `/IM chrome.exe`** — that kills the teacher's browser and corrupts its profile, producing a "Restore pages?" prompt that breaks the next launch and may restore the previous pupil's tabs.
 - Profile directory deleted after teardown; failure to delete is logged, not silent.
 
+### 4.4.1 Browser support — Edge and Chrome
+
+**Decided August 2026: support both, prefer Edge.** Implemented by Prompt 20, after the first end-to-end run.
+
+**Edge is preferred for two reasons, and the second is not obvious.**
+
+1. **It is always there.** Edge ships with every Windows 10 1809+ and Windows 11 machine. `E01` — no browser found — stops being a realistic failure at a school that has never installed Chrome, and one prerequisite disappears from G3's 90-minute unaided setup.
+2. **It separates the launcher's browser from the teacher's.** §4.4 warns never to `taskkill /IM chrome.exe`, because it kills Cikgu Farah's session and corrupts her profile. If the launcher drives Edge and humans use Chrome, that collision largely stops existing — different binary, different process tree, different profile. The PID-scoped teardown remains the actual guarantee; this simply removes most of the opportunities for it to matter.
+
+**Configuration:** `preferred_browser` — `auto` (default: Edge, else Chrome), `edge`, or `chrome`. Log which browser was resolved; a school reporting a fault will need it.
+
+**Titles are per-browser and must be measured.** Every string T0.4 captured ends `- Google Chrome`. Edge produces its own suffix, so each browser carries its own list.
+
+> **Do not "solve" this by matching the page portion and ignoring the browser suffix.** That is substring matching, which this section forbids, and it is what produced 47 false ready-states in T0.3. Exact `Ordinal` matching against per-browser lists, or nothing.
+
+**An unmeasured browser must fail closed.** Ship the Edge lists empty with a comment saying so, so that running against an unmeasured browser aborts visibly instead of matching nothing in a way that reads as a bug.
+
+**What carries over, and what does not:**
+
+| | |
+| :--- | :--- |
+| `SendInput` injection (T0.3) | Carries over — browser-agnostic |
+| UIA `IsPassword` (T0.4) | Very likely — Edge shares Chromium's accessibility layer — but confirm in the same pass |
+| Window titles | **Must be re-measured**, twenty runs, per `T0.4_UIA_Verification.md` |
+| Window class `Chrome_WidgetWin_1` | **Verify.** Edge probably reports the same, in which case the class check cannot distinguish the browsers and the PID check is carrying the whole burden |
+| Enterprise policy path | Differs — `Policies\Microsoft\Edge`, and `InPrivateModeAvailability` rather than `IncognitoModeAvailability` |
+
+---
+
 ### 4.5 The handoff URL
 
 **Resolved by T0.2, August 2026 — route C selected.** Full record in `T0.2_URL_Confirmation.md`.
