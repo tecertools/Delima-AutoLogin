@@ -393,6 +393,22 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 21 — Cancel on the consent screen must not exit
+
+The E2E run found this. The teardown is right; the destination is wrong.
+
+> When a pupil presses **Cancel** on the OAuth consent screen, `Delima.Launcher` currently quits. Change it to return to **`Pilih Kelas`**.
+>
+> **Why quitting is wrong, and it is not a small thing.** PRD §8.3 offers launch-at-logon kiosk mode, in which the launcher is the shell. Exiting drops a seven-year-old onto the Windows desktop — exactly what arch §9's kiosk hardening exists to prevent. And this will not be rare: Cancel and Continue are adjacent buttons and the user is seven.
+>
+> **Keep the teardown as it is.** Closing the browser process tree, wiping the throwaway profile and zeroing the credential all appear to work — the cancel-during-injection path does the same thing and passed. Only the destination changes.
+>
+> **Log it as a distinct event.** A Cancel here can mean the pupil saw a classmate's name on the consent screen and refused it — **G2 working**, the defect v1 was built to fix. That belongs in the audit log (§8), not discarded with the process. A cluster of them in one class is worth a teacher knowing about.
+>
+> **In kiosk mode the launcher must never exit on a pupil action at all.** Check the other paths for the same defect while you are here — anywhere a pupil gesture can terminate the process is the same bug wearing different clothes.
+
+---
+
 ## Prompt 20 — Support Edge as well as Chrome
 
 **Run this after the E2E first run, not before.** You are one step from the first time this has ever worked end to end; changing the browser first means a stage-2 failure could be the seam or could be the browser, and you would not know which.

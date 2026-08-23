@@ -257,10 +257,20 @@ All four stages completed. The wizard produced a `school.dlmpack`, provisioning 
 | Cancel during injection | Typing stops, Chrome closes, profile wiped | **Pass** |
 | Close Chrome mid-injection | Abort, actionable error, nothing typed elsewhere | **Pass** |
 | **Alt-Tab during injection** | **Nothing typed into the other window** | **Pass** |
-| Cancel on the consent screen | Undefined — record it | **Behaviour observed; detail not yet recorded** |
+| Cancel on the consent screen | Undefined — record it | **Observed: the program quits.** Correct teardown, wrong destination — see below |
 | Idle 10 minutes | Idle reset, profile wiped | **Pass** |
 
 **The Alt-Tab result is the one that matters most.** T0.3 measured injection fidelity and found that stealing focus *mid-injection* leaked the remaining characters, because `BlockInput` is denied to a non-elevated process on a lab PC. §4.2 answered that with the topmost overlay plus per-keystroke re-verification. This is the first time that answer has been tested against a live attempt rather than asserted — and it held.
+
+### Cancel on the consent screen — observed, and now specified
+
+**Observed behaviour: the launcher quits.** The teardown appears correct; the destination is not.
+
+**In kiosk mode it is actively wrong.** PRD §8.3 offers launch-at-logon, where the launcher *is* the shell. Quitting drops a seven-year-old onto the Windows desktop, which is precisely what §9's kiosk hardening exists to prevent. This is not a rare edge case either — Cancel and Continue sit side by side and the user is seven.
+
+**It also discards a signal worth keeping.** Pressing Cancel can mean the pupil looked at the consent screen, saw a classmate's name, and correctly refused it. That is **G2 working as designed** — the defect v1 was built to fix — and it should reach the audit log rather than vanish with the process.
+
+**Specified behaviour:** tear down exactly as the cancel-during-injection path already does — close the browser process tree, wipe the throwaway profile, zero the credential — then **return to `Pilih Kelas`**. Never exit. Log the event as a pupil-initiated consent refusal.
 
 ### Still outstanding from this run
 
