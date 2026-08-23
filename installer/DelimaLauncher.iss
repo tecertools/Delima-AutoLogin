@@ -51,7 +51,7 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 ; Per-machine store. Interactive users must not be able to read it (arch §3.5).
 ; Permissions: everyone-none admins-full system-full removes inherited %ProgramData% read grants for Users between installation and first provisioning.
 ; We also explicitly strip inherited %ProgramData% permissions in [Run] and [Code].
-Name: "{commonappdata}\DELIMa Launcher"; Permissions: everyone-none admins-full system-full
+Name: "{commonappdata}\DELIMa Launcher"; Permissions: admins-full system-full
 
 [Icons]
 Name: "{group}\DELIMa";           Filename: "{app}\Delima.Launcher.exe"; Components: lab
