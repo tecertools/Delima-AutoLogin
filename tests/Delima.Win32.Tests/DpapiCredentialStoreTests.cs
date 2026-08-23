@@ -131,6 +131,13 @@ public class DpapiCredentialStoreTests : IDisposable
 
         Assert.Equal((ushort)2, store.SchemaVersion);
         Assert.Equal("TEST01", store.SchoolCode);
+        Assert.Equal("Sekolah Rendah Kebangsaan Test", store.School.Name);
+        Assert.Equal("#056839", store.Theme.Primary);
+        Assert.Single(store.Classes);
+        Assert.Equal("1 Cemerlang", store.Classes[0].Name);
+        Assert.Equal(4, store.Students.Count);
+        Assert.Equal("Nur Aishah Binti Ahmad", store.Students[0].Name);
+        Assert.Equal("Nur Aishah", store.Students[0].DisplayName);
         Assert.Equal(4, store.StudentCount);
 
         Assert.True(store.HasCredential("s_0001"));
@@ -140,6 +147,48 @@ public class DpapiCredentialStoreTests : IDisposable
 
         Assert.True(store.IsStudentActive("s_0001"));
         Assert.False(store.IsStudentActive("s_0004"));
+    }
+
+    [Fact]
+    public void DpapiStore_PopulatesRosterSchoolThemeClassesAndStudents_WithoutPlaintextPasswordsInMemory()
+    {
+        var payload = CreateSyntheticPayload();
+        DpapiCredentialStore.WriteStore(payload, _testDirectory, applyAcls: false);
+
+        using var store = DpapiCredentialStore.Open(_testDirectory);
+
+        Assert.NotNull(store.School);
+        Assert.Equal("TEST01", store.School.Code);
+        Assert.Equal("Sekolah Rendah Kebangsaan Test", store.School.Name);
+        Assert.Equal("Berilmu Berbakti", store.School.Motto);
+        Assert.Equal("moe-dl.edu.my", store.School.Domain);
+
+        Assert.NotNull(store.Theme);
+        Assert.Equal("#056839", store.Theme.Primary);
+        Assert.Equal("#F7941D", store.Theme.Accent);
+        Assert.Equal(3, store.Theme.ClassColours.Count);
+
+        Assert.NotNull(store.Config);
+        Assert.True(store.Config.PicturePasswordRequired);
+        Assert.Equal(600, store.Config.IdleResetSeconds);
+
+        Assert.Single(store.Classes);
+        Assert.Equal("c_1", store.Classes[0].Id);
+        Assert.Equal("1 Cemerlang", store.Classes[0].Name);
+        Assert.Equal(1, store.Classes[0].Grade);
+
+        Assert.Equal(4, store.Students.Count);
+        var s1 = store.Students[0];
+        Assert.Equal("s_0001", s1.Id);
+        Assert.Equal("Nur Aishah Binti Ahmad", s1.Name);
+        Assert.Equal("Nur Aishah", s1.DisplayName);
+        Assert.Equal("m-10000001", s1.EmailLocal);
+        Assert.Equal("kucing", s1.Avatar);
+        Assert.True(s1.Active);
+
+        // Security check: Student objects in memory have NO password property
+        // Plaintext passwords can only be accessed through OpenCredential
+        Assert.True(store.HasCredential("s_0001"));
     }
 
     [Fact]

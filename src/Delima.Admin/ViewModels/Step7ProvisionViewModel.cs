@@ -5,6 +5,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Admin.Models;
 using Delima.Core.Audit;
+using Delima.Core.Crypto;
 using Delima.Core.Store;
 
 namespace Delima.Admin.ViewModels;
@@ -104,6 +105,17 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
         {
             string? pwd = _state.StudentPasswords.TryGetValue(student.Id, out var p) ? p : null;
             string avatar = _state.StudentAvatars.TryGetValue(student.Id, out var av) && !string.IsNullOrWhiteSpace(av) ? av : "kucing";
+
+            PicturePasswordInfo? picPwInfo = null;
+            if (_state.StudentPicturePasswords.TryGetValue(student.Id, out var picSeq) && picSeq.Count == 3)
+            {
+                picPwInfo = PicturePasswordHasher.CreatePicturePassword(picSeq);
+            }
+            else
+            {
+                picPwInfo = PicturePasswordHasher.CreatePicturePassword(["kucing", "bunga", "kereta"]);
+            }
+
             payload.Students.Add(new StudentInfo
             {
                 Id = student.Id,
@@ -112,6 +124,7 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
                 EmailLocal = student.EmailLocal,
                 Avatar = avatar,
                 Password = pwd,
+                PicturePassword = picPwInfo,
                 Active = true,
                 UpdatedAt = DateTimeOffset.UtcNow
             });

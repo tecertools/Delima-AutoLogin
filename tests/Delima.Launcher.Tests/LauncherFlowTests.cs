@@ -1,3 +1,4 @@
+using System.IO;
 using Delima.Core.Crypto;
 using Delima.Core.Roster;
 using Delima.Core.Store;
@@ -218,6 +219,101 @@ public class LauncherFlowTests
         Assert.IsType<RalatViewModel>(mainVm.CurrentView);
         var ralatVm = (RalatViewModel)mainVm.CurrentView;
         Assert.Equal(FailureCodes.E11_NoPasswordStored, ralatVm.ErrorCode);
+    }
+
+    [Fact]
+    public void MainViewModel_LoadsFromProvisionedStoreDirectory_WhenAvailable()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), "LauncherTest_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var payload = new MasterBundlePayload
+            {
+                SchemaVersion = 2,
+                School = new SchoolInfo
+                {
+                    Code = "UJIAN",
+                    Name = "SK Ujian Kebangsaan",
+                    Motto = "Maju Jaya",
+                    Domain = "moe-dl.edu.my"
+                },
+                Theme = new ThemeInfo
+                {
+                    Primary = "#123456",
+                    Accent = "#654321",
+                    ClassColours = ["#123456", "#654321"]
+                },
+                Config = new AppConfig
+                {
+                    PicturePasswordRequired = true,
+                    IdleResetSeconds = 450
+                },
+                Classes =
+                [
+                    new Delima.Core.Store.ClassInfo { Id = "2 Ujian", Name = "2 Ujian", Grade = 2, ColourIndex = 0 }
+                ],
+                Students =
+                [
+                    new StudentInfo
+                    {
+                        Id = "s_ujian_01",
+                        Name = "Nama Anda Di Sini",
+                        ClassId = "2 Ujian",
+                        EmailLocal = "g-41360438",
+                        Avatar = "kucing",
+                        Password = "PasswordSebenarAnda",
+                        Active = true
+                    }
+                ]
+            };
+
+            Delima.Win32.Store.DpapiCredentialStore.WriteStore(payload, tempDir, applyAcls: false);
+
+            var mainVm = new MainViewModel(tempDir);
+
+            Assert.NotNull(mainVm.CredentialStore);
+            Assert.Equal("UJIAN", mainVm.School.Code);
+            Assert.Equal("SK Ujian Kebangsaan", mainVm.School.Name);
+            Assert.Equal("#123456", mainVm.Theme.Primary);
+            Assert.Single(mainVm.Classes);
+            Assert.Equal("2 Ujian", mainVm.Classes[0].Name);
+            Assert.Single(mainVm.Students);
+            Assert.Equal("Nama Anda Di Sini", mainVm.Students[0].Name);
+            Assert.Equal("g-41360438", mainVm.Students[0].EmailLocal);
+
+            // Verify navigation to CariNama matches the provisioned class
+            mainVm.NavigateToCariNama(mainVm.Classes[0]);
+            Assert.IsType<CariNamaViewModel>(mainVm.CurrentView);
+            var cariVm = (CariNamaViewModel)mainVm.CurrentView;
+            Assert.Equal("Tahun 2 2 Ujian", cariVm.ClassName);
+            // 1 pupil card + 1 escape hatch card
+            Assert.Equal(2, cariVm.FilteredPupilCards.Count);
+            Assert.Equal("Anda Di Sini", cariVm.FilteredPupilCards[0].DisplayName);
+            Assert.Equal("Nama Anda Di Sini", cariVm.FilteredPupilCards[0].Student?.Name);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                try { Directory.Delete(tempDir, recursive: true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void MainViewModel_NavigateToSedangMasuk_Sets_SedangMasukViewModel()
+    {
+        var mainVm = new MainViewModel();
+        var student = mainVm.Students[0];
+        using var cred = new SecurePasswordBuffer("Test1234!"u8);
+
+        mainVm.NavigateToSedangMasuk(student, cred);
+
+        Assert.IsType<SedangMasukViewModel>(mainVm.CurrentView);
+        var sedangVm = (SedangMasukViewModel)mainVm.CurrentView!;
+        Assert.Equal(student, sedangVm.Student);
     }
 
     private sealed class FakeCredentialStore(bool hasCredential) : ICredentialStore

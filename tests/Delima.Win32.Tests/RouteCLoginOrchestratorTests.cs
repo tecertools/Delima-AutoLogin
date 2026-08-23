@@ -676,4 +676,26 @@ public class RouteCLoginOrchestratorTests
 
         Assert.Equal(expected, resolution);
     }
+
+    [Fact]
+    public void RouteCOptions_DefaultValues_Have_SendEnterAfterPassword_True()
+    {
+        var options = new RouteCOptions();
+        Assert.True(options.SendEnterAfterPassword);
+        Assert.True(options.SendEnterAfterEmail);
+        Assert.True(options.AutoClickLandingButton);
+        Assert.Equal("Log Masuk ke DELIMa", options.LandingButtonText);
+    }
+
+    [Fact]
+    public void UiaHelper_TryInvokeButtonInForeground_CancelledToken_ReturnsFalse()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        var result = UiaHelper.TryInvokeButtonInForeground("Log Masuk ke DELIMa", TimeSpan.FromSeconds(5), cts.Token);
+        Assert.False(result);
+    }
 }
+
+

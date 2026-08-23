@@ -20,9 +20,15 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     [NotifyPropertyChangedFor(nameof(AvatarDisplay))]
     private string _avatar = "kucing";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PicturePasswordDisplay))]
+    private List<string> _picturePassword = ["kucing", "bunga", "kereta"];
+
     public string AvatarEmoji => GetAvatarEmoji(Avatar);
     public string AvatarDisplayName => GetAvatarDisplayName(Avatar);
     public string AvatarDisplay => $"{AvatarEmoji} {AvatarDisplayName}";
+
+    public string PicturePasswordDisplay => string.Join(" ➔ ", PicturePassword.Select(p => $"{GetAvatarEmoji(p)} {GetAvatarDisplayName(p)}"));
 
     public static string GetAvatarEmoji(string avatar) => (avatar?.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_")) switch
     {
@@ -123,6 +129,13 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         "biri_biri", "sloth"
     ];
 
+    public static readonly string[] StandardPicturePasswordIcons =
+    [
+        "kucing", "bunga", "kereta", "bola", "ikan", "bintang",
+        "epal", "payung", "belon", "pokok", "rumah", "buku",
+        "pisang", "jam", "pensel", "topi"
+    ];
+
     public ObservableCollection<AvatarAssignmentItem> AvatarItems { get; } = [];
     public ObservableCollection<AvatarAssignmentItem> FilteredAvatarItems { get; } = [];
     public ObservableCollection<string> ClassNames { get; } = [];
@@ -194,8 +207,25 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
                 else
                 {
                     avatar = StandardAvatars[avatarIdx % StandardAvatars.Length];
-                    avatarIdx++;
                 }
+
+                List<string> picPassword;
+                if (_state.StudentPicturePasswords.TryGetValue(student.Id, out var existingPic) && existingPic.Count == 3)
+                {
+                    picPassword = [.. existingPic];
+                }
+                else
+                {
+                    int total = StandardPicturePasswordIcons.Length;
+                    int i1 = avatarIdx % total;
+                    int i2 = (avatarIdx * 3 + 1) % total;
+                    if (i2 == i1) i2 = (i2 + 1) % total;
+                    int i3 = (avatarIdx * 7 + 2) % total;
+                    while (i3 == i1 || i3 == i2) i3 = (i3 + 1) % total;
+                    picPassword = [StandardPicturePasswordIcons[i1], StandardPicturePasswordIcons[i2], StandardPicturePasswordIcons[i3]];
+                }
+
+                avatarIdx++;
 
                 AvatarItems.Add(new AvatarAssignmentItem
                 {
@@ -203,7 +233,8 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
                     StudentName = student.FullName,
                     ClassName = student.ClassName,
                     EmailLocal = student.EmailLocal,
-                    Avatar = avatar
+                    Avatar = avatar,
+                    PicturePassword = picPassword
                 });
             }
         }
@@ -254,6 +285,7 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             if (!string.IsNullOrWhiteSpace(item.StudentId))
             {
                 _state.StudentAvatars[item.StudentId] = item.Avatar;
+                _state.StudentPicturePasswords[item.StudentId] = item.PicturePassword;
             }
         }
     }
@@ -291,6 +323,7 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("    .student-name { font-weight: 700; font-size: 14px; color: #0F172A; line-height: 1.3; margin-bottom: 2px; }");
         sb.AppendLine("    .student-id { font-size: 12px; color: #64748B; font-family: monospace; }");
         sb.AppendLine("    .avatar-tag { display: inline-block; background: #E0E7FF; color: #3730A3; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-top: 4px; text-transform: capitalize; }");
+        sb.AppendLine("    .pic-pw-tag { display: inline-block; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 600; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-top: 4px; }");
         sb.AppendLine("    .footer { border-top: 1px solid #E2E8F0; padding-top: 16px; font-size: 12px; color: #64748B; line-height: 1.5; }");
         sb.AppendLine("    .footer strong { color: #334155; }");
         sb.AppendLine("    .no-print-bar { margin-bottom: 20px; display: flex; justify-content: flex-end; gap: 10px; }");
@@ -332,6 +365,10 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             sb.AppendLine($"          <div class=\"student-name\">{s.StudentName}</div>");
             sb.AppendLine($"          <div class=\"student-id\">{(string.IsNullOrWhiteSpace(s.EmailLocal) ? s.StudentId : s.EmailLocal)}</div>");
             sb.AppendLine($"          <div class=\"avatar-tag\">{s.AvatarEmoji} {s.Avatar} • {s.ClassName}</div>");
+            if (PicturePasswordRequired)
+            {
+                sb.AppendLine($"          <div class=\"pic-pw-tag\">🔑 {s.PicturePasswordDisplay}</div>");
+            }
             sb.AppendLine("        </div>");
             sb.AppendLine("      </div>");
         }

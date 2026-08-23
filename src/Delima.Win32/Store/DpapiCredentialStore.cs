@@ -5,7 +5,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Delima.Core.Crypto;
+using Delima.Core.Roster;
 using Delima.Core.Store;
+using ClassInfo = Delima.Core.Roster.ClassInfo;
 
 namespace Delima.Win32.Store;
 
@@ -45,6 +47,31 @@ public sealed class DpapiCredentialStore : ICredentialStore
     /// Timestamp when the store was generated.
     /// </summary>
     public DateTimeOffset GeneratedAt { get; private set; }
+
+    /// <summary>
+    /// School metadata from the provisioned store.
+    /// </summary>
+    public School School { get; private set; } = new();
+
+    /// <summary>
+    /// Theme settings from the provisioned store.
+    /// </summary>
+    public ThemeInfo Theme { get; private set; } = new();
+
+    /// <summary>
+    /// Application configuration from the provisioned store.
+    /// </summary>
+    public AppConfig Config { get; private set; } = new();
+
+    /// <summary>
+    /// Registered classes in the provisioned store.
+    /// </summary>
+    public IReadOnlyList<ClassInfo> Classes { get; private set; } = [];
+
+    /// <summary>
+    /// Registered students (without passwords) in the provisioned store.
+    /// </summary>
+    public IReadOnlyList<Student> Students { get; private set; } = [];
 
     /// <summary>
     /// Full path to the credentials.dat file.
@@ -261,106 +288,79 @@ public sealed class DpapiCredentialStore : ICredentialStore
         byte[] decryptedPayload = ProtectedData.Unprotect(_protectedBlob, _entropy, DataProtectionScope.LocalMachine);
         try
         {
-            var reader = new Utf8JsonReader(decryptedPayload);
-            while (reader.Read())
+            var payload = JsonSerializer.Deserialize<MasterBundlePayload>(decryptedPayload);
+            if (payload != null)
             {
-                if (reader.TokenType == JsonTokenType.PropertyName)
+                SchemaVersion = payload.SchemaVersion;
+                SchoolCode = payload.School?.Code ?? "";
+                GeneratedAt = payload.GeneratedAt;
+                School = new School
                 {
-                    if (reader.ValueTextEquals("schema_version"u8))
+                    Code = payload.School?.Code ?? "",
+                    Name = payload.School?.Name ?? "",
+                    Motto = payload.School?.Motto,
+                    Domain = string.IsNullOrWhiteSpace(payload.School?.Domain) ? "moe-dl.edu.my" : payload.School.Domain
+                };
+                Theme = payload.Theme ?? new ThemeInfo();
+                Config = payload.Config ?? new AppConfig();
+                Classes = payload.Classes?.Select(c => new ClassInfo
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Grade = c.Grade,
+                    ColourIndex = c.ColourIndex
+                }).ToList() ?? [];
+
+                var studentsList = new List<Student>();
+                if (payload.Students != null)
+                {
+                    foreach (var s in payload.Students)
                     {
-                        reader.Read();
-                        SchemaVersion = reader.GetUInt16();
-                    }
-                    else if (reader.ValueTextEquals("school"u8))
-                    {
-                        ParseSchoolMetadata(ref reader);
-                    }
-                    else if (reader.ValueTextEquals("generated_at"u8))
-                    {
-                        reader.Read();
-                        if (reader.TryGetDateTimeOffset(out var genAt))
+                        if (!string.IsNullOrEmpty(s.Id))
                         {
-                            GeneratedAt = genAt;
+                            _allStudentIds.Add(s.Id);
+                            _studentActiveMap[s.Id] = s.Active;
+                            if (!string.IsNullOrEmpty(s.Password))
+                            {
+                                _studentIdsWithPassword.Add(s.Id);
+                            }
+
+                            studentsList.Add(new Student
+                            {
+                                Id = s.Id,
+                                Name = s.Name,
+                                ClassId = s.ClassId,
+                                EmailLocal = s.EmailLocal,
+                                Avatar = string.IsNullOrWhiteSpace(s.Avatar) ? "kucing" : s.Avatar,
+                                PasswordVersion = s.PasswordVersion,
+                                PicturePassword = s.PicturePassword,
+                                Active = s.Active
+                            });
                         }
                     }
-                    else if (reader.ValueTextEquals("students"u8))
+                }
+
+                // Compute display names for all students grouped by class
+                foreach (var group in studentsList.GroupBy(s => s.ClassId))
+                {
+                    var classStudents = group.ToList();
+                    var displayNames = DisplayNameCalculator.ComputeDisplayNames(classStudents);
+                    foreach (var st in classStudents)
                     {
-                        ParseStudentsIndex(ref reader);
+                        if (displayNames.TryGetValue(st.Id, out var dn))
+                        {
+                            st.DisplayName = dn;
+                        }
                     }
                 }
+
+                Students = studentsList;
             }
         }
         finally
         {
             // Decryption discipline: zero unencrypted buffer immediately
             CryptographicOperations.ZeroMemory(decryptedPayload);
-        }
-    }
-
-    private void ParseSchoolMetadata(ref Utf8JsonReader reader)
-    {
-        if (reader.TokenType != JsonTokenType.StartObject)
-        {
-            reader.Read();
-        }
-
-        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-        {
-            if (reader.TokenType == JsonTokenType.PropertyName && reader.ValueTextEquals("code"u8))
-            {
-                reader.Read();
-                SchoolCode = reader.GetString() ?? "";
-            }
-        }
-    }
-
-    private void ParseStudentsIndex(ref Utf8JsonReader reader)
-    {
-        if (reader.TokenType != JsonTokenType.StartArray)
-        {
-            reader.Read();
-        }
-
-        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-        {
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                string? studentId = null;
-                bool hasPassword = false;
-                bool active = true;
-
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                {
-                    if (reader.TokenType == JsonTokenType.PropertyName)
-                    {
-                        if (reader.ValueTextEquals("id"u8))
-                        {
-                            reader.Read();
-                            studentId = reader.GetString();
-                        }
-                        else if (reader.ValueTextEquals("password"u8))
-                        {
-                            reader.Read();
-                            hasPassword = reader.TokenType == JsonTokenType.String && reader.ValueSpan.Length > 0;
-                        }
-                        else if (reader.ValueTextEquals("active"u8))
-                        {
-                            reader.Read();
-                            active = reader.GetBoolean();
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(studentId))
-                {
-                    _allStudentIds.Add(studentId);
-                    _studentActiveMap[studentId] = active;
-                    if (hasPassword)
-                    {
-                        _studentIdsWithPassword.Add(studentId);
-                    }
-                }
-            }
         }
     }
 
@@ -526,6 +526,8 @@ public sealed class DpapiCredentialStore : ICredentialStore
             _studentIdsWithPassword.Clear();
             _allStudentIds.Clear();
             _studentActiveMap.Clear();
+            Classes = [];
+            Students = [];
             _disposed = true;
             GC.SuppressFinalize(this);
         }

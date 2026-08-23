@@ -113,14 +113,26 @@ public sealed record RouteCOptions
     public bool SendEnterAfterEmail { get; init; } = true;
 
     /// <summary>
-    /// Whether to send Enter key after typing password. Default is false per §4.2.
+    /// Whether to send Enter key after typing password. Default is true.
     /// </summary>
-    public bool SendEnterAfterPassword { get; init; } = false;
+    public bool SendEnterAfterPassword { get; init; } = true;
 
     /// <summary>
     /// Delay between keystrokes in ms. Default is 0 ms.
     /// </summary>
     public int PerCharDelayMs { get; init; } = 0;
+
+    /// <summary>
+    /// Whether to automatically find and click the landing page button (e.g. "Log Masuk ke DELIMa") via UI Automation.
+    /// Default is true.
+    /// </summary>
+    public bool AutoClickLandingButton { get; init; } = true;
+
+    /// <summary>
+    /// Button label or text substring to match for auto-clicking on the landing page.
+    /// Default is "Log Masuk ke DELIMa".
+    /// </summary>
+    public string LandingButtonText { get; init; } = "Log Masuk ke DELIMa";
 }
 
 /// <summary>
@@ -245,6 +257,25 @@ public static class RouteCLoginOrchestrator
 
             int totalChars = 0;
 
+            // If auto-clicking landing page button is enabled, start background UIA watcher
+            CancellationTokenSource? landingCts = null;
+            if (options.AutoClickLandingButton && OperatingSystem.IsWindows())
+            {
+                landingCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                var landingToken = landingCts.Token;
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        UiaHelper.TryInvokeButtonInForeground(options.LandingButtonText, options.WindowWaitTimeout, landingToken);
+                    }
+                    catch
+                    {
+                        // Non-critical background task
+                    }
+                }, landingToken);
+            }
+
             // ====================================================================
             // Step 1: Identifier (Email) Injection
             // ====================================================================
@@ -260,6 +291,9 @@ public static class RouteCLoginOrchestrator
                     injectionOptions with { SendEnter = options.SendEnterAfterEmail },
                     cancellationToken);
             }, cancellationToken);
+
+            landingCts?.Cancel();
+            landingCts?.Dispose();
 
             if (!emailResult.Success)
             {
