@@ -393,6 +393,20 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 
 ---
 
+## Prompt 22 — Teach the UIA probe to drive Edge
+
+Small change to an existing tool. `Delima.Win32` already resolves both browsers after Prompt 20; the probe does not.
+
+> Add a `--browser` switch to the UIA probe — `chrome` | `edge`, defaulting to `chrome`. Resolve the executable through the same `BrowserSession` path resolution Prompt 20 added, rather than hard-coding a second path.
+>
+> Add a `browser` column to the CSV, so a single results folder can hold both and they cannot be confused later.
+>
+> Keep everything else identical: 100 ms sampling, `--force-renderer-accessibility`, `is_password` left **blank** rather than `false` when UIA cannot resolve an element, and the summary block at the end.
+>
+> **One addition to the summary:** print the **distinct window titles observed, with counts**, grouped by browser. That is the actual output wanted from this run — the titles, not the pass/fail verdict.
+
+---
+
 ## Prompt 21 — Cancel on the consent screen must not exit
 
 The E2E run found this. The teardown is right; the destination is wrong.
