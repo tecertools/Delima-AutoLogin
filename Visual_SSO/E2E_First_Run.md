@@ -242,3 +242,31 @@ The pupil will find these anyway. Better you find them first.
 **One pupil, one clean pass, then one class.** G1's under-three-minutes target is measured with a real class (PRD §4) — but not on the first day the software has ever run.
 
 A stage-1 failure on a quiet afternoon is a very different event from the same failure with a teacher and 44 seven-year-olds waiting.
+
+---
+
+## Result — 21 August 2026 — **PASS**
+
+All four stages completed. The wizard produced a `school.dlmpack`, provisioning wrote a `credentials.dat` a pupil account could not read, the launcher signed in, and injection stopped at the consent screen without clicking it.
+
+### Failure paths — all six exercised deliberately
+
+| Provoked | Expected | Result |
+| :--- | :--- | :--- |
+| Wrong picture password ×5 | Lockout in BM, no crash | **Pass** |
+| Cancel during injection | Typing stops, Chrome closes, profile wiped | **Pass** |
+| Close Chrome mid-injection | Abort, actionable error, nothing typed elsewhere | **Pass** |
+| **Alt-Tab during injection** | **Nothing typed into the other window** | **Pass** |
+| Cancel on the consent screen | Undefined — record it | **Behaviour observed; detail not yet recorded** |
+| Idle 10 minutes | Idle reset, profile wiped | **Pass** |
+
+**The Alt-Tab result is the one that matters most.** T0.3 measured injection fidelity and found that stealing focus *mid-injection* leaked the remaining characters, because `BlockInput` is denied to a non-elevated process on a lab PC. §4.2 answered that with the topmost overlay plus per-keystroke re-verification. This is the first time that answer has been tested against a live attempt rather than asserted — and it held.
+
+### Still outstanding from this run
+
+Parts 9, 11 and 12 were not completed:
+
+- **The consent page's window title** was not captured. It is still a guess in `TitleConsentPage`, and Prompt 20 needs a measured baseline before Edge titles can be compared against anything.
+- **Timings** — click-to-signed-in against G1, and launcher cold start (arch §11.0 item 3) — not recorded.
+- **Audit log** not verified against a real session (§8).
+- **Cleanup (Part 11) not done**: `katalaluan.csv` holds a plaintext password, and the test account's password has now been through software on its first ever run.
