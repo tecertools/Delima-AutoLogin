@@ -13,21 +13,35 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="Avatar &amp; Kata Laluan Gambar" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Avatar visual dijana unik untuk setiap murid dalam kelas bagi memudahkan pengecaman." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Avatar visual &amp; 3-simbol kata laluan gambar dijana unik bagi setiap murid mengikut tahun dan kelas." Style="{StaticResource StepSubHeading}" />
 
             <!-- Filter & Action Toolbar Card -->
             <Border Style="{StaticResource SettingsCard}">
                 <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="170"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Tapis Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
-                    <ComboBox Grid.Column="2" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" />
-                    <Button Grid.Column="4" Content="🖨️ Cetak Helaian Avatar Kelas" Style="{StaticResource SecondaryButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak atau jana helaian avatar murid untuk kelas yang dipilih" />
+
+                    <!-- Row 0: Filters and Print Action -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Tapis Tahun:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
+                    <ComboBox Grid.Row="0" Grid.Column="2" ItemsSource="{Binding YearNames}" SelectedItem="{Binding SelectedYearFilter, Mode=TwoWay}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="0" Grid.Column="4" Text="Tapis Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
+                    <ComboBox Grid.Row="0" Grid.Column="6" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" VerticalAlignment="Center" />
+
+                    <Button Grid.Row="0" Grid.Column="8" Content="🖨️ Cetak Kata Laluan Gambar" Style="{StaticResource SecondaryButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak helaian kata laluan gambar mengikut tahun dan kelas yang dipilih" VerticalAlignment="Center" />
                 </Grid>
             </Border>
 
@@ -42,6 +56,8 @@
                                         <ColumnDefinition Width="38"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <!-- DiceBear Critter Avatar Circle -->
                                     <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18" Background="#F1F3F5" VerticalAlignment="Center" ClipToBounds="True">
@@ -50,11 +66,23 @@
                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                Stretch="UniformToFill" />
                                     </Border>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
-                                        <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13"/>
-                                        <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="{StaticResource Ink3Brush}" FontSize="12"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="{StaticResource Ink3Brush}" FontSize="12" Margin="4,0,0,0"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding EmailLocal}" Foreground="{StaticResource Ink3Brush}" FontSize="11" FontFamily="Consolas, monospace" Margin="0,1,0,0"/>
                                     </StackPanel>
-                                    <Button Grid.Column="2" Content="Tukar ↻" Style="{StaticResource SmallButton}" Click="OnCycleAvatarClick" ToolTip="Jana avatar unik baharu secara rawak" />
+
+                                    <!-- Picture Password Preview Tag -->
+                                    <Border Grid.Column="2" Background="#FEF3C7" BorderBrush="#FCD34D" BorderThickness="1" CornerRadius="12" Padding="8,3" VerticalAlignment="Center" Margin="0,0,4,0" ToolTip="{Binding PicturePasswordDetailedDisplay}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="🔑 " FontSize="11" />
+                                            <TextBlock Text="{Binding PicturePasswordDisplay}" FontSize="11.5" FontWeight="SemiBold" Foreground="#92400E" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Button Grid.Column="4" Content="Tukar ↻" Style="{StaticResource SmallButton}" Click="OnCycleAvatarClick" ToolTip="Jana avatar unik baharu secara rawak" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -80,3 +108,4 @@
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+

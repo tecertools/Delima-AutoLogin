@@ -426,11 +426,12 @@ public class ImporterTests
     {
         var roster = new List<ImportedStudent>
         {
-            new() { Id = "s_12345678", FullName = "Danial", ClassName = "2C", EmailLocal = "m-12345678", DelimaDigits = "12345678", RegisterNoJoinKey = "170101-10-1234" },
-            new() { Id = "s_12345679", FullName = "Aishah", ClassName = "2C", EmailLocal = "m-12345679", DelimaDigits = "12345679", RegisterNoJoinKey = "170202-10-2345" }
+            new() { Id = "s_12345678", FullName = "Danial", ClassName = "2C", Grade = 2, EmailLocal = "m-12345678", DelimaDigits = "12345678", RegisterNoJoinKey = "170101-10-1234" },
+            new() { Id = "s_12345679", FullName = "Aishah", ClassName = "2C", Grade = 2, EmailLocal = "m-12345679", DelimaDigits = "12345679", RegisterNoJoinKey = "170202-10-2345" }
         };
 
         string content = TemplateGenerator.GeneratePasswordTemplateContent(roster);
+        Assert.Contains("TAHUN", content);
         Assert.Contains("Danial", content);
         Assert.Contains("Aishah", content);
         Assert.Contains("m-12345678", content);
@@ -438,7 +439,31 @@ public class ImporterTests
         using var stream = FromString(content);
         var (headers, rows, _) = DataFileReader.ReadCsv(stream);
         Assert.Contains("KATA LALUAN", headers);
+        Assert.Contains("TAHUN", headers);
         Assert.Equal(2, rows.Count);
+    }
+
+    [Fact]
+    public void TemplateGenerator_FiltersByGradeAndClassCorrectly()
+    {
+        var roster = new List<ImportedStudent>
+        {
+            new() { Id = "s_1", FullName = "Ali", ClassName = "1 Amanah", Grade = 1, EmailLocal = "m-1" },
+            new() { Id = "s_2", FullName = "Abu", ClassName = "1 Bakti", Grade = 1, EmailLocal = "m-2" },
+            new() { Id = "s_3", FullName = "Siti", ClassName = "2 Bestari", Grade = 2, EmailLocal = "m-3" }
+        };
+
+        // Filter Grade 1
+        string grade1Content = TemplateGenerator.GeneratePasswordTemplateContent(roster, filterGrade: 1);
+        Assert.Contains("Ali", grade1Content);
+        Assert.Contains("Abu", grade1Content);
+        Assert.DoesNotContain("Siti", grade1Content);
+
+        // Filter Class 1 Amanah
+        string class1AContent = TemplateGenerator.GeneratePasswordTemplateContent(roster, filterGrade: 1, filterClass: "1 Amanah");
+        Assert.Contains("Ali", class1AContent);
+        Assert.DoesNotContain("Abu", class1AContent);
+        Assert.DoesNotContain("Siti", class1AContent);
     }
 
     // ---------------------------------------------------------------------------

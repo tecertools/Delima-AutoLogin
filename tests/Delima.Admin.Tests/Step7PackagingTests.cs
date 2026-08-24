@@ -74,7 +74,7 @@ public class Step7PackagingTests
             Assert.True(File.Exists(checklistPath));
             string content = File.ReadAllText(checklistPath);
             Assert.Contains("MAKMAL-01", content);
-            Assert.Contains("2.0.2", content);
+            Assert.Contains("2.1.0", content);
             Assert.Contains("AppLocker_Disahkan", content);
         }
         finally

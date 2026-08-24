@@ -26,14 +26,15 @@ public partial class Step5AvatarsView : UserControl
             try
             {
                 string path = vm.PrintAvatarSheet();
-                MessageBox.Show($"Helaian avatar kelas telah dibuka di pelayar untuk dicetak.\n\nLokasi fail:\n{path}",
-                    "Cetak Helaian Avatar", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Helaian kata laluan gambar ({vm.SelectedYearFilter} - {vm.SelectedClassFilter}) telah dibuka di pelayar untuk dicetak.\n\nLokasi fail:\n{path}",
+                    "Cetak Kata Laluan Gambar", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ralat semasa menjana helaian cetakan avatar: {ex.Message}",
+                MessageBox.Show($"Ralat semasa menjana helaian cetakan kata laluan gambar: {ex.Message}",
                     "Ralat Cetakan", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
 }
+

@@ -32,9 +32,15 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         ConsentIsMatched ? "" : $"Sila taip kod sekolah yang betul ('{_state.School.Code}') untuk meneruskan.";
 
     public ObservableCollection<PasswordGridItem> PasswordItems { get; } = [];
+    public ObservableCollection<PasswordGridItem> FilteredPasswordItems { get; } = [];
+    public ObservableCollection<string> YearNames { get; } = [];
+    public ObservableCollection<string> ClassNames { get; } = [];
 
     [ObservableProperty]
-    private string _filterText = "";
+    private string? _selectedYearFilter;
+
+    [ObservableProperty]
+    private string? _selectedClassFilter;
 
     [ObservableProperty]
     private PasswordGridItem? _activePopoverItem;
@@ -53,6 +59,11 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
     public int MissingPasswordCount => PasswordItems.Count(p => !p.HasPassword);
     public int SharedPasswordCount => PasswordItems.Count(p => p.IsShared);
 
+    public int FilteredTotalCount => FilteredPasswordItems.Count;
+    public int FilteredWithCount => FilteredPasswordItems.Count(p => p.HasPassword);
+    public int FilteredMissingCount => FilteredPasswordItems.Count(p => !p.HasPassword);
+    public int FilteredSharedCount => FilteredPasswordItems.Count(p => p.IsShared);
+
     public bool CanProceed => ActiveSubView == "Grid";
 
     public Step4PasswordImportViewModel(AdminWizardState state)
@@ -67,18 +78,126 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         InitializeGridFromRoster();
     }
 
+    partial void OnSelectedYearFilterChanged(string? value)
+    {
+        UpdateClassListForSelectedYear();
+        UpdateFilteredPasswordItems();
+    }
+
+    partial void OnSelectedClassFilterChanged(string? value)
+    {
+        UpdateFilteredPasswordItems();
+    }
+
+    private void UpdateClassListForSelectedYear()
+    {
+        string? previousClassSelection = SelectedClassFilter;
+        ClassNames.Clear();
+
+        int filterGrade = ParseYearFilterToGrade(SelectedYearFilter);
+
+        var query = PasswordItems.AsEnumerable();
+        if (filterGrade > 0)
+        {
+            query = query.Where(a => a.Grade == filterGrade);
+        }
+
+        var classes = query.Select(s => s.ClassName)
+                           .Where(c => !string.IsNullOrWhiteSpace(c))
+                           .Distinct()
+                           .OrderBy(c => c)
+                           .ToList();
+
+        ClassNames.Add("Semua Kelas");
+        foreach (var c in classes)
+        {
+            ClassNames.Add(c);
+        }
+
+        if (!string.IsNullOrWhiteSpace(previousClassSelection) && ClassNames.Contains(previousClassSelection))
+        {
+            SelectedClassFilter = previousClassSelection;
+        }
+        else
+        {
+            SelectedClassFilter = "Semua Kelas";
+        }
+    }
+
+    public static int ParseYearFilterToGrade(string? yearFilter)
+    {
+        if (string.IsNullOrWhiteSpace(yearFilter) || yearFilter.Equals("Semua Tahun", StringComparison.OrdinalIgnoreCase))
+            return 0;
+
+        string digits = new(yearFilter.Where(char.IsDigit).ToArray());
+        return int.TryParse(digits, out int g) ? g : 0;
+    }
+
+    public void UpdateFilteredPasswordItems()
+    {
+        FilteredPasswordItems.Clear();
+        int filterGrade = ParseYearFilterToGrade(SelectedYearFilter);
+        var classFilter = SelectedClassFilter;
+
+        IEnumerable<PasswordGridItem> items = PasswordItems;
+
+        if (filterGrade > 0)
+        {
+            items = items.Where(a => a.Grade == filterGrade);
+        }
+
+        if (!string.IsNullOrWhiteSpace(classFilter) && !classFilter.Equals("Semua Kelas", StringComparison.OrdinalIgnoreCase))
+        {
+            items = items.Where(a => string.Equals(a.ClassName, classFilter, StringComparison.OrdinalIgnoreCase));
+        }
+
+        foreach (var item in items)
+        {
+            FilteredPasswordItems.Add(item);
+        }
+
+        NotifyCountersChanged();
+    }
+
     public void InitializeGridFromRoster()
     {
         PasswordItems.Clear();
+        YearNames.Clear();
+        ClassNames.Clear();
+
+        // Populate YearNames (Semua Tahun, Tahun 1..6)
+        var distinctGrades = _state.RosterStudents.Select(s => s.Grade > 0 ? s.Grade : RosterImporter.NormalizeClassAndGrade(s.ClassName, null).Grade)
+                                                 .Where(g => g >= 1 && g <= 6)
+                                                 .Distinct()
+                                                 .OrderBy(g => g)
+                                                 .ToList();
+
+        YearNames.Add("Semua Tahun");
+        if (distinctGrades.Count > 0)
+        {
+            foreach (var g in distinctGrades)
+            {
+                YearNames.Add($"Tahun {g}");
+            }
+        }
+        else
+        {
+            for (int g = 1; g <= 6; g++)
+            {
+                YearNames.Add($"Tahun {g}");
+            }
+        }
 
         foreach (var student in _state.RosterStudents)
         {
+            int grade = student.Grade > 0 ? student.Grade : RosterImporter.NormalizeClassAndGrade(student.ClassName, null).Grade;
             string? pwd = _state.StudentPasswords.TryGetValue(student.Id, out var p) ? p : null;
             PasswordItems.Add(new PasswordGridItem
             {
                 StudentId = student.Id,
                 StudentName = student.FullName,
                 ClassName = student.ClassName,
+                Grade = grade,
                 DelimaDigits = student.DelimaDigits,
                 EmailLocal = student.EmailLocal,
                 RegisterNo = student.RegisterNoJoinKey,
@@ -87,6 +206,10 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         }
 
         RecalculateSharedPasswords();
+
+        SelectedYearFilter = "Semua Tahun";
+        UpdateClassListForSelectedYear();
+        UpdateFilteredPasswordItems();
     }
 
     public void AcknowledgeConsent()
@@ -110,9 +233,13 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         OnPropertyChanged(nameof(CanProceed));
     }
 
-    public void SavePasswordTemplate(string targetPath)
+    public void SavePasswordTemplate(string targetPath, string? yearFilter = null, string? classFilter = null)
     {
-        TemplateGenerator.SavePasswordTemplate(targetPath, _state.RosterStudents);
+        string effectiveYear = yearFilter ?? SelectedYearFilter ?? "Semua Tahun";
+        string effectiveClass = classFilter ?? SelectedClassFilter ?? "Semua Kelas";
+        int filterGrade = ParseYearFilterToGrade(effectiveYear);
+
+        TemplateGenerator.SavePasswordTemplate(targetPath, _state.RosterStudents, filterGrade, effectiveClass);
     }
 
     public void LoadPasswordFile(string filePath)
@@ -310,6 +437,11 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         OnPropertyChanged(nameof(WithPasswordCount));
         OnPropertyChanged(nameof(MissingPasswordCount));
         OnPropertyChanged(nameof(SharedPasswordCount));
+
+        OnPropertyChanged(nameof(FilteredTotalCount));
+        OnPropertyChanged(nameof(FilteredWithCount));
+        OnPropertyChanged(nameof(FilteredMissingCount));
+        OnPropertyChanged(nameof(FilteredSharedCount));
     }
 
     public void SaveToState()
@@ -321,3 +453,4 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         }
     }
 }
+

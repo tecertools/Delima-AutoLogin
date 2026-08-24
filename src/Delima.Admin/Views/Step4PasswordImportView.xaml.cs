@@ -29,17 +29,23 @@ public partial class Step4PasswordImportView : UserControl
 
     private void OnDownloadPasswordTemplateClick(object sender, RoutedEventArgs e)
     {
+        if (DataContext is not Step4PasswordImportViewModel vm) return;
+
+        string yr = vm.SelectedYearFilter?.Replace(" ", "_") ?? "Semua_Tahun";
+        string cls = vm.SelectedClassFilter?.Replace(" ", "_") ?? "Semua_Kelas";
+        string defaultFileName = $"templat_kata_laluan_{yr}_{cls}.csv";
+
         var dlg = new SaveFileDialog
         {
             Filter = "Fail CSV Templat (*.csv)|*.csv",
-            FileName = "templat_kata_laluan_delima.csv",
+            FileName = defaultFileName,
             Title = "Muat Turun Templat Kata Laluan"
         };
 
-        if (dlg.ShowDialog() == true && DataContext is Step4PasswordImportViewModel vm)
+        if (dlg.ShowDialog() == true)
         {
             vm.SavePasswordTemplate(dlg.FileName);
-            MessageBox.Show($"Templat kata laluan berjaya disimpan ke:\n{dlg.FileName}\n\nJika anda telah mengimport senarai murid pada Langkah 3, templat ini telah diprapasang dengan nama dan ID murid sekolah anda.", "Templat Kata Laluan Dimuat Turun", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Templat kata laluan ({vm.SelectedYearFilter} - {vm.SelectedClassFilter}) berjaya disimpan ke:\n{dlg.FileName}\n\nTemplat ini diprapasang dengan nama, tahun, kelas, dan ID murid sekolah anda mengikut skop yang dipilih.", "Templat Kata Laluan Dimuat Turun", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

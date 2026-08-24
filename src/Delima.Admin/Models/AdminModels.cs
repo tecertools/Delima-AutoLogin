@@ -38,6 +38,8 @@ public sealed partial class PasswordGridItem : ObservableObject
     public string StudentId { get; init; } = "";
     public string StudentName { get; init; } = "";
     public string ClassName { get; init; } = "";
+    public int Grade { get; init; }
+    public string GradeDisplay => Grade > 0 ? $"Tahun {Grade}" : "—";
     public string DelimaDigits { get; init; } = "";
     public string EmailLocal { get; init; } = "";
     public string? RegisterNo { get; init; }
@@ -134,7 +136,7 @@ public sealed class LabChecklistItem
 {
     public string PcName { get; set; } = "";
     public bool IsProvisioned { get; set; }
-    public string Version { get; set; } = "2.0.2";
+    public string Version { get; set; } = "2.1.0";
     public string StoreDate { get; set; } = "—";
     public bool AppLockerVerified { get; set; }
 }

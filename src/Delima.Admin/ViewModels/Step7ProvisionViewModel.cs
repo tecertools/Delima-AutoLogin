@@ -8,6 +8,7 @@ using Delima.Core.Audit;
 using Delima.Core.Crypto;
 using Delima.Core.Services;
 using Delima.Core.Store;
+using Delima.Import;
 
 namespace Delima.Admin.ViewModels;
 
@@ -69,7 +70,7 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
             {
                 PcName = $"MAKMAL-{i:D2}",
                 IsProvisioned = false,
-                Version = "2.0.2",
+                Version = "2.1.0",
                 StoreDate = "—"
             });
         }
@@ -92,11 +93,15 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
         foreach (var group in classGroups)
         {
             var firstStudent = group.First();
+            int grade = firstStudent.Grade > 0
+                ? firstStudent.Grade
+                : RosterImporter.NormalizeClassAndGrade(firstStudent.ClassName, null).Grade;
+
             payload.Classes.Add(new ClassInfo
             {
                 Id = group.Key,
                 Name = group.Key,
-                Grade = firstStudent.Grade,
+                Grade = grade,
                 ColourIndex = colourIdx++ % Math.Max(1, _state.Theme.ClassColours.Count)
             });
         }

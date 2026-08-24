@@ -133,4 +133,80 @@ public class Step4PasswordImportTests
             if (File.Exists(pwdTemplatePath)) File.Delete(pwdTemplatePath);
         }
     }
+
+    [Fact]
+    public void YearFilter_FiltersPasswordItemsAndUpdatesClassesDynamically()
+    {
+        var state = new AdminWizardState
+        {
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" },
+            HasAcknowledgedConsent = true
+        };
+
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_1", FullName = "Ali", ClassName = "1 Amanah", Grade = 1, EmailLocal = "m-1" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_2", FullName = "Abu", ClassName = "1 Bakti", Grade = 1, EmailLocal = "m-2" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_3", FullName = "Siti", ClassName = "2 Bestari", Grade = 2, EmailLocal = "m-3" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_4", FullName = "Chong", ClassName = "3 Cemerlang", Grade = 3, EmailLocal = "m-4" });
+
+        var vm = new Step4PasswordImportViewModel(state);
+
+        // Year options populated
+        Assert.Contains("Semua Tahun", vm.YearNames);
+        Assert.Contains("Tahun 1", vm.YearNames);
+        Assert.Contains("Tahun 2", vm.YearNames);
+        Assert.Contains("Tahun 3", vm.YearNames);
+
+        // Initially Semua Tahun
+        Assert.Equal(4, vm.FilteredPasswordItems.Count);
+
+        // Filter by Tahun 1
+        vm.SelectedYearFilter = "Tahun 1";
+        Assert.Equal(2, vm.FilteredPasswordItems.Count);
+        Assert.Contains("Semua Kelas", vm.ClassNames);
+        Assert.Contains("1 Amanah", vm.ClassNames);
+        Assert.Contains("1 Bakti", vm.ClassNames);
+        Assert.DoesNotContain("2 Bestari", vm.ClassNames);
+
+        // Further filter by Class 1 Amanah
+        vm.SelectedClassFilter = "1 Amanah";
+        Assert.Single(vm.FilteredPasswordItems);
+        Assert.Equal("Ali", vm.FilteredPasswordItems[0].StudentName);
+
+        // Reset to Semua Tahun
+        vm.SelectedYearFilter = "Semua Tahun";
+        Assert.Equal(4, vm.FilteredPasswordItems.Count);
+    }
+
+    [Fact]
+    public void SavePasswordTemplate_WithYearAndClassFilters_ExportsScopedSubset()
+    {
+        var state = new AdminWizardState
+        {
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" },
+            HasAcknowledgedConsent = true
+        };
+
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_1", FullName = "Danial", ClassName = "1 Amanah", Grade = 1, EmailLocal = "m-1" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_2", FullName = "Aishah", ClassName = "2 Bestari", Grade = 2, EmailLocal = "m-2" });
+
+        var vm = new Step4PasswordImportViewModel(state);
+        string templatePath = Path.Combine(Path.GetTempPath(), $"scoped_template_{Guid.NewGuid():N}.csv");
+        try
+        {
+            vm.SelectedYearFilter = "Tahun 1";
+            vm.SelectedClassFilter = "Semua Kelas";
+            vm.SavePasswordTemplate(templatePath);
+
+            Assert.True(File.Exists(templatePath));
+            string content = File.ReadAllText(templatePath);
+            Assert.Contains("TAHUN", content);
+            Assert.Contains("Danial", content);
+            Assert.DoesNotContain("Aishah", content);
+        }
+        finally
+        {
+            if (File.Exists(templatePath)) File.Delete(templatePath);
+        }
+    }
 }
+

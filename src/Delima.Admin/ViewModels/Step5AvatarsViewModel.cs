@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Admin.Models;
 using Delima.Core.Audit;
 using Delima.Core.Services;
+using Delima.Import;
 
 namespace Delima.Admin.ViewModels;
 
@@ -14,7 +15,10 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     public string StudentId { get; init; } = "";
     public string StudentName { get; init; } = "";
     public string ClassName { get; init; } = "";
+    public int Grade { get; init; }
     public string EmailLocal { get; init; } = "";
+
+    public string GradeDisplay => Grade > 0 ? $"Tahun {Grade}" : "Lain-lain";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AvatarUrl))]
@@ -22,6 +26,7 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PicturePasswordDisplay))]
+    [NotifyPropertyChangedFor(nameof(PicturePasswordDetailedDisplay))]
     private List<string> _picturePassword = ["kucing", "bunga", "kereta"];
 
     /// <summary>
@@ -35,6 +40,8 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     public string AvatarUrl => DiceBearService.GetAvatarUrl(DiceBearSeed);
 
     public string PicturePasswordDisplay => string.Join(" ➔ ", PicturePassword.Select(GetPictureIconEmoji));
+
+    public string PicturePasswordDetailedDisplay => string.Join(" ➔ ", PicturePassword.Select(p => $"{GetPictureIconEmoji(p)} {GetAvatarDisplayName(p)}"));
 
     /// <summary>Returns emoji for picture-password icons only (not used for student avatars).</summary>
     public static string GetPictureIconEmoji(string icon) => (icon?.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_")) switch
@@ -125,6 +132,11 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
         "kapal" or "ship" => "Kapal",
         "bulan" or "moon" => "Bulan",
         "rumah" or "house" => "Rumah",
+        "payung" => "Payung",
+        "belon" => "Belon",
+        "pisang" => "Pisang",
+        "jam" => "Jam",
+        "topi" => "Topi",
         _ => avatar ?? "Avatar"
     };
 }
@@ -142,7 +154,11 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
 
     public ObservableCollection<AvatarAssignmentItem> AvatarItems { get; } = [];
     public ObservableCollection<AvatarAssignmentItem> FilteredAvatarItems { get; } = [];
+    public ObservableCollection<string> YearNames { get; } = [];
     public ObservableCollection<string> ClassNames { get; } = [];
+
+    [ObservableProperty]
+    private string? _selectedYearFilter;
 
     [ObservableProperty]
     private string? _selectedClassFilter;
@@ -163,19 +179,78 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         InitializeAvatars();
     }
 
+    partial void OnSelectedYearFilterChanged(string? value)
+    {
+        UpdateClassListForSelectedYear();
+        UpdateFilteredAvatarItems();
+    }
+
     partial void OnSelectedClassFilterChanged(string? value)
     {
         UpdateFilteredAvatarItems();
     }
 
+    private void UpdateClassListForSelectedYear()
+    {
+        string? previousClassSelection = SelectedClassFilter;
+        ClassNames.Clear();
+
+        int filterGrade = ParseYearFilterToGrade(SelectedYearFilter);
+
+        var query = AvatarItems.AsEnumerable();
+        if (filterGrade > 0)
+        {
+            query = query.Where(a => a.Grade == filterGrade);
+        }
+
+        var classes = query.Select(s => s.ClassName)
+                           .Where(c => !string.IsNullOrWhiteSpace(c))
+                           .Distinct()
+                           .OrderBy(c => c)
+                           .ToList();
+
+        ClassNames.Add("Semua Kelas");
+        foreach (var c in classes)
+        {
+            ClassNames.Add(c);
+        }
+
+        if (!string.IsNullOrWhiteSpace(previousClassSelection) && ClassNames.Contains(previousClassSelection))
+        {
+            SelectedClassFilter = previousClassSelection;
+        }
+        else
+        {
+            SelectedClassFilter = "Semua Kelas";
+        }
+    }
+
+    public static int ParseYearFilterToGrade(string? yearFilter)
+    {
+        if (string.IsNullOrWhiteSpace(yearFilter) || yearFilter.Equals("Semua Tahun", StringComparison.OrdinalIgnoreCase))
+            return 0;
+
+        string digits = new(yearFilter.Where(char.IsDigit).ToArray());
+        return int.TryParse(digits, out int g) ? g : 0;
+    }
+
     public void UpdateFilteredAvatarItems()
     {
         FilteredAvatarItems.Clear();
-        var filter = SelectedClassFilter;
+        int filterGrade = ParseYearFilterToGrade(SelectedYearFilter);
+        var classFilter = SelectedClassFilter;
 
-        IEnumerable<AvatarAssignmentItem> items = string.IsNullOrWhiteSpace(filter) || filter == "Semua Kelas"
-            ? AvatarItems
-            : AvatarItems.Where(a => string.Equals(a.ClassName, filter, StringComparison.OrdinalIgnoreCase));
+        IEnumerable<AvatarAssignmentItem> items = AvatarItems;
+
+        if (filterGrade > 0)
+        {
+            items = items.Where(a => a.Grade == filterGrade);
+        }
+
+        if (!string.IsNullOrWhiteSpace(classFilter) && !classFilter.Equals("Semua Kelas", StringComparison.OrdinalIgnoreCase))
+        {
+            items = items.Where(a => string.Equals(a.ClassName, classFilter, StringComparison.OrdinalIgnoreCase));
+        }
 
         foreach (var item in items)
         {
@@ -186,15 +261,30 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
     public void InitializeAvatars()
     {
         AvatarItems.Clear();
+        YearNames.Clear();
         ClassNames.Clear();
 
-        var classes = _state.RosterStudents.Select(s => s.ClassName).Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().OrderBy(c => c).ToList();
-        foreach (var c in classes)
-            ClassNames.Add(c);
+        // Populate YearNames (Semua Tahun, Tahun 1..6)
+        var distinctGrades = _state.RosterStudents.Select(s => s.Grade > 0 ? s.Grade : RosterImporter.NormalizeClassAndGrade(s.ClassName, null).Grade)
+                                                 .Where(g => g >= 1 && g <= 6)
+                                                 .Distinct()
+                                                 .OrderBy(g => g)
+                                                 .ToList();
 
-        if (ClassNames.Count > 1)
+        YearNames.Add("Semua Tahun");
+        if (distinctGrades.Count > 0)
         {
-            ClassNames.Insert(0, "Semua Kelas");
+            foreach (var g in distinctGrades)
+            {
+                YearNames.Add($"Tahun {g}");
+            }
+        }
+        else
+        {
+            for (int g = 1; g <= 6; g++)
+            {
+                YearNames.Add($"Tahun {g}");
+            }
         }
 
         // Group by class and assign unique avatars per class
@@ -203,8 +293,11 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             int avatarIdx = 0;
             foreach (var student in group)
             {
+                int grade = student.Grade > 0
+                    ? student.Grade
+                    : RosterImporter.NormalizeClassAndGrade(student.ClassName, null).Grade;
+
                 // Use the stored avatar only if it is a new-style seed (not a legacy animal key).
-                // Legacy keys & blank values are left empty so DiceBearSeed auto-resolves to student.Id.
                 string avatar = "";
                 if (_state.StudentAvatars.TryGetValue(student.Id, out var existingAvatar)
                     && !string.IsNullOrWhiteSpace(existingAvatar)
@@ -236,6 +329,7 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
                     StudentId = student.Id,
                     StudentName = student.FullName,
                     ClassName = student.ClassName,
+                    Grade = grade,
                     EmailLocal = student.EmailLocal,
                     Avatar = avatar,
                     PicturePassword = picPassword
@@ -243,14 +337,9 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             }
         }
 
-        if (ClassNames.Count > 0)
-        {
-            SelectedClassFilter = ClassNames.Count > 1 ? ClassNames[1] : ClassNames[0];
-        }
-        else
-        {
-            UpdateFilteredAvatarItems();
-        }
+        SelectedYearFilter = "Semua Tahun";
+        UpdateClassListForSelectedYear();
+        UpdateFilteredAvatarItems();
 
         // Pre-cache all avatar PNGs in the background (best-effort, non-blocking)
         var seeds = AvatarItems.Select(a => a.DiceBearSeed).ToList();
@@ -302,22 +391,77 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         }
     }
 
-    public string GenerateAvatarSheetHtml(string? className = null)
+    /// <summary>
+    /// Generates printable HTML for student picture passwords & avatars filtered by Year and/or Class.
+    /// Supports yearFilter (e.g. "Tahun 1", "Semua Tahun") and classFilter (e.g. "1 Amanah", "Semua Kelas").
+    /// </summary>
+    public string GenerateAvatarSheetHtml(string? yearOrClassFilter = null, string? classFilter = null)
     {
-        string targetFilter = string.IsNullOrWhiteSpace(className)
-            ? (SelectedClassFilter ?? "Semua Kelas")
-            : className;
+        string targetYear;
+        string targetClass;
 
-        bool isAllClasses = string.Equals(targetFilter, "Semua Kelas", StringComparison.OrdinalIgnoreCase);
+        if (classFilter != null)
+        {
+            targetYear = string.IsNullOrWhiteSpace(yearOrClassFilter) ? (SelectedYearFilter ?? "Semua Tahun") : yearOrClassFilter;
+            targetClass = classFilter;
+        }
+        else if (!string.IsNullOrWhiteSpace(yearOrClassFilter))
+        {
+            if (yearOrClassFilter.StartsWith("Tahun", StringComparison.OrdinalIgnoreCase) ||
+                yearOrClassFilter.Equals("Semua Tahun", StringComparison.OrdinalIgnoreCase))
+            {
+                targetYear = yearOrClassFilter;
+                targetClass = SelectedClassFilter ?? "Semua Kelas";
+            }
+            else
+            {
+                // Passed a class name directly for backward compatibility
+                targetYear = "Semua Tahun";
+                targetClass = yearOrClassFilter;
+            }
+        }
+        else
+        {
+            targetYear = SelectedYearFilter ?? "Semua Tahun";
+            targetClass = SelectedClassFilter ?? "Semua Kelas";
+        }
 
-        var classGroups = isAllClasses
-            ? AvatarItems.GroupBy(a => a.ClassName).OrderBy(g => g.Key).ToList()
-            : AvatarItems.Where(a => string.Equals(a.ClassName, targetFilter, StringComparison.OrdinalIgnoreCase))
-                         .GroupBy(a => a.ClassName).ToList();
+        int filterGrade = ParseYearFilterToGrade(targetYear);
+        bool isAllClasses = string.IsNullOrWhiteSpace(targetClass) || string.Equals(targetClass, "Semua Kelas", StringComparison.OrdinalIgnoreCase);
 
-        string pageTitle = isAllClasses
-            ? $"Helaian Avatar Semua Kelas - {_state.School.Code}"
-            : $"Helaian Avatar Kelas - {targetFilter} - {_state.School.Code}";
+        var query = AvatarItems.AsEnumerable();
+        if (filterGrade > 0)
+        {
+            query = query.Where(a => a.Grade == filterGrade);
+        }
+
+        if (!isAllClasses)
+        {
+            query = query.Where(a => string.Equals(a.ClassName, targetClass, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Group by ClassName (and order by Grade then ClassName)
+        var classGroups = query
+            .GroupBy(a => a.ClassName)
+            .OrderBy(g => g.FirstOrDefault()?.Grade ?? 0)
+            .ThenBy(g => g.Key)
+            .ToList();
+
+        string pageTitleScope;
+        if (filterGrade > 0)
+        {
+            pageTitleScope = isAllClasses
+                ? $"Tahun {filterGrade} (Semua Kelas)"
+                : $"Tahun {filterGrade} - {targetClass}";
+        }
+        else
+        {
+            pageTitleScope = isAllClasses
+                ? "Semua Tahun & Kelas"
+                : targetClass;
+        }
+
+        string pageTitle = $"Helaian Kata Laluan Gambar - {pageTitleScope} - {_state.School.Code}";
 
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");
@@ -328,28 +472,32 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("  <style>");
         sb.AppendLine("    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }");
         sb.AppendLine("    body { background: #F8F9FA; color: #1E293B; padding: 24px; }");
-        sb.AppendLine("    .container { max-width: 960px; margin: 0 auto; }");
+        sb.AppendLine("    .container { max-width: 1020px; margin: 0 auto; }");
         sb.AppendLine("    .class-sheet { background: #FFFFFF; border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; margin-bottom: 32px; page-break-after: always; break-after: page; }");
         sb.AppendLine("    .class-sheet:last-child { margin-bottom: 0; page-break-after: auto; break-after: auto; }");
-        sb.AppendLine("    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #056839; padding-bottom: 20px; margin-bottom: 24px; }");
-        sb.AppendLine("    .school-title { font-size: 22px; font-weight: 800; color: #056839; }");
-        sb.AppendLine("    .school-subtitle { font-size: 14px; color: #64748B; margin-top: 4px; }");
+        sb.AppendLine("    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #056839; padding-bottom: 18px; margin-bottom: 20px; }");
+        sb.AppendLine("    .school-title { font-size: 22px; font-weight: 800; color: #056839; line-height: 1.2; }");
+        sb.AppendLine("    .school-subtitle { font-size: 14px; color: #64748B; margin-top: 4px; font-weight: 600; }");
+        sb.AppendLine("    .badges-group { display: flex; gap: 8px; align-items: center; }");
         sb.AppendLine("    .badge { background: #056839; color: #FFFFFF; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; }");
-        sb.AppendLine("    .info-bar { display: flex; justify-content: space-between; background: #F1F5F9; border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; color: #334155; }");
+        sb.AppendLine("    .year-badge { background: #0284C7; color: #FFFFFF; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; }");
+        sb.AppendLine("    .info-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; background: #F1F5F9; border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; color: #334155; }");
         sb.AppendLine("    .info-bar strong { color: #0F172A; }");
-        sb.AppendLine("    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 32px; }");
-        sb.AppendLine("    .card { border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; background: #FFFFFF; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; break-inside: avoid; }");
-        sb.AppendLine("    .avatar-circle { width: 56px; height: 56px; border-radius: 50%; background: #F1F5F9; border: 2px solid #CBD5E1; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }");
+        sb.AppendLine("    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px; }");
+        sb.AppendLine("    .card { border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 14px; background: #FFFFFF; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; break-inside: avoid; }");
+        sb.AppendLine("    .avatar-circle { width: 58px; height: 58px; border-radius: 50%; background: #F1F5F9; border: 2px solid #CBD5E1; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }");
         sb.AppendLine("    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }");
-        sb.AppendLine("    .student-info { overflow: hidden; }");
+        sb.AppendLine("    .student-info { overflow: hidden; flex: 1; }");
         sb.AppendLine("    .student-name { font-weight: 700; font-size: 14px; color: #0F172A; line-height: 1.3; margin-bottom: 2px; }");
         sb.AppendLine("    .student-id { font-size: 12px; color: #64748B; font-family: monospace; }");
-        sb.AppendLine("    .avatar-tag { display: inline-block; background: #E0E7FF; color: #3730A3; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-top: 4px; text-transform: capitalize; }");
-        sb.AppendLine("    .pic-pw-tag { display: inline-block; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 600; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-top: 4px; }");
-        sb.AppendLine("    .footer { border-top: 1px solid #E2E8F0; padding-top: 16px; font-size: 12px; color: #64748B; line-height: 1.5; }");
+        sb.AppendLine("    .meta-row { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }");
+        sb.AppendLine("    .avatar-tag { display: inline-block; background: #E0E7FF; color: #3730A3; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 12px; text-transform: capitalize; }");
+        sb.AppendLine("    .pic-pw-tag { display: inline-flex; align-items: center; gap: 4px; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; font-size: 11.5px; padding: 3px 8px; border-radius: 12px; margin-top: 4px; }");
+        sb.AppendLine("    .footer { border-top: 1px solid #E2E8F0; padding-top: 14px; font-size: 12px; color: #64748B; line-height: 1.5; }");
         sb.AppendLine("    .footer strong { color: #334155; }");
-        sb.AppendLine("    .no-print-bar { margin-bottom: 20px; display: flex; justify-content: flex-end; gap: 10px; }");
-        sb.AppendLine("    .btn-print { background: #056839; color: #FFFFFF; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }");
+        sb.AppendLine("    .no-print-bar { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 1px solid #E2E8F0; padding: 12px 20px; border-radius: 10px; }");
+        sb.AppendLine("    .print-summary { font-size: 14px; color: #334155; font-weight: 600; }");
+        sb.AppendLine("    .btn-print { background: #056839; color: #FFFFFF; border: none; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }");
         sb.AppendLine("    .btn-print:hover { background: #04522d; }");
         sb.AppendLine("    @media print {");
         sb.AppendLine("      body { background: #FFFFFF; padding: 0; }");
@@ -364,31 +512,41 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("<body>");
         sb.AppendLine("  <div class=\"container\">");
         sb.AppendLine("    <div class=\"no-print-bar no-print\">");
-        sb.AppendLine($"      <button class=\"btn-print\" onclick=\"window.print()\">🖨️ Cetak Helaian Avatar {(isAllClasses ? "Semua Kelas" : targetFilter)}</button>");
+        sb.AppendLine($"      <div class=\"print-summary\">📋 Skop Cetakan: <strong>{pageTitleScope}</strong> ({classGroups.Sum(g => g.Count())} orang murid)</div>");
+        sb.AppendLine($"      <button class=\"btn-print\" onclick=\"window.print()\">🖨️ Cetak Helaian Kata Laluan Gambar</button>");
         sb.AppendLine("    </div>");
 
         if (classGroups.Count == 0)
         {
             sb.AppendLine("    <div class=\"class-sheet\">");
-            sb.AppendLine("      <p style=\"text-align:center; padding: 20px; color: #64748B;\">Tiada murid dijumpai.</p>");
+            sb.AppendLine("      <p style=\"text-align:center; padding: 20px; color: #64748B;\">Tiada rekod murid dijumpai untuk skop yang dipilih.</p>");
             sb.AppendLine("    </div>");
         }
         else
         {
             foreach (var group in classGroups)
             {
-                string currentClass = string.IsNullOrWhiteSpace(group.Key) ? (isAllClasses ? "Tanpa Kelas" : targetFilter) : group.Key;
+                string currentClass = string.IsNullOrWhiteSpace(group.Key) ? "Tanpa Kelas" : group.Key;
                 var students = group.ToList();
+                int sheetGrade = students.FirstOrDefault()?.Grade ?? 0;
+                string sheetGradeLabel = sheetGrade > 0 ? $"Tahun {sheetGrade}" : "Tahun —";
 
                 sb.AppendLine("    <div class=\"class-sheet\">");
                 sb.AppendLine("      <div class=\"header\">");
                 sb.AppendLine("        <div>");
                 sb.AppendLine($"          <div class=\"school-title\">{_state.School.Name}</div>");
-                sb.AppendLine($"          <div class=\"school-subtitle\">Helaian Avatar & Log Masuk DELIMa Murid</div>");
+                sb.AppendLine($"          <div class=\"school-subtitle\">Helaian Avatar & Kata Laluan Gambar Murid (DELIMa SSO)</div>");
                 sb.AppendLine("        </div>");
-                sb.AppendLine($"        <div class=\"badge\">{_state.School.Code}</div>");
+                sb.AppendLine("        <div class=\"badges-group\">");
+                if (sheetGrade > 0)
+                {
+                    sb.AppendLine($"          <div class=\"year-badge\">{sheetGradeLabel}</div>");
+                }
+                sb.AppendLine($"          <div class=\"badge\">{_state.School.Code}</div>");
+                sb.AppendLine("        </div>");
                 sb.AppendLine("      </div>");
                 sb.AppendLine("      <div class=\"info-bar\">");
+                sb.AppendLine($"        <div>Tahun: <strong>{sheetGradeLabel}</strong></div>");
                 sb.AppendLine($"        <div>Kelas: <strong>{currentClass}</strong></div>");
                 sb.AppendLine($"        <div>Jumlah Murid: <strong>{students.Count}</strong></div>");
                 sb.AppendLine($"        <div>Kata Laluan Gambar: <strong>{(PicturePasswordRequired ? "Aktif (3-Ikon)" : "Dinyahaktifkan")}</strong></div>");
@@ -404,10 +562,12 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
                     sb.AppendLine("          <div class=\"student-info\">");
                     sb.AppendLine($"            <div class=\"student-name\">{s.StudentName}</div>");
                     sb.AppendLine($"            <div class=\"student-id\">{(string.IsNullOrWhiteSpace(s.EmailLocal) ? s.StudentId : s.EmailLocal)}</div>");
-                    sb.AppendLine($"            <div class=\"avatar-tag\">🐾 {s.ClassName}</div>");
+                    sb.AppendLine("            <div class=\"meta-row\">");
+                    sb.AppendLine($"              <span class=\"avatar-tag\">🏫 {s.ClassName}</span>");
+                    sb.AppendLine("            </div>");
                     if (PicturePasswordRequired)
                     {
-                        sb.AppendLine($"            <div class=\"pic-pw-tag\">🔑 {s.PicturePasswordDisplay}</div>");
+                        sb.AppendLine($"            <div class=\"pic-pw-tag\">🔑 {s.PicturePasswordDetailedDisplay}</div>");
                     }
                     sb.AppendLine("          </div>");
                     sb.AppendLine("        </div>");
@@ -415,8 +575,8 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
 
                 sb.AppendLine("      </div>");
                 sb.AppendLine("      <div class=\"footer\">");
-                sb.AppendLine("        <strong>Panduan Guru Kelas & Guru Makmal:</strong><br />");
-                sb.AppendLine("        Helaian ini boleh dipamerkan pada sudut kenyataan kelas atau disimpan di meja makmal komputer untuk membantu murid Tahun 1 & 2 mengenal pasti akaun masing-masing.");
+                sb.AppendLine("        <strong>Panduan Guru Kelas & Guru Penyelaras Makmal:</strong><br />");
+                sb.AppendLine("        Helaian ini mengandungi simbol kata laluan gambar 3-ikon untuk murid log masuk secara pantas di PC Makmal Komputer. Simpan di meja makmal atau edarkan kepada guru kelas mengikut tahun.");
                 sb.AppendLine("      </div>");
                 sb.AppendLine("    </div>");
             }
@@ -434,15 +594,17 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         return sb.ToString();
     }
 
-    public string PrintAvatarSheet(string? className = null)
+    public string PrintAvatarSheet(string? yearOrClassFilter = null, string? classFilter = null)
     {
-        string targetClass = string.IsNullOrWhiteSpace(className)
-            ? (SelectedClassFilter ?? (ClassNames.FirstOrDefault() ?? "Kelas"))
-            : className;
+        string html = GenerateAvatarSheetHtml(yearOrClassFilter, classFilter);
 
-        string html = GenerateAvatarSheetHtml(targetClass);
-        string sanitizedClass = string.Join("_", targetClass.Split(Path.GetInvalidFileNameChars()));
-        string fileName = $"Helaian_Avatar_{sanitizedClass}_{DateTime.Now:yyyyMMdd_HHmmss}.html";
+        string targetYear = string.IsNullOrWhiteSpace(yearOrClassFilter) ? (SelectedYearFilter ?? "Semua_Tahun") : yearOrClassFilter;
+        string targetClass = string.IsNullOrWhiteSpace(classFilter) ? (SelectedClassFilter ?? "Semua_Kelas") : classFilter;
+
+        string sanitizedYear = string.Join("_", targetYear.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
+        string sanitizedClass = string.Join("_", targetClass.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
+
+        string fileName = $"Helaian_KataLaluanGambar_{sanitizedYear}_{sanitizedClass}_{DateTime.Now:yyyyMMdd_HHmmss}.html";
         string exportDir = Path.Combine(Path.GetTempPath(), "Delima_Cetak");
         Directory.CreateDirectory(exportDir);
         string fullPath = Path.Combine(exportDir, fileName);
@@ -462,9 +624,10 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             Outcome = "SUCCESS",
             SchoolCode = _state.School.Code,
             WindowsUser = Environment.UserName,
-            Details = $"Class avatar sheet printed/exported for class '{targetClass}' ({fullPath})."
+            Details = $"Student picture password sheet printed/exported for Year '{targetYear}', Class '{targetClass}' ({fullPath})."
         });
 
         return fullPath;
     }
 }
+
