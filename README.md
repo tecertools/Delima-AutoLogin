@@ -7,6 +7,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![project_license][license-shield]][license-url]
+[![Latest Release][release-shield]][release-url]
 [![Build & Test Status][build-shield]][build-url]
 
 <!-- PROJECT LOGO -->
@@ -21,6 +22,8 @@
   <p align="center">
     A zero-cloud, privacy-first Windows desktop sign-in assistant designed for Malaysian primary school computer labs (Tahap 1, Ages 7–9).
     <br />
+    <a href="https://github.com/tecertools/Delima-AutoLogin/releases/latest"><strong>📥 Download Latest Installer (.exe) »</strong></a>
+    ·
     <a href="docs/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
@@ -51,7 +54,8 @@
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#download--quick-install">Download & Quick Install</a></li>
+        <li><a href="#prerequisites-for-development">Prerequisites for Development</a></li>
         <li><a href="#building-from-source">Building from Source</a></li>
         <li><a href="#running-tests">Running Tests</a></li>
         <li><a href="#publishing-executables">Publishing Executables</a></li>
@@ -157,9 +161,17 @@ Delima-AutoLogin/
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Follow these instructions to set up the project locally for development or to build the release artifacts.
+### Download & Quick Install
 
-### Prerequisites
+If you are a School ICT Coordinator or Teacher looking to install DELIMa Smart Launcher:
+
+1. **[📥 Download Latest Installer from GitHub Releases](https://github.com/tecertools/Delima-AutoLogin/releases/latest)**
+2. Run the signed installer package (`DELIMaLauncher-Setup-2.0.0.exe`) on your Admin PC and Lab PCs.
+3. Follow the interactive setup guide in [docs/](docs/) or open the [Online Setup Guide](https://tecertools.github.io/Delima-AutoLogin/).
+
+---
+
+### Prerequisites for Development
 
 * **Operating System**: Windows 10 or Windows 11 (x64)
 * **.NET SDK**: [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
@@ -334,6 +346,8 @@ Project Link: [https://github.com/tecertools/Delima-AutoLogin](https://github.co
 [issues-url]: https://github.com/tecertools/Delima-AutoLogin/issues
 [license-shield]: https://img.shields.io/github/license/tecertools/Delima-AutoLogin.svg?style=for-the-badge
 [license-url]: https://github.com/tecertools/Delima-AutoLogin/blob/main/LICENSE
+[release-shield]: https://img.shields.io/github/v/release/tecertools/Delima-AutoLogin.svg?style=for-the-badge&logo=github&color=blue
+[release-url]: https://github.com/tecertools/Delima-AutoLogin/releases/latest
 [build-shield]: https://img.shields.io/badge/Build%20%26%20Tests-414%20Passing-brightgreen?style=for-the-badge&logo=dotnet
 [build-url]: https://github.com/tecertools/Delima-AutoLogin/actions
 
