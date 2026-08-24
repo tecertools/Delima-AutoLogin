@@ -224,16 +224,28 @@ public class RouteCLoginOrchestratorTests
                 var hwnd = new System.Windows.Interop.WindowInteropHelper(window).EnsureHandle();
                 var windowEl = AutomationElement.FromHandle(hwnd);
 
-                var textEl = windowEl.FindFirst(
-                    TreeScope.Descendants,
-                    new PropertyCondition(AutomationElement.AutomationIdProperty, "testTextBox"));
+                AutomationElement? textEl = null;
+                AutomationElement? passEl = null;
 
-                var passEl = windowEl.FindFirst(
-                    TreeScope.Descendants,
-                    new PropertyCondition(AutomationElement.AutomationIdProperty, "testPasswordBox"));
+                for (int i = 0; i < 20 && (textEl == null || passEl == null); i++)
+                {
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+                    Thread.Sleep(100);
 
-                textBoxIsPassword = UiaHelper.IsElementPassword(textEl);
-                passwordBoxIsPassword = UiaHelper.IsElementPassword(passEl);
+                    if (windowEl != null)
+                    {
+                        textEl ??= windowEl.FindFirst(
+                            TreeScope.Descendants,
+                            new PropertyCondition(AutomationElement.AutomationIdProperty, "testTextBox"));
+
+                        passEl ??= windowEl.FindFirst(
+                            TreeScope.Descendants,
+                            new PropertyCondition(AutomationElement.AutomationIdProperty, "testPasswordBox"));
+                    }
+                }
+
+                if (textEl != null) textBoxIsPassword = UiaHelper.IsElementPassword(textEl);
+                if (passEl != null) passwordBoxIsPassword = UiaHelper.IsElementPassword(passEl);
 
                 window.Close();
             }
@@ -245,8 +257,9 @@ public class RouteCLoginOrchestratorTests
 
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
-        thread.Join(TimeSpan.FromSeconds(5));
+        bool completed = thread.Join(TimeSpan.FromSeconds(30));
 
+        Assert.True(completed, "STA thread timed out while resolving UIA elements");
         Assert.Null(threadEx);
         Assert.NotNull(textBoxIsPassword);
         Assert.NotNull(passwordBoxIsPassword);
