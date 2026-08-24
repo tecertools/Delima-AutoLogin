@@ -66,42 +66,28 @@ jobs:
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" /DMyAppVersion=$env:VERSION installer/DelimaLauncher.iss
 
-      # 9. Upload unsigned installer artifact for SignPath origin verification
-      - name: Upload unsigned installer artifact
-        id: upload_unsigned_artifact
+      # 9. Generate SHA-256 Checksums of the installer
+      - name: Generate SHA-256 checksums of installer
+        shell: pwsh
+        run: |
+          Get-FileHash dist/DELIMaLauncher-Setup-$env:VERSION.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } |
+            Out-File "dist/DELIMaLauncher-$env:VERSION-checksums.txt" -Encoding ascii
+          Get-Content "dist/DELIMaLauncher-$env:VERSION-checksums.txt"
+
+      # 10. Upload installer artifact to GitHub Actions run
+      - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unsigned-installer
+          name: DELIMaLauncher-Setup-${{ env.VERSION }}
           path: dist/DELIMaLauncher-Setup-${{ env.VERSION }}.exe
           if-no-files-found: error
 
-      # 10. Submit to SignPath Foundation for OV code signing
-      - name: Submit signing request to SignPath
-        id: signpath_sign
-        uses: signpath/github-action-submit-signing-request@v1
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'delima-launcher'
-          signing-policy-slug: 'release-signing'
-          github-artifact-id: '${{ steps.upload_unsigned_artifact.outputs.artifact-id }}'
-          wait-for-completion: true
-          output-artifact-directory: 'signed-dist'
-
-      # 11. Generate SHA-256 Checksums of the SIGNED installer
-      - name: Generate SHA-256 checksums of signed installer
-        shell: pwsh
-        run: |
-          Get-FileHash signed-dist/DELIMaLauncher-Setup-$env:VERSION.exe -Algorithm SHA256 |
-            ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } |
-            Out-File "signed-dist/DELIMaLauncher-$env:VERSION-checksums.txt" -Encoding ascii
-          Get-Content "signed-dist/DELIMaLauncher-$env:VERSION-checksums.txt"
-
-      # 12. Create Draft GitHub Release with T0.1 responsibility statement
-      - name: Create Draft GitHub Release
+      # 11. Create GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
+          draft: false
           prerelease: false
           name: "DELIMa Smart Launcher v${{ env.VERSION }}"
           body: |
@@ -128,14 +114,14 @@ jobs:
             ---
 
             ### Senarai Fail Muat Turun
-            - `DELIMaLauncher-Setup-${{ env.VERSION }}.exe` — Pemasang Windows tunggal bertandatangan (Inno Setup / SignPath)
-            - `DELIMaLauncher-${{ env.VERSION }}-checksums.txt` — Hash integriti SHA-256 bagi fail pemasang bertandatangan
+            - `DELIMaLauncher-Setup-${{ env.VERSION }}.exe` — Pemasang Windows tunggal (Inno Setup 64-bit)
+            - `DELIMaLauncher-${{ env.VERSION }}-checksums.txt` — Hash integriti SHA-256 bagi fail pemasang
             - `Panduan_Pemasangan.pdf` — Panduan persediaan makmal komputer (10 muka surat BM)
             - `Panduan_Import.pdf` — Panduan format dan pengimportan data murid/kata laluan
             - `contoh_roster.csv` & `contoh_kata_laluan.csv` — Templat CSV APDM
           files: |
-            signed-dist/DELIMaLauncher-Setup-${{ env.VERSION }}.exe
-            signed-dist/DELIMaLauncher-${{ env.VERSION }}-checksums.txt
+            dist/DELIMaLauncher-Setup-${{ env.VERSION }}.exe
+            dist/DELIMaLauncher-${{ env.VERSION }}-checksums.txt
             installer/assets/Panduan_Pemasangan.pdf
             installer/assets/Panduan_Import.pdf
             installer/assets/contoh_roster.csv
