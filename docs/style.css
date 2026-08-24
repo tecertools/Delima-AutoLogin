@@ -864,6 +864,7 @@ a:hover {
   position: relative;
   min-height: 280px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background: var(--bg-surface);
@@ -874,7 +875,7 @@ a:hover {
 .screenshot-img {
   width: 100%;
   height: auto;
-  max-height: 520px;
+  max-height: 580px;
   object-fit: contain;
   display: block;
   cursor: zoom-in;
@@ -883,6 +884,17 @@ a:hover {
 
 .screenshot-img:hover {
   transform: scale(1.005);
+}
+
+.screenshot-img[style*="display: none"],
+.screenshot-img[style*="display:none"] {
+  display: none !important;
+}
+
+/* Hide fallback placeholder when screenshot is active */
+.mockup-body.has-image .image-placeholder-fallback,
+.mockup-body:has(.screenshot-img:not([style*="display: none"]):not([style*="display:none"])) .image-placeholder-fallback {
+  display: none !important;
 }
 
 /* Placeholder Box when image not yet uploaded */

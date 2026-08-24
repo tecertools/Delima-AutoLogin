@@ -407,25 +407,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fallback and Error Handling for Screenshots
   document.querySelectorAll('.screenshot-img').forEach((img) => {
-    img.addEventListener('error', () => {
-      // Hide the broken img and keep placeholder fallback visible
-      img.style.display = 'none';
-      const parent = img.closest('.mockup-body');
-      if (parent) {
-        const fallback = parent.querySelector('.image-placeholder-fallback');
-        if (fallback) fallback.style.display = 'flex';
-      }
-    });
+    const parent = img.closest('.mockup-body');
+    const fallback = parent ? parent.querySelector('.image-placeholder-fallback') : null;
 
-    img.addEventListener('load', () => {
-      // Show img and hide fallback
+    const handleSuccess = () => {
       img.style.display = 'block';
-      const parent = img.closest('.mockup-body');
-      if (parent) {
-        const fallback = parent.querySelector('.image-placeholder-fallback');
-        if (fallback) fallback.style.display = 'none';
+      if (parent) parent.classList.add('has-image');
+      if (fallback) fallback.style.display = 'none';
+    };
+
+    const handleError = () => {
+      img.style.display = 'none';
+      if (parent) parent.classList.remove('has-image');
+      if (fallback) fallback.style.display = 'flex';
+    };
+
+    // Check if image already loaded (e.g. from cache)
+    if (img.complete) {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        handleSuccess();
+      } else if (img.src && !img.src.endsWith('#') && img.naturalWidth === 0) {
+        handleError();
       }
-    });
+    }
+
+    img.addEventListener('load', handleSuccess);
+    img.addEventListener('error', handleError);
 
     // Lightbox on click
     img.addEventListener('click', () => {
