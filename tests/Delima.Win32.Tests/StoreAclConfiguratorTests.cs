@@ -112,7 +112,7 @@ public class StoreAclConfiguratorTests : IDisposable
     }
 
     [Fact]
-    public void InstallerScript_DelimaLauncherIss_Specifies_EveryoneNone_AdminsFull_SystemFull()
+    public void InstallerScript_DelimaLauncherIss_Specifies_AdminsFull_SystemFull()
     {
         string baseDir = AppContext.BaseDirectory;
         string? solutionRoot = null;
@@ -132,7 +132,9 @@ public class StoreAclConfiguratorTests : IDisposable
         Assert.True(File.Exists(issPath), $"DelimaLauncher.iss not found at {issPath}");
 
         string issContent = File.ReadAllText(issPath);
-        Assert.Contains(@"Name: ""{commonappdata}\DELIMa Launcher""; Permissions: everyone-none admins-full system-full", issContent);
+        Assert.Contains(@"Name: ""{commonappdata}\DELIMa Launcher""; Permissions: admins-full system-full", issContent);
+        Assert.Contains(@"icacls.exe", issContent);
+        Assert.Contains(@"/inheritance:r", issContent);
     }
 }
 

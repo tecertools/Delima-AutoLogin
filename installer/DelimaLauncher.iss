@@ -22,7 +22,6 @@ Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
 SetupIconFile=..\icon.ico
-UninstallIconFile=..\icon.ico
 LicenseFile=assets\LESEN.rtf
 ; Windows 10 1809 (build 17763) or later per PRD §8
 MinVersion=10.0.17763

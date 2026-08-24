@@ -275,7 +275,7 @@ Source: "assets\contoh_kata_laluan.csv";             DestDir: "{app}\docs"; Comp
 
 [Dirs]
 ; Per-machine store. Interactive users must not be able to read it (arch §3.5).
-Name: "{commonappdata}\DELIMa Launcher"; Permissions: everyone-none admins-full system-full
+Name: "{commonappdata}\DELIMa Launcher"; Permissions: admins-full system-full
 
 [Icons]
 Name: "{group}\DELIMa";           Filename: "{app}\Delima.Launcher.exe"; Components: lab
@@ -300,7 +300,7 @@ Root: HKLM; Subkey: "SOFTWARE\Policies\Google\Chrome"; ValueType: dword; \
 
 - **`AppId` is a fixed GUID, generated once, never changed.** It is how Windows knows 2.0.1 is an upgrade of 2.0.0 rather than a second product. Change it and every school ends up with two installations and one orphaned credential store. Generate it once, paste it in, and add a comment saying never to touch it.
 - **`{commonappdata}`, never `{userappdata}`.** The store is per-machine (arch §3.3) — a per-user path would give every pupil profile its own broken copy.
-- **`Permissions: everyone-none admins-full system-full`** is the ACL from arch §3.5 expressed in Inno's syntax. Be honest about what it buys: it stops a pupil browsing to the file in Explorer. It does not stop someone who can run arbitrary code in a lab session. That is what AppLocker is for, and AppLocker is not in this script — see below.
+- **`Permissions: admins-full system-full`** is the ACL from arch §3.5 expressed in Inno's syntax (supported permission types are `full`, `modify`, `readexec`, `read`), accompanied by `icacls` invocation to strip inherited permissions from `%ProgramData%`. Be honest about what it buys: it stops a pupil browsing to the file in Explorer. It does not stop someone who can run arbitrary code in a lab session. That is what AppLocker is for, and AppLocker is not in this script — see below.
 - **The Chrome policy task is `unchecked` by default and its description says it affects the whole PC.** It writes to `HKLM` and changes Chrome for every user on the machine, including the teacher's own browsing. A checkbox that quietly does that is not acceptable; the wording is the mitigation.
 - **`isreadme` on the install guide** means a coordinator finishing setup is offered the PDF. G3 — 90 minutes, unaided (PRD §4) — is not reachable without it.
 - **AppLocker is deliberately absent.** Restricting which programs the pupil account may run is what actually protects the store (PRD §8.3, arch §9), but it depends on the school's Windows edition and existing group policy. A checkbox that silently fails on Windows Home would be worse than no checkbox, because the coordinator would believe he was protected. It ships as a documented snippet and a **required** line on the lab checklist.
