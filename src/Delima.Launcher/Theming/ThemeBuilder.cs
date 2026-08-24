@@ -20,7 +20,7 @@ public sealed class ThemeValidationResult
 /// </summary>
 public static class ThemeBuilder
 {
-    // Default SK Seksyen 24 palette per PROMPT.txt and PRD §7.1
+    // Neutral default palette per PROMPT.txt and PRD §7.1
     public const string DefaultPageBackground = "#FFFDF7";
     public const string DefaultSurface = "#FFFFFF";
     public const string DefaultSoftSurface = "#FDF9DC";
@@ -110,7 +110,7 @@ public static class ThemeBuilder
 
     /// <summary>
     /// Builds a ResourceDictionary containing theme brush tokens from the given ThemeInfo.
-    /// Falls back cleanly to SK Seksyen 24 default values if themeInfo is missing or invalid.
+    /// Falls back cleanly to neutral default values if themeInfo is missing or invalid.
     /// </summary>
     public static ResourceDictionary BuildResourceDictionary(ThemeInfo? themeInfo)
     {

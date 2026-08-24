@@ -215,11 +215,7 @@ public sealed partial class MainViewModel : ObservableObject
             credential,
             onSuccess: session => OnInjectionSucceeded(student, session),
             onFailure: result => OnInjectionFailed(student, result),
-            onCancel: () =>
-            {
-                if (LastClass != null) NavigateToCariNama(LastClass);
-                else NavigateToPilihKelas();
-            },
+            onCancel: () => NavigateToPilihKelas(),
             options: routeCOptions
         );
     }
@@ -237,20 +233,12 @@ public sealed partial class MainViewModel : ObservableObject
                 }
 
                 _resetBarWindow = new FloatingResetBarWindow(
-                    student,
-                    session,
-                    onReset: () =>
-                    {
-                        if (Application.Current?.MainWindow != null)
-                        {
-                            Application.Current.MainWindow.WindowState = WindowState.Normal;
-                            Application.Current.MainWindow.Activate();
-                        }
-
-                        if (LastClass != null) NavigateToCariNama(LastClass);
-                        else NavigateToPilihKelas();
-                    },
-                    idleResetSeconds: Config.IdleResetSeconds);
+                    student: student,
+                    session: session,
+                    onReset: () => HandleSessionReset(),
+                    idleResetSeconds: Config.IdleResetSeconds,
+                    school: School,
+                    onConsentRefused: () => HandleConsentRefused(student));
                 _resetBarWindow.Show();
             });
         }
@@ -258,6 +246,48 @@ public sealed partial class MainViewModel : ObservableObject
         {
             // If running in headless test environment without WPF Application instance
         }
+    }
+
+    private void HandleSessionReset()
+    {
+        try
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                if (Application.Current?.MainWindow != null)
+                {
+                    Application.Current.MainWindow.WindowState = WindowState.Normal;
+                    Application.Current.MainWindow.Activate();
+                }
+            });
+        }
+        catch
+        {
+            // Suppress dispatcher errors in tests
+        }
+
+        NavigateToPilihKelas();
+    }
+
+    private void HandleConsentRefused(Student student)
+    {
+        try
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                if (Application.Current?.MainWindow != null)
+                {
+                    Application.Current.MainWindow.WindowState = WindowState.Normal;
+                    Application.Current.MainWindow.Activate();
+                }
+            });
+        }
+        catch
+        {
+            // Suppress dispatcher errors in tests
+        }
+
+        NavigateToPilihKelas();
     }
 
     private void OnInjectionFailed(Student student, RouteCResult result)

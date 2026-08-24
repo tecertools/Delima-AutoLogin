@@ -14,17 +14,18 @@
         WindowStartupLocation="Manual"
         ResizeMode="NoResize">
 
+    <!-- Windows 11 Acrylic-Style Floating Pill -->
     <Border x:Name="MainBorder"
-            Background="{DynamicResource SurfaceBrush}"
+            Background="#FDFDFDEE"
             BorderBrush="{DynamicResource BorderBrush}"
-            BorderThickness="1.5"
-            CornerRadius="18"
-            Margin="4"
-            Effect="{DynamicResource CardShadow}"
-            Padding="12,6"
+            BorderThickness="1"
+            CornerRadius="14"
+            Margin="6"
+            Effect="{DynamicResource PopupShadow}"
+            Padding="12,8"
             MouseLeftButtonDown="OnBarMouseLeftButtonDown"
             Cursor="SizeAll"
-            ToolTip="Tarik untuk alihkan bar ini">
+            ToolTip="Tarik untuk alihkan kedudukan bar ini">
 
         <StackPanel x:Name="BarStackPanel">
             <Grid VerticalAlignment="Center">
@@ -35,57 +36,65 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Pupil Display Information -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,10,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,12,0">
                     <Border x:Name="AvatarBorder"
                             Width="32" Height="32"
                             CornerRadius="16"
                             Background="{DynamicResource SoftSurfaceBrush}"
                             BorderBrush="{DynamicResource PrimaryBrush}"
-                            BorderThickness="2"
+                            BorderThickness="1.5"
+                            ClipToBounds="True"
                             Margin="0,0,8,0">
-                        <TextBlock Text="👤"
-                                   FontSize="15"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
+                        <Grid>
+                            <TextBlock x:Name="AvatarFallbackText"
+                                       Text="🐾"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                            <Image x:Name="AvatarImage"
+                                   Width="32" Height="32"
+                                   Stretch="UniformToFill"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Grid>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock x:Name="PupilNameText"
                                    Text="Nama Murid"
-                                   FontWeight="Bold"
+                                   FontWeight="SemiBold"
                                    FontSize="13"
                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                    TextTrimming="CharacterEllipsis"
                                    MaxWidth="200" />
                         <TextBlock x:Name="SubtitleText"
                                    Text="DELIMa 3.0"
-                                   FontSize="10"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource MutedTextBrush}" />
+                                   FontSize="10.5"
+                                   FontWeight="Normal"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
                     </StackPanel>
                 </StackPanel>
 
-                <!-- Red Logout / Reset Button (Selesai — Murid seterusnya) -->
+                <!-- Red Logout / Reset Button (WinUI 3 Critical Action Button) -->
                 <Button x:Name="LogoutButton"
                         Grid.Column="1"
                         Click="OnLogoutClicked"
                         Background="{DynamicResource AlertBrush}"
                         Foreground="#FFFFFF"
                         BorderThickness="0"
-                        Padding="12,5"
+                        Padding="14,6"
                         Cursor="Hand"
                         VerticalAlignment="Center"
                         Margin="4,0">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
-                            <Setter Property="CornerRadius" Value="10" />
+                            <Setter Property="CornerRadius" Value="6" />
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="🚪 " FontSize="13" VerticalAlignment="Center" Margin="0,0,2,0" />
+                        <TextBlock Text="🚪 " FontSize="12" VerticalAlignment="Center" Margin="0,0,3,0" />
                         <TextBlock x:Name="LogoutText"
                                    Text="Selesai"
                                    FontSize="12"
-                                   FontWeight="ExtraBold"
+                                   FontWeight="SemiBold"
                                    VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -94,8 +103,8 @@
                 <Button x:Name="ToggleCollapseButton"
                         Grid.Column="2"
                         Click="OnToggleCollapseClicked"
-                        Background="{DynamicResource SoftSurfaceBrush}"
-                        Foreground="{DynamicResource MutedTextBrush}"
+                        Background="#F1F3F5"
+                        Foreground="{DynamicResource SecondaryTextBrush}"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
                         Width="28" Height="28"
@@ -110,29 +119,29 @@
                     </Button.Resources>
                     <TextBlock x:Name="ToggleIcon"
                                Text="▲"
-                               FontSize="11"
+                               FontSize="10"
                                FontWeight="Bold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Button>
             </Grid>
 
-            <!-- OAuth Consent Identity Verification Prompt Line (§4.5, PRD §7.4) -->
+            <!-- OAuth Consent Identity Verification Prompt Line -->
             <Border x:Name="ConsentPromptBorder"
-                    Background="#EBF5FB"
+                    Background="#F0F6FF"
                     BorderBrush="#BEE3F8"
                     BorderThickness="1"
-                    CornerRadius="10"
-                    Margin="4,6,4,2"
-                    Padding="10,5"
+                    CornerRadius="6"
+                    Margin="4,8,4,2"
+                    Padding="10,6"
                     Visibility="Visible">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock Text="👉 " FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0" />
                     <TextBlock x:Name="ConsentPromptText"
                                Text="Lihat nama kamu. Kalau betul, tekan butang biru di bawah."
                                FontSize="11.5"
-                               FontWeight="Bold"
-                               Foreground="#1B75BC"
+                               FontWeight="SemiBold"
+                               Foreground="#005FB8"
                                TextWrapping="Wrap"
                                VerticalAlignment="Center" />
                 </StackPanel>

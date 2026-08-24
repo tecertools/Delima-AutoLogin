@@ -14,7 +14,7 @@ public class Step7PackagingTests
     {
         var state = new AdminWizardState
         {
-            School = new SchoolInfo { Code = "SKS24", Name = "SK Seksyen 24", Domain = "moe-dl.edu.my" },
+            School = new SchoolInfo { Code = "BBA1234", Name = "SK Contoh", Domain = "moe-dl.edu.my" },
             AdminPassphrase = "MasterKeyPassphrase2026!"
         };
 
@@ -39,8 +39,8 @@ public class Step7PackagingTests
         var payload = MasterBundle.Unpack(packBytes, "MasterKeyPassphrase2026!");
 
         Assert.Equal(2, payload.SchemaVersion);
-        Assert.Equal("SKS24", payload.School.Code);
-        Assert.Equal("SK Seksyen 24", payload.School.Name);
+        Assert.Equal("BBA1234", payload.School.Code);
+        Assert.Equal("SK Contoh", payload.School.Name);
         Assert.Single(payload.Classes);
         Assert.Equal("2 Cemerlang", payload.Classes[0].Name);
         Assert.Single(payload.Students);

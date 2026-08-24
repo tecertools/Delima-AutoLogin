@@ -24,6 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="..\..\icon.ico" Link="icon.ico" />
+    <Resource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Delima.Core\Delima.Core.csproj" />
     <ProjectReference Include="..\Delima.Import\Delima.Import.csproj" />
   </ItemGroup>

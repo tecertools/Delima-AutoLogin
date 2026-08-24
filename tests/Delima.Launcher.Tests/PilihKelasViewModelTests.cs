@@ -20,7 +20,7 @@ public class PilihKelasViewModelTests
             onClassConfirmed: _ => { }
         );
 
-        Assert.Equal("SK Seksyen 24 Shah Alam", vm.SchoolName);
+        Assert.Equal("Sekolah Kebangsaan Contoh", vm.SchoolName);
         Assert.Equal("Berilmu Berdisiplin", vm.SchoolMotto);
         Assert.True(vm.HasLastClass);
         Assert.Equal("Tahun 2 2 Cemerlang", vm.LastClassDisplayText);

@@ -1,15 +1,15 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Embedded Google Fonts Pack URIs per Technical Architecture §6.5 -->
-    <FontFamily x:Key="NunitoFont">pack://application:,,,/Delima.Launcher;component/Assets/Fonts/#Nunito, Segoe UI, sans-serif</FontFamily>
-    <FontFamily x:Key="Baloo2Font">pack://application:,,,/Delima.Launcher;component/Assets/Fonts/#Baloo 2, Segoe UI, sans-serif</FontFamily>
+    <!-- Windows 11 Fluent Typography System (Segoe UI Variable with Google Fonts Fallback) -->
+    <FontFamily x:Key="NunitoFont">Segoe UI Variable Text, Segoe UI, Nunito, sans-serif</FontFamily>
+    <FontFamily x:Key="Baloo2Font">Segoe UI Variable Display, Segoe UI, Baloo 2, sans-serif</FontFamily>
 
     <!-- Global Base TextBlock Style -->
     <Style TargetType="{x:Type TextBlock}">
         <Setter Property="FontFamily" Value="{StaticResource NunitoFont}" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="15" />
     </Style>
 
     <!-- Global Base Control Style -->
@@ -22,21 +22,21 @@
     <Style x:Key="ScreenHeadingStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="FontFamily" Value="{StaticResource Baloo2Font}" />
         <Setter Property="FontSize" Value="26" />
-        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
     </Style>
 
     <Style x:Key="SectionHeadingStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="FontFamily" Value="{StaticResource Baloo2Font}" />
         <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
     </Style>
 
     <Style x:Key="FieldLabelStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="FontFamily" Value="{StaticResource NunitoFont}" />
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
         <Setter Property="Margin" Value="0,0,0,6" />
     </Style>

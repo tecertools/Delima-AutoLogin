@@ -16,10 +16,10 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="Bina &amp; Sediakan" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Membina school.dlmpack (AES-256-GCM) dan menyediakan PC makmal." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Membina bungkusan 'school.dlmpack' disulitkan (AES-256-GCM) dan menyediakan PC makmal." Style="{StaticResource StepSubHeading}" />
 
             <!-- 3 Provisioning Route Cards -->
-            <Grid Margin="0,0,0,16">
+            <Grid Margin="0,0,0,14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="12"/>
@@ -29,81 +29,81 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- USB Card -->
-                <Border Grid.Column="0" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Padding="14">
+                <Border Grid.Column="0" Padding="14">
                     <Border.Style>
-                        <Style TargetType="Border">
+                        <Style TargetType="Border" BasedOn="{StaticResource SettingsCard}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SelectedRoute}" Value="Usb">
                                     <Setter Property="BorderBrush" Value="{StaticResource PrimaryGreenBrush}" />
-                                    <Setter Property="BorderThickness" Value="2" />
+                                    <Setter Property="Background" Value="#F4FAF6" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
                     <StackPanel>
-                        <TextBlock Text="Pendrive" FontWeight="Bold" FontSize="13.5" Margin="0,0,0,4" />
-                        <TextBlock Text="Pendrive kosong, 1 GB+. Jalankan Provision.exe pada setiap PC." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,10" />
+                        <TextBlock Text="Pendrive USB (Disyorkan)" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                        <TextBlock Text="Simpan pakej lengkap ke pendrive. Klik '1_Sediakan_Makmal.exe' pada setiap PC." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,12" />
                         <Button Content="Pilih Pendrive" Style="{StaticResource SmallPrimaryButton}" Click="OnSelectUsbRouteClick" />
                     </StackPanel>
                 </Border>
 
                 <!-- Network Share Card -->
-                <Border Grid.Column="2" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Padding="14">
+                <Border Grid.Column="2" Padding="14">
                     <Border.Style>
-                        <Style TargetType="Border">
+                        <Style TargetType="Border" BasedOn="{StaticResource SettingsCard}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SelectedRoute}" Value="Network">
                                     <Setter Property="BorderBrush" Value="{StaticResource PrimaryGreenBrush}" />
-                                    <Setter Property="BorderThickness" Value="2" />
+                                    <Setter Property="Background" Value="#F4FAF6" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
                     <StackPanel>
-                        <TextBlock Text="Rangkaian" FontWeight="Bold" FontSize="13.5" Margin="0,0,0,4" />
-                        <TextBlock Text="Laluan UNC boleh dicapai daripada setiap PC makmal." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,10" />
+                        <TextBlock Text="Rangkaian Tempatan" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                        <TextBlock Text="Laluan UNC perkongsian rangkaian yang boleh dicapai oleh PC makmal." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,12" />
                         <Button Content="Pilih Rangkaian" Style="{StaticResource SmallPrimaryButton}" Click="OnSelectNetworkRouteClick" />
                     </StackPanel>
                 </Border>
 
                 <!-- Scripted Card -->
-                <Border Grid.Column="4" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="#FFFFFF" Padding="14">
+                <Border Grid.Column="4" Padding="14">
                     <Border.Style>
-                        <Style TargetType="Border">
+                        <Style TargetType="Border" BasedOn="{StaticResource SettingsCard}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SelectedRoute}" Value="Script">
                                     <Setter Property="BorderBrush" Value="{StaticResource PrimaryGreenBrush}" />
-                                    <Setter Property="BorderThickness" Value="2" />
+                                    <Setter Property="Background" Value="#F4FAF6" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
                     <StackPanel>
-                        <TextBlock Text="Skrip" FontWeight="Bold" FontSize="13.5" Margin="0,0,0,4" />
-                        <TextBlock Text="Skrip PowerShell untuk PDQ/GPO merentasi makmal." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,10" />
+                        <TextBlock Text="Skrip Automasi" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                        <TextBlock Text="Skrip PowerShell untuk edaran PDQ, GPO atau RMM seluruh makmal." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,12" />
                         <Button Content="Pilih Skrip" Style="{StaticResource SmallPrimaryButton}" Click="OnSelectScriptRouteClick" />
                     </StackPanel>
                 </Border>
             </Grid>
 
-            <!-- Route Sub-Panels -->
+            <!-- Route Details Sub-Panels -->
             <!-- Sub-Panel USB -->
-            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="{StaticResource StripeBgBrush}" Padding="14" Margin="0,0,0,16"
+            <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,14"
                     Visibility="{Binding SelectedRoute, Converter={StaticResource EqToVisConv}, ConverterParameter=Usb}">
                 <StackPanel>
-                    <TextBlock Text="Penyediaan Melalui Pendrive USB" FontWeight="Bold" Margin="0,0,0,4" />
-                    <TextBlock Text="Pilih lokasi fail untuk menyimpan bungkusan 'school.dlmpack'." FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,10" />
-                    <Button Content="Bina &amp; Simpan school.dlmpack…" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnSaveBundleFileClick" />
+                    <TextBlock Text="Penyediaan Lengkap Melalui Pendrive USB" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="Menjana bungkusan sekolah serta menyalin aplikasi persediaan '1_Sediakan_Makmal.exe' ke pendrive anda." FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,12" />
+                    <Button Content="📁 Bina &amp; Simpan Pakej ke Pendrive…" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnSaveBundleFileClick" />
                 </StackPanel>
             </Border>
 
             <!-- Sub-Panel Network -->
-            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="{StaticResource StripeBgBrush}" Padding="14" Margin="0,0,0,16"
+            <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,14"
                     Visibility="{Binding SelectedRoute, Converter={StaticResource EqToVisConv}, ConverterParameter=Network}">
                 <StackPanel>
-                    <TextBlock Text="Penyediaan Melalui Perkongsian Rangkaian (UNC)" FontWeight="Bold" Margin="0,0,0,4" />
+                    <TextBlock Text="Penyediaan Melalui Perkongsian Rangkaian (UNC)" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
                     <TextBlock Text="Masukkan laluan folder rangkaian yang boleh dicapai oleh PC makmal:" FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8" />
-                    <Grid Margin="0,0,0,10">
+                    <Grid Margin="0,0,0,6">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="10"/>
@@ -116,23 +116,23 @@
             </Border>
 
             <!-- Sub-Panel Script -->
-            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Background="{StaticResource StripeBgBrush}" Padding="14" Margin="0,0,0,16"
+            <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,14"
                     Visibility="{Binding SelectedRoute, Converter={StaticResource EqToVisConv}, ConverterParameter=Script}">
                 <StackPanel>
-                    <TextBlock Text="Skrip Automasi PowerShell (PDQ / GPO / RMM)" FontWeight="Bold" Margin="0,0,0,4" />
+                    <TextBlock Text="Skrip Automasi PowerShell (PDQ / GPO / RMM)" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
                     <TextBlock Text="Kata laluan pentadbir ditanya secara interaktif dalam memori dan tidak disimpan di dalam fail skrip." FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8" />
                     <TextBox Text="{Binding PowerShellScript}" Height="120" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" Style="{StaticResource MonoTextBox}" Margin="0,0,0,10" />
-                    <Button Content="Salin Skrip ke Papan Keratan" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnCopyScriptClick" />
+                    <Button Content="📋 Salin Skrip ke Papan Keratan" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnCopyScriptClick" />
                 </StackPanel>
             </Border>
 
-            <!-- Status Banner -->
-            <Border Background="#E5F2EA" BorderBrush="#B2D8C0" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,16"
+            <!-- WinUI 3 Status InfoBar -->
+            <Border Style="{StaticResource InfoBarSuccess}" Margin="0,0,0,14"
                     Visibility="{Binding StatusMessage, Converter={StaticResource NullOrEmptyToVisConv}}">
-                <TextBlock Text="{Binding StatusMessage}" FontWeight="Bold" Foreground="{StaticResource PrimaryGreenBrush}" />
+                <TextBlock Text="{Binding StatusMessage}" FontWeight="SemiBold" Foreground="{StaticResource SuccessTextBrush}" />
             </Border>
 
-            <!-- Lab Checklist Preview -->
+            <!-- Lab Checklist DataGrid -->
             <StackPanel Margin="0,0,0,10">
                 <Grid Margin="0,0,0,6">
                     <Grid.ColumnDefinitions>
@@ -143,15 +143,34 @@
                     <Button Grid.Column="1" Content="Eksport Senarai Semak (.csv)" Style="{StaticResource SmallButton}" Click="OnExportChecklistClick" />
                 </Grid>
 
-                <DataGrid ItemsSource="{Binding LabChecklist}" MaxHeight="220" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="NAMA PC" Binding="{Binding PcName}" Width="150" ElementStyle="{StaticResource MonoText}" />
-                        <DataGridTextColumn Header="DISEDIAKAN" Binding="{Binding IsProvisioned, StringFormat='{}{0}'}" Width="120" />
-                        <DataGridTextColumn Header="VERSI" Binding="{Binding Version}" Width="90" ElementStyle="{StaticResource MonoText}" />
-                        <DataGridTextColumn Header="TARIKH SIMPAN" Binding="{Binding StoreDate}" Width="*" ElementStyle="{StaticResource MonoText}" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" ClipToBounds="True">
+                    <DataGrid ItemsSource="{Binding LabChecklist}" MaxHeight="220" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="NAMA PC" Binding="{Binding PcName}" Width="160" ElementStyle="{StaticResource MonoText}" />
+                            <DataGridTextColumn Header="DISEDIAKAN" Binding="{Binding IsProvisioned, StringFormat='{}{0}'}" Width="130" />
+                            <DataGridTextColumn Header="VERSI" Binding="{Binding Version}" Width="95" ElementStyle="{StaticResource MonoText}" />
+                            <DataGridTextColumn Header="TARIKH SIMPAN" Binding="{Binding StoreDate}" Width="*" ElementStyle="{StaticResource MonoText}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
             </StackPanel>
+
+            <!-- Optional Support Card -->
+            <Border Style="{StaticResource SettingsCard}" Margin="0,6,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="☕ Sokong Pembangunan DELIMa Smart Launcher" FontWeight="SemiBold" FontSize="13" />
+                        <TextBlock Text="Perisian ini percuma untuk semua sekolah. Anda boleh menyumbang secara sukarela kepada pembangun." Foreground="{StaticResource Ink2Brush}" FontSize="12" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Kod QR Sumbangan" Style="{StaticResource SmallButton}"
+                            Command="{Binding DataContext.OpenDonationModalCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

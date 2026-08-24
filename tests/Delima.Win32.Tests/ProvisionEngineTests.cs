@@ -33,7 +33,7 @@ public class ProvisionEngineTests : IDisposable
         }
     }
 
-    private static MasterBundlePayload CreateSamplePayload(string schoolCode = "SKS24", int pupilCount = 5)
+    private static MasterBundlePayload CreateSamplePayload(string schoolCode = "BBA1234", int pupilCount = 5)
     {
         var payload = new MasterBundlePayload
         {
@@ -41,7 +41,7 @@ public class ProvisionEngineTests : IDisposable
             School = new SchoolInfo
             {
                 Code = schoolCode,
-                Name = "Sekolah Kebangsaan Seksyen 24",
+                Name = "Sekolah Kebangsaan Contoh",
                 Motto = "Berilmu Berbakti",
                 Domain = "moe-dl.edu.my"
             },
@@ -120,7 +120,7 @@ public class ProvisionEngineTests : IDisposable
         // Assert
         Assert.True(result.Success);
         Assert.Equal(0, result.ExitCode);
-        Assert.Equal("SKS24", result.SchoolCode);
+        Assert.Equal("BBA1234", result.SchoolCode);
         Assert.Equal(5, result.StudentCount);
         Assert.NotNull(result.DeviceId);
 
@@ -133,7 +133,7 @@ public class ProvisionEngineTests : IDisposable
         // Verify DPAPI store is openable and valid
         using var store = DpapiCredentialStore.Open(targetDir);
         Assert.Equal(5, store.StudentCount);
-        Assert.Equal("SKS24", store.SchoolCode);
+        Assert.Equal("BBA1234", store.SchoolCode);
         Assert.True(store.HasCredential("s_0001"));
 
         using var cred = store.OpenCredential("s_0001");
@@ -360,7 +360,7 @@ public class ProvisionEngineTests : IDisposable
         string[] lines = File.ReadAllLines(checklistPath);
         Assert.Equal(2, lines.Length); // Header + 1 record
         Assert.Contains("Timestamp,PC_Name,Device_ID,School_Code,Software_Version,Store_Date,Status", lines[0]);
-        Assert.Contains("SKS24", lines[1]);
+        Assert.Contains("BBA1234", lines[1]);
         Assert.Contains("SUCCESS", lines[1]);
 
         // Run 2 (second run appends another row, does not duplicate header)
@@ -452,5 +452,46 @@ public class ProvisionEngineTests : IDisposable
 
         var helpOptions = ProvisionOptions.Parse(["-h"]);
         Assert.True(helpOptions.ShowHelp);
+    }
+
+    [Fact]
+    public void ProvisionOptions_Parsing_StreamlinedFlags()
+    {
+        string[] args = ["--kiosk", "--no-install", "--no-shortcut", "--no-policy", "--install-dir", @"D:\CustomApp"];
+        var options = ProvisionOptions.Parse(args);
+
+        Assert.True(options.EnableKioskStartup);
+        Assert.False(options.InstallLauncher);
+        Assert.False(options.CreateDesktopShortcut);
+        Assert.False(options.ApplyBrowserPolicies);
+        Assert.Equal(@"D:\CustomApp", options.InstallDestinationPath);
+    }
+
+    [Fact]
+    public void SetupLauncherAndShortcuts_CopiesLauncherToDestination()
+    {
+        string tempSourceDir = Path.Combine(_testDirectory, "SourceDir");
+        string tempDestDir = Path.Combine(_testDirectory, "DestDir");
+        Directory.CreateDirectory(tempSourceDir);
+
+        string sourceExe = Path.Combine(tempSourceDir, "Delima.Launcher.exe");
+        File.WriteAllText(sourceExe, "dummy-launcher-binary");
+
+        var options = new ProvisionOptions
+        {
+            InstallLauncher = true,
+            LauncherSourcePath = sourceExe,
+            InstallDestinationPath = tempDestDir,
+            CreateDesktopShortcut = false,
+            EnableKioskStartup = false,
+            ApplyBrowserPolicies = false
+        };
+
+        using var outWriter = new StringWriter();
+        string? installedPath = ProvisionEngine.SetupLauncherAndShortcuts(options, null, outWriter);
+
+        Assert.NotNull(installedPath);
+        Assert.True(File.Exists(Path.Combine(tempDestDir, "Delima.Launcher.exe")));
+        Assert.Equal("dummy-launcher-binary", File.ReadAllText(Path.Combine(tempDestDir, "Delima.Launcher.exe")));
     }
 }

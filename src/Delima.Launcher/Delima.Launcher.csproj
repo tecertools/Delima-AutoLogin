@@ -20,6 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="..\..\icon.ico" Link="icon.ico" />
     <Resource Include="Assets\Fonts\*.ttf" />
     <None Include="Assets\Fonts\*.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

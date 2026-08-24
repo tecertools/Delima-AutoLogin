@@ -6,7 +6,7 @@
              xmlns:vm="clr-namespace:Delima.Admin.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="700">
-    <Grid Margin="0,0,0,10">
+    <Grid Margin="0,0,0,6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -15,37 +15,40 @@
 
         <StackPanel Grid.Row="0">
             <TextBlock Text="Perakuan Tanggungjawab Sekolah" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Sila baca makluman dasar ini sebelum memulakan wizard persediaan kali pertama." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Sila baca makluman dasar ini sebelum memulakan persediaan sistem kali pertama." Style="{StaticResource StepSubHeading}" />
         </StackPanel>
 
-        <Border Grid.Row="1" Background="{StaticResource StripeBgBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+        <!-- Document Viewer Container (Windows 11 Surface Layer) -->
+        <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="20">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Background="{StaticResource AmberBgBrush}" BorderBrush="#EAD7B0" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,0,16">
+                    <!-- WinUI 3 Warning Banner -->
+                    <Border Style="{StaticResource InfoBarWarning}">
                         <StackPanel>
-                            <TextBlock Text="Makluman Penting &amp; Tanggungjawab Dasar (T0.1)" FontWeight="Bold" Foreground="{StaticResource AmberTextBrush}" Margin="0,0,0,6" />
-                            <TextBlock Text="Perisian ini dibangunkan untuk membantu operasi makmal komputer sekolah, namun pengendalian data murid tertakluk kepada ketetapan pentadbiran sekolah." TextWrapping="Wrap" Foreground="{StaticResource AmberTextBrush}" FontSize="12.5" />
+                            <TextBlock Text="⚠️  Makluman Penting &amp; Tanggungjawab Dasar (T0.1)" FontWeight="SemiBold" Foreground="{StaticResource AmberTextBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="Perisian ini dibangunkan untuk melancarkan operasi makmal komputer sekolah. Pengendalian data akaun murid tertakluk kepada pengesahan dan ketetapan pentadbiran sekolah." TextWrapping="Wrap" Foreground="{StaticResource AmberTextBrush}" FontSize="12.5" />
                         </StackPanel>
                     </Border>
 
-                    <TextBlock Text="1. Apa yang disimpan." FontWeight="Bold" Margin="0,0,0,4" />
-                    <TextBlock Text="Perisian ini menyimpan kata laluan akaun DELIMa murid pada komputer sekolah anda. Kata laluan tersebut disulitkan dan disimpan pada komputer makmal berkenaan sahaja. Tiada salinan dihantar ke mana-mana pelayan luar, dan pembangun perisian ini tidak menerima sebarang data." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,14" />
+                    <TextBlock Text="1. Apa yang disimpan." FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="Perisian ini menyimpan kata laluan akaun DELIMa murid pada komputer sekolah anda. Kata laluan tersebut disulitkan dengan piawaian keselamatan Windows DPAPI dan disimpan pada komputer makmal tempatan sahaja. Tiada sebarang data dihantar ke pelayan luar, dan pembangun tidak menerima maklumat anda." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,16" LineHeight="20" />
 
-                    <TextBlock Text="2. Tiada pendirian rasmi diperoleh." FontWeight="Bold" Margin="0,0,0,4" />
-                    <TextBlock Text="Setakat ini, tiada pendirian bertulis diperoleh daripada Kementerian Pendidikan Malaysia (KPM) atau Bahagian Sumber dan Teknologi Pendidikan (BSTP) mengenai amalan menyimpan kata laluan murid dan mengisinya semula secara automatik. Ini bermakna amalan tersebut tidak pernah disahkan, dan tidak pernah dilarang, oleh mana-mana pihak berkuasa." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,14" />
+                    <TextBlock Text="2. Tiada pendirian rasmi diperoleh." FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="Setakat ini, tiada pendirian bertulis diperoleh daripada Kementerian Pendidikan Malaysia (KPM) atau Bahagian Sumber dan Teknologi Pendidikan (BSTP) mengenai amalan menyimpan kata laluan murid dan mengisinya semula secara automatik. Ini bermakna amalan tersebut tidak pernah disahkan, dan tidak pernah dilarang, oleh mana-mana pihak berkuasa." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,16" LineHeight="20" />
 
-                    <TextBlock Text="3. Tanggungjawab sekolah." FontWeight="Bold" Margin="0,0,0,4" />
-                    <TextBlock Text="Sekolah yang memasang perisian ini bertanggungjawab sepenuhnya ke atas kata laluan murid yang disimpan — termasuk keputusan untuk menggunakannya, cara ia dilindungi, dan pematuhan terhadap mana-mana dasar atau perundangan yang terpakai. Tanggungjawab untuk menilai amalan ini dan mendapatkan kelulusan daripada pihak berkuasa yang berkenaan terletak pada pihak sekolah, bukan pada pembangun perisian." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,14" />
+                    <TextBlock Text="3. Tanggungjawab sekolah." FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="Sekolah yang memasang perisian ini bertanggungjawab sepenuhnya ke atas kata laluan murid yang disimpan — termasuk keputusan untuk menggunakannya, kawalan akses fizikal ke makmal, dan pematuhan dasar yang terpakai." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,16" LineHeight="20" />
 
-                    <TextBlock Text="4. Tanpa jaminan." FontWeight="Bold" Margin="0,0,0,4" />
-                    <TextBlock Text="Perisian ini diberikan secara percuma dan tanpa sebarang jaminan." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,14" />
+                    <TextBlock Text="4. Tanpa jaminan." FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                    <TextBlock Text="Perisian ini diberikan sebagai perisian sumber terbuka secara percuma dan tanpa sebarang jaminan tersirat." TextWrapping="Wrap" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,8" LineHeight="20" />
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
-        <Border Grid.Row="2" Background="{StaticResource AmberBgBrush}" BorderBrush="#EAD7B0" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,16,0,0">
-            <CheckBox IsChecked="{Binding HasReadNotice, Mode=TwoWay}" VerticalContentAlignment="Center">
-                <TextBlock Text="Saya faham dan menerima tanggungjawab ini bagi pihak sekolah." FontWeight="SemiBold" Foreground="{StaticResource AmberTextBrush}" FontSize="12.5" Margin="6,0,0,0" />
+        <!-- Acceptance Checkbox Bar (SettingsCard Style) -->
+        <Border Grid.Row="2" Background="#F8F9FA" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,14,0,0">
+            <CheckBox IsChecked="{Binding HasReadNotice, Mode=TwoWay}" VerticalContentAlignment="Center" Cursor="Hand">
+                <TextBlock Text="Saya faham dan menerima perakuan tanggungjawab ini bagi pihak sekolah." FontWeight="SemiBold" Foreground="{StaticResource InkBrush}" FontSize="13" Margin="8,0,0,0" />
             </CheckBox>
         </Border>
     </Grid>

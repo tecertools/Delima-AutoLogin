@@ -316,6 +316,109 @@ public class LauncherFlowTests
         Assert.Equal(student, sedangVm.Student);
     }
 
+    [Fact]
+    public void MainViewModel_SedangMasukCancel_NavigatesToPilihKelas()
+    {
+        var mainVm = new MainViewModel();
+        var student = mainVm.Students[0];
+        using var cred = new SecurePasswordBuffer("Test1234!"u8);
+
+        mainVm.NavigateToSedangMasuk(student, cred);
+        var sedangVm = (SedangMasukViewModel)mainVm.CurrentView!;
+
+        // Pupil clicks Cancel during injection / login
+        sedangVm.CancelCommand.Execute(null);
+
+        // Destination must be PilihKelasViewModel (Skrin 1)
+        Assert.IsType<PilihKelasViewModel>(mainVm.CurrentView);
+    }
+
+    [Fact]
+    public void FloatingResetBar_ConsentRefusal_WritesAuditLog_And_NavigatesToPilihKelas()
+    {
+        string testAuditDir = Path.Combine(Path.GetTempPath(), "ResetBarAuditTest_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testAuditDir);
+
+        try
+        {
+            RunInSta(() =>
+            {
+                var mainVm = new MainViewModel();
+                var student = mainVm.Students[0];
+                bool consentRefusedCalled = false;
+
+                var resetBar = new Views.FloatingResetBarWindow(
+                    student: student,
+                    session: null,
+                    onReset: () => { },
+                    school: mainVm.School,
+                    onConsentRefused: () => consentRefusedCalled = true,
+                    auditDirectory: testAuditDir);
+
+                // Pupil presses Cancel on consent screen (or clicks Logout before destination is reached)
+                Assert.False(resetBar.DestinationReached);
+                resetBar.Close();
+
+                Assert.True(consentRefusedCalled);
+            });
+
+            // Audit log must have recorded consent_refused
+            string logPath = Delima.Core.Audit.AuditLogger.GetAuditLogFilePath(DateTimeOffset.UtcNow, testAuditDir);
+            Assert.True(File.Exists(logPath));
+            string logContent = File.ReadAllText(logPath);
+            Assert.Contains("\"event\":\"consent_refused\"", logContent);
+            Assert.Contains("\"outcome\":\"REFUSED\"", logContent);
+            Assert.Contains("\"outcome_code\":\"G2_CONSENT_REFUSED\"", logContent);
+        }
+        finally
+        {
+            if (Directory.Exists(testAuditDir))
+            {
+                try { Directory.Delete(testAuditDir, recursive: true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void MainWindow_KioskMode_PreventsCloseUnlessForceClosed()
+    {
+        RunInSta(() =>
+        {
+            var kioskWindow = new MainWindow(isKiosk: true);
+            Assert.True(kioskWindow.IsKiosk);
+
+            // Attempt normal close
+            kioskWindow.Close();
+
+            // ForceClose allows clean exit
+            kioskWindow.ForceClose();
+        });
+    }
+
+    private static void RunInSta(Action action)
+    {
+        Exception? ex = null;
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+        });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join();
+
+        if (ex != null)
+        {
+            throw new AggregateException("STA thread execution failed", ex);
+        }
+    }
+
     private sealed class FakeCredentialStore(bool hasCredential) : ICredentialStore
     {
         public ushort SchemaVersion => 2;

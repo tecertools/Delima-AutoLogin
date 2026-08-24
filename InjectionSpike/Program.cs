@@ -42,7 +42,9 @@ internal static class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        var mode = args.FirstOrDefault()?.ToLowerInvariant() ?? "help";
+        var isHelp = args.Length == 0 || args.Any(a => string.Equals(a, "help", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "-h", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "--help", StringComparison.OrdinalIgnoreCase));
+        var explicitMode = args.FirstOrDefault(a => !a.StartsWith("-", StringComparison.Ordinal))?.ToLowerInvariant();
+        var mode = isHelp ? "help" : (explicitMode ?? "uia");
         var runs = ParseIntArg(args, "--runs", 50);
         var method = ParseStringArg(args, "--method", "sendinput").ToLowerInvariant();
         var settleMs = ParseIntArg(args, "--settle", 400);
@@ -52,13 +54,9 @@ internal static class Program
 
         var defaultUrl = mode == "uia" ? DefaultUiaUrl : DefaultTimingUrl;
         var url = ParseStringArg(args, "--url", defaultUrl);
+        var browser = ParseStringArg(args, "--browser", "chrome").ToLowerInvariant();
 
-        // Guard against exactly the mistake that produced a mislabelled run in
-        // practice: --method sendkets (typo) silently fell through the old
-        // `if (method == "sendkeys") ... else sendinput` check and ran
-        // SendInput under a filename that read as the SendKeys control. The
-        // whole point of Mode A is a clean two-way comparison; a third,
-        // accidental method that nothing warns about defeats it silently.
+        // Guard against invalid method in Mode A
         if (mode == "fidelity" && method != "sendkeys" && method != "sendinput")
         {
             Console.Error.WriteLine($"FATAL: --method \"{method}\" is neither \"sendkeys\" nor \"sendinput\".");
@@ -67,14 +65,21 @@ internal static class Program
             return 2;
         }
 
-        var chromePath = ChromeSession.ResolveChromePath();
-        if (chromePath is null)
+        // Validate browser switch
+        if (browser != "chrome" && browser != "edge")
         {
-            Console.Error.WriteLine("FATAL: chrome.exe not found via registry or well-known paths.");
-            Console.Error.WriteLine("       This is itself a finding — the PRD hardcodes one path.");
+            Console.Error.WriteLine($"FATAL: --browser \"{browser}\" is neither \"chrome\" nor \"edge\".");
             return 2;
         }
-        Console.WriteLine($"Chrome: {chromePath}");
+
+        var resolved = BrowserSession.ResolveBrowser(browser);
+        if (resolved is null || !File.Exists(resolved.Value.Path))
+        {
+            Console.Error.WriteLine($"FATAL: {browser} executable not found via registry or well-known paths.");
+            return 2;
+        }
+        var (browserKind, browserPath) = resolved.Value;
+        Console.WriteLine($"Browser ({browserKind}): {browserPath}");
 
         // A run started after any interrupted/crashed earlier attempt can find
         // a leftover "SPIKE:*" window still open. WaitForForegroundWindow would
@@ -92,9 +97,9 @@ internal static class Program
 
         return mode switch
         {
-            "fidelity" => RunFidelity(chromePath, runs, method, settleMs, charDelayMs),
-            "timing"   => RunTiming(chromePath, runs, url, hint),
-            "uia"      => RunUia(chromePath, runs, url, noAccessibility),
+            "fidelity" => RunFidelity(browserPath, runs, method, settleMs, charDelayMs),
+            "timing"   => RunTiming(browserPath, runs, url, hint),
+            "uia"      => RunUia(browser, browserPath, browserKind, runs, url, noAccessibility),
             _          => PrintHelp()
         };
     }
@@ -279,24 +284,24 @@ internal static class Program
 
     // ------------------------------------------------------------------
     // Mode C — UI Automation Verification Probe (T0.4)
-    // Purely observational: an operator drives Chrome by hand; the probe polls
+    // Purely observational: an operator drives Chrome / Edge by hand; the probe polls
     // every 100 ms and records focus_resolvable and is_password properties.
     // Never automates sign-in or types credentials.
     // ------------------------------------------------------------------
-    private static int RunUia(string chromePath, int runs, string url, bool noAccessibility)
+    private static int RunUia(string browser, string browserPath, BrowserKind browserKind, int runs, string url, bool noAccessibility)
     {
-        Console.WriteLine($"MODE C — uia (T0.4 probe)   runs={runs}   force-accessibility={!noAccessibility}");
+        Console.WriteLine($"MODE C — uia (T0.4 probe)   browser={browser}   runs={runs}   force-accessibility={!noAccessibility}");
         Console.WriteLine($"URL: {url}");
         Console.WriteLine();
         Console.WriteLine("OPERATOR INSTRUCTIONS:");
-        Console.WriteLine("  1. Probe launches Chrome at the entry URL.");
+        Console.WriteLine($"  1. Probe launches {browser} at the entry URL.");
         Console.WriteLine("  2. Click the sign-in button.");
         Console.WriteLine("  3. Wait on identifier page (2s) -> Type your real email -> Press Enter.");
         Console.WriteLine("  4. Wait on password page (2s). DO NOT TYPE A PASSWORD.");
-        Console.WriteLine("  5. Close the Chrome window. Probe will log the run and relaunch.");
+        Console.WriteLine($"  5. Close the {browser} window. Probe will log the run and relaunch.");
         Console.WriteLine(new string('-', 78));
 
-        var csvPath = ResolveSpikeResultsPath($"uia_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+        var csvPath = ResolveSpikeResultsPath($"uia_{browser}_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
         var directory = Path.GetDirectoryName(csvPath);
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
@@ -304,17 +309,18 @@ internal static class Program
         }
 
         using var writer = new StreamWriter(csvPath, false, Encoding.UTF8);
-        writer.WriteLine("run,elapsed_ms,window_title,focus_resolvable,is_password");
+        writer.WriteLine("run,browser,elapsed_ms,window_title,focus_resolvable,is_password");
         writer.Flush();
 
         var totalSamples = 0;
         var totalResolvedSamples = 0;
         var totalPasswordTrueSamples = 0;
+        var titleCounts = new Dictionary<string, int>(StringComparer.Ordinal);
 
         for (var run = 1; run <= runs; run++)
         {
-            Console.WriteLine($"[{run}/{runs}] Launching Chrome...");
-            using var session = ChromeSession.Launch(chromePath, url, forceRendererAccessibility: !noAccessibility);
+            Console.WriteLine($"[{run}/{runs}] Launching {browser} ({browserKind})...");
+            using var session = BrowserSession.Launch(browserPath, url, forceRendererAccessibility: !noAccessibility, browserKind: browserKind);
             var sw = Stopwatch.StartNew();
             var runSamples = 0;
 
@@ -329,13 +335,18 @@ internal static class Program
                     : "";
 
                 var escapedTitle = title.Replace("\"", "\"\"");
-                writer.WriteLine($"{run},{elapsedMs},\"{escapedTitle}\",{(focusResolvable ? "true" : "false")},{isPasswordStr}");
+                writer.WriteLine($"{run},{browser},{elapsedMs},\"{escapedTitle}\",{(focusResolvable ? "true" : "false")},{isPasswordStr}");
                 writer.Flush();
 
                 runSamples++;
                 totalSamples++;
                 if (focusResolvable) totalResolvedSamples++;
                 if (focusResolvable && isPassword == true) totalPasswordTrueSamples++;
+
+                if (!string.IsNullOrEmpty(title))
+                {
+                    titleCounts[title] = titleCounts.GetValueOrDefault(title) + 1;
+                }
 
                 Thread.Sleep(100);
             }
@@ -348,24 +359,53 @@ internal static class Program
             }
         }
 
-        Console.WriteLine();
-        Console.WriteLine("==============================================================================");
-        Console.WriteLine("T0.4 UIA PROBE BATCH COMPLETE");
-        Console.WriteLine("==============================================================================");
-        Console.WriteLine($"Total runs completed    : {runs}");
-        Console.WriteLine($"Total samples recorded  : {totalSamples}");
-        Console.WriteLine($"Focus resolvable samples: {totalResolvedSamples}");
-        Console.WriteLine($"IsPassword=true samples : {totalPasswordTrueSamples}");
-        Console.WriteLine($"CSV Output              : {csvPath}");
-        Console.WriteLine();
-        Console.WriteLine("Refer to Visual_SSO/T0.4_UIA_Verification.md Part 3 to evaluate results:");
-        Console.WriteLine("  Q1. Focus resolvable on identifier page (>= 49/50)");
-        Console.WriteLine("  Q2. IsPassword == false on identifier page (50/50 - no false positives)");
-        Console.WriteLine("  Q3. Focus resolvable on password page (>= 49/50)");
-        Console.WriteLine("  Q4. IsPassword == true on password page (50/50 - no tolerance)");
-        Console.WriteLine("  Q5. Settle latency from page load to property readable (p50/p95)");
-        Console.WriteLine("  Q6. Accessibility flag overhead (compare with --no-accessibility)");
-        Console.WriteLine("==============================================================================");
+        var sb = new StringBuilder();
+        sb.AppendLine();
+        sb.AppendLine("==============================================================================");
+        sb.AppendLine($"T0.4 UIA PROBE BATCH COMPLETE — {browser.ToUpperInvariant()}");
+        sb.AppendLine("==============================================================================");
+        sb.AppendLine($"Browser                 : {browser} ({browserKind}) at {browserPath}");
+        sb.AppendLine($"Total runs completed    : {runs}");
+        sb.AppendLine($"Total samples recorded  : {totalSamples}");
+        sb.AppendLine($"Focus resolvable samples: {totalResolvedSamples}");
+        sb.AppendLine($"IsPassword=true samples : {totalPasswordTrueSamples}");
+        sb.AppendLine($"CSV Output              : {csvPath}");
+        sb.AppendLine();
+        sb.AppendLine($"DISTINCT WINDOW TITLES ({browser}):");
+        if (titleCounts.Count == 0)
+        {
+            sb.AppendLine("  (no titles observed)");
+        }
+        else
+        {
+            foreach (var kvp in titleCounts.OrderByDescending(x => x.Value))
+            {
+                sb.AppendLine($"  {kvp.Value,6} samples : \"{kvp.Key}\"");
+            }
+        }
+        sb.AppendLine();
+        sb.AppendLine("Refer to Visual_SSO/T0.4_UIA_Verification.md to evaluate results:");
+        sb.AppendLine("  Q1. Focus resolvable on identifier page (>= 49/50)");
+        sb.AppendLine("  Q2. IsPassword == false on identifier page (50/50 - no false positives)");
+        sb.AppendLine("  Q3. Focus resolvable on password page (>= 49/50)");
+        sb.AppendLine("  Q4. IsPassword == true on password page (50/50 - no tolerance)");
+        sb.AppendLine("  Q5. Settle latency from page load to property readable (p50/p95)");
+        sb.AppendLine("  Q6. Accessibility flag overhead (compare with --no-accessibility)");
+        sb.AppendLine("==============================================================================");
+
+        var summaryText = sb.ToString();
+        Console.WriteLine(summaryText);
+
+        var summaryPath = Path.Combine(directory ?? Directory.GetCurrentDirectory(), $"uia_{browser}_{DateTime.Now:yyyyMMdd_HHmmss}_summary.txt");
+        try
+        {
+            File.WriteAllText(summaryPath, summaryText, Encoding.UTF8);
+            Console.WriteLine($"Summary File            : {summaryPath}");
+        }
+        catch
+        {
+            // Non-critical summary file write failure
+        }
 
         return 0;
     }
@@ -484,6 +524,7 @@ internal static class Program
                               Driven manually by operator; no automated keystrokes or stored credentials.
 
             Options
+              --browser B         chrome | edge                 (default chrome)
               --runs N            number of runs                (default 50)
               --method M          sendinput | sendkeys          (default sendinput)
               --settle MS         pause after window ready      (default 400)

@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Admin.Models;
 using Delima.Core.Audit;
 using Delima.Core.Crypto;
+using Delima.Core.Services;
 using Delima.Core.Store;
 
 namespace Delima.Admin.ViewModels;
@@ -104,7 +105,11 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
         foreach (var student in _state.RosterStudents)
         {
             string? pwd = _state.StudentPasswords.TryGetValue(student.Id, out var p) ? p : null;
-            string avatar = _state.StudentAvatars.TryGetValue(student.Id, out var av) && !string.IsNullOrWhiteSpace(av) ? av : "kucing";
+            // Resolve the DiceBear seed: legacy/blank values fall back to student.Id
+            string avatarSeed = DiceBearService.ResolveSeed(
+                _state.StudentAvatars.TryGetValue(student.Id, out var av) ? av : null,
+                student.Id);
+            string avatar = avatarSeed;
 
             PicturePasswordInfo? picPwInfo = null;
             if (_state.StudentPicturePasswords.TryGetValue(student.Id, out var picSeq) && picSeq.Count == 3)
@@ -152,8 +157,124 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
     {
         byte[] bytes = GeneratedBundleBytes ?? BuildMasterBundle();
         File.WriteAllBytes(outputPath, bytes);
-        StatusMessage = $"Bungkusan 'school.dlmpack' berjaya disimpan ke: {outputPath}";
+
+        string? targetDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(targetDir))
+        {
+            CreateTurnkeyDeploymentKit(targetDir);
+        }
+
+        StatusMessage = $"Bungkusan lengkap sedia digunakan di: {targetDir ?? outputPath}\n" +
+                        "Palamkan pendrive pada PC makmal dan klik dua kali pada '1_Sediakan_Makmal.exe'.";
         IsSuccess = true;
+    }
+
+    private static void CreateTurnkeyDeploymentKit(string targetDir)
+    {
+        try
+        {
+            // 1. Locate and copy Delima.Provision.exe as 1_Sediakan_Makmal.exe
+            string? provisionExe = FindFileInSurroundingDirs("Delima.Provision.exe");
+            if (!string.IsNullOrEmpty(provisionExe) && File.Exists(provisionExe))
+            {
+                string destFriendly = Path.Combine(targetDir, "1_Sediakan_Makmal.exe");
+                string destStandard = Path.Combine(targetDir, "Delima.Provision.exe");
+
+                File.Copy(provisionExe, destFriendly, true);
+                if (!File.Exists(destStandard))
+                {
+                    File.Copy(provisionExe, destStandard, true);
+                }
+            }
+
+            // 2. Locate and copy Delima.Launcher.exe
+            string? launcherExe = FindFileInSurroundingDirs("Delima.Launcher.exe");
+            if (!string.IsNullOrEmpty(launcherExe) && File.Exists(launcherExe))
+            {
+                string destLauncher = Path.Combine(targetDir, "Delima.Launcher.exe");
+                File.Copy(launcherExe, destLauncher, true);
+
+                // Copy avatars folder if present
+                string? sourceDir = Path.GetDirectoryName(launcherExe);
+                if (!string.IsNullOrEmpty(sourceDir))
+                {
+                    string sourceAvatars = Path.Combine(sourceDir, "avatars");
+                    string destAvatars = Path.Combine(targetDir, "avatars");
+                    if (Directory.Exists(sourceAvatars) && !string.Equals(Path.GetFullPath(sourceAvatars), Path.GetFullPath(destAvatars), StringComparison.OrdinalIgnoreCase))
+                    {
+                        CopyDirectoryRecursive(sourceAvatars, destAvatars);
+                    }
+                }
+            }
+
+            // 3. Write friendly readme instructions
+            string readmePath = Path.Combine(targetDir, "BACA_SAYA_PANDUAN_MAKMAL.txt");
+            string readmeContent =
+                "=====================================================================\r\n" +
+                "PANDUAN PERSEDIAAN PANTAS PC MAKMAL DELIMa\r\n" +
+                "=====================================================================\r\n\r\n" +
+                "Langkah Penyediaan untuk Guru Penyelaras ICT:\r\n\r\n" +
+                "1. Palamkan pendrive ini pada setiap PC Makmal Komputer.\r\n" +
+                "2. Buka pendrive dan klik dua kali pada fail:\r\n" +
+                "   -> '1_Sediakan_Makmal.exe'\r\n\r\n" +
+                "3. Masukkan Kata Laluan Pentadbir yang telah anda tetapkan.\r\n" +
+                "4. Klik butang besar '🚀 Sediakan Komputer Ini Sekarang'.\r\n\r\n" +
+                "Selesai! Sistem akan memasang aplikasi Pelancar DELIMa,\r\n" +
+                "mencipta pintasan Desktop secara automatik, dan mengunci storan murid.\r\n" +
+                "=====================================================================\r\n";
+            File.WriteAllText(readmePath, readmeContent, Encoding.UTF8);
+        }
+        catch
+        {
+            // Silently continue if companion binaries cannot be copied
+        }
+    }
+
+    private static string? FindFileInSurroundingDirs(string filename)
+    {
+        List<string> candidateDirs =
+        [
+            AppDomain.CurrentDomain.BaseDirectory,
+            Environment.CurrentDirectory,
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "publish", "Provision"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "publish", "Launcher"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Provision"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Launcher")
+        ];
+
+        foreach (var dir in candidateDirs)
+        {
+            if (Directory.Exists(dir))
+            {
+                string fullPath = Path.Combine(dir, filename);
+                if (File.Exists(fullPath))
+                {
+                    return fullPath;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static void CopyDirectoryRecursive(string sourceDir, string destinationDir)
+    {
+        var dir = new DirectoryInfo(sourceDir);
+        if (!dir.Exists) return;
+
+        Directory.CreateDirectory(destinationDir);
+
+        foreach (var file in dir.GetFiles("*", SearchOption.AllDirectories))
+        {
+            string relativePath = Path.GetRelativePath(sourceDir, file.FullName);
+            string destFile = Path.Combine(destinationDir, relativePath);
+            string? destSubDir = Path.GetDirectoryName(destFile);
+            if (!string.IsNullOrEmpty(destSubDir) && !Directory.Exists(destSubDir))
+            {
+                Directory.CreateDirectory(destSubDir);
+            }
+            file.CopyTo(destFile, true);
+        }
     }
 
     public void CopyScriptToClipboard()

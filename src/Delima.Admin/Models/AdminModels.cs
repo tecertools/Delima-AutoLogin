@@ -143,9 +143,9 @@ public sealed class AdminWizardState
 {
     public SchoolInfo School { get; set; } = new()
     {
-        Code = "SKS24",
-        Name = "SK Seksyen 24 Shah Alam",
-        Motto = "Berilmu Berdisiplin",
+        Code = "",
+        Name = "",
+        Motto = "",
         Domain = "moe-dl.edu.my"
     };
 

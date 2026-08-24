@@ -48,6 +48,7 @@ public partial class App : Application
         };
 
         string? storeDir = null;
+        bool isKiosk = false;
         if (e.Args != null)
         {
             for (int i = 0; i < e.Args.Length; i++)
@@ -57,6 +58,11 @@ public partial class App : Application
                 {
                     storeDir = e.Args[i + 1];
                     i++;
+                }
+                else if (string.Equals(e.Args[i], "--kiosk", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(e.Args[i], "-k", StringComparison.OrdinalIgnoreCase))
+                {
+                    isKiosk = true;
                 }
             }
         }
@@ -80,7 +86,7 @@ public partial class App : Application
         ThemeBuilder.ApplyTheme(Resources, customTheme);
 
         var mainVm = new MainViewModel(storeDir);
-        var mainWindow = new MainWindow { DataContext = mainVm };
+        var mainWindow = new MainWindow(isKiosk: isKiosk) { DataContext = mainVm };
         MainWindow = mainWindow;
         mainWindow.Show();
     }

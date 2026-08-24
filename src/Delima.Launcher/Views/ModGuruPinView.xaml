@@ -15,17 +15,18 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
         
+        <!-- WinUI 3 Keypad Button Style -->
         <Style x:Key="KeypadButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="72" />
-            <Setter Property="Height" Value="72" />
-            <Setter Property="Margin" Value="8" />
-            <Setter Property="FontSize" Value="24" />
-            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Width" Value="68" />
+            <Setter Property="Height" Value="58" />
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontFamily" Value="{DynamicResource Baloo2Font}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -34,7 +35,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="36"
+                                CornerRadius="6"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
@@ -45,12 +46,11 @@
                                 <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{DynamicResource PrimaryBrush}" />
-                                <Setter Property="Foreground" Value="#FFFFFF" />
+                                <Setter TargetName="border" Property="Background" Value="#EDEFEA" />
                             </Trigger>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                                <Setter TargetName="border" Property="BorderThickness" Value="3" />
+                                <Setter TargetName="border" Property="BorderThickness" Value="1.5" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.4" />
@@ -62,7 +62,7 @@
         </Style>
 
         <Style x:Key="KeypadActionButtonStyle" TargetType="Button" BasedOn="{StaticResource KeypadButtonStyle}">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13" />
             <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
             <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
         </Style>
@@ -70,19 +70,19 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Header (78px) -->
-            <RowDefinition Height="78" />
+            <!-- Header (64px) -->
+            <RowDefinition Height="64" />
             <!-- Main Content -->
             <RowDefinition Height="*" />
-            <!-- Footer (44px) -->
-            <RowDefinition Height="44" />
+            <!-- Footer (40px) -->
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <!-- TOP BAR -->
+        <!-- TOP BAR (Windows 11 Surface Header) -->
         <Border Grid.Row="0"
                 Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource AlertBrush}"
-                BorderThickness="0,0,0,3"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
                 Padding="32,0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -93,83 +93,83 @@
 
                 <!-- Left: Kembali Button -->
                 <Button Grid.Column="0"
-                        Style="{StaticResource OutlineButtonStyle}"
+                        Style="{StaticResource BackButtonStyle}"
                         Command="{Binding CancelCommand}"
                         TabIndex="20"
                         AutomationProperties.Name="Kembali ke skrin sebelumnya">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="◂ " FontSize="16" FontWeight="Bold" />
-                        <TextBlock Text="Kembali" FontSize="15" FontWeight="Bold" />
+                        <TextBlock Text="← " FontSize="13" FontWeight="Bold" />
+                        <TextBlock Text="Kembali" FontSize="13" FontWeight="SemiBold" />
                     </StackPanel>
                 </Button>
 
                 <!-- Center: Mod Guru Pill -->
                 <Border Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Background="{DynamicResource SecondaryTextBrush}"
-                        CornerRadius="999"
-                        Padding="16,6">
-                    <TextBlock Text="Mod Guru"
-                               Foreground="#FFFFFF"
-                               FontWeight="Bold"
-                               FontSize="14" />
+                        Background="#F1F3F5"
+                        CornerRadius="6"
+                        Padding="16,4">
+                    <TextBlock Text="Mod Kawalan Guru"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               FontWeight="SemiBold"
+                               FontSize="13" />
                 </Border>
 
                 <!-- Right: School Crest -->
                 <Border Grid.Column="2"
-                        Width="46" Height="46"
-                        CornerRadius="12"
-                        Background="{DynamicResource AccentBrush}"
+                        Width="34" Height="34"
+                        CornerRadius="6"
+                        Background="{DynamicResource PrimaryBrush}"
                         AutomationProperties.Name="Lencana Sekolah">
                     <TextBlock Text="{Binding SchoolCode}"
                                FontFamily="{DynamicResource Baloo2Font}"
                                FontWeight="Bold"
-                               FontSize="15"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               FontSize="11"
+                               Foreground="#FFFFFF"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>
             </Grid>
         </Border>
 
-        <!-- MAIN CARD -->
+        <!-- MAIN CARD (Windows 11 Dialog Card) -->
         <ScrollViewer Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <Border Width="460"
+            <Border Width="420"
                     Margin="0,20"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="20"
-                    Padding="36,28"
-                    Effect="{StaticResource CardShadow}">
+                    CornerRadius="8"
+                    Padding="32,24"
+                    Effect="{StaticResource PopupShadow}">
                 <StackPanel HorizontalAlignment="Center">
 
                     <!-- Title -->
                     <TextBlock Text="Masukkan PIN Guru"
                                Style="{DynamicResource ScreenHeadingStyle}"
-                               FontSize="26"
+                               FontSize="22"
                                TextAlignment="Center"
-                               Margin="0,0,0,6" />
+                               Margin="0,0,0,4" />
 
-                    <TextBlock Text="Sila masukkan PIN 4 angka untuk membuka kawalan guru."
+                    <TextBlock Text="Sila masukkan PIN 4 angka untuk membuka panel guru."
                                Style="{DynamicResource HelperTextStyle}"
                                TextAlignment="Center"
                                TextWrapping="Wrap"
-                               Margin="0,0,0,20" />
+                               Margin="0,0,0,18" />
 
                     <!-- PIN DOTS INDICATOR -->
                     <StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
-                                Margin="0,0,0,20"
+                                Margin="0,0,0,18"
                                 AutomationProperties.Name="{Binding PinLength, StringFormat='PIN dimasukkan {0} daripada 4 angka'}">
                         
                         <!-- Dot 1 -->
-                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
-                                BorderThickness="2"
+                        <Border Width="16" Height="16" CornerRadius="8" Margin="8,0"
+                                BorderThickness="1.5"
                                 BorderBrush="{DynamicResource SecondaryTextBrush}">
                             <Border.Style>
                                 <Style TargetType="Border">
@@ -185,8 +185,8 @@
                         </Border>
 
                         <!-- Dot 2 -->
-                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
-                                BorderThickness="2"
+                        <Border Width="16" Height="16" CornerRadius="8" Margin="8,0"
+                                BorderThickness="1.5"
                                 BorderBrush="{DynamicResource SecondaryTextBrush}">
                             <Border.Style>
                                 <Style TargetType="Border">
@@ -202,8 +202,8 @@
                         </Border>
 
                         <!-- Dot 3 -->
-                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
-                                BorderThickness="2"
+                        <Border Width="16" Height="16" CornerRadius="8" Margin="8,0"
+                                BorderThickness="1.5"
                                 BorderBrush="{DynamicResource SecondaryTextBrush}">
                             <Border.Style>
                                 <Style TargetType="Border">
@@ -219,8 +219,8 @@
                         </Border>
 
                         <!-- Dot 4 -->
-                        <Border Width="20" Height="20" CornerRadius="10" Margin="8,0"
-                                BorderThickness="2"
+                        <Border Width="16" Height="16" CornerRadius="8" Margin="8,0"
+                                BorderThickness="1.5"
                                 BorderBrush="{DynamicResource SecondaryTextBrush}">
                             <Border.Style>
                                 <Style TargetType="Border">
@@ -238,38 +238,38 @@
 
                     <!-- ERROR / LOCKOUT BANNER -->
                     <Border Visibility="{Binding IsError, Converter={StaticResource BoolToVisConverter}}"
-                            Background="#FDF0ED"
-                            BorderBrush="{DynamicResource AlertBrush}"
+                            Background="#FDE7E9"
+                            BorderBrush="#ED1B24"
                             BorderThickness="1"
-                            CornerRadius="10"
-                            Padding="12,8"
-                            Margin="0,0,0,14">
+                            CornerRadius="6"
+                            Padding="12,6"
+                            Margin="0,0,0,12">
                         <TextBlock Text="{Binding ErrorMessage}"
-                                   Foreground="{DynamicResource AlertBrush}"
-                                   FontWeight="Bold"
-                                   FontSize="13"
+                                   Foreground="#A80000"
+                                   FontWeight="SemiBold"
+                                   FontSize="12.5"
                                    TextAlignment="Center" />
                     </Border>
 
                     <Border Visibility="{Binding IsLockedOut, Converter={StaticResource BoolToVisConverter}}"
-                            Background="#FDF0ED"
-                            BorderBrush="{DynamicResource AlertBrush}"
+                            Background="#FFF4CE"
+                            BorderBrush="#797673"
                             BorderThickness="1"
-                            CornerRadius="10"
-                            Padding="14,10"
-                            Margin="0,0,0,14">
+                            CornerRadius="6"
+                            Padding="12,8"
+                            Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="{Binding LockoutMessage}"
-                                       Foreground="{DynamicResource AlertBrush}"
-                                       FontWeight="Bold"
-                                       FontSize="13"
+                                       Foreground="#4C4A48"
+                                       FontWeight="SemiBold"
+                                       FontSize="12.5"
                                        TextAlignment="Center"
                                        TextWrapping="Wrap"
                                        Margin="0,0,0,4" />
                             <TextBlock Text="{Binding LockoutTimeRemainingText, StringFormat='Masa baki: {0}'}"
-                                       Foreground="{DynamicResource AlertBrush}"
+                                       Foreground="#4C4A48"
                                        FontWeight="Bold"
-                                       FontSize="16"
+                                       FontSize="14"
                                        TextAlignment="Center" />
                         </StackPanel>
                     </Border>
@@ -277,7 +277,7 @@
                     <!-- KEYPAD (3 COLUMNS x 4 ROWS) -->
                     <UniformGrid Columns="3"
                                  HorizontalAlignment="Center"
-                                 Margin="0,0,0,16">
+                                 Margin="0,0,0,14">
                         <!-- Row 1 -->
                         <Button Style="{StaticResource KeypadButtonStyle}"
                                 Content="1"
@@ -360,17 +360,18 @@
                     <!-- REMAINING ATTEMPTS TEXT -->
                     <TextBlock Text="{Binding AttemptsRemainingText}"
                                Style="{DynamicResource HelperTextStyle}"
+                               FontSize="12"
                                TextAlignment="Center"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,14" />
 
                     <!-- BATAL BUTTON -->
                     <Button Style="{StaticResource OutlineButtonStyle}"
                             Command="{Binding CancelCommand}"
                             Content="Batal"
-                            Height="48"
+                            Height="40"
                             TabIndex="13"
                             HorizontalAlignment="Center"
-                            Padding="32,0"
+                            Padding="28,0"
                             AutomationProperties.Name="Batal dan kembali ke skrin utama" />
                 </StackPanel>
             </Border>
@@ -385,11 +386,16 @@
             <Grid VerticalAlignment="Center">
                 <TextBlock Text="Mod Guru — Kawalan Kiosk"
                            Style="{DynamicResource HelperTextStyle}"
-                           FontSize="13"
+                           FontSize="11.5"
                            HorizontalAlignment="Left" />
+                <TextBlock Text="tecertools Digital Solutions"
+                           FontSize="11"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Opacity="0.65"
+                           HorizontalAlignment="Center" />
                 <TextBlock Text="Kunci automatik selepas 5 percubaan tidak sah"
                            Style="{DynamicResource HelperTextStyle}"
-                           FontSize="13"
+                           FontSize="11.5"
                            HorizontalAlignment="Right" />
             </Grid>
         </Border>

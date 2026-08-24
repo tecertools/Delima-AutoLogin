@@ -6,7 +6,7 @@ using ClassInfo = Delima.Core.Roster.ClassInfo;
 namespace Delima.Launcher.Services;
 
 /// <summary>
-/// Provides synthetic test and development school roster data matching SK Seksyen 24 Shah Alam.
+/// Provides synthetic test and development school roster data.
 /// No real pupil data is used.
 /// </summary>
 public static class SampleDataService
@@ -15,8 +15,8 @@ public static class SampleDataService
     {
         return new School
         {
-            Code = "SKS24",
-            Name = "SK Seksyen 24 Shah Alam",
+            Code = "BBA1234",
+            Name = "Sekolah Kebangsaan Contoh",
             Motto = "Berilmu Berdisiplin",
             Domain = "moe-dl.edu.my"
         };

@@ -62,7 +62,8 @@ public class StepNavigationTests
         Assert.False(wizard.CanGoNext);
         Assert.Contains("Kod Sekolah diperlukan", wizard.BlockedReason);
 
-        wizard.Step1Vm.SchoolCode = "SKS24";
+        wizard.Step1Vm.SchoolCode = "BBA1234";
+        wizard.Step1Vm.SchoolName = "SK Contoh";
         Assert.True(wizard.Step1Vm.CanProceed);
         Assert.True(wizard.CanGoNext);
     }
@@ -70,8 +71,14 @@ public class StepNavigationTests
     [Fact]
     public void Step2_Validation_BlockedUntilPassphraseValidAndAgreed()
     {
-        var state = new AdminWizardState { HasAcknowledgedDisclaimer = true };
+        var state = new AdminWizardState
+        {
+            HasAcknowledgedDisclaimer = true,
+            LastCompletedStep = 1,
+            School = new Delima.Core.Store.SchoolInfo { Code = "TEST01", Name = "SK Ujian" }
+        };
         var wizard = new MainWizardViewModel(state);
+        wizard.NavigateToStep(2);
 
         wizard.Step2Vm.Passphrase = "Short1!";
         wizard.Step2Vm.ConfirmPassphrase = "Short1!";
@@ -79,16 +86,19 @@ public class StepNavigationTests
 
         Assert.False(wizard.Step2Vm.CanProceed);
         Assert.Contains("12 aksara", wizard.Step2Vm.ValidationMessage);
+        Assert.False(wizard.CanGoNext);
 
         wizard.Step2Vm.Passphrase = "ValidPassphrase2026!";
         wizard.Step2Vm.ConfirmPassphrase = "MismatchPassphrase!";
         Assert.False(wizard.Step2Vm.CanProceed);
         Assert.Contains("tidak sepadan", wizard.Step2Vm.ValidationMessage);
+        Assert.False(wizard.CanGoNext);
 
         wizard.Step2Vm.ConfirmPassphrase = "ValidPassphrase2026!";
         wizard.Step2Vm.HasAgreedNoRecovery = false;
         Assert.False(wizard.Step2Vm.CanProceed);
         Assert.Contains("tiada pemulihan", wizard.Step2Vm.ValidationMessage);
+        Assert.False(wizard.CanGoNext);
 
         wizard.Step2Vm.HasAgreedNoRecovery = true;
         Assert.True(wizard.Step2Vm.CanProceed);
@@ -126,6 +136,10 @@ public class StepNavigationTests
         Assert.Equal(1, wizard.CurrentStepIndex);
         Assert.True(state.HasAcknowledgedDisclaimer);
         Assert.Equal("Seterusnya →", wizard.NextButtonText);
+        Assert.False(wizard.CanGoNext);
+
+        wizard.Step1Vm.SchoolCode = "TEST01";
+        wizard.Step1Vm.SchoolName = "SK Ujian";
         Assert.True(wizard.CanGoNext);
     }
 
@@ -137,7 +151,7 @@ public class StepNavigationTests
             HasAcknowledgedDisclaimer = true,
             HasAcknowledgedConsent = false,
             LastCompletedStep = 3,
-            School = new Delima.Core.Store.SchoolInfo { Code = "SKS24" }
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234" }
         };
 
         var wizard = new MainWizardViewModel(state);
@@ -146,14 +160,14 @@ public class StepNavigationTests
         Assert.Equal("Consent", wizard.Step4Vm.ActiveSubView);
         Assert.Equal("Teruskan →", wizard.NextButtonText);
         Assert.False(wizard.CanGoNext);
-        Assert.Contains("SKS24", wizard.BlockedReason);
+        Assert.Contains("BBA1234", wizard.BlockedReason);
 
         // Typing partial / wrong code keeps button disabled
-        wizard.Step4Vm.ConsentTypedCode = "SKS";
+        wizard.Step4Vm.ConsentTypedCode = "BBA";
         Assert.False(wizard.CanGoNext);
 
         // Typing correct code enables button dynamically
-        wizard.Step4Vm.ConsentTypedCode = "SKS24";
+        wizard.Step4Vm.ConsentTypedCode = "BBA1234";
         Assert.True(wizard.CanGoNext);
         Assert.Equal("", wizard.BlockedReason);
 
@@ -238,8 +252,8 @@ public class StepNavigationTests
         // Step 2 -> Kata Laluan Pentadbir
         Assert.Equal(2, wizard.CurrentStepIndex);
         Assert.False(wizard.CanGoNext);
-        wizard.Step2Vm.Passphrase = "admin_delimasks24";
-        wizard.Step2Vm.ConfirmPassphrase = "admin_delimasks24";
+        wizard.Step2Vm.Passphrase = "admin_delima2026!";
+        wizard.Step2Vm.ConfirmPassphrase = "admin_delima2026!";
         wizard.Step2Vm.HasAgreedNoRecovery = true;
         Assert.True(wizard.CanGoNext);
         wizard.GoNext();
@@ -351,5 +365,18 @@ public class StepNavigationTests
         Assert.Equal("Konfigurasi Selesai", messageTitle);
         Assert.Contains("Tahniah", messageText);
         Assert.True(state.IsSetupCompletedOnce);
+    }
+
+    [Fact]
+    public void DonationModal_OpenAndCloseCommands_ToggleState()
+    {
+        var wizard = new MainWizardViewModel();
+        Assert.False(wizard.IsDonationModalOpen);
+
+        wizard.OpenDonationModalCommand.Execute(null);
+        Assert.True(wizard.IsDonationModalOpen);
+
+        wizard.CloseDonationModalCommand.Execute(null);
+        Assert.False(wizard.IsDonationModalOpen);
     }
 }
