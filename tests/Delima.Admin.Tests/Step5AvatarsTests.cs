@@ -100,6 +100,39 @@ public class Step5AvatarsTests
     }
 
     [Fact]
+    public void GenerateAvatarSheetHtml_WhenAllClasses_DividesStudentsByClassAndDoesNotSayAllClassesInClassField()
+    {
+        var state = new AdminWizardState
+        {
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234", Name = "SK SKS24" }
+        };
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_1", FullName = "Ahmad", ClassName = "1 Amanah", EmailLocal = "m-1" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_2", FullName = "Badrul", ClassName = "1 Amanah", EmailLocal = "m-2" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_3", FullName = "Chong", ClassName = "2 Bestari", EmailLocal = "m-3" });
+
+        var vm = new Step5AvatarsViewModel(state);
+        string html = vm.GenerateAvatarSheetHtml("Semua Kelas");
+
+        // Should NOT say "Kelas: <strong>Semua Kelas</strong>"
+        Assert.DoesNotContain("Kelas: <strong>Semua Kelas</strong>", html);
+
+        // Should divide by class
+        Assert.Contains("Kelas: <strong>1 Amanah</strong>", html);
+        Assert.Contains("Jumlah Murid: <strong>2</strong>", html);
+        Assert.Contains("Kelas: <strong>2 Bestari</strong>", html);
+        Assert.Contains("Jumlah Murid: <strong>1</strong>", html);
+
+        // Contains all students
+        Assert.Contains("Ahmad", html);
+        Assert.Contains("Badrul", html);
+        Assert.Contains("Chong", html);
+
+        // Includes multiple class-sheet blocks with page-break styling
+        Assert.Contains("class-sheet", html);
+        Assert.Contains("page-break-after: always", html);
+    }
+
+    [Fact]
     public void InitializeAvatars_AssignsThreeIconPicturePasswordSequence_And_PersistsToState()
     {
         var state = new AdminWizardState();

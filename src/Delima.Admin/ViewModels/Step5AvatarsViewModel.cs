@@ -304,24 +304,33 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
 
     public string GenerateAvatarSheetHtml(string? className = null)
     {
-        string targetClass = string.IsNullOrWhiteSpace(className) || className == "Semua Kelas"
-            ? (SelectedClassFilter == "Semua Kelas" ? "Semua Kelas" : (SelectedClassFilter ?? "Kelas"))
+        string targetFilter = string.IsNullOrWhiteSpace(className)
+            ? (SelectedClassFilter ?? "Semua Kelas")
             : className;
 
-        var students = targetClass == "Semua Kelas"
-            ? AvatarItems.ToList()
-            : AvatarItems.Where(a => string.Equals(a.ClassName, targetClass, StringComparison.OrdinalIgnoreCase)).ToList();
+        bool isAllClasses = string.Equals(targetFilter, "Semua Kelas", StringComparison.OrdinalIgnoreCase);
+
+        var classGroups = isAllClasses
+            ? AvatarItems.GroupBy(a => a.ClassName).OrderBy(g => g.Key).ToList()
+            : AvatarItems.Where(a => string.Equals(a.ClassName, targetFilter, StringComparison.OrdinalIgnoreCase))
+                         .GroupBy(a => a.ClassName).ToList();
+
+        string pageTitle = isAllClasses
+            ? $"Helaian Avatar Semua Kelas - {_state.School.Code}"
+            : $"Helaian Avatar Kelas - {targetFilter} - {_state.School.Code}";
 
         var sb = new StringBuilder();
         sb.AppendLine("<!DOCTYPE html>");
         sb.AppendLine("<html lang=\"ms\">");
         sb.AppendLine("<head>");
         sb.AppendLine("  <meta charset=\"utf-8\" />");
-        sb.AppendLine($"  <title>Helaian Avatar Kelas - {targetClass} - {_state.School.Code}</title>");
+        sb.AppendLine($"  <title>{pageTitle}</title>");
         sb.AppendLine("  <style>");
         sb.AppendLine("    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }");
         sb.AppendLine("    body { background: #F8F9FA; color: #1E293B; padding: 24px; }");
-        sb.AppendLine("    .container { max-width: 960px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; }");
+        sb.AppendLine("    .container { max-width: 960px; margin: 0 auto; }");
+        sb.AppendLine("    .class-sheet { background: #FFFFFF; border-radius: 12px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; margin-bottom: 32px; page-break-after: always; break-after: page; }");
+        sb.AppendLine("    .class-sheet:last-child { margin-bottom: 0; page-break-after: auto; break-after: auto; }");
         sb.AppendLine("    .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #056839; padding-bottom: 20px; margin-bottom: 24px; }");
         sb.AppendLine("    .school-title { font-size: 22px; font-weight: 800; color: #056839; }");
         sb.AppendLine("    .school-subtitle { font-size: 14px; color: #64748B; margin-top: 4px; }");
@@ -329,7 +338,7 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("    .info-bar { display: flex; justify-content: space-between; background: #F1F5F9; border-radius: 8px; padding: 12px 18px; margin-bottom: 24px; font-size: 13px; color: #334155; }");
         sb.AppendLine("    .info-bar strong { color: #0F172A; }");
         sb.AppendLine("    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 32px; }");
-        sb.AppendLine("    .card { border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; background: #FFFFFF; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; }");
+        sb.AppendLine("    .card { border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; background: #FFFFFF; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; break-inside: avoid; }");
         sb.AppendLine("    .avatar-circle { width: 56px; height: 56px; border-radius: 50%; background: #F1F5F9; border: 2px solid #CBD5E1; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }");
         sb.AppendLine("    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }");
         sb.AppendLine("    .student-info { overflow: hidden; }");
@@ -345,6 +354,8 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("    @media print {");
         sb.AppendLine("      body { background: #FFFFFF; padding: 0; }");
         sb.AppendLine("      .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }");
+        sb.AppendLine("      .class-sheet { box-shadow: none; border: none; padding: 0; margin-bottom: 0; page-break-after: always; break-after: page; }");
+        sb.AppendLine("      .class-sheet:last-child { page-break-after: auto; break-after: auto; }");
         sb.AppendLine("      .no-print { display: none !important; }");
         sb.AppendLine("      @page { size: A4 portrait; margin: 12mm; }");
         sb.AppendLine("    }");
@@ -353,45 +364,64 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("<body>");
         sb.AppendLine("  <div class=\"container\">");
         sb.AppendLine("    <div class=\"no-print-bar no-print\">");
-        sb.AppendLine("      <button class=\"btn-print\" onclick=\"window.print()\">🖨️ Cetak Helaian Avatar Ini</button>");
+        sb.AppendLine($"      <button class=\"btn-print\" onclick=\"window.print()\">🖨️ Cetak Helaian Avatar {(isAllClasses ? "Semua Kelas" : targetFilter)}</button>");
         sb.AppendLine("    </div>");
-        sb.AppendLine("    <div class=\"header\">");
-        sb.AppendLine("      <div>");
-        sb.AppendLine($"        <div class=\"school-title\">{_state.School.Name}</div>");
-        sb.AppendLine($"        <div class=\"school-subtitle\">Helaian Avatar & Log Masuk DELIMa Murid</div>");
-        sb.AppendLine("      </div>");
-        sb.AppendLine($"      <div class=\"badge\">{_state.School.Code}</div>");
-        sb.AppendLine("    </div>");
-        sb.AppendLine("    <div class=\"info-bar\">");
-        sb.AppendLine($"      <div>Kelas: <strong>{targetClass}</strong></div>");
-        sb.AppendLine($"      <div>Jumlah Murid: <strong>{students.Count}</strong></div>");
-        sb.AppendLine($"      <div>Kata Laluan Gambar: <strong>{(PicturePasswordRequired ? "Aktif (3-Ikon)" : "Dinyahaktifkan")}</strong></div>");
-        sb.AppendLine($"      <div>Tarikh: <strong>{DateTime.Now:dd/MM/yyyy}</strong></div>");
-        sb.AppendLine("    </div>");
-        sb.AppendLine("    <div class=\"grid\">");
 
-        foreach (var s in students)
+        if (classGroups.Count == 0)
         {
-            string avatarImgUrl = DiceBearService.GetAvatarUrl(s.DiceBearSeed);
-            sb.AppendLine("      <div class=\"card\">");
-            sb.AppendLine($"        <div class=\"avatar-circle\"><img src=\"{avatarImgUrl}\" alt=\"Avatar\" loading=\"lazy\" /></div>");
-            sb.AppendLine("        <div class=\"student-info\">");
-            sb.AppendLine($"          <div class=\"student-name\">{s.StudentName}</div>");
-            sb.AppendLine($"          <div class=\"student-id\">{(string.IsNullOrWhiteSpace(s.EmailLocal) ? s.StudentId : s.EmailLocal)}</div>");
-            sb.AppendLine($"          <div class=\"avatar-tag\">🐾 {s.ClassName}</div>");
-            if (PicturePasswordRequired)
+            sb.AppendLine("    <div class=\"class-sheet\">");
+            sb.AppendLine("      <p style=\"text-align:center; padding: 20px; color: #64748B;\">Tiada murid dijumpai.</p>");
+            sb.AppendLine("    </div>");
+        }
+        else
+        {
+            foreach (var group in classGroups)
             {
-                sb.AppendLine($"          <div class=\"pic-pw-tag\">🔑 {s.PicturePasswordDisplay}</div>");
+                string currentClass = string.IsNullOrWhiteSpace(group.Key) ? (isAllClasses ? "Tanpa Kelas" : targetFilter) : group.Key;
+                var students = group.ToList();
+
+                sb.AppendLine("    <div class=\"class-sheet\">");
+                sb.AppendLine("      <div class=\"header\">");
+                sb.AppendLine("        <div>");
+                sb.AppendLine($"          <div class=\"school-title\">{_state.School.Name}</div>");
+                sb.AppendLine($"          <div class=\"school-subtitle\">Helaian Avatar & Log Masuk DELIMa Murid</div>");
+                sb.AppendLine("        </div>");
+                sb.AppendLine($"        <div class=\"badge\">{_state.School.Code}</div>");
+                sb.AppendLine("      </div>");
+                sb.AppendLine("      <div class=\"info-bar\">");
+                sb.AppendLine($"        <div>Kelas: <strong>{currentClass}</strong></div>");
+                sb.AppendLine($"        <div>Jumlah Murid: <strong>{students.Count}</strong></div>");
+                sb.AppendLine($"        <div>Kata Laluan Gambar: <strong>{(PicturePasswordRequired ? "Aktif (3-Ikon)" : "Dinyahaktifkan")}</strong></div>");
+                sb.AppendLine($"        <div>Tarikh: <strong>{DateTime.Now:dd/MM/yyyy}</strong></div>");
+                sb.AppendLine("      </div>");
+                sb.AppendLine("      <div class=\"grid\">");
+
+                foreach (var s in students)
+                {
+                    string avatarImgUrl = DiceBearService.GetAvatarUrl(s.DiceBearSeed);
+                    sb.AppendLine("        <div class=\"card\">");
+                    sb.AppendLine($"          <div class=\"avatar-circle\"><img src=\"{avatarImgUrl}\" alt=\"Avatar\" loading=\"lazy\" /></div>");
+                    sb.AppendLine("          <div class=\"student-info\">");
+                    sb.AppendLine($"            <div class=\"student-name\">{s.StudentName}</div>");
+                    sb.AppendLine($"            <div class=\"student-id\">{(string.IsNullOrWhiteSpace(s.EmailLocal) ? s.StudentId : s.EmailLocal)}</div>");
+                    sb.AppendLine($"            <div class=\"avatar-tag\">🐾 {s.ClassName}</div>");
+                    if (PicturePasswordRequired)
+                    {
+                        sb.AppendLine($"            <div class=\"pic-pw-tag\">🔑 {s.PicturePasswordDisplay}</div>");
+                    }
+                    sb.AppendLine("          </div>");
+                    sb.AppendLine("        </div>");
+                }
+
+                sb.AppendLine("      </div>");
+                sb.AppendLine("      <div class=\"footer\">");
+                sb.AppendLine("        <strong>Panduan Guru Kelas & Guru Makmal:</strong><br />");
+                sb.AppendLine("        Helaian ini boleh dipamerkan pada sudut kenyataan kelas atau disimpan di meja makmal komputer untuk membantu murid Tahun 1 & 2 mengenal pasti akaun masing-masing.");
+                sb.AppendLine("      </div>");
+                sb.AppendLine("    </div>");
             }
-            sb.AppendLine("        </div>");
-            sb.AppendLine("      </div>");
         }
 
-        sb.AppendLine("    </div>");
-        sb.AppendLine("    <div class=\"footer\">");
-        sb.AppendLine("      <strong>Panduan Guru Kelas & Guru Makmal:</strong><br />");
-        sb.AppendLine("      Helaian ini boleh dipamerkan pada sudut kenyataan kelas atau disimpan di meja makmal komputer untuk membantu murid Tahun 1 & 2 mengenal pasti akaun masing-masing.");
-        sb.AppendLine("    </div>");
         sb.AppendLine("  </div>");
         sb.AppendLine("  <script>");
         sb.AppendLine("    window.onload = function() {");
