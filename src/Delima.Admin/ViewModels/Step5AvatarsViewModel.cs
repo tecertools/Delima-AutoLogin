@@ -18,7 +18,18 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     public int Grade { get; init; }
     public string EmailLocal { get; init; } = "";
 
-    public string GradeDisplay => Grade > 0 ? $"Tahun {Grade}" : "Lain-lain";
+    public string FullClassDisplay
+    {
+        get
+        {
+            if (Grade <= 0) return string.IsNullOrWhiteSpace(ClassName) ? "Tanpa Kelas" : ClassName;
+            string trimmed = ClassName?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(trimmed)) return $"Tahun {Grade}";
+            if (trimmed.StartsWith(Grade.ToString()) || trimmed.StartsWith($"Tahun {Grade}", StringComparison.OrdinalIgnoreCase))
+                return trimmed;
+            return $"{Grade} {trimmed}";
+        }
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AvatarUrl))]
@@ -280,17 +291,18 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             }
         }
 
-        // Group by class and assign unique avatars per class
-        foreach (var group in _state.RosterStudents.GroupBy(s => s.ClassName))
+        // Group by (Grade, ClassName) and assign unique avatars per class
+        var groupedStudents = _state.RosterStudents.GroupBy(s => (
+            Grade: s.Grade > 0 ? s.Grade : RosterImporter.NormalizeClassAndGrade(s.ClassName, null).Grade,
+            ClassName: s.ClassName ?? ""
+        ));
+
+        foreach (var group in groupedStudents)
         {
             int avatarIdx = 0;
+            int grade = group.Key.Grade;
             foreach (var student in group)
             {
-                int grade = student.Grade > 0
-                    ? student.Grade
-                    : RosterImporter.NormalizeClassAndGrade(student.ClassName, null).Grade;
-
-                // Use the stored avatar only if it is a new-style seed (not a legacy animal key).
                 string avatar = "";
                 if (_state.StudentAvatars.TryGetValue(student.Id, out var existingAvatar)
                     && !string.IsNullOrWhiteSpace(existingAvatar)
@@ -334,14 +346,10 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         UpdateClassListForSelectedYear();
         UpdateFilteredAvatarItems();
 
-        // Pre-cache all avatar PNGs in the background (best-effort, non-blocking)
         var seeds = AvatarItems.Select(a => a.DiceBearSeed).ToList();
         _ = DiceBearService.PreCacheBatchAsync(seeds);
     }
 
-    /// <summary>
-    /// Assigns a new random DiceBear seed to the student, giving them a different critter.
-    /// </summary>
     public void RandomizeAvatar(AvatarAssignmentItem item)
     {
         item.Avatar = Guid.NewGuid().ToString("N")[..10];
@@ -349,7 +357,6 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         SaveToState();
     }
 
-    // Kept for backward compatibility with any remaining callers
     public void CycleAvatar(AvatarAssignmentItem item) => RandomizeAvatar(item);
 
     public void TogglePicturePasswordPolicy(bool isRequired)
@@ -384,10 +391,6 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Generates printable HTML for student picture passwords & avatars filtered by Year and/or Class.
-    /// Supports yearFilter (e.g. "Tahun 1", "Semua Tahun") and classFilter (e.g. "1 Amanah", "Semua Kelas").
-    /// </summary>
     public string GenerateAvatarSheetHtml(string? yearOrClassFilter = null, string? classFilter = null)
     {
         string targetYear;
@@ -408,7 +411,6 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             }
             else
             {
-                // Passed a class name directly for backward compatibility
                 targetYear = "Semua Tahun";
                 targetClass = yearOrClassFilter;
             }
@@ -430,14 +432,17 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
 
         if (!isAllClasses)
         {
-            query = query.Where(a => string.Equals(a.ClassName, targetClass, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(a => string.Equals(a.ClassName, targetClass, StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(a.FullClassDisplay, targetClass, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Group by ClassName (and order by Grade then ClassName)
         var classGroups = query
-            .GroupBy(a => a.ClassName)
-            .OrderBy(g => g.FirstOrDefault()?.Grade ?? 0)
-            .ThenBy(g => g.Key)
+            .GroupBy(a => (
+                Grade: a.Grade,
+                ClassName: a.ClassName ?? ""
+            ))
+            .OrderBy(g => g.Key.Grade)
+            .ThenBy(g => g.Key.ClassName)
             .ToList();
 
         string pageTitleScope;
@@ -494,9 +499,12 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         sb.AppendLine("    .btn-print:hover { background: #04522d; }");
         sb.AppendLine("    @media print {");
         sb.AppendLine("      body { background: #FFFFFF; padding: 0; }");
-        sb.AppendLine("      .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }");
-        sb.AppendLine("      .class-sheet { box-shadow: none; border: none; padding: 0; margin-bottom: 0; page-break-after: always; break-after: page; }");
-        sb.AppendLine("      .class-sheet:last-child { page-break-after: auto; break-after: auto; }");
+        sb.AppendLine("      .container { box-shadow: none; border: none; padding: 0; max-width: 100%; width: 100%; margin: 0; }");
+        sb.AppendLine("      .class-sheet { box-shadow: none; border: none; padding: 0; margin: 0 0 0 0; page-break-after: always !important; break-after: page !important; page-break-inside: auto; break-inside: auto; }");
+        sb.AppendLine("      .class-sheet:last-child { page-break-after: auto !important; break-after: auto !important; }");
+        sb.AppendLine("      .header, .info-bar, .footer { page-break-inside: avoid !important; break-inside: avoid !important; }");
+        sb.AppendLine("      .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }");
+        sb.AppendLine("      .card { page-break-inside: avoid !important; break-inside: avoid !important; border: 1px solid #CBD5E1; padding: 10px; }");
         sb.AppendLine("      .no-print { display: none !important; }");
         sb.AppendLine("      @page { size: A4 portrait; margin: 12mm; }");
         sb.AppendLine("    }");
@@ -519,10 +527,11 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         {
             foreach (var group in classGroups)
             {
-                string currentClass = string.IsNullOrWhiteSpace(group.Key) ? "Tanpa Kelas" : group.Key;
-                var students = group.ToList();
-                int sheetGrade = students.FirstOrDefault()?.Grade ?? 0;
+                int sheetGrade = group.Key.Grade;
+                string rawClass = group.Key.ClassName;
+                var students = group.OrderBy(s => s.StudentName, StringComparer.OrdinalIgnoreCase).ToList();
                 string sheetGradeLabel = sheetGrade > 0 ? $"Tahun {sheetGrade}" : "Tahun —";
+                string displayClassTitle = group.First().FullClassDisplay;
 
                 sb.AppendLine("    <div class=\"class-sheet\">");
                 sb.AppendLine("      <div class=\"header\">");
@@ -540,8 +549,8 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
                 sb.AppendLine("      </div>");
                 sb.AppendLine("      <div class=\"info-bar\">");
                 sb.AppendLine($"        <div>Tahun: <strong>{sheetGradeLabel}</strong></div>");
-                sb.AppendLine($"        <div>Kelas: <strong>{currentClass}</strong></div>");
-                sb.AppendLine($"        <div>Jumlah Murid: <strong>{students.Count}</strong></div>");
+                sb.AppendLine($"        <div>Kelas: <strong>{displayClassTitle}</strong></div>");
+                sb.AppendLine($"        <div>Jumlah Murid: <strong>{students.Count} orang</strong></div>");
                 sb.AppendLine($"        <div>Kata Laluan Gambar: <strong>{(PicturePasswordRequired ? "Aktif (3-Ikon)" : "Dinyahaktifkan")}</strong></div>");
                 sb.AppendLine($"        <div>Tarikh: <strong>{DateTime.Now:dd/MM/yyyy}</strong></div>");
                 sb.AppendLine("      </div>");
@@ -556,7 +565,7 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
                     sb.AppendLine($"            <div class=\"student-name\">{s.StudentName}</div>");
                     sb.AppendLine($"            <div class=\"student-id\">{(string.IsNullOrWhiteSpace(s.EmailLocal) ? s.StudentId : s.EmailLocal)}</div>");
                     sb.AppendLine("            <div class=\"meta-row\">");
-                    sb.AppendLine($"              <span class=\"avatar-tag\">🏫 {s.ClassName}</span>");
+                    sb.AppendLine($"              <span class=\"avatar-tag\">🏫 {s.FullClassDisplay}</span>");
                     sb.AppendLine("            </div>");
                     if (PicturePasswordRequired)
                     {

@@ -185,9 +185,9 @@ public class Step5AvatarsTests
 
         // Should divide by class
         Assert.Contains("Kelas: <strong>1 Amanah</strong>", html);
-        Assert.Contains("Jumlah Murid: <strong>2</strong>", html);
+        Assert.Contains("Jumlah Murid: <strong>2 orang</strong>", html);
         Assert.Contains("Kelas: <strong>2 Bestari</strong>", html);
-        Assert.Contains("Jumlah Murid: <strong>1</strong>", html);
+        Assert.Contains("Jumlah Murid: <strong>1 orang</strong>", html);
 
         // Contains all students
         Assert.Contains("Ahmad", html);
@@ -196,7 +196,44 @@ public class Step5AvatarsTests
 
         // Includes multiple class-sheet blocks with page-break styling
         Assert.Contains("class-sheet", html);
-        Assert.Contains("page-break-after: always", html);
+        Assert.Contains("page-break-after: always !important", html);
+    }
+
+    [Fact]
+    public void GenerateAvatarSheetHtml_WhenMultipleYearsShareSameClassName_SeparatesThemIntoDistinctSheets()
+    {
+        var state = new AdminWizardState
+        {
+            School = new Delima.Core.Store.SchoolInfo { Code = "BBA1234", Name = "SK SKS24" }
+        };
+        // Roster where ClassName is "Amanah" for both Year 1 and Year 2 (common in MOE exports)
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_1", FullName = "Ali", ClassName = "Amanah", Grade = 1, EmailLocal = "m-1" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_2", FullName = "Abu", ClassName = "Amanah", Grade = 1, EmailLocal = "m-2" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_3", FullName = "Bala", ClassName = "Amanah", Grade = 2, EmailLocal = "m-3" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_4", FullName = "Badrul", ClassName = "Amanah", Grade = 2, EmailLocal = "m-4" });
+        state.RosterStudents.Add(new ImportedStudent { Id = "s_5", FullName = "Bakar", ClassName = "Amanah", Grade = 2, EmailLocal = "m-5" });
+
+        var vm = new Step5AvatarsViewModel(state);
+
+        // Generate HTML for Year 2 (All classes)
+        string htmlYear2 = vm.GenerateAvatarSheetHtml("Tahun 2", "Semua Kelas");
+
+        // Year 2 sheet must only contain the 3 Year 2 students, not all 5
+        Assert.Contains("Tahun 2", htmlYear2);
+        Assert.Contains("Jumlah Murid: <strong>3 orang</strong>", htmlYear2);
+        Assert.Contains("Bala", htmlYear2);
+        Assert.Contains("Badrul", htmlYear2);
+        Assert.Contains("Bakar", htmlYear2);
+        Assert.DoesNotContain("Ali", htmlYear2);
+        Assert.DoesNotContain("Abu", htmlYear2);
+
+        // Generate HTML for Semua Tahun (All classes)
+        string htmlAll = vm.GenerateAvatarSheetHtml("Semua Tahun", "Semua Kelas");
+
+        // Must create separate sheets for Year 1 (2 students) and Year 2 (3 students), not one combined sheet with 5 students
+        Assert.Contains("Jumlah Murid: <strong>2 orang</strong>", htmlAll);
+        Assert.Contains("Jumlah Murid: <strong>3 orang</strong>", htmlAll);
+        Assert.DoesNotContain("Jumlah Murid: <strong>5 orang</strong>", htmlAll);
     }
 
     [Fact]
