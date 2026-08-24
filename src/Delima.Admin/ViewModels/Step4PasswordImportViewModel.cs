@@ -114,14 +114,7 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
             ClassNames.Add(c);
         }
 
-        if (!string.IsNullOrWhiteSpace(previousClassSelection) && ClassNames.Contains(previousClassSelection))
-        {
-            SelectedClassFilter = previousClassSelection;
-        }
-        else
-        {
-            SelectedClassFilter = "Semua Kelas";
-        }
+        SelectedClassFilter = "Semua Kelas";
     }
 
     public static int ParseYearFilterToGrade(string? yearFilter)
