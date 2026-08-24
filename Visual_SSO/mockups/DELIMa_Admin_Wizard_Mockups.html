@@ -132,7 +132,7 @@ const steps = [
 
 function sidebar(activeN){
   return `<div class="sidebar">
-    <div class="sb-brand"><div class="sb-crest">SK</div><div>DELIMa Admin<br>SK Seksyen 24</div></div>
+    <div class="sb-brand"><div class="sb-crest">SK</div><div>DELIMa Admin<br>SK Bulan Purnama</div></div>
     ${steps.map(s=>{
       let cls = "step-item";
       if(s.n===activeN) cls+=" current";
@@ -154,8 +154,8 @@ frames["1"] = `${sidebar(1)}
     <div class="field"><label>Kod Sekolah</label><input value="SKS24"></div>
     <div class="field"><label>Domain E-mel MOE</label><input value="moe-dl.edu.my"></div>
   </div>
-  <div class="field"><label>Nama Sekolah</label><input value="SK Seksyen 24 Shah Alam"></div>
-  <div class="field"><label>Moto (pilihan)</label><input value="Berilmu Berdisiplin"></div>
+  <div class="field"><label>Nama Sekolah</label><input value="SK Bulan Purnama"></div>
+  <div class="field"><label>Moto (pilihan)</label><input value="Bertukar Jadi Serigala"></div>
   <div class="field"><label>Lambang Sekolah</label><input type="button" value="Muat Naik Lambang…" class="btn btn-sm" style="width:auto;"></div>
   <div class="field">
     <label>Palet Jenama — kontras disahkan secara langsung</label>
