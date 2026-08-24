@@ -12,7 +12,6 @@
 credentials*
 roster.json
 /audit/
-audit/
 *.log
 
 # CSV / Excel data files (ignore by default; allow explicit template & fixture files)
@@ -20,6 +19,9 @@ audit/
 *.tsv
 *.xlsx
 *.xls
+/fidelity_*.csv
+/timing_*.csv
+/uia_*.csv
 
 # Whitelist safe templates, test fixtures, and synthetic spike results
 !templates/contoh_*.csv
@@ -41,13 +43,6 @@ e2e-test/
 *.crt
 *.der
 *.csr
-
-# ---------------------------------------------------------------------------
-# 2. Spike & Benchmark Artifacts
-# ---------------------------------------------------------------------------
-fidelity_*.csv
-timing_*.csv
-uia_*.csv
 
 # ---------------------------------------------------------------------------
 # 3. .NET / C# Build & Compiler Outputs

@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Pemasangan & Persediaan Makmal — DELIMa Smart Launcher</title>
+  
+  <meta name="description" content="Panduan langkah demi langkah persediaan dan pemasangan DELIMa Smart Launcher untuk Penyelaras ICT dan Makmal Komputer Sekolah Rendah Malaysia.">
+  <meta name="author" content="tecertools Digital Solutions">
+  <link rel="icon" type="image/png" href="../icon.png">
+
+  <!-- Google Fonts: Plus Jakarta Sans, Outfit, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main Design System CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Site Sticky Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" class="brand-section">
+        <div class="brand-logo-wrap">
+          <img src="../icon.png" alt="Logo DELIMa Smart Launcher" onerror="this.src='Logo Delima auto-login.jpg'">
+        </div>
+        <div class="brand-text-block">
+          <div class="brand-title">
+            DELIMa Smart Launcher
+            <span class="badge-tag">Panduan Rasmi</span>
+          </div>
+          <div class="brand-sub">Manual Persediaan Makmal Komputer Sekolah Rendah</div>
+        </div>
+      </a>
+
+      <!-- Header Action Controls -->
+      <div class="header-actions">
+        <div class="search-box-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="guideSearchInput" class="search-input" placeholder="Cari langkah, APDM, USB, AppLocker...">
+        </div>
+
+        <button id="viewModeToggleBtn" class="btn-ctrl" title="Tukar antara mod langkah demi langkah atau paparan penuh">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          Papar Semua Langkah
+        </button>
+
+        <button id="btnPrintGuide" class="btn-ctrl" title="Cetak panduan ini atau simpan sebagai PDF">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Cetak
+        </button>
+
+        <button id="themeToggleBtn" class="btn-ctrl" title="Tukar mod gelap/cerah">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          Mod Gelap
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Progress Bar Under Header -->
+    <div class="top-progress-bar-container">
+      <div id="topProgressFill" class="top-progress-bar-fill"></div>
+    </div>
+
+    <!-- Progress Status Bar -->
+    <div class="progress-status-bar">
+      <div class="progress-info">
+        <span id="currentStepCounterText" class="progress-chip">Langkah 1 daripada 14</span>
+        <span id="progressPercentText" class="progress-text">0% Selesai</span>
+      </div>
+      <div class="progress-quick-jump">
+        <span style="font-size: 0.76rem; color: var(--text-subtle);">Status Panduan: Interaktif (Auto-Save)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Introduction Section -->
+  <section class="hero-section">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <h1 class="hero-title">Panduan Persediaan <span class="highlight">DELIMa Smart Launcher</span></h1>
+        <p class="hero-desc">
+          Selamat datang, <strong>Penyelaras ICT & Guru Makmal Komputer</strong>! Panduan interaktif ini akan membimbing anda langkah demi langkah bermula daripada memuat turun fail pemasang (*installer*), mengkonfigurasi senarai murid APDM, menjana pakej tersulit USB, sehinggalah murid Tahap 1 dapat log masuk ke DELIMa sepantas 10 saat tanpa menaip emel panjang!
+        </p>
+        <div class="hero-badges">
+          <span class="hero-pill"><i>🔒</i> 100% Zero-Cloud (Privasi Tempatan)</span>
+          <span class="hero-pill"><i>⚡</i> Automasi Log Masuk Tanpa Ralat</span>
+          <span class="hero-pill"><i>🎨</i> PIN Gambar Comel (Tahap 1)</span>
+          <span class="hero-pill"><i>🛡️</i> Perlindungan DPAPI Mesin</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-card-summary">
+          <div class="hero-card-title">
+            <span>Perjalanan Persediaan Anda</span>
+            <span style="font-size: 0.72rem; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 99px;">5 Fasa Utama</span>
+          </div>
+          <ul class="hero-card-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <strong>Fasa 1:</strong> Keperluan Sistem & Peralatan Asas
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <strong>Fasa 2:</strong> Muat Turun & Pemasangan Installer
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <strong>Fasa 3:</strong> Konfigurasi Wizard Admin (Delima.Admin)
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <strong>Fasa 4:</strong> Penyeragaman PC Makmal Melalui USB
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <strong>Fasa 5:</strong> Sesi Log Masuk Murid & Mod Guru (F12)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Layout -->
+  <div class="main-layout">
+
+    <!-- Left Sticky Sidebar: Step Navigation -->
+    <aside class="guide-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-heading">
+          <span>Senarai Langkah</span>
+          <span class="sidebar-count">14 Langkah</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- FASA 1 -->
+        <div class="phase-group">
+          <div class="phase-title">Fasa 1: Persediaan Awal</div>
+          <a href="#step-1" class="nav-step-item" data-step="1">
+            <span class="nav-step-num">01</span>
+            <span class="nav-step-title">Keperluan Sistem & Alat</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </div>
+
+        <!-- FASA 2 -->
+        <div class="phase-group">
+          <div class="phase-title">Fasa 2: Pemasangan Installer</div>
+          <a href="#step-2" class="nav-step-item" data-step="2">
+            <span class="nav-step-num">02</span>
+            <span class="nav-step-title">Muat Turun Pemasang Rasmi</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-3" class="nav-step-item" data-step="3">
+            <span class="nav-step-num">03</span>
+            <span class="nav-step-title">Pemasangan di PC Pentadbir</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-4" class="nav-step-item" data-step="4">
+            <span class="nav-step-num">04</span>
+            <span class="nav-step-title">Pemasangan di PC Makmal</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </div>
+
+        <!-- FASA 3 -->
+        <div class="phase-group">
+          <div class="phase-title">Fasa 3: Konfigurasi Delima.Admin</div>
+          <a href="#step-5" class="nav-step-item" data-step="5">
+            <span class="nav-step-num">05</span>
+            <span class="nav-step-title">Identiti & Kata Laluan Admin</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-6" class="nav-step-item" data-step="6">
+            <span class="nav-step-num">06</span>
+            <span class="nav-step-title">Import Roster APDM (.csv)</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-7" class="nav-step-item" data-step="7">
+            <span class="nav-step-num">07</span>
+            <span class="nav-step-title">Import Kata Laluan DELIMa</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-8" class="nav-step-item" data-step="8">
+            <span class="nav-step-num">08</span>
+            <span class="nav-step-title">Avatar & Cetak Roster PIN</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-9" class="nav-step-item" data-step="9">
+            <span class="nav-step-num">09</span>
+            <span class="nav-step-title">Eksport Pakej Sulit USB</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </div>
+
+        <!-- FASA 4 -->
+        <div class="phase-group">
+          <div class="phase-title">Fasa 4: Penyeragaman Makmal</div>
+          <a href="#step-10" class="nav-step-item" data-step="10">
+            <span class="nav-step-num">10</span>
+            <span class="nav-step-title">Jalankan Provision di PC Makmal</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-11" class="nav-step-item" data-step="11">
+            <span class="nav-step-num">11</span>
+            <span class="nav-step-title">Pengukuhan Keselamatan & Kiosk</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </div>
+
+        <!-- FASA 5 -->
+        <div class="phase-group">
+          <div class="phase-title">Fasa 5: Penggunaan & Bantuan</div>
+          <a href="#step-12" class="nav-step-item" data-step="12">
+            <span class="nav-step-num">12</span>
+            <span class="nav-step-title">Aliran Log Masuk Murid</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-13" class="nav-step-item" data-step="13">
+            <span class="nav-step-num">13</span>
+            <span class="nav-step-title">Mod Guru & Pintasan F12</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+          <a href="#step-14" class="nav-step-item" data-step="14">
+            <span class="nav-step-num">14</span>
+            <span class="nav-step-title">Penyelenggaraan & Soalan Lazim</span>
+            <span class="nav-step-check">✓</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btnResetProgress" class="btn-sidebar-reset">Set Semula Kemajuan</button>
+        <span style="font-size: 0.72rem; color: var(--text-subtle);">v2.0.0</span>
+      </div>
+    </aside>
+
+    <!-- Right Side: Step Instruction Cards -->
+    <main class="guide-content">
+
+      <!-- ====================================================================
+           LANGKAH 01: Keperluan Sistem & Peralatan Asas
+           ==================================================================== -->
+      <div id="step-card-1" class="step-container" data-step="1">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">01</div>
+              <div>
+                <div class="step-meta-phase">Fasa 1: Persediaan Awal</div>
+                <h2 class="step-title">Keperluan Sistem & Senarai Semak Peralatan</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🖥️ Semua Komputer</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Sebelum memulakan pemasangan, pastikan anda telah menyediakan perkakasan, perisian, dan fail data murid yang mencukupi bagi melancarkan proses persediaan.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">A</span>
+                <div class="substep-content">
+                  <div class="substep-title">PC Pentadbir (Komputer Guru Penyelaras ICT)</div>
+                  <div class="substep-desc">
+                    Komputer riba atau desktop dengan <strong>Windows 10 (versi 1809 ke atas)</strong> atau <strong>Windows 11 (64-bit)</strong>. Digunakan sekali sahaja untuk membina pakej konfigurasi sekolah menggunakan aplikasi <code>Delima.Admin.exe</code>.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">B</span>
+                <div class="substep-content">
+                  <div class="substep-title">PC Makmal Komputer (Komputer Murid)</div>
+                  <div class="substep-desc">
+                    Komputer makmal yang menggunakan Windows 10/11 x64 dengan pelayar <strong>Google Chrome</strong> atau <strong>Microsoft Edge</strong> terpasang. Komputer makmal mestilah mempunyai akaun murid biasa (*Standard User*) serta hak pentadbir (*Administrator*) sementara untuk proses *provisioning*.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">C</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pemacu Kilat USB (Pendrive)</div>
+                  <div class="substep-desc">
+                    Satu pemacu USB kosong dengan saiz sekurang-kurangnya 1GB berformat FAT32 atau NTFS untuk memindahkan pakej sulit <code>school.dlmpack</code> ke PC makmal.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">D</span>
+                <div class="substep-content">
+                  <div class="substep-title">Fail Data Murid APDM & Kata Laluan DELIMa</div>
+                  <div class="substep-desc">
+                    Fail CSV senarai nama murid dieksport daripada portal APDM KPM serta senarai kata laluan DELIMa murid yang disediakan oleh pihak sekolah.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Rajah Ekosistem Persediaan DELIMa Launcher</div>
+                <div>📷 Tangkapan Skrin 01</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-01-keperluan.png" alt="Gambarajah Keperluan Sistem & Peralatan" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">💻</div>
+                  <span class="placeholder-badge">Placeholder Gambarajah</span>
+                  <div class="placeholder-title">Gambarajah Ekosistem Persediaan (Admin PC + Lab PCs + USB)</div>
+                  <p class="placeholder-meta">
+                    Gambarajah visual yang menunjukkan aliran penyediaan: PC Pentadbir menjana pakej sulit ke Pendrive USB, kemudian disebarkan ke 20-40 PC makmal murid.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-01-keperluan.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 1.1: Aliran penyediaan makmal tanpa pelayan awan (100% Zero-Cloud).</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <!-- Callout -->
+            <div class="callout callout-tip">
+              <div class="callout-icon">💡</div>
+              <div class="callout-content">
+                <strong>Prinsip Privasi Sifar Awan (Zero-Cloud Privacy)</strong>
+                DELIMa Smart Launcher tidak menggunakan sebarang pelayan awan luar, pengkalan data internet, atau analitik penjejakan. Semua data murid dan kata laluan disimpan dan disulitkan secara setempat di dalam komputer sekolah sahaja mengikut piawaian Akta Perlindungan Data Peribadi (PDPA).
+              </div>
+            </div>
+
+            <!-- Interactive Sub-Checklist -->
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 1:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-1-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Komputer Guru Penyelaras ICT (Windows 10/11 64-bit) telah tersedia.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-1-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Satu pemacu kilat USB (Pendrive) kosong telah disediakan.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-1-3">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Fail CSV senarai nama murid APDM dan kata laluan sedia untuk diproses.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" disabled>← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="1">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 02: Muat Turun Pemasang Rasmi
+           ==================================================================== -->
+      <div id="step-card-2" class="step-container" data-step="2">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">02</div>
+              <div>
+                <div class="step-meta-phase">Fasa 2: Pemasangan Installer</div>
+                <h2 class="step-title">Muat Turun Pemasang Rasmi (DELIMaLauncher-Setup.exe)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🌐 Internet / PC Admin</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Muat turun pakej pemasang rasmi terkini yang telah dibina dan ditandatangani untuk sistem operasi Windows 64-bit.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Layari Halaman GitHub Releases</div>
+                  <div class="substep-desc">
+                    Buka pelayar web dan pergi ke repositori rasmi: <a href="https://github.com/tecertools/Delima-AutoLogin/releases" target="_blank" style="color: var(--primary); font-weight: 700;">github.com/tecertools/Delima-AutoLogin/releases</a>.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pilih Versi Stabil Terkini (Latest Release)</div>
+                  <div class="substep-desc">
+                    Di bahagian <em>Assets</em>, klik pada fail <code>DELIMaLauncher-Setup-2.0.0.exe</code> untuk memuat turun fail ke dalam folder <em>Downloads</em> komputer anda.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Salin Installer ke Pendrive USB</div>
+                  <div class="substep-desc">
+                    Salin fail installer yang telah dimuat turun ke dalam Pendrive USB supaya ia mudah dipasang pada PC Makmal kemudian nanti.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">GitHub Releases — Muat Turun DELIMaLauncher-Setup.exe</div>
+                <div>📷 Tangkapan Skrin 02</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-02-muat-turun.png" alt="Skrin Muat Turun GitHub Release" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">⬇️</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Halaman GitHub Releases & Fail Pemasang .EXE</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin halaman GitHub Releases yang menunjukkan senarai fail aset yang boleh dimuat turun, khususnya fail <code>DELIMaLauncher-Setup-2.0.0.exe</code>.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-02-muat-turun.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 2.1: Memuat turun installer rasmi daripada GitHub.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <!-- Callout Windows SmartScreen -->
+            <div class="callout callout-warning">
+              <div class="callout-icon">🛡️</div>
+              <div class="callout-content">
+                <strong>Nota Amaran Windows SmartScreen:</strong>
+                Sekiranya Windows memaparkan skrin biru <em>"Windows protected your PC"</em> semasa membuka installer buat kali pertama, klik pautan <strong>"More info"</strong> dan kemudian tekan butang <strong>"Run anyway"</strong>.
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 2:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-2-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Fail <code>DELIMaLauncher-Setup-2.0.0.exe</code> berjaya dimuat turun sepenuhnya.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-2-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Salinan fail pemasang telah disimpan di dalam Pendrive USB.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="2">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 03: Pemasangan di PC Pentadbir
+           ==================================================================== -->
+      <div id="step-card-3" class="step-container" data-step="3">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">03</div>
+              <div>
+                <div class="step-meta-phase">Fasa 2: Pemasangan Installer</div>
+                <h2 class="step-title">Pemasangan pada PC Pentadbir / Guru ICT</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">💼 PC Pentadbir Sahaja</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Lakukan pemasangan pada komputer anda untuk memasang aplikasi <strong>Alat Pentadbir DELIMa (Delima.Admin.exe)</strong>.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Jalankan Pemasang sebagai Pentadbir</div>
+                  <div class="substep-desc">
+                    Klik kanan pada fail <code>DELIMaLauncher-Setup.exe</code> dan pilih <strong>"Run as administrator"</strong>.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pilih Komponen "Alat Pentadbir" (Admin Tool)</div>
+                  <div class="substep-desc">
+                    Di skrin pemilihan komponen pemasangan (*Select Components*), pilih pilihan <strong>"Alat Pentadbir"</strong> atau <strong>"Kedua-duanya (Full)"</strong>. Ini akan memasang wizard persediaan sekolah <code>Delima.Admin.exe</code> beserta contoh fail templat CSV.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Lengkapkan Pemasangan</div>
+                  <div class="substep-desc">
+                    Tekan <em>Next</em> dan biarkan direktori pemasangan lalai di <code>C:\Program Files\DELIMa Launcher</code>. Klik <em>Install</em> sehingga selesai.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Inno Setup — Pemilihan Komponen Alat Pentadbir</div>
+                <div>📷 Tangkapan Skrin 03</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-03-pemasangan-admin.png" alt="Skrin Pemilihan Komponen Inno Setup" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">⚙️</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Skrin Pemilihan Komponen "Alat Pentadbir"</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin dialog pemasang yang menunjukkan pemilihan jenis 'Alat Pentadbir' (satu PC sahaja untuk Penyelaras ICT).
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-03-pemasangan-admin.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 3.1: Memilih komponen Alat Pentadbir semasa memasang pada PC Guru.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 3:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-3-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Aplikasi dipasang dengan komponen "Alat Pentadbir".</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-3-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Ikon <strong>"Alat Pentadbir DELIMa"</strong> muncul di Start Menu / Program Files.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="3">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 04: Pemasangan di PC Makmal
+           ==================================================================== -->
+      <div id="step-card-4" class="step-container" data-step="4">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">04</div>
+              <div>
+                <div class="step-meta-phase">Fasa 2: Pemasangan Installer</div>
+                <h2 class="step-title">Pemasangan pada PC Makmal Komputer (Komputer Murid)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🏫 PC Makmal Murid</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Pasangkan aplikasi pada setiap PC makmal komputer dengan konfigurasi mesra murid dan sekatan keselamatan pelayar web.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pilih Komponen "PC Makmal" (Lab PC)</div>
+                  <div class="substep-desc">
+                    Semasa menjalankan installer di PC makmal, pilih pilihan <strong>"PC Makmal"</strong>. Ini akan memasang <code>Delima.Launcher.exe</code> (antara muka murid) dan <code>Delima.Provision.exe</code> (alat konfigurasi makmal).
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Tandakan Pilihan Tambahan (*Tasks*):</div>
+                  <div class="substep-desc">
+                    <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
+                      <li><strong>[✓] Mulakan semasa log masuk (Mod Kiosk):</strong> Memastikan DELIMa Smart Launcher dibuka secara automatik setiap kali murid log masuk Windows.</li>
+                      <li><strong>[✓] Guna dasar Edge / Chrome sekolah:</strong> Melumpuhkan fungsi simpan kata laluan pelayar dan menyekat mod Incognito/InPrivate supaya murid tidak dapat mengubah tetapan keselamatan.</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Selesaikan Pemasangan</div>
+                  <div class="substep-desc">
+                    Klik <em>Install</em>. Pemasang akan secara automatik mengkonfigurasi kebenaran folder sulit (NTFS ACL) di <code>%ProgramData%\DELIMa Launcher</code>.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Inno Setup — Pemasangan PC Makmal & Dasar Sekatan Pelayar</div>
+                <div>📷 Tangkapan Skrin 04</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-04-pemasangan-makmal.png" alt="Skrin Pemasangan PC Makmal" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🖥️</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Skrin Tetapan Tugasan PC Makmal (Kiosk & Browser Policies)</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin pilihan Inno Setup yang menunjukkan kotak pilihan <em>Startup Kiosk</em> dan sekatan dasar pendaftaran pelayar <em>Edge/Chrome Policy</em>.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-04-pemasangan-makmal.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 4.1: Menetapkan dasar keselamatan pelayar dan permulaan automatik (Kiosk).</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 4:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-4-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Komponen "PC Makmal" dipasang pada komputer makmal murid.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-4-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Ikon pintasan "DELIMa" terpapar pada Desktop murid.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="4">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 05: Memulakan Delima.Admin & Identiti Sekolah
+           ==================================================================== -->
+      <div id="step-card-5" class="step-container" data-step="5">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">05</div>
+              <div>
+                <div class="step-meta-phase">Fasa 3: Konfigurasi Delima.Admin</div>
+                <h2 class="step-title">Memulakan Wizard, Identiti Sekolah & Kata Laluan Pentadbir</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">💼 Delima.Admin Wizard</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Buka aplikasi <strong>Alat Pentadbir DELIMa</strong> (<code>Delima.Admin.exe</code>) pada PC Guru ICT untuk memulakan konfigurasi sekolah.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Perakuan Tanggungjawab & Privasi (T0.1 Disclaimer)</div>
+                  <div class="substep-desc">
+                    Pada skrin pertama, baca pernyataan pematuhan data sekolah. Tandakan kotak persetujuan dan klik <em>Teruskan</em>.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Langkah 1: Identiti & Penjenamaan Sekolah</div>
+                  <div class="substep-desc">
+                    Masukkan <strong>Nama Sekolah</strong> (contoh: <em>SK Seksyen 24, Shah Alam</em>) dan <strong>Kod Sekolah KPM</strong> (contoh: <code>BBA8230</code>). Anda juga boleh memilih warna tema sekolah dan memuat naik fail gambar lencana/crest sekolah.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Langkah 2: Cipta Kata Laluan Pentadbir & PIN Guru</div>
+                  <div class="substep-desc">
+                    Tetapkan <strong>Kata Laluan Induk Pentadbir</strong> (digunakan untuk menyulitkan fail <code>school.dlmpack</code>) serta <strong>4-Digit PIN Mod Guru</strong> (contoh: <code>1234</code>) yang akan digunakan oleh guru di makmal untuk pintasan kecemasan.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Delima.Admin — Langkah 1 & 2: Identiti Sekolah & Kata Laluan Pentadbir</div>
+                <div>📷 Tangkapan Skrin 05</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-05-admin-identiti.png" alt="Skrin Identiti Sekolah Delima.Admin" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🏫</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Antaramuka Delima.Admin: Identiti Sekolah & PIN Mod Guru</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin borang penjenamaan nama sekolah, kod sekolah KPM, palet warna dengan penunjuk kontras WCAG, dan medan penetapan kata laluan pentadbir.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-05-admin-identiti.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 5.1: Mengisi identiti sekolah dan mencipta kata laluan induk penyulitan.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
+              </div>
+            </div>
+
+            <!-- Caution Callout -->
+            <div class="callout callout-danger">
+              <div class="callout-icon">⚠️</div>
+              <div class="callout-content">
+                <strong>PENTING: Catatkan Kata Laluan Pentadbir Anda!</strong>
+                Kata laluan ini tidak disimpan di mana-mana pelayan dan tidak boleh dipulihkan sekiranya terlupa. Sila catat kata laluan ini dalam buku rekod pengurusan ICT sekolah anda.
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 5:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-5-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Nama dan Kod Sekolah KPM telah diisi dengan betul.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-5-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Kata Laluan Pentadbir dan PIN Guru 4-digit telah ditetapkan & dicatat.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="5">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 06: Import Roster APDM (.csv)
+           ==================================================================== -->
+      <div id="step-card-6" class="step-container" data-step="6">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">06</div>
+              <div>
+                <div class="step-meta-phase">Fasa 3: Konfigurasi Delima.Admin</div>
+                <h2 class="step-title">Import Senarai Murid APDM & Pemetaan Lajur</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">📂 Fail CSV APDM</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Muat naik fail CSV senarai murid daripada APDM dan sahkan pemetaan lajur data.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pilih Fail Roster Murid (.CSV)</div>
+                  <div class="substep-desc">
+                    Pada <strong>Langkah 3</strong> Wizard Admin, klik butang <em>"Pilih Fail CSV Roster"</em> dan pilih fail CSV yang mengandungi senarai nama murid kelas sasaran.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Sahkan Pemetaan Lajur Pintar (Column Mapping)</div>
+                  <div class="substep-desc">
+                    Sistem akan memadankan lajur fail secara automatik. Pastikan padanan adalah tepat:
+                    <ul style="margin-top: 4px; padding-left: 18px;">
+                      <li><strong>Nama Penuh Murid:</strong> Dipetakan ke <code>NAMA MURID</code></li>
+                      <li><strong>Kelas:</strong> Dipetakan ke <code>KELAS</code> (contoh: <em>1 Cemerlang</em>)</li>
+                      <li><strong>Tahun:</strong> Dipetakan ke <code>TAHUN</code> (1, 2, atau 3)</li>
+                      <li><strong>ID DELIMa:</strong> Dipetakan ke <code>ID DELIMA</code> (contoh: <code>m-12345678@moe-dl.edu.my</code>)</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Semak Laporan Percubaan (Dry-Run Validation Report)</div>
+                  <div class="substep-desc">
+                    Pastikan penunjuk status menunjukkan hijau: <code>Semua Rekod Sah & Sedia</code>. Sekiranya terdapat amaran murid bertindih atau ID tidak lengkap, baiki fail CSV berkenaan.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Interactive CSV Tester Tool -->
+            <div class="csv-tester-card">
+              <div class="csv-tester-header">
+                <div class="csv-tester-title">
+                  <span>🧪 Penguji Format CSV APDM Segera</span>
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Uji sebelum import</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                Tampal baris tajuk (*header*) fail CSV APDM anda di bawah untuk mengesahkan padanan lajur:
+              </p>
+              <textarea id="csvInputArea" class="csv-textarea" placeholder="Contoh: BIL,NAMA MURID,KELAS,TAHUN,ID DELIMA,NO KAD PENGENALAN"></textarea>
+              <button id="btnValidateCsv" class="csv-tester-btn">Uji Keserasian Format CSV</button>
+              <div id="csvResultBox" class="csv-result-box"></div>
+            </div>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Delima.Admin — Langkah 3: Pemetaan Lajur CSV & Laporan Dry-Run</div>
+                <div>📷 Tangkapan Skrin 06</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-06-admin-import-roster.png" alt="Skrin Pemetaan Lajur CSV" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">📋</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Skrin Pemetaan Lajur Roster Murid & Jadual Pratonton</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin antaramuka pemetaan 5 lajur utama (Nama, Kelas, Tahun, ID DELIMa, MyKid) dan ringkasan pengesahan Dry-Run (Ready: X rekod).
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-06-admin-import-roster.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 6.1: Antaramuka pemetaan lajur pintar APDM CSV.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 6:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-6-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Fail CSV senarai murid berjaya dimuat naik ke dalam Delima.Admin.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-6-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Pemetaan lajur disahkan tepat dan laporan Dry-Run menunjukkan status sedia.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="6">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="6">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 07: Import Kata Laluan DELIMa Murid
+           ==================================================================== -->
+      <div id="step-card-7" class="step-container" data-step="7">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">07</div>
+              <div>
+                <div class="step-meta-phase">Fasa 3: Konfigurasi Delima.Admin</div>
+                <h2 class="step-title">Import & Penyulitan Kata Laluan DELIMa Murid</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🔐 Keselamatan AES-256</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Import senarai kata laluan DELIMa murid yang akan disulitkan secara serta-merta dengan enkripsi gred tentera AES-256-GCM.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pengesahan Keselamatan Buka Kunci</div>
+                  <div class="substep-desc">
+                    Pada <strong>Langkah 4</strong> Wizard, sistem memerlukan anda menaip Kod Sekolah (contoh: <code>BBA8230</code>) sebagai perlindungan daripada tindakan tidak sengaja.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Muat Naik Fail Kata Laluan (.CSV)</div>
+                  <div class="substep-desc">
+                    Pilih fail <code>katalaluan.csv</code>. Sistem akan memadankan kata laluan murid berdasarkan ID DELIMa secara automatik.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Perlindungan Bertopeng & Semakan Pilihan</div>
+                  <div class="substep-desc">
+                    Kata laluan dipaparkan dalam bentuk bertopeng <code>••••••••</code>. Sekiranya guru ingin menyemak kata laluan murid tertentu, klik pada topeng tersebut dan masukkan Kata Laluan Pentadbir. Nilai akan dinyah-topeng selama 10 saat sebelum ditopengkan semula secara automatik.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Delima.Admin — Langkah 4: Pengesahan & Import Kata Laluan Bertopeng</div>
+                <div>📷 Tangkapan Skrin 07</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-07-admin-import-katalaluan.png" alt="Skrin Import Kata Laluan" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🔒</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Skrin Pengesahan Keselamatan & Jadual Kata Laluan Tersulit</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin skrin buka kunci kod sekolah dan jadual kata laluan murid yang bertopeng rapi dengan status penyulitan AES-256-GCM.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-07-admin-import-katalaluan.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 7.1: Perlindungan bertopeng dan penyulitan setempat kata laluan murid.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 7:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-7-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Semua kata laluan murid berjaya dipadankan dengan ID DELIMa masing-masing.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-7-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Tiada amaran kata laluan tertinggal atau tiada padanan.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="7">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="7">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 08: Avatar & Cetak Helaian Roster PIN
+           ==================================================================== -->
+      <div id="step-card-8" class="step-container" data-step="8">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">08</div>
+              <div>
+                <div class="step-meta-phase">Fasa 3: Konfigurasi Delima.Admin</div>
+                <h2 class="step-title">Pengagihan Avatar & Mencetak Helaian Roster Gambar Murid</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🎨 Cetakan Makmal</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Sistem akan menjana avatar haiwan berwarna-warni dan 3 kombinasi simbol gambar untuk setiap murid secara automatik.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Semakan Avatar 20 Haiwan</div>
+                  <div class="substep-desc">
+                    Setiap murid diberikan avatar unik (Kucing 🐱, Ikan Lumba-lumba 🐬, Helang 🦅, Koala 🐨, dsb.) bagi memudahkan mereka mengecam nama sendiri tanpa bergantung pada ejaan rumit.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Cetak Helaian Roster Gambar Kelas (Tindakan Wajib!)</div>
+                  <div class="substep-desc">
+                    Klik butang <strong>"Cetak Helaian Roster Gambar Kelas"</strong> (atau simpan sebagai PDF). Helaian ini mengandungi nama murid, gambar avatar, dan 3 simbol kata laluan gambar murid.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Kegunaan Helaian Roster di Makmal Komputer</div>
+                  <div class="substep-desc">
+                    Helaian ini boleh dicetak dan dipotong menjadi kad kecil untuk murid, atau disimpan di dalam fail rekod guru makmal komputer sebagai rujukan semasa sesi PdP.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Delima.Admin — Langkah 5: Grid Avatar Haiwan & Templat Helaian Cetakan</div>
+                <div>📷 Tangkapan Skrin 08</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-08-admin-avatar-pin.png" alt="Skrin Avatar & Cetakan Helaian" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🦁</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Grid Avatar Murid & Pratonton Helaian Cetakan Kelas</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin pengagihan 20 avatar haiwan ceria serta paparan pratonton cetakan kad PIN gambar murid mengikut kelas.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-08-admin-avatar-pin.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 8.1: Menjana avatar dan mencetak helaian kad gambar murid.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 8:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-8-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Avatar telah diagihkan kepada semua murid dalam kelas.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-8-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Helaian Roster Gambar Kelas telah disimpan sebagai PDF atau dicetak.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="8">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="8">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 09: Eksport Pakej Sulit USB
+           ==================================================================== -->
+      <div id="step-card-9" class="step-container" data-step="9">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">09</div>
+              <div>
+                <div class="step-meta-phase">Fasa 3: Konfigurasi Delima.Admin</div>
+                <h2 class="step-title">Eksport Pakej Sulit Makmal (school.dlmpack) ke Pendrive USB</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">💾 Pendrive USB</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Jana fail bungkusan konfigurasi makmal tersulit (<code>school.dlmpack</code>) dan salin terus ke dalam pemacu kilat USB.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Masukkan Pendrive USB ke PC Admin</div>
+                  <div class="substep-desc">
+                    Cucuk pemacu USB ke komputer anda. Pada <strong>Langkah 6 & 7</strong> Wizard Admin, pilih huruf pemacu USB (contoh: <code>E:\</code>).
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Klik "Bina & Tulis Pakej Makmal"</div>
+                  <div class="substep-desc">
+                    Wizard akan menjana dua fail di dalam Pendrive USB anda:
+                    <ul style="margin-top: 4px; padding-left: 18px;">
+                      <li><code>school.dlmpack</code> — Pakej data murid yang telah disulitkan penuh.</li>
+                      <li><code>Delima.Provision.exe</code> — Aplikasi pelaksanaan penyediaan makmal mudah alih.</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Ujian Integriti Fail (Pilihan Keselamatan)</div>
+                  <div class="substep-desc">
+                    Sekiranya anda membuka fail <code>school.dlmpack</code> menggunakan Notepad, ia mestilah memaparkan aksara binari rawak (*binary gibberish*). Tiada nama murid atau kata laluan yang boleh dibaca secara teks biasa.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Delima.Admin — Langkah 7: Bina & Eksport Pakej ke Pemacu USB</div>
+                <div>📷 Tangkapan Skrin 09</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-09-admin-export-usb.png" alt="Skrin Eksport USB" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">💾</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Skrin Kejayaan Penulisan Pakej ke Pemacu USB</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin status akhir Delima.Admin yang memaparkan pengesahan penulisan fail <code>school.dlmpack</code> berjaya ke pemacu kilat USB.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-09-admin-export-usb.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 9.1: Eksport pakej tersulit ke pemacu USB sedia untuk dibawa ke makmal.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 9:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-9-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Fail <code>school.dlmpack</code> dan <code>Delima.Provision.exe</code> wujud di dalam USB.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-9-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Pemacu USB telah dikeluarkan (*Eject safely*) dan sedia dibawa ke makmal.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="9">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="9">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 10: Jalankan Provision di PC Makmal
+           ==================================================================== -->
+      <div id="step-card-10" class="step-container" data-step="10">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">10</div>
+              <div>
+                <div class="step-meta-phase">Fasa 4: Penyeragaman Makmal</div>
+                <h2 class="step-title">Menjalankan Penyediaan di Setiap PC Makmal (Delima.Provision)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">⚡ Proses Cepat (1 Minit/PC)</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Bawa pemacu USB ke komputer murid di makmal untuk memindahkan dan mengunci pangkalan data ke perkakasan setiap PC.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Cucuk USB ke PC Makmal & Jalankan Delima.Provision</div>
+                  <div class="substep-desc">
+                    Log masuk sebagai akaun Administrator di PC makmal. Buka pemacu USB, klik kanan pada <code>Delima.Provision.exe</code> dan pilih <strong>"Run as administrator"</strong>.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pilih Pakej & Masukkan Kata Laluan Pentadbir</div>
+                  <div class="substep-desc">
+                    Pilih fail <code>school.dlmpack</code> dan taipkan <strong>Kata Laluan Pentadbir</strong> yang telah anda tetapkan di Langkah 5.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Penguncian Perkakasan Automatik (DPAPI Binding)</div>
+                  <div class="substep-desc">
+                    Alat ini akan menyahsulit pakej dan menyimpan fail <code>credentials.dat</code> di dalam <code>%ProgramData%\DELIMa Launcher\</code>, kemudian menguncinya terus ke cip perkakasan komputer berkenaan menggunakan Windows Data Protection API (DPAPI Skop Mesin). Fail ini tidak boleh disalin ke PC lain.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">4</span>
+                <div class="substep-content">
+                  <div class="substep-title">Ulang pada PC Seterusnya</div>
+                  <div class="substep-desc">
+                    Cabut pemacu USB dan ulang proses ini pada komputer makmal yang lain. Keseluruhan proses hanya mengambil masa kurang daripada 1 minit bagi setiap PC!
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Code Snippet for CLI Alternative -->
+            <div class="code-box">
+              <div class="code-header">
+                <span class="code-title">PowerShell (Pilihan Pantas Melalui Command Line):</span>
+                <button class="btn-copy" data-copy-target="cmdProvision">Salin Arahan</button>
+              </div>
+              <pre><code id="cmdProvision"># Jalankan di PowerShell Pentadbir (gantikan E: dengan huruf pemacu USB anda)
+E:\Delima.Provision.exe --pack E:\school.dlmpack</code></pre>
+            </div>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Delima.Provision — Penyediaan Storan Selamat Tempatan</div>
+                <div>📷 Tangkapan Skrin 10</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-10-provision-makmal.png" alt="Skrin Delima.Provision Makmal" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">⚡</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Antaramuka Delima.Provision & Pengesahan Kunci DPAPI</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin aplikasi Delima.Provision semasa mengesahkan kata laluan pentadbir dan mengunci storan kelayakan ke perkakasan PC makmal.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-10-provision-makmal.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 10.1: Proses penyeragaman storan kelayakan pada PC makmal komputer.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 10:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-10-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span><code>Delima.Provision.exe</code> berjaya dijalankan tanpa ralat pada PC makmal.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-10-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Fail <code>C:\ProgramData\DELIMa Launcher\credentials.dat</code> telah dijana.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="10">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="10">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 11: Pengukuhan Keselamatan & Mod Kiosk
+           ==================================================================== -->
+      <div id="step-card-11" class="step-container" data-step="11">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">11</div>
+              <div>
+                <div class="step-meta-phase">Fasa 4: Penyeragaman Makmal</div>
+                <h2 class="step-title">Ujian Keselamatan Storan & Pengukuhan AppLocker (Pilihan)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🛡️ Ujian Sekatan Fail</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Lakukan ujian pengesahan keselamatan untuk memastikan akaun murid biasa tidak dapat membaca atau menyalin fail kelayakan makmal.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Ujian Sekatan Hak Akses (*Access Denied Test*)</div>
+                  <div class="substep-desc">
+                    Log keluar daripada akaun pentadbir dan log masuk sebagai akaun <strong>Murid biasa</strong>. Tekan <code>Win + R</code>, taipkan arahan di bawah dan tekan Enter:
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <div class="code-box">
+              <div class="code-header">
+                <span class="code-title">Ujian Membuka Fail Storan Menggunakan Notepad:</span>
+                <button class="btn-copy" data-copy-text='notepad "C:\ProgramData\DELIMa Launcher\credentials.dat"'>Salin</button>
+              </div>
+              <pre><code>notepad "C:\ProgramData\DELIMa Launcher\credentials.dat"</code></pre>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin: 12px 0;">
+              <strong>Keputusan Yang Dikehendaki:</strong> Notepad mestilah memaparkan dialog ralat <span style="color: var(--crimson); font-weight: 700;">"Access is denied" (Akses Ditolak)</span>. Ini membuktikan senarai kawalan capaian NTFS (ACL) berfungsi sepenuhnya melindungi data murid.
+            </p>
+
+            <ul class="substep-list" style="margin-top: 18px;">
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pengukuhan Tambahan Melalui AppLocker (Disyorkan)</div>
+                  <div class="substep-desc">
+                    Bagi makmal dengan Windows Enterprise atau Education, jalankan skrip pengukuhan AppLocker untuk menghalang murid daripada menjalankan fail program luaran daripada pemacu USB atau direktori Temp.
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <div class="code-box">
+              <div class="code-header">
+                <span class="code-title">Skrip Pengaktifan AppLocker (Administrator PowerShell):</span>
+                <button class="btn-copy" data-copy-target="cmdAppLocker">Salin Skrip</button>
+              </div>
+              <pre><code id="cmdAppLocker"># Pastikan perkhidmatan Application Identity berjalan
+Set-Service -Name "AppIDSvc" -StartupType Automatic
+Start-Service -Name "AppIDSvc"</code></pre>
+            </div>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">Ujian Keselamatan — Access is Denied pada Akaun Murid</div>
+                <div>📷 Tangkapan Skrin 11</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-11-ujian-keselamatan.png" alt="Ujian Sekatan Keselamatan Access is Denied" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🚫</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Paparan Ralat "Access is Denied" Semasa Ujian Akses Murid</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin dialog Notepad Windows memaparkan amaran Access Denied apabila akaun murid cuba mengakses fail <code>credentials.dat</code> secara langsung.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-11-ujian-keselamatan.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 11.1: Pengesahan sekatan keselamatan NTFS ACL pada akaun murid.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 11:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-11-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Ujian Notepad pada akaun murid menghasilkan amaran "Access is denied".</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-11-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>PC Makmal disahkan selamat daripada percubaan akses fail kelayakan.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="11">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="11">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 12: Aliran Log Masuk Murid
+           ==================================================================== -->
+      <div id="step-card-12" class="step-container" data-step="12">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">12</div>
+              <div>
+                <div class="step-meta-phase">Fasa 5: Penggunaan & Bantuan</div>
+                <h2 class="step-title">Aliran Log Masuk Murid Tahap 1 (Mudah & Pantas)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🎒 Sesi Kelas PdP</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Bagaimana murid Tahap 1 menggunakan DELIMa Smart Launcher semasa sesi pembelajaran di makmal komputer:
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Skrin 1: Pilih Kelas</div>
+                  <div class="substep-desc">
+                    Murid menghidupkan PC atau membuka aplikasi DELIMa. Murid hanya perlu menekan butang nama kelas mereka (contoh: <strong>1 Cemerlang</strong>).
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Skrin 2: Cari Nama & Avatar Haiwan</div>
+                  <div class="substep-desc">
+                    Murid mencari nama mereka sendiri yang disertai dengan avatar haiwan comel dan warna latar yang ceria.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Skrin 3: Masukkan Kata Laluan Gambar (3 Simbol)</div>
+                  <div class="substep-desc">
+                    Murid menekan 3 simbol gambar yang tertera pada kad mereka (contoh: 🐱 Kucing + 🐬 Ikan Lumba-lumba + ⭐ Bintang).
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">4</span>
+                <div class="substep-content">
+                  <div class="substep-title">Skrin 4: Auto-Login Masuk ke Portal Pembelajaran</div>
+                  <div class="substep-desc">
+                    Murid memilih destinasi (Portal DELIMa / Google Classroom / Google Drive). Pelayar web akan dibuka secara automatik, mengisi ID & kata laluan melalui simulasi perkakasan selamat (*Win32 SendInput*), dan membawa murid terus ke akaun mereka tanpa sebarang kesilapan taip!
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">DELIMa Launcher — Antaramuka Sentuh Murid Tahap 1</div>
+                <div>📷 Tangkapan Skrin 12</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-12-log-masuk-murid.png" alt="Skrin Aliran Log Masuk Murid" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">✨</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Aliran Skrin Murid: Kelas → Nama/Avatar → PIN Gambar → DELIMa</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin gabungan 4 langkah antaramuka murid: Skrin Pilihan Kelas, Grid Kad Murid, Papan Kekunci PIN Gambar, dan Skrin Destinasi Pembelajaran.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-12-log-masuk-murid.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 12.1: Pengalaman log masuk visual tanpa papan kekunci bagi murid Tahap 1.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 12:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-12-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Ujian log masuk murid berjaya membawa murid terus ke portal DELIMa.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-12-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Masa log masuk murid berkurang daripada 15 minit kepada kurang 10 saat!</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="12">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="12">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 13: Mod Guru & Pintasan F12
+           ==================================================================== -->
+      <div id="step-card-13" class="step-container" data-step="13">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">13</div>
+              <div>
+                <div class="step-meta-phase">Fasa 5: Penggunaan & Bantuan</div>
+                <h2 class="step-title">Kawalan & Pintasan Kecemasan Guru (Mod Guru F12)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">🎓 Untuk Guru Sahaja</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Sekiranya ada murid yang terlupa PIN gambar atau berlaku sebarang gangguan, guru boleh mengaktifkan <strong>Mod Guru</strong> pada bila-bila masa.
+            </p>
+
+            <ul class="substep-list">
+              <li class="substep-item">
+                <span class="substep-number">1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Cara Mengaktifkan Mod Guru</div>
+                  <div class="substep-desc">
+                    Tekan kekunci <kbd style="background: var(--bg-surface-alt); border: 1px solid var(--border-strong); padding: 2px 6px; border-radius: 4px; font-weight: 800;">F12</kbd> pada papan kekunci atau klik <strong>ikon topi graduan guru</strong> di sudut kanan atas skrin pelancar.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Masukkan PIN Guru 4-Angka</div>
+                  <div class="substep-desc">
+                    Masukkan 4-digit Master PIN yang telah anda tetapkan semasa Langkah 5.
+                  </div>
+                </div>
+              </li>
+              <li class="substep-item">
+                <span class="substep-number">3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Pilihan Tindakan Guru:</div>
+                  <div class="substep-desc">
+                    <ul style="margin-top: 6px; padding-left: 18px; line-height: 1.6;">
+                      <li><strong>Log Masuk Segera (Bypass Single Student):</strong> Log masuk murid berkenaan secara langsung tanpa memerlukan PIN gambar.</li>
+                      <li><strong>Tukar PIN Gambar Murid:</strong> Mengemaskini simbol kata laluan gambar murid tersebut secara setempat di PC berkenaan.</li>
+                      <li><strong>Keluar ke Desktop Windows:</strong> Menutup mod Kiosk untuk kegunaan penyelenggaraan atau tetapan Windows.</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">DELIMa Launcher — Mod Guru (F12 Master Override)</div>
+                <div>📷 Tangkapan Skrin 13</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-13-mod-guru-override.png" alt="Skrin Mod Guru F12" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🎓</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Skrin Mod Guru & Dialog PIN 4-Angka</div>
+                  <p class="placeholder-meta">
+                    Tangkapan skrin dialog Mod Guru yang dibuka melalui kekunci F12 dengan pilihan log masuk terus murid, tukar PIN, dan keluar ke Desktop.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-13-mod-guru-override.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 13.1: Menu kawalan guru makmal untuk bantuan segera murid.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah 13:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-13-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Kekunci pintasan <kbd>F12</kbd> dan PIN Mod Guru telah diuji dan berfungsi.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-13-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Guru ICT memahami prosedur pintasan log masuk murid terlupa PIN.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="13">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="13">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Langkah Ini (Teruskan)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ====================================================================
+           LANGKAH 14: Penyelenggaraan, Murid Baharu & FAQ
+           ==================================================================== -->
+      <div id="step-card-14" class="step-container" data-step="14">
+        <article class="step-card">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <div class="step-badge-circle">14</div>
+              <div>
+                <div class="step-meta-phase">Fasa 5: Penggunaan & Bantuan</div>
+                <h2 class="step-title">Penyelenggaraan Tahunan, Murid Baharu & Soalan Lazim (FAQ)</h2>
+              </div>
+            </div>
+            <span class="step-target-tag">📚 Panduan Sokongan</span>
+          </div>
+
+          <div class="step-card-body">
+            <p class="instruction-lead">
+              Panduan lengkap untuk mengurus murid berpindah masuk/keluar, pertukaran sesi persekolahan baharu, dan penyelesaian masalah lazim.
+            </p>
+
+            <h3 style="font-size: 1.1rem; margin: 20px 0 10px; color: var(--primary);">Soalan Lazim & Senario Biasa (FAQ)</h3>
+
+            <div class="substep-list">
+              <div class="substep-item">
+                <span class="substep-number">Q1</span>
+                <div class="substep-content">
+                  <div class="substep-title">Bagaimana jika ada murid baharu berpindah masuk ke kelas?</div>
+                  <div class="substep-desc">
+                    Buka <code>Delima.Admin.exe</code> pada PC Guru, import fail senarai CSV APDM terkini (atau tambah rekod murid baharu), jana pakej <code>school.dlmpack</code> baharu ke Pendrive USB, dan jalankan <code>Delima.Provision.exe</code> pada PC makmal. Data lama akan digantikan secara lancar.
+                  </div>
+                </div>
+              </div>
+
+              <div class="substep-item">
+                <span class="substep-number">Q2</span>
+                <div class="substep-content">
+                  <div class="substep-title">Bagaimana jika kata laluan DELIMa murid diubah di portal KPM?</div>
+                  <div class="substep-desc">
+                    Ulang proses import fail kata laluan baharu di <code>Delima.Admin.exe</code>, eksport pakej ke USB, dan jalankan <code>Delima.Provision.exe</code> pada PC makmal untuk mengemas kini storan selamat.
+                  </div>
+                </div>
+              </div>
+
+              <div class="substep-item">
+                <span class="substep-number">Q3</span>
+                <div class="substep-content">
+                  <div class="substep-title">Adakah pelayar Chrome atau Edge yang lebih disyorkan?</div>
+                  <div class="substep-desc">
+                    Kedua-dua pelayar Microsoft Edge dan Google Chrome disokong sepenuhnya dengan ketepatan 100%. Pemasang DELIMa Launcher secara automatik melumpuhkan dialog pengurus kata laluan (*Password Manager popup*) pada kedua-dua pelayar.
+                  </div>
+                </div>
+              </div>
+
+              <div class="substep-item">
+                <span class="substep-number">Q4</span>
+                <div class="substep-content">
+                  <div class="substep-title">Bagaimana jika skrin monitor makmal menggunakan resolusi lama (1366x768)?</div>
+                  <div class="substep-desc">
+                    Antaramuka DELIMa Smart Launcher direka bentuk mengikut piawaian penskalaan dinamik WPF dan diuji pada resolusi serendah 1366x768 sehingga skrin sentuh 4K tanpa sebarang masalah teks terpotong.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Screenshot / Placeholder Mockup -->
+            <div class="screenshot-container">
+              <div class="mockup-window-bar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot red"></span>
+                  <span class="mockup-dot yellow"></span>
+                  <span class="mockup-dot green"></span>
+                </div>
+                <div class="mockup-title">DELIMa Launcher — Panduan Penyelenggaraan & Kemas Kini Makmal</div>
+                <div>📷 Tangkapan Skrin 14</div>
+              </div>
+              <div class="mockup-body">
+                <img src="assets/screenshots/langkah-14-penyelenggaraan-faq.png" alt="Skrin Penyelenggaraan Makmal" class="screenshot-img" onerror="this.style.display='none'">
+                <div class="image-placeholder-fallback">
+                  <div class="placeholder-icon-wrap">🔧</div>
+                  <span class="placeholder-badge">Placeholder Tangkapan Skrin</span>
+                  <div class="placeholder-title">Panduan Kemas Kini Sesi Persekolahan & Penyelenggaraan Makmal</div>
+                  <p class="placeholder-meta">
+                    Gambarajah visual ringkasan pengurusan tahunan makmal komputer dan sokongan teknikal guru penyelaras ICT sekolah.
+                  </p>
+                  <div class="placeholder-file-tag">📁 docs/assets/screenshots/langkah-14-penyelenggaraan-faq.png</div>
+                </div>
+              </div>
+              <div class="mockup-caption">
+                <span>Rajah 14.1: Pengurusan dan penyelenggaraan berkala makmal komputer sekolah.</span>
+                <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1280x720</span>
+              </div>
+            </div>
+
+            <div class="step-checklist-box">
+              <div class="checklist-title">
+                <span>Senarai Semak Langkah Akhir:</span>
+              </div>
+              <ul class="checklist-items">
+                <li class="checklist-item" data-chk-id="chk-14-1">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Prosedur kemas kini murid baharu difahami sepenuhnya.</span>
+                </li>
+                <li class="checklist-item" data-chk-id="chk-14-2">
+                  <div class="custom-checkbox">✓</div>
+                  <span>Semua 14 langkah persediaan makmal telah berjaya disempurnakan!</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Full Completion Celebration Card -->
+            <div id="stepCompletionBanner" class="completion-banner">
+              <div class="celebrate-badge">🎉</div>
+              <h2 class="celebrate-title">Tahniah! Makmal Komputer Anda Kini Beroperasi Penuh!</h2>
+              <p class="celebrate-desc">
+                Anda telah berjaya menyelesaikan semua langkah konfigurasi dan penyeragaman. Murid Tahap 1 kini boleh log masuk ke DELIMa dengan pantas, ceria, dan selamat tanpa sebarang kekecewaan papan kekunci!
+              </p>
+              <div class="celebrate-actions">
+                <button class="btn-celebrate-print" onclick="window.print()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  Cetak Senarai Semak & Manual Guru
+                </button>
+                <a href="https://github.com/tecertools/Delima-AutoLogin/issues" target="_blank" class="btn-celebrate-print" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); text-decoration: none;">
+                  💬 Laporkan Maklum Balas / Bantuan
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-card-footer">
+            <button class="btn-nav-prev" data-step="14">← Sebelum</button>
+            <div class="finish-action-wrap">
+              <button class="btn-finish-step" data-step="14">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Saya Telah Selesai Semua Langkah! (Sempurna 🎉)
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div id="lightboxModal" class="lightbox-modal">
+    <div class="lightbox-content">
+      <button id="lightboxClose" class="lightbox-close" title="Tutup">✕</button>
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Paparan Penuh Tangkapan Skrin">
+      <div id="lightboxCaption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Bar -->
+  <div id="toastNotice" class="toast-notice">
+    <span style="color: var(--amber); font-size: 1.1rem;">✓</span>
+    <span id="toastText">Langkah berjaya diselesaikan.</span>
+  </div>
+
+  <!-- JavaScript Engine -->
+  <script src="app.js"></script>
+</body>
+</html>
