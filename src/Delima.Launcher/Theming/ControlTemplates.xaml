@@ -34,6 +34,7 @@
                             Background="{TemplateBinding Background}"
                             CornerRadius="8"
                             Padding="22,12"
+                            RenderTransformOrigin="0.5,0.5"
                             SnapsToDevicePixels="True"
                             Effect="{StaticResource ButtonElevationShadow}">
                         <ContentPresenter HorizontalAlignment="Center"
@@ -42,10 +43,20 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Opacity" Value="0.92" />
+                            <Setter TargetName="border" Property="Opacity" Value="0.94" />
+                            <Setter TargetName="border" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Opacity" Value="0.80" />
+                            <Setter TargetName="border" Property="Opacity" Value="0.85" />
+                            <Setter TargetName="border" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
@@ -80,6 +91,7 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="6"
                             Padding="16,8"
+                            RenderTransformOrigin="0.5,0.5"
                             SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
@@ -88,9 +100,20 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="border" Property="Background" Value="#F6F7F9" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                            <Setter TargetName="border" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="border" Property="Background" Value="#EDEFEA" />
+                            <Setter TargetName="border" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -119,6 +142,7 @@
                             Background="{TemplateBinding Background}"
                             CornerRadius="8"
                             Padding="20,14"
+                            RenderTransformOrigin="0.5,0.5"
                             SnapsToDevicePixels="True"
                             Effect="{StaticResource ButtonElevationShadow}">
                         <ContentPresenter HorizontalAlignment="Left"
@@ -127,10 +151,20 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Opacity" Value="0.9" />
+                            <Setter TargetName="border" Property="Opacity" Value="0.94" />
+                            <Setter TargetName="border" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Opacity" Value="0.8" />
+                            <Setter TargetName="border" Property="Opacity" Value="0.84" />
+                            <Setter TargetName="border" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -343,7 +377,7 @@
         </Setter>
     </Style>
 
-    <!-- Pupil Card Button Style (WinUI 3 Grid Tile) -->
+    <!-- Pupil Card Button Style (WinUI 3 Grid Tile with Fluent Motion) -->
     <Style x:Key="PupilCardButtonStyle" TargetType="{x:Type Button}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualDefault}" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
@@ -360,8 +394,9 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="10"
+                            CornerRadius="8"
                             Padding="6,8"
+                            RenderTransformOrigin="0.5,0.5"
                             SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center" />
@@ -371,9 +406,24 @@
                             <Setter TargetName="cardBorder" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
                             <Setter TargetName="cardBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
                             <Setter TargetName="cardBorder" Property="BorderThickness" Value="1.5" />
+                            <Setter TargetName="cardBorder" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.03" ScaleY="1.03" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="cardBorder" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="20" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.09" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="cardBorder" Property="Background" Value="#F5ECC0" />
+                            <Setter TargetName="cardBorder" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsFocused" Value="True">
                             <Setter TargetName="cardBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
@@ -399,8 +449,9 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="#C9C4B0"
                             BorderThickness="1.5"
-                            CornerRadius="10"
+                            CornerRadius="8"
                             Padding="6,8"
+                            RenderTransformOrigin="0.5,0.5"
                             SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center" />
@@ -409,9 +460,19 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="missingBorder" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
                             <Setter TargetName="missingBorder" Property="BorderBrush" Value="{DynamicResource SecondaryTextBrush}" />
+                            <Setter TargetName="missingBorder" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="missingBorder" Property="Background" Value="#F5ECC0" />
+                            <Setter TargetName="missingBorder" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsFocused" Value="True">
                             <Setter TargetName="missingBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />

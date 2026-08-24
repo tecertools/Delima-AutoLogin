@@ -14,7 +14,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <theming:PicturePasswordTemplateSelector x:Key="PictureSelector" />
 
-        <!-- Icon Tile Button Style (Windows 11 Fluent Tile, 10px radius) -->
+        <!-- Icon Tile Button Style (Windows 11 Fluent Tile with Micro-interactions) -->
         <Style x:Key="PicturePasswordTileButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualDefault}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
@@ -33,8 +33,9 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10"
+                                CornerRadius="8"
                                 Padding="6"
+                                RenderTransformOrigin="0.5,0.5"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
@@ -44,9 +45,24 @@
                                 <Setter TargetName="tileBorder" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
                                 <Setter TargetName="tileBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
                                 <Setter TargetName="tileBorder" Property="BorderThickness" Value="1.5" />
+                                <Setter TargetName="tileBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.05" ScaleY="1.05" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="tileBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="18" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.10" />
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="tileBorder" Property="Background" Value="#F5ECC0" />
+                                <Setter TargetName="tileBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter TargetName="tileBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
@@ -179,8 +195,35 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Headings and 3 Progress Dots -->
-            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,8">
+            <!-- Headings and 3 Progress Dots with Windows 11 Shake Animation -->
+            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,8" RenderTransformOrigin="0.5,0.5">
+                <StackPanel.RenderTransform>
+                    <TranslateTransform x:Name="HeaderShakeTransform" X="0" Y="0" />
+                </StackPanel.RenderTransform>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsError}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.04" Value="-10" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.08" Value="10" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.12" Value="-8" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.16" Value="8" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.20" Value="-4" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.24" Value="4" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.28" Value="0" />
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
                 <!-- Heading -->
                 <TextBlock Text="Pilih Kata Laluan Gambar"
                            Style="{StaticResource ScreenHeadingStyle}"
@@ -198,7 +241,7 @@
                 <!-- 3 Sequence Progress Dots -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
                     <!-- Dot 1 -->
-                    <Border Width="18" Height="18" CornerRadius="9" Margin="6,0"
+                    <Border Width="20" Height="20" CornerRadius="10" Margin="6,0"
                             BorderBrush="{DynamicResource PrimaryBrush}"
                             BorderThickness="1.5"
                             SnapsToDevicePixels="True">
@@ -215,7 +258,7 @@
                     </Border>
 
                     <!-- Dot 2 -->
-                    <Border Width="18" Height="18" CornerRadius="9" Margin="6,0"
+                    <Border Width="20" Height="20" CornerRadius="10" Margin="6,0"
                             BorderBrush="{DynamicResource PrimaryBrush}"
                             BorderThickness="1.5"
                             SnapsToDevicePixels="True">
@@ -232,7 +275,7 @@
                     </Border>
 
                     <!-- Dot 3 -->
-                    <Border Width="18" Height="18" CornerRadius="9" Margin="6,0"
+                    <Border Width="20" Height="20" CornerRadius="10" Margin="6,0"
                             BorderBrush="{DynamicResource PrimaryBrush}"
                             BorderThickness="1.5"
                             SnapsToDevicePixels="True">

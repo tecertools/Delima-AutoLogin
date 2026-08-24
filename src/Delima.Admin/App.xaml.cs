@@ -12,6 +12,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        Wpf.Ui.Appearance.ApplicationThemeManager.ApplySystemTheme();
+
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
             var ex = args.ExceptionObject as Exception;

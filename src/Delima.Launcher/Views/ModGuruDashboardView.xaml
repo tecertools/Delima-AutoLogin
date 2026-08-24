@@ -15,9 +15,9 @@
 
         <!-- WinUI 3 Navigation Tab Button Style -->
         <Style x:Key="TabNavButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="46" />
-            <Setter Property="Margin" Value="0,0,0,4" />
-            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Margin" Value="0,0,0,3" />
+            <Setter Property="Padding" Value="10,0" />
             <Setter Property="FontSize" Value="13.5" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
@@ -36,16 +36,20 @@
                                 SnapsToDevicePixels="True">
                             <Grid>
                                 <!-- Left Indicator Pill for active tab -->
-                                <Border x:Name="activeIndicator" Width="3" Height="16" Background="{DynamicResource PrimaryBrush}"
+                                <Border x:Name="activeIndicator" Width="3.5" Height="18" Background="{DynamicResource PrimaryBrush}"
                                         HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2"
-                                        Visibility="Collapsed" Margin="-8,0,0,0" />
-                                <ContentPresenter VerticalAlignment="Center" Margin="4,0,0,0" />
+                                        Visibility="Collapsed" Margin="-6,0,0,0" />
+                                <ContentPresenter VerticalAlignment="Center" Margin="6,0,0,0" />
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#F1F3F5" />
+                                <Setter TargetName="border" Property="Background" Value="#F6F7F9" />
                             </Trigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" Value="Active">
+                                <Setter TargetName="border" Property="Background" Value="#EAECEF" />
+                                <Setter TargetName="activeIndicator" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -163,8 +167,7 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="Password">
-                                        <Setter Property="Background" Value="#F1F3F5" />
-                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Tag" Value="Active" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -184,8 +187,7 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="Picture">
-                                        <Setter Property="Background" Value="#F1F3F5" />
-                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Tag" Value="Active" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -205,8 +207,7 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="AddPupil">
-                                        <Setter Property="Background" Value="#F1F3F5" />
-                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Tag" Value="Active" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -226,8 +227,7 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="ResetAll">
-                                        <Setter Property="Background" Value="#F1F3F5" />
-                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Tag" Value="Active" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -247,8 +247,7 @@
                             <Style TargetType="Button" BasedOn="{StaticResource TabNavButtonStyle}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding SelectedTab}" Value="Diagnostics">
-                                        <Setter Property="Background" Value="#F1F3F5" />
-                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Tag" Value="Active" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

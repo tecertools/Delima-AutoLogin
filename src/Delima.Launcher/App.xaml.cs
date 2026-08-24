@@ -82,7 +82,8 @@ public partial class App : Application
             }
         }
 
-        // Apply theme to Application resources at startup
+        // Apply WPF-UI's Fluent 2 control theme first, then layer the app's own brand theme on top
+        Wpf.Ui.Appearance.ApplicationThemeManager.ApplySystemTheme();
         ThemeBuilder.ApplyTheme(Resources, customTheme);
 
         var mainVm = new MainViewModel(storeDir);

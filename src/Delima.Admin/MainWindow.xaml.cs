@@ -1,9 +1,9 @@
-using System.Windows;
 using Delima.Admin.ViewModels;
+using Wpf.Ui.Controls;
 
 namespace Delima.Admin;
 
-public partial class MainWindow : Window
+public partial class MainWindow : FluentWindow
 {
     public MainWindow()
     {

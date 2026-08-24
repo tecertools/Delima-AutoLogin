@@ -5,10 +5,11 @@ using Delima.Core.Audit;
 using Delima.Core.Roster;
 using Delima.Core.Services;
 using Delima.Win32;
+using Wpf.Ui.Controls;
 
 namespace Delima.Launcher.Views;
 
-public partial class FloatingResetBarWindow : Window
+public partial class FloatingResetBarWindow : FluentWindow
 {
     private readonly Student _student;
     private readonly School? _school;

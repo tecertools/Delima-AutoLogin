@@ -15,11 +15,11 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
         
-        <!-- WinUI 3 Keypad Button Style -->
+        <!-- WinUI 3 Keypad Button Style with Fluent Micro-interactions -->
         <Style x:Key="KeypadButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="68" />
-            <Setter Property="Height" Value="58" />
-            <Setter Property="Margin" Value="6" />
+            <Setter Property="Width" Value="72" />
+            <Setter Property="Height" Value="60" />
+            <Setter Property="Margin" Value="5" />
             <Setter Property="FontSize" Value="20" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontFamily" Value="{DynamicResource Baloo2Font}" />
@@ -35,7 +35,8 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6"
+                                CornerRadius="8"
+                                RenderTransformOrigin="0.5,0.5"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
@@ -44,9 +45,19 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
                                 <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#EDEFEA" />
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.94" ScaleY="0.94" />
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
@@ -143,9 +154,36 @@
                     Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8"
+                    CornerRadius="10"
                     Padding="32,24"
+                    RenderTransformOrigin="0.5,0.5"
                     Effect="{StaticResource PopupShadow}">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="CardShakeTransform" X="0" Y="0" />
+                </Border.RenderTransform>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsError}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.04" Value="-10" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.08" Value="10" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.12" Value="-8" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.16" Value="8" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.20" Value="-4" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.24" Value="4" />
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.28" Value="0" />
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <StackPanel HorizontalAlignment="Center">
 
                     <!-- Title -->

@@ -1,13 +1,14 @@
 using System.ComponentModel;
 using System.Windows;
 using Delima.Win32;
+using Wpf.Ui.Controls;
 
 namespace Delima.Launcher;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml with kiosk hardening per Architecture §9 and PRD §8.3.
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow : FluentWindow
 {
     private readonly bool _isKiosk;
     private bool _allowClose = false;
@@ -22,6 +23,9 @@ public partial class MainWindow : Window
 
         if (_isKiosk)
         {
+            // Kiosk mode is fullscreen/borderless, so the window backdrop is never visible —
+            // skip it entirely rather than mix Mica/Acrylic composition with the kiosk hardening path.
+            WindowBackdropType = WindowBackdropType.None;
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
             ResizeMode = ResizeMode.NoResize;
