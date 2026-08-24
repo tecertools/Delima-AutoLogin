@@ -1,0 +1,1664 @@
+{
+  "DelimaLauncher.sln": {
+    "mtime": 1787294266.9347856,
+    "seen": 1787547816.091616,
+    "ast_hash": "af48aaa96f82b5b1dadfedcdab3b7522",
+    "semantic_hash": "af48aaa96f82b5b1dadfedcdab3b7522"
+  },
+  "InjectionSpike/InjectionSpike.csproj": {
+    "mtime": 1787294266.9350214,
+    "seen": 1787547816.091618,
+    "ast_hash": "013c3a9e973c6243545735dadc45f579",
+    "semantic_hash": "013c3a9e973c6243545735dadc45f579"
+  },
+  "InjectionSpike/Program.cs": {
+    "mtime": 1787535131.6538663,
+    "seen": 1787547816.091619,
+    "ast_hash": "81b4403abf2de47b217e7824928536cc",
+    "semantic_hash": "81b4403abf2de47b217e7824928536cc"
+  },
+  "docs/app.js": {
+    "mtime": 1787540424.2199516,
+    "seen": 1787547816.0916202,
+    "ast_hash": "17ee2e78dae097a31d6de6628a573afe",
+    "semantic_hash": "17ee2e78dae097a31d6de6628a573afe"
+  },
+  "src/Delima.Admin/App.xaml": {
+    "mtime": 1787290683.8486829,
+    "seen": 1787547816.0916212,
+    "ast_hash": "2a989f316693cfad05ad8a3eec70e736",
+    "semantic_hash": "2a989f316693cfad05ad8a3eec70e736"
+  },
+  "src/Delima.Admin/App.xaml.cs": {
+    "mtime": 1787457342.082649,
+    "seen": 1787547816.0916219,
+    "ast_hash": "832f10dd992e46bda5786bcfa6764fbe",
+    "semantic_hash": "832f10dd992e46bda5786bcfa6764fbe"
+  },
+  "src/Delima.Admin/Converters/AdminConverters.cs": {
+    "mtime": 1787290683.8489692,
+    "seen": 1787547816.0916228,
+    "ast_hash": "2e3e6435dc6578c90a051ec0097148cd",
+    "semantic_hash": "2e3e6435dc6578c90a051ec0097148cd"
+  },
+  "src/Delima.Admin/Delima.Admin.csproj": {
+    "mtime": 1787535131.6601033,
+    "seen": 1787547816.091624,
+    "ast_hash": "1f5e468c632943570d7bc530ce8380ed",
+    "semantic_hash": "1f5e468c632943570d7bc530ce8380ed"
+  },
+  "src/Delima.Admin/MainWindow.xaml": {
+    "mtime": 1787535131.6602454,
+    "seen": 1787547816.091625,
+    "ast_hash": "5f1782be208b7e5b71a42b5675506ce2",
+    "semantic_hash": "5f1782be208b7e5b71a42b5675506ce2"
+  },
+  "src/Delima.Admin/MainWindow.xaml.cs": {
+    "mtime": 1787457342.0828106,
+    "seen": 1787547816.091626,
+    "ast_hash": "8f4ae7e3c6f9574a0c5b3dc16c503c26",
+    "semantic_hash": "8f4ae7e3c6f9574a0c5b3dc16c503c26"
+  },
+  "src/Delima.Admin/Models/AdminModels.cs": {
+    "mtime": 1787535131.6604106,
+    "seen": 1787547816.091626,
+    "ast_hash": "57fa7a825ada61b29e48b389a576e5ca",
+    "semantic_hash": "57fa7a825ada61b29e48b389a576e5ca"
+  },
+  "src/Delima.Admin/Models/ColorContrastHelper.cs": {
+    "mtime": 1787290683.8502162,
+    "seen": 1787547816.0916271,
+    "ast_hash": "c775191b9f20f5813898e0327b81673d",
+    "semantic_hash": "c775191b9f20f5813898e0327b81673d"
+  },
+  "src/Delima.Admin/Models/PasswordStrengthEvaluator.cs": {
+    "mtime": 1787535131.6605232,
+    "seen": 1787547816.091628,
+    "ast_hash": "e233b5c8dd2696b8bbbeac75191438ae",
+    "semantic_hash": "e233b5c8dd2696b8bbbeac75191438ae"
+  },
+  "src/Delima.Admin/Theming/AdminTheme.xaml": {
+    "mtime": 1787535131.660748,
+    "seen": 1787547816.091629,
+    "ast_hash": "e82190dd1989e69b19fe240f579871ab",
+    "semantic_hash": "e82190dd1989e69b19fe240f579871ab"
+  },
+  "src/Delima.Admin/ViewModels/FirstRunDisclaimerViewModel.cs": {
+    "mtime": 1787290683.8506665,
+    "seen": 1787547816.09163,
+    "ast_hash": "e3513c93493ce34cb6c88496c5ec9fb4",
+    "semantic_hash": "e3513c93493ce34cb6c88496c5ec9fb4"
+  },
+  "src/Delima.Admin/ViewModels/MainWizardViewModel.cs": {
+    "mtime": 1787535131.6609256,
+    "seen": 1787547816.0916312,
+    "ast_hash": "a45ac0423bcf927596747f4e3338c350",
+    "semantic_hash": "a45ac0423bcf927596747f4e3338c350"
+  },
+  "src/Delima.Admin/ViewModels/Step1IdentityViewModel.cs": {
+    "mtime": 1787535131.6610618,
+    "seen": 1787547816.0916321,
+    "ast_hash": "451fa0e670691938f9b481df1b15c2d7",
+    "semantic_hash": "451fa0e670691938f9b481df1b15c2d7"
+  },
+  "src/Delima.Admin/ViewModels/Step2PassphraseViewModel.cs": {
+    "mtime": 1787290683.8511224,
+    "seen": 1787547816.0916328,
+    "ast_hash": "2d3e567d04d8bd4178d309fe18d18301",
+    "semantic_hash": "2d3e567d04d8bd4178d309fe18d18301"
+  },
+  "src/Delima.Admin/ViewModels/Step3RosterImportViewModel.cs": {
+    "mtime": 1787457342.0838358,
+    "seen": 1787547816.091634,
+    "ast_hash": "0b13b3f0dc639df689b02963af739b7b",
+    "semantic_hash": "0b13b3f0dc639df689b02963af739b7b"
+  },
+  "src/Delima.Admin/ViewModels/Step4PasswordImportViewModel.cs": {
+    "mtime": 1787457342.084047,
+    "seen": 1787547816.091635,
+    "ast_hash": "c4dc3f9d971541039dcc3e1b87f702dc",
+    "semantic_hash": "c4dc3f9d971541039dcc3e1b87f702dc"
+  },
+  "src/Delima.Admin/ViewModels/Step5AvatarsViewModel.cs": {
+    "mtime": 1787535131.661215,
+    "seen": 1787547816.091635,
+    "ast_hash": "3d1eeccf42b27655f9f72c254d118466",
+    "semantic_hash": "3d1eeccf42b27655f9f72c254d118466"
+  },
+  "src/Delima.Admin/ViewModels/Step6SettingsViewModel.cs": {
+    "mtime": 1787489878.2074184,
+    "seen": 1787547816.091636,
+    "ast_hash": "de1bcba1a3a2ac8403233405551044f1",
+    "semantic_hash": "de1bcba1a3a2ac8403233405551044f1"
+  },
+  "src/Delima.Admin/ViewModels/Step7ProvisionViewModel.cs": {
+    "mtime": 1787535131.6614318,
+    "seen": 1787547816.091637,
+    "ast_hash": "2b268a75da11b03e8e3817000c98a424",
+    "semantic_hash": "2b268a75da11b03e8e3817000c98a424"
+  },
+  "src/Delima.Admin/Views/FirstRunDisclaimerView.xaml": {
+    "mtime": 1787535131.6616044,
+    "seen": 1787547816.091638,
+    "ast_hash": "ab8eb32b05e173e9606f9f8c4cd662e7",
+    "semantic_hash": "ab8eb32b05e173e9606f9f8c4cd662e7"
+  },
+  "src/Delima.Admin/Views/FirstRunDisclaimerView.xaml.cs": {
+    "mtime": 1787290683.8534815,
+    "seen": 1787547816.091639,
+    "ast_hash": "0fd4441e1f1fcef1c403d88c5b27114f",
+    "semantic_hash": "0fd4441e1f1fcef1c403d88c5b27114f"
+  },
+  "src/Delima.Admin/Views/Step1IdentityView.xaml": {
+    "mtime": 1787535131.66178,
+    "seen": 1787547816.09164,
+    "ast_hash": "53e2339a8257e6270df3ebc32b36a376",
+    "semantic_hash": "53e2339a8257e6270df3ebc32b36a376"
+  },
+  "src/Delima.Admin/Views/Step1IdentityView.xaml.cs": {
+    "mtime": 1787290683.8537605,
+    "seen": 1787547816.0916412,
+    "ast_hash": "733013cfa35667601cb5b73dd5dcdca1",
+    "semantic_hash": "733013cfa35667601cb5b73dd5dcdca1"
+  },
+  "src/Delima.Admin/Views/Step2PassphraseView.xaml": {
+    "mtime": 1787535131.661908,
+    "seen": 1787547816.0916421,
+    "ast_hash": "d2c571aeabe675f6babe5d11c64b2ff7",
+    "semantic_hash": "d2c571aeabe675f6babe5d11c64b2ff7"
+  },
+  "src/Delima.Admin/Views/Step2PassphraseView.xaml.cs": {
+    "mtime": 1787290683.8540297,
+    "seen": 1787547816.0916429,
+    "ast_hash": "a332a2ce7eda4f477f321b61eb9e9326",
+    "semantic_hash": "a332a2ce7eda4f477f321b61eb9e9326"
+  },
+  "src/Delima.Admin/Views/Step3RosterImportView.xaml": {
+    "mtime": 1787535131.6620398,
+    "seen": 1787547816.0916438,
+    "ast_hash": "35d73d50166309dad579454ef7f758d7",
+    "semantic_hash": "35d73d50166309dad579454ef7f758d7"
+  },
+  "src/Delima.Admin/Views/Step3RosterImportView.xaml.cs": {
+    "mtime": 1787457342.0848725,
+    "seen": 1787547816.0916438,
+    "ast_hash": "19e12035480834e12980863eec072a50",
+    "semantic_hash": "19e12035480834e12980863eec072a50"
+  },
+  "src/Delima.Admin/Views/Step4PasswordImportView.xaml": {
+    "mtime": 1787535131.6621916,
+    "seen": 1787547816.091645,
+    "ast_hash": "0e55cd31b02ada93425b719640984467",
+    "semantic_hash": "0e55cd31b02ada93425b719640984467"
+  },
+  "src/Delima.Admin/Views/Step4PasswordImportView.xaml.cs": {
+    "mtime": 1787457342.0852873,
+    "seen": 1787547816.091646,
+    "ast_hash": "c27aa5f201b5f7290dffc8b96981a4f3",
+    "semantic_hash": "c27aa5f201b5f7290dffc8b96981a4f3"
+  },
+  "src/Delima.Admin/Views/Step5AvatarsView.xaml": {
+    "mtime": 1787535131.6623328,
+    "seen": 1787547816.091647,
+    "ast_hash": "04e88edc7d588b34b08f82f75d7e0c53",
+    "semantic_hash": "04e88edc7d588b34b08f82f75d7e0c53"
+  },
+  "src/Delima.Admin/Views/Step5AvatarsView.xaml.cs": {
+    "mtime": 1787457342.085636,
+    "seen": 1787547816.091648,
+    "ast_hash": "e6628db4f482a0b102f35da912cbcb82",
+    "semantic_hash": "e6628db4f482a0b102f35da912cbcb82"
+  },
+  "src/Delima.Admin/Views/Step6SettingsView.xaml": {
+    "mtime": 1787535131.662471,
+    "seen": 1787547816.091649,
+    "ast_hash": "b0035b20868cc967e8995336de8f23c0",
+    "semantic_hash": "b0035b20868cc967e8995336de8f23c0"
+  },
+  "src/Delima.Admin/Views/Step6SettingsView.xaml.cs": {
+    "mtime": 1787290683.8563633,
+    "seen": 1787547816.09165,
+    "ast_hash": "220f653e18516886e49c6405bcad0816",
+    "semantic_hash": "220f653e18516886e49c6405bcad0816"
+  },
+  "src/Delima.Admin/Views/Step7ProvisionView.xaml": {
+    "mtime": 1787535131.6626794,
+    "seen": 1787547816.09165,
+    "ast_hash": "b8f79c28474c539e2dab5badd004087a",
+    "semantic_hash": "b8f79c28474c539e2dab5badd004087a"
+  },
+  "src/Delima.Admin/Views/Step7ProvisionView.xaml.cs": {
+    "mtime": 1787290683.8566587,
+    "seen": 1787547816.091651,
+    "ast_hash": "3c570db4d1890e0e0d04278bc3f667ff",
+    "semantic_hash": "3c570db4d1890e0e0d04278bc3f667ff"
+  },
+  "src/Delima.Core/Audit/AuditLogEntry.cs": {
+    "mtime": 1787283944.6665518,
+    "seen": 1787547816.0916522,
+    "ast_hash": "aa7bb614bb6107fa64cad2f9f5bf44de",
+    "semantic_hash": "aa7bb614bb6107fa64cad2f9f5bf44de"
+  },
+  "src/Delima.Core/Audit/AuditLogger.cs": {
+    "mtime": 1787535131.6628869,
+    "seen": 1787547816.091653,
+    "ast_hash": "0c5de5d3f307d405ab71e6eeece5cece",
+    "semantic_hash": "0c5de5d3f307d405ab71e6eeece5cece"
+  },
+  "src/Delima.Core/Crypto/Argon2Kdf.cs": {
+    "mtime": 1787019738.0453956,
+    "seen": 1787547816.0916538,
+    "ast_hash": "0678ed8240ec08e712c4de4a7bab6aa0",
+    "semantic_hash": "0678ed8240ec08e712c4de4a7bab6aa0"
+  },
+  "src/Delima.Core/Crypto/HmacHelper.cs": {
+    "mtime": 1787019738.045682,
+    "seen": 1787547816.091655,
+    "ast_hash": "f593932f7bab44946887c10ed66f12cc",
+    "semantic_hash": "f593932f7bab44946887c10ed66f12cc"
+  },
+  "src/Delima.Core/Crypto/MasterBundleHeader.cs": {
+    "mtime": 1787019738.0459073,
+    "seen": 1787547816.091656,
+    "ast_hash": "eb0ddc4c0303dda782a8edc7cbbe7b3b",
+    "semantic_hash": "eb0ddc4c0303dda782a8edc7cbbe7b3b"
+  },
+  "src/Delima.Core/Crypto/PicturePasswordHasher.cs": {
+    "mtime": 1787112485.7502553,
+    "seen": 1787547816.091657,
+    "ast_hash": "5f655aea0fb306111f467c69d12c051c",
+    "semantic_hash": "5f655aea0fb306111f467c69d12c051c"
+  },
+  "src/Delima.Core/Crypto/PicturePasswordLockoutService.cs": {
+    "mtime": 1787112485.7505426,
+    "seen": 1787547816.0916579,
+    "ast_hash": "59a6ef9ad6e2ab22d3f271f8a1a115cb",
+    "semantic_hash": "59a6ef9ad6e2ab22d3f271f8a1a115cb"
+  },
+  "src/Delima.Core/Delima.Core.csproj": {
+    "mtime": 1787019738.0461159,
+    "seen": 1787547816.091659,
+    "ast_hash": "06b597b10ed386a3200bd13afde437c7",
+    "semantic_hash": "06b597b10ed386a3200bd13afde437c7"
+  },
+  "src/Delima.Core/Roster/DisplayNameCalculator.cs": {
+    "mtime": 1787019738.0463977,
+    "seen": 1787547816.09166,
+    "ast_hash": "021631cc6580a1bd062c7bada0aeaf50",
+    "semantic_hash": "021631cc6580a1bd062c7bada0aeaf50"
+  },
+  "src/Delima.Core/Roster/GridCalculator.cs": {
+    "mtime": 1787019738.0466764,
+    "seen": 1787547816.091661,
+    "ast_hash": "d6490eb4ca7e41120009fafc49f95818",
+    "semantic_hash": "d6490eb4ca7e41120009fafc49f95818"
+  },
+  "src/Delima.Core/Roster/IRosterStore.cs": {
+    "mtime": 1787019738.046973,
+    "seen": 1787547816.091661,
+    "ast_hash": "fb6250a455bbef00480b3b38e55cc91d",
+    "semantic_hash": "fb6250a455bbef00480b3b38e55cc91d"
+  },
+  "src/Delima.Core/Roster/NameSplitter.cs": {
+    "mtime": 1787019738.0472202,
+    "seen": 1787547816.0916622,
+    "ast_hash": "c588fedbd0f94ba285f020d25202b011",
+    "semantic_hash": "c588fedbd0f94ba285f020d25202b011"
+  },
+  "src/Delima.Core/Roster/RosterModels.cs": {
+    "mtime": 1787112485.7508905,
+    "seen": 1787547816.0916631,
+    "ast_hash": "91cf59703de59963361221cee41123cf",
+    "semantic_hash": "91cf59703de59963361221cee41123cf"
+  },
+  "src/Delima.Core/Security/TeacherPinService.cs": {
+    "mtime": 1787290683.8569098,
+    "seen": 1787547816.0916638,
+    "ast_hash": "6134f83e1afd07fd86232cfb874a97e6",
+    "semantic_hash": "6134f83e1afd07fd86232cfb874a97e6"
+  },
+  "src/Delima.Core/Services/DiceBearService.cs": {
+    "mtime": 1787535131.6631103,
+    "seen": 1787547816.0916648,
+    "ast_hash": "60f000c0bc4c540f1d4325f86772caca",
+    "semantic_hash": "60f000c0bc4c540f1d4325f86772caca"
+  },
+  "src/Delima.Core/Store/BundleModels.cs": {
+    "mtime": 1787489878.2078195,
+    "seen": 1787547816.091666,
+    "ast_hash": "63c8e338420a15b8aeba6f61de3fd5d4",
+    "semantic_hash": "63c8e338420a15b8aeba6f61de3fd5d4"
+  },
+  "src/Delima.Core/Store/ICredential.cs": {
+    "mtime": 1787019738.04798,
+    "seen": 1787547816.091667,
+    "ast_hash": "f7318ef5a64bca508fad03ff8dc30aa6",
+    "semantic_hash": "f7318ef5a64bca508fad03ff8dc30aa6"
+  },
+  "src/Delima.Core/Store/ICredentialStore.cs": {
+    "mtime": 1787019738.0482037,
+    "seen": 1787547816.091667,
+    "ast_hash": "99dc627157b9b9d0939844509f522031",
+    "semantic_hash": "99dc627157b9b9d0939844509f522031"
+  },
+  "src/Delima.Core/Store/MasterBundle.cs": {
+    "mtime": 1787019738.0485697,
+    "seen": 1787547816.091668,
+    "ast_hash": "72835380afd44893bc4d402502d73332",
+    "semantic_hash": "72835380afd44893bc4d402502d73332"
+  },
+  "src/Delima.Core/Store/MasterBundleException.cs": {
+    "mtime": 1787019738.0488203,
+    "seen": 1787547816.091669,
+    "ast_hash": "9f9f38e56220d54638dde582947b4e78",
+    "semantic_hash": "9f9f38e56220d54638dde582947b4e78"
+  },
+  "src/Delima.Core/Store/SecurePasswordBuffer.cs": {
+    "mtime": 1787019738.0490415,
+    "seen": 1787547816.09167,
+    "ast_hash": "411a748981b66758ad393565b4329ea5",
+    "semantic_hash": "411a748981b66758ad393565b4329ea5"
+  },
+  "src/Delima.Import/ColumnMapping.cs": {
+    "mtime": 1787457342.0860293,
+    "seen": 1787547816.091671,
+    "ast_hash": "a2f1ae958c1f577c7689b74c828725f7",
+    "semantic_hash": "a2f1ae958c1f577c7689b74c828725f7"
+  },
+  "src/Delima.Import/DataFileReader.cs": {
+    "mtime": 1787457342.0861835,
+    "seen": 1787547816.0916722,
+    "ast_hash": "76f4d1cbffc287d2f1b22c488565c628",
+    "semantic_hash": "76f4d1cbffc287d2f1b22c488565c628"
+  },
+  "src/Delima.Import/Delima.Import.csproj": {
+    "mtime": 1787020323.3606284,
+    "seen": 1787547816.0916731,
+    "ast_hash": "607ba7a431510d9723b7dee6677f0bd6",
+    "semantic_hash": "607ba7a431510d9723b7dee6677f0bd6"
+  },
+  "src/Delima.Import/FileEncodingDetector.cs": {
+    "mtime": 1787020337.0012624,
+    "seen": 1787547816.0916731,
+    "ast_hash": "a2952fe307f7997df42c13e0ec80dd5e",
+    "semantic_hash": "a2952fe307f7997df42c13e0ec80dd5e"
+  },
+  "src/Delima.Import/ImportModels.cs": {
+    "mtime": 1787020341.7153997,
+    "seen": 1787547816.091674,
+    "ast_hash": "de1d3d74a478ad3b90e46315d6f0d9b7",
+    "semantic_hash": "de1d3d74a478ad3b90e46315d6f0d9b7"
+  },
+  "src/Delima.Import/RosterImporter.cs": {
+    "mtime": 1787457342.0863504,
+    "seen": 1787547816.0916748,
+    "ast_hash": "12f73a0c2380f38d668d987d8922b7d4",
+    "semantic_hash": "12f73a0c2380f38d668d987d8922b7d4"
+  },
+  "src/Delima.Import/TemplateGenerator.cs": {
+    "mtime": 1787457342.0865738,
+    "seen": 1787547816.091676,
+    "ast_hash": "03d5a443d0ab366803a2b2eb0216b14a",
+    "semantic_hash": "03d5a443d0ab366803a2b2eb0216b14a"
+  },
+  "src/Delima.Launcher/App.xaml": {
+    "mtime": 1787535131.663241,
+    "seen": 1787547816.091677,
+    "ast_hash": "526b826d4c58d8eb2a1e9bd61ed29470",
+    "semantic_hash": "526b826d4c58d8eb2a1e9bd61ed29470"
+  },
+  "src/Delima.Launcher/App.xaml.cs": {
+    "mtime": 1787535131.6634858,
+    "seen": 1787547816.091678,
+    "ast_hash": "4926ef2158a01eb9ab844635bb74f31d",
+    "semantic_hash": "4926ef2158a01eb9ab844635bb74f31d"
+  },
+  "src/Delima.Launcher/Delima.Launcher.csproj": {
+    "mtime": 1787535131.6635797,
+    "seen": 1787547816.0916789,
+    "ast_hash": "4760ab08d3db494ebc53fabbc6968ee2",
+    "semantic_hash": "4760ab08d3db494ebc53fabbc6968ee2"
+  },
+  "src/Delima.Launcher/MainWindow.xaml": {
+    "mtime": 1787535131.663714,
+    "seen": 1787547816.09168,
+    "ast_hash": "7f768d02ac6082e6e7b3e93f448dc522",
+    "semantic_hash": "7f768d02ac6082e6e7b3e93f448dc522"
+  },
+  "src/Delima.Launcher/MainWindow.xaml.cs": {
+    "mtime": 1787535131.6638093,
+    "seen": 1787547816.091681,
+    "ast_hash": "6c9a044a6ffafa7694e2891aaf843bee",
+    "semantic_hash": "6c9a044a6ffafa7694e2891aaf843bee"
+  },
+  "src/Delima.Launcher/Services/SampleDataService.cs": {
+    "mtime": 1787535131.6639366,
+    "seen": 1787547816.091682,
+    "ast_hash": "9bee341f99551374a0054b2dbef4c012",
+    "semantic_hash": "9bee341f99551374a0054b2dbef4c012"
+  },
+  "src/Delima.Launcher/Theming/AvatarSeedToImageConverter.cs": {
+    "mtime": 1787535131.664008,
+    "seen": 1787547816.091682,
+    "ast_hash": "efed9ad29c4f36b327ad521bc6f88668",
+    "semantic_hash": "efed9ad29c4f36b327ad521bc6f88668"
+  },
+  "src/Delima.Launcher/Theming/AvatarTemplateSelector.cs": {
+    "mtime": 1787457342.0869067,
+    "seen": 1787547816.0916831,
+    "ast_hash": "02cef40bb4d77b6491ebf1962346d02f",
+    "semantic_hash": "02cef40bb4d77b6491ebf1962346d02f"
+  },
+  "src/Delima.Launcher/Theming/AvatarTemplates.xaml": {
+    "mtime": 1787535131.6641002,
+    "seen": 1787547816.091684,
+    "ast_hash": "1c6ca615f344ad503fa903bc7f8e05bb",
+    "semantic_hash": "1c6ca615f344ad503fa903bc7f8e05bb"
+  },
+  "src/Delima.Launcher/Theming/ControlTemplates.xaml": {
+    "mtime": 1787535131.6642406,
+    "seen": 1787547816.091685,
+    "ast_hash": "d9ecc9188fb813a5254ddc529f0d0aca",
+    "semantic_hash": "d9ecc9188fb813a5254ddc529f0d0aca"
+  },
+  "src/Delima.Launcher/Theming/DefaultTheme.xaml": {
+    "mtime": 1787535131.6643465,
+    "seen": 1787547816.0916858,
+    "ast_hash": "f8dd3c983394085cce670d4e3e6d3b6c",
+    "semantic_hash": "f8dd3c983394085cce670d4e3e6d3b6c"
+  },
+  "src/Delima.Launcher/Theming/PicturePasswordTemplateSelector.cs": {
+    "mtime": 1787112485.7640142,
+    "seen": 1787547816.091687,
+    "ast_hash": "f42c6e0cf8133b9f8415a87c247488de",
+    "semantic_hash": "f42c6e0cf8133b9f8415a87c247488de"
+  },
+  "src/Delima.Launcher/Theming/PicturePasswordTemplates.xaml": {
+    "mtime": 1787112485.7644994,
+    "seen": 1787547816.091688,
+    "ast_hash": "5bcbad6c28fe33f179989803934f56a0",
+    "semantic_hash": "5bcbad6c28fe33f179989803934f56a0"
+  },
+  "src/Delima.Launcher/Theming/Styles.xaml": {
+    "mtime": 1787535131.6644528,
+    "seen": 1787547816.091688,
+    "ast_hash": "a14e510d36c1d042b159ffb97b69157d",
+    "semantic_hash": "a14e510d36c1d042b159ffb97b69157d"
+  },
+  "src/Delima.Launcher/Theming/ThemeBuilder.cs": {
+    "mtime": 1787535131.6645865,
+    "seen": 1787547816.0916889,
+    "ast_hash": "acf46566f906cc0d51aef9904e50ff56",
+    "semantic_hash": "acf46566f906cc0d51aef9904e50ff56"
+  },
+  "src/Delima.Launcher/Theming/Tokens.cs": {
+    "mtime": 1787112485.7657707,
+    "seen": 1787547816.09169,
+    "ast_hash": "4062227e3c77a272b6fd469a00ec42d4",
+    "semantic_hash": "4062227e3c77a272b6fd469a00ec42d4"
+  },
+  "src/Delima.Launcher/ViewModels/CariNamaViewModel.cs": {
+    "mtime": 1787535131.6646962,
+    "seen": 1787547816.091691,
+    "ast_hash": "e7062d562d7d06770c86b788a34ea3fc",
+    "semantic_hash": "e7062d562d7d06770c86b788a34ea3fc"
+  },
+  "src/Delima.Launcher/ViewModels/KataLaluanGambarViewModel.cs": {
+    "mtime": 1787112485.7664776,
+    "seen": 1787547816.091692,
+    "ast_hash": "e970244e4ced513c9a1efc586ee9c823",
+    "semantic_hash": "e970244e4ced513c9a1efc586ee9c823"
+  },
+  "src/Delima.Launcher/ViewModels/MainViewModel.cs": {
+    "mtime": 1787535131.6648412,
+    "seen": 1787547816.0916932,
+    "ast_hash": "a1f5070e953b66d91d6bc734b818fd62",
+    "semantic_hash": "a1f5070e953b66d91d6bc734b818fd62"
+  },
+  "src/Delima.Launcher/ViewModels/ModGuruDashboardViewModel.cs": {
+    "mtime": 1787535131.664944,
+    "seen": 1787547816.091694,
+    "ast_hash": "8ecb434eb8ec0238e08680ecfb119549",
+    "semantic_hash": "8ecb434eb8ec0238e08680ecfb119549"
+  },
+  "src/Delima.Launcher/ViewModels/ModGuruPinViewModel.cs": {
+    "mtime": 1787290683.8593738,
+    "seen": 1787547816.091695,
+    "ast_hash": "70ab71b0056e71f0e122d2089975e3eb",
+    "semantic_hash": "70ab71b0056e71f0e122d2089975e3eb"
+  },
+  "src/Delima.Launcher/ViewModels/PicturePasswordIconViewModel.cs": {
+    "mtime": 1787112485.767369,
+    "seen": 1787547816.091696,
+    "ast_hash": "f39a006d6c2add639b9d323281403f0a",
+    "semantic_hash": "f39a006d6c2add639b9d323281403f0a"
+  },
+  "src/Delima.Launcher/ViewModels/PilihKelasViewModel.cs": {
+    "mtime": 1787112485.7676482,
+    "seen": 1787547816.091697,
+    "ast_hash": "d3f5ae8d49e7dc5abe5f9daea177747a",
+    "semantic_hash": "d3f5ae8d49e7dc5abe5f9daea177747a"
+  },
+  "src/Delima.Launcher/ViewModels/PupilCardViewModel.cs": {
+    "mtime": 1787112485.7679117,
+    "seen": 1787547816.091698,
+    "ast_hash": "7dc4e5084d392f4f3da5f315c8ef03b7",
+    "semantic_hash": "7dc4e5084d392f4f3da5f315c8ef03b7"
+  },
+  "src/Delima.Launcher/ViewModels/RalatViewModel.cs": {
+    "mtime": 1787290683.8595588,
+    "seen": 1787547816.091699,
+    "ast_hash": "2f2817d42362650926a119240884ede6",
+    "semantic_hash": "2f2817d42362650926a119240884ede6"
+  },
+  "src/Delima.Launcher/ViewModels/SedangMasukViewModel.cs": {
+    "mtime": 1787489878.2084308,
+    "seen": 1787547816.091699,
+    "ast_hash": "0b04adfa7f374fde9d9937b63894a221",
+    "semantic_hash": "0b04adfa7f374fde9d9937b63894a221"
+  },
+  "src/Delima.Launcher/Views/CariNamaView.xaml": {
+    "mtime": 1787535131.6651096,
+    "seen": 1787547816.0917,
+    "ast_hash": "ca47716463462874f3edba210cbe6e76",
+    "semantic_hash": "ca47716463462874f3edba210cbe6e76"
+  },
+  "src/Delima.Launcher/Views/CariNamaView.xaml.cs": {
+    "mtime": 1787112485.768659,
+    "seen": 1787547816.091701,
+    "ast_hash": "6ce25f7750d882f2a2b11d32b30ffdc4",
+    "semantic_hash": "6ce25f7750d882f2a2b11d32b30ffdc4"
+  },
+  "src/Delima.Launcher/Views/FloatingResetBarWindow.xaml": {
+    "mtime": 1787535131.6652355,
+    "seen": 1787547816.091702,
+    "ast_hash": "2d56b28d9899ecb6eeaae84d4efadea9",
+    "semantic_hash": "2d56b28d9899ecb6eeaae84d4efadea9"
+  },
+  "src/Delima.Launcher/Views/FloatingResetBarWindow.xaml.cs": {
+    "mtime": 1787535131.6654553,
+    "seen": 1787547816.091703,
+    "ast_hash": "75af5e6e67b4e638d592eeca9be8333d",
+    "semantic_hash": "75af5e6e67b4e638d592eeca9be8333d"
+  },
+  "src/Delima.Launcher/Views/KataLaluanGambarView.xaml": {
+    "mtime": 1787535131.6655664,
+    "seen": 1787547816.091703,
+    "ast_hash": "98422ef8c3162f47a498f8f7bdf7aee0",
+    "semantic_hash": "98422ef8c3162f47a498f8f7bdf7aee0"
+  },
+  "src/Delima.Launcher/Views/KataLaluanGambarView.xaml.cs": {
+    "mtime": 1787112485.769284,
+    "seen": 1787547816.0917041,
+    "ast_hash": "7e30cdeaf7c0c5dceae3f611d98d8f25",
+    "semantic_hash": "7e30cdeaf7c0c5dceae3f611d98d8f25"
+  },
+  "src/Delima.Launcher/Views/ModGuruDashboardView.xaml": {
+    "mtime": 1787535131.6657383,
+    "seen": 1787547816.091705,
+    "ast_hash": "ce7b99c291af51ed7fb72bdbcfddb894",
+    "semantic_hash": "ce7b99c291af51ed7fb72bdbcfddb894"
+  },
+  "src/Delima.Launcher/Views/ModGuruDashboardView.xaml.cs": {
+    "mtime": 1787290683.8599901,
+    "seen": 1787547816.091706,
+    "ast_hash": "9fac206c8eea73a5b10f3fbb6803cb42",
+    "semantic_hash": "9fac206c8eea73a5b10f3fbb6803cb42"
+  },
+  "src/Delima.Launcher/Views/ModGuruPinView.xaml": {
+    "mtime": 1787535131.6658545,
+    "seen": 1787547816.091707,
+    "ast_hash": "87bf2ed8c548d7e63559aa10b45417c1",
+    "semantic_hash": "87bf2ed8c548d7e63559aa10b45417c1"
+  },
+  "src/Delima.Launcher/Views/ModGuruPinView.xaml.cs": {
+    "mtime": 1787290683.8603103,
+    "seen": 1787547816.091708,
+    "ast_hash": "b35e6a781287229d4b44ee93a917a255",
+    "semantic_hash": "b35e6a781287229d4b44ee93a917a255"
+  },
+  "src/Delima.Launcher/Views/PilihKelasView.xaml": {
+    "mtime": 1787535131.6659825,
+    "seen": 1787547816.091709,
+    "ast_hash": "025f642fb02b92cbaab2da4a06d4b2a4",
+    "semantic_hash": "025f642fb02b92cbaab2da4a06d4b2a4"
+  },
+  "src/Delima.Launcher/Views/PilihKelasView.xaml.cs": {
+    "mtime": 1787112485.7700462,
+    "seen": 1787547816.0917099,
+    "ast_hash": "b9a29b96ee88cbc43e220e6e4aa3cdcb",
+    "semantic_hash": "b9a29b96ee88cbc43e220e6e4aa3cdcb"
+  },
+  "src/Delima.Launcher/Views/RalatView.xaml": {
+    "mtime": 1787290683.860518,
+    "seen": 1787547816.0917099,
+    "ast_hash": "119c4fdf18d27d681d741ce0ff04c289",
+    "semantic_hash": "119c4fdf18d27d681d741ce0ff04c289"
+  },
+  "src/Delima.Launcher/Views/RalatView.xaml.cs": {
+    "mtime": 1787283944.6685593,
+    "seen": 1787547816.091711,
+    "ast_hash": "5206000e7e80d266f61e7f75330d43b5",
+    "semantic_hash": "5206000e7e80d266f61e7f75330d43b5"
+  },
+  "src/Delima.Launcher/Views/SedangMasukView.xaml": {
+    "mtime": 1787283944.6687222,
+    "seen": 1787547816.091712,
+    "ast_hash": "b9d846e48090051d4483035e3891a6b6",
+    "semantic_hash": "b9d846e48090051d4483035e3891a6b6"
+  },
+  "src/Delima.Launcher/Views/SedangMasukView.xaml.cs": {
+    "mtime": 1787283944.6688945,
+    "seen": 1787547816.091713,
+    "ast_hash": "f7b5fb3a3683775ec16ce4ab0e4bc093",
+    "semantic_hash": "f7b5fb3a3683775ec16ce4ab0e4bc093"
+  },
+  "src/Delima.Provision/App.xaml": {
+    "mtime": 1787535131.6660707,
+    "seen": 1787547816.0917141,
+    "ast_hash": "84910780faa3a36658a2a4910f6d6c64",
+    "semantic_hash": "84910780faa3a36658a2a4910f6d6c64"
+  },
+  "src/Delima.Provision/App.xaml.cs": {
+    "mtime": 1787535131.6661513,
+    "seen": 1787547816.091715,
+    "ast_hash": "78114dac5925db2c094ae4eaf4d739ca",
+    "semantic_hash": "78114dac5925db2c094ae4eaf4d739ca"
+  },
+  "src/Delima.Provision/Delima.Provision.csproj": {
+    "mtime": 1787535131.6662376,
+    "seen": 1787547816.091715,
+    "ast_hash": "0bfeaa59f7c03699abf5800f3ce5ec62",
+    "semantic_hash": "0bfeaa59f7c03699abf5800f3ce5ec62"
+  },
+  "src/Delima.Provision/MainWindow.xaml": {
+    "mtime": 1787535131.6663582,
+    "seen": 1787547816.091716,
+    "ast_hash": "a170c818182949b641d5411892a40c70",
+    "semantic_hash": "a170c818182949b641d5411892a40c70"
+  },
+  "src/Delima.Provision/MainWindow.xaml.cs": {
+    "mtime": 1787535131.6664333,
+    "seen": 1787547816.091717,
+    "ast_hash": "11eb46d607c7679195527986c4af8aa1",
+    "semantic_hash": "11eb46d607c7679195527986c4af8aa1"
+  },
+  "src/Delima.Provision/ProvisionEngine.cs": {
+    "mtime": 1787535131.6665761,
+    "seen": 1787547816.091718,
+    "ast_hash": "ab6bffbe8c8cb1ac4b9d8910d021abeb",
+    "semantic_hash": "ab6bffbe8c8cb1ac4b9d8910d021abeb"
+  },
+  "src/Delima.Provision/ProvisionOptions.cs": {
+    "mtime": 1787535131.6667063,
+    "seen": 1787547816.091719,
+    "ast_hash": "68f31c54eb48b9975f1234ecf364b07a",
+    "semantic_hash": "68f31c54eb48b9975f1234ecf364b07a"
+  },
+  "src/Delima.Provision/Theming/ProvisionTheme.xaml": {
+    "mtime": 1787535131.6668563,
+    "seen": 1787547816.0917199,
+    "ast_hash": "505db9d99acd91ca441c02384b32d4c5",
+    "semantic_hash": "505db9d99acd91ca441c02384b32d4c5"
+  },
+  "src/Delima.Provision/ViewModels/ProvisionViewModel.cs": {
+    "mtime": 1787535131.667118,
+    "seen": 1787547816.0917199,
+    "ast_hash": "61285626a476e0557b86b7a28d711163",
+    "semantic_hash": "61285626a476e0557b86b7a28d711163"
+  },
+  "src/Delima.Win32/BrowserKind.cs": {
+    "mtime": 1787489878.2088623,
+    "seen": 1787547816.091721,
+    "ast_hash": "1b7ea8cf3f8fae63f0f242c30c7a06ab",
+    "semantic_hash": "1b7ea8cf3f8fae63f0f242c30c7a06ab"
+  },
+  "src/Delima.Win32/BrowserPolicyConfigurator.cs": {
+    "mtime": 1787489878.2090645,
+    "seen": 1787547816.091722,
+    "ast_hash": "8bafa2d401bffbe714e81fd5d48224ba",
+    "semantic_hash": "8bafa2d401bffbe714e81fd5d48224ba"
+  },
+  "src/Delima.Win32/BrowserSession.cs": {
+    "mtime": 1787489878.209265,
+    "seen": 1787547816.091723,
+    "ast_hash": "54f86caf57049bc4b893ee9d5785e650",
+    "semantic_hash": "54f86caf57049bc4b893ee9d5785e650"
+  },
+  "src/Delima.Win32/BrowserTitles.cs": {
+    "mtime": 1787535131.6673124,
+    "seen": 1787547816.091724,
+    "ast_hash": "98127b1874996bf562fa92d9a3dca9dd",
+    "semantic_hash": "98127b1874996bf562fa92d9a3dca9dd"
+  },
+  "src/Delima.Win32/ChromePolicyConfigurator.cs": {
+    "mtime": 1787489878.209667,
+    "seen": 1787547816.091725,
+    "ast_hash": "4fbcb224916c125a10c8e28ace640617",
+    "semantic_hash": "4fbcb224916c125a10c8e28ace640617"
+  },
+  "src/Delima.Win32/ChromeSession.cs": {
+    "mtime": 1787489878.2098494,
+    "seen": 1787547816.091725,
+    "ast_hash": "d44bb9ae5e2806e9806d0678b78ee9b8",
+    "semantic_hash": "d44bb9ae5e2806e9806d0678b78ee9b8"
+  },
+  "src/Delima.Win32/Delima.Win32.csproj": {
+    "mtime": 1787296407.093512,
+    "seen": 1787547816.091726,
+    "ast_hash": "17215d79466b0e2ec38a1874f85fea91",
+    "semantic_hash": "17215d79466b0e2ec38a1874f85fea91"
+  },
+  "src/Delima.Win32/FailureTaxonomy.cs": {
+    "mtime": 1787489878.210078,
+    "seen": 1787547816.091727,
+    "ast_hash": "3d9db2873a1c6e3c1fba783c3c15fa43",
+    "semantic_hash": "3d9db2873a1c6e3c1fba783c3c15fa43"
+  },
+  "src/Delima.Win32/IdleTracker.cs": {
+    "mtime": 1787489878.2103336,
+    "seen": 1787547816.091728,
+    "ast_hash": "b3dcbdbf7f398a20d11ff4cc90b9a66f",
+    "semantic_hash": "b3dcbdbf7f398a20d11ff4cc90b9a66f"
+  },
+  "src/Delima.Win32/InjectionEngine.cs": {
+    "mtime": 1787489878.2106173,
+    "seen": 1787547816.091729,
+    "ast_hash": "b4be8160929c0138dbeadf10997993f5",
+    "semantic_hash": "b4be8160929c0138dbeadf10997993f5"
+  },
+  "src/Delima.Win32/InjectionResult.cs": {
+    "mtime": 1787489878.2137413,
+    "seen": 1787547816.0917299,
+    "ast_hash": "b401426b876021c3b53d86571140f7f9",
+    "semantic_hash": "b401426b876021c3b53d86571140f7f9"
+  },
+  "src/Delima.Win32/KioskGuard.cs": {
+    "mtime": 1787290683.8614292,
+    "seen": 1787547816.0917308,
+    "ast_hash": "7405c3565b1bcf3b4fc38bfbdeee96b6",
+    "semantic_hash": "7405c3565b1bcf3b4fc38bfbdeee96b6"
+  },
+  "src/Delima.Win32/LaunchAtLogonConfigurator.cs": {
+    "mtime": 1787290683.861595,
+    "seen": 1787547816.0917308,
+    "ast_hash": "f4b8919f1fd2e1f2d62a05a0883e1aed",
+    "semantic_hash": "f4b8919f1fd2e1f2d62a05a0883e1aed"
+  },
+  "src/Delima.Win32/NativeMethods.cs": {
+    "mtime": 1787290683.8619123,
+    "seen": 1787547816.091732,
+    "ast_hash": "7285af41d0f88e2d4eea83c6e240009f",
+    "semantic_hash": "7285af41d0f88e2d4eea83c6e240009f"
+  },
+  "src/Delima.Win32/RouteCLoginOrchestrator.cs": {
+    "mtime": 1787489878.2140288,
+    "seen": 1787547816.091733,
+    "ast_hash": "42ff3e7949aca08b3138946d1297560e",
+    "semantic_hash": "42ff3e7949aca08b3138946d1297560e"
+  },
+  "src/Delima.Win32/ShortcutHelper.cs": {
+    "mtime": 1787535131.6674278,
+    "seen": 1787547816.091734,
+    "ast_hash": "80f00f8629b56fad507a7c70d1dcd68f",
+    "semantic_hash": "80f00f8629b56fad507a7c70d1dcd68f"
+  },
+  "src/Delima.Win32/Store/DpapiCredentialStore.cs": {
+    "mtime": 1787466655.5138268,
+    "seen": 1787547816.0917351,
+    "ast_hash": "e1b0372d4a67ca7c542aa875c63cc59c",
+    "semantic_hash": "e1b0372d4a67ca7c542aa875c63cc59c"
+  },
+  "src/Delima.Win32/Store/StoreAclConfigurator.cs": {
+    "mtime": 1787283944.6699498,
+    "seen": 1787547816.091736,
+    "ast_hash": "7e75bd02935283209d3669048bc0da09",
+    "semantic_hash": "7e75bd02935283209d3669048bc0da09"
+  },
+  "src/Delima.Win32/TopmostOverlay.cs": {
+    "mtime": 1787112485.7751532,
+    "seen": 1787547816.091736,
+    "ast_hash": "e1c4b58520dd9d6f6e7699cbc43b1829",
+    "semantic_hash": "e1c4b58520dd9d6f6e7699cbc43b1829"
+  },
+  "src/Delima.Win32/UiaHelper.cs": {
+    "mtime": 1787466655.5141094,
+    "seen": 1787547816.091737,
+    "ast_hash": "fcc231e5bd45306a14a6371e5eddfa1a",
+    "semantic_hash": "fcc231e5bd45306a14a6371e5eddfa1a"
+  },
+  "tests/Delima.Admin.Tests/ContrastHelperTests.cs": {
+    "mtime": 1787290683.8620934,
+    "seen": 1787547816.0917382,
+    "ast_hash": "f50ea67d057c69ccc3171f179bae6621",
+    "semantic_hash": "f50ea67d057c69ccc3171f179bae6621"
+  },
+  "tests/Delima.Admin.Tests/Delima.Admin.Tests.csproj": {
+    "mtime": 1787290683.8622007,
+    "seen": 1787547816.091739,
+    "ast_hash": "70267e2d7d685012c5fa8eca6003323c",
+    "semantic_hash": "70267e2d7d685012c5fa8eca6003323c"
+  },
+  "tests/Delima.Admin.Tests/PasswordStrengthTests.cs": {
+    "mtime": 1787535131.6676228,
+    "seen": 1787547816.09174,
+    "ast_hash": "0892337f4c70dd1d2ce7624f61c24103",
+    "semantic_hash": "0892337f4c70dd1d2ce7624f61c24103"
+  },
+  "tests/Delima.Admin.Tests/Step3RosterImportTests.cs": {
+    "mtime": 1787457342.087649,
+    "seen": 1787547816.0917408,
+    "ast_hash": "1e5520a94e2cbff8895a38280253c35e",
+    "semantic_hash": "1e5520a94e2cbff8895a38280253c35e"
+  },
+  "tests/Delima.Admin.Tests/Step4PasswordImportTests.cs": {
+    "mtime": 1787535131.6677558,
+    "seen": 1787547816.091742,
+    "ast_hash": "c9928dd68a82c647242dddee12cb79ed",
+    "semantic_hash": "c9928dd68a82c647242dddee12cb79ed"
+  },
+  "tests/Delima.Admin.Tests/Step5AvatarsTests.cs": {
+    "mtime": 1787535131.6678975,
+    "seen": 1787547816.091743,
+    "ast_hash": "97ac5318eac39cfa2ee2aaa8b4fcdee0",
+    "semantic_hash": "97ac5318eac39cfa2ee2aaa8b4fcdee0"
+  },
+  "tests/Delima.Admin.Tests/Step7PackagingTests.cs": {
+    "mtime": 1787535131.6679943,
+    "seen": 1787547816.091743,
+    "ast_hash": "63f9be142aee3b0dc10a2559eaad54a2",
+    "semantic_hash": "63f9be142aee3b0dc10a2559eaad54a2"
+  },
+  "tests/Delima.Admin.Tests/StepNavigationTests.cs": {
+    "mtime": 1787535131.6681352,
+    "seen": 1787547816.091744,
+    "ast_hash": "8a611fe0ea396d6b684bedbdcb538cd8",
+    "semantic_hash": "8a611fe0ea396d6b684bedbdcb538cd8"
+  },
+  "tests/Delima.Core.Tests/Audit/AuditLoggerTests.cs": {
+    "mtime": 1787535131.6683443,
+    "seen": 1787547816.0917451,
+    "ast_hash": "3d6ee9751dbc03f3dcd3b4949cef85c9",
+    "semantic_hash": "3d6ee9751dbc03f3dcd3b4949cef85c9"
+  },
+  "tests/Delima.Core.Tests/Crypto/Argon2KdfTests.cs": {
+    "mtime": 1787019738.0493464,
+    "seen": 1787547816.091746,
+    "ast_hash": "2f74157eee1e2defbd7274e17d9a8dce",
+    "semantic_hash": "2f74157eee1e2defbd7274e17d9a8dce"
+  },
+  "tests/Delima.Core.Tests/Crypto/HmacTests.cs": {
+    "mtime": 1787019738.0495846,
+    "seen": 1787547816.091747,
+    "ast_hash": "07be2955bb53cf30674a06beddfcd860",
+    "semantic_hash": "07be2955bb53cf30674a06beddfcd860"
+  },
+  "tests/Delima.Core.Tests/Crypto/PicturePasswordHasherTests.cs": {
+    "mtime": 1787112485.7754512,
+    "seen": 1787547816.091748,
+    "ast_hash": "332b693597810752d63eb7250da730f5",
+    "semantic_hash": "332b693597810752d63eb7250da730f5"
+  },
+  "tests/Delima.Core.Tests/Crypto/PicturePasswordLockoutServiceTests.cs": {
+    "mtime": 1787112485.7757206,
+    "seen": 1787547816.0917492,
+    "ast_hash": "ea87ea2ae344a1e791b0ad68dc20b858",
+    "semantic_hash": "ea87ea2ae344a1e791b0ad68dc20b858"
+  },
+  "tests/Delima.Core.Tests/Delima.Core.Tests.csproj": {
+    "mtime": 1787019738.0498514,
+    "seen": 1787547816.09175,
+    "ast_hash": "d023464af85e3fd051f95020fef01702",
+    "semantic_hash": "d023464af85e3fd051f95020fef01702"
+  },
+  "tests/Delima.Core.Tests/Roster/DisplayNameTests.cs": {
+    "mtime": 1787019738.0501823,
+    "seen": 1787547816.09175,
+    "ast_hash": "6fee477f1da1304933aad8d109c61e08",
+    "semantic_hash": "6fee477f1da1304933aad8d109c61e08"
+  },
+  "tests/Delima.Core.Tests/Roster/RosterModelTests.cs": {
+    "mtime": 1787019738.0504014,
+    "seen": 1787547816.0917509,
+    "ast_hash": "5d6c7822b3d7d6cf75afab04d07c881c",
+    "semantic_hash": "5d6c7822b3d7d6cf75afab04d07c881c"
+  },
+  "tests/Delima.Core.Tests/Security/TeacherPinServiceTests.cs": {
+    "mtime": 1787535131.668512,
+    "seen": 1787547816.091752,
+    "ast_hash": "e68e059c3696e3422e52f9a8d06aaa45",
+    "semantic_hash": "e68e059c3696e3422e52f9a8d06aaa45"
+  },
+  "tests/Delima.Core.Tests/Store/MasterBundleTests.cs": {
+    "mtime": 1787489878.2148595,
+    "seen": 1787547816.091753,
+    "ast_hash": "c4cee42f40db5baabd231ba34641ac25",
+    "semantic_hash": "c4cee42f40db5baabd231ba34641ac25"
+  },
+  "tests/Delima.Core.Tests/Store/ZeroingTests.cs": {
+    "mtime": 1787019738.0509946,
+    "seen": 1787547816.091754,
+    "ast_hash": "a1784a64ccfb5ceb5f7ce919e183f2b0",
+    "semantic_hash": "a1784a64ccfb5ceb5f7ce919e183f2b0"
+  },
+  "tests/Delima.Import.Tests/Delima.Import.Tests.csproj": {
+    "mtime": 1787020361.4578292,
+    "seen": 1787547816.091755,
+    "ast_hash": "a8612b9edb5fc7ff4bb632309a8eb4ab",
+    "semantic_hash": "a8612b9edb5fc7ff4bb632309a8eb4ab"
+  },
+  "tests/Delima.Import.Tests/ImporterTests.cs": {
+    "mtime": 1787457342.0889728,
+    "seen": 1787547816.091756,
+    "ast_hash": "f7be5ad0bcce7835e7ad1fe81bdabd7a",
+    "semantic_hash": "f7be5ad0bcce7835e7ad1fe81bdabd7a"
+  },
+  "tests/Delima.Launcher.Tests/AvatarTemplateSelectorTests.cs": {
+    "mtime": 1787457342.0892386,
+    "seen": 1787547816.091756,
+    "ast_hash": "6a826d88b86590c7839b45dfa7f1a798",
+    "semantic_hash": "6a826d88b86590c7839b45dfa7f1a798"
+  },
+  "tests/Delima.Launcher.Tests/CariNamaViewModelTests.cs": {
+    "mtime": 1787112485.7760394,
+    "seen": 1787547816.091757,
+    "ast_hash": "9189abf39b7d7c61ad5b46c491cf064a",
+    "semantic_hash": "9189abf39b7d7c61ad5b46c491cf064a"
+  },
+  "tests/Delima.Launcher.Tests/Delima.Launcher.Tests.csproj": {
+    "mtime": 1787112485.7762382,
+    "seen": 1787547816.091758,
+    "ast_hash": "602cf810d2e5e1653c3471eeb4463973",
+    "semantic_hash": "602cf810d2e5e1653c3471eeb4463973"
+  },
+  "tests/Delima.Launcher.Tests/ForbiddenVocabularyTests.cs": {
+    "mtime": 1787112485.7764766,
+    "seen": 1787547816.0917592,
+    "ast_hash": "2f984c15515ebab61ecc7f5178909ea0",
+    "semantic_hash": "2f984c15515ebab61ecc7f5178909ea0"
+  },
+  "tests/Delima.Launcher.Tests/KataLaluanGambarViewModelTests.cs": {
+    "mtime": 1787535131.668688,
+    "seen": 1787547816.0917602,
+    "ast_hash": "1ad8add8bd60b3937ae286a17638a490",
+    "semantic_hash": "1ad8add8bd60b3937ae286a17638a490"
+  },
+  "tests/Delima.Launcher.Tests/LauncherFlowTests.cs": {
+    "mtime": 1787535131.6688209,
+    "seen": 1787547816.0917609,
+    "ast_hash": "c853b56e6772a1d2011010cae53910d3",
+    "semantic_hash": "c853b56e6772a1d2011010cae53910d3"
+  },
+  "tests/Delima.Launcher.Tests/ModGuruViewModelTests.cs": {
+    "mtime": 1787535131.6689873,
+    "seen": 1787547816.0917609,
+    "ast_hash": "989ff11e69b02ee5423ffffb84886737",
+    "semantic_hash": "989ff11e69b02ee5423ffffb84886737"
+  },
+  "tests/Delima.Launcher.Tests/PilihKelasViewModelTests.cs": {
+    "mtime": 1787535131.6690943,
+    "seen": 1787547816.0917618,
+    "ast_hash": "642fb8d3df31dda46a96e7b855a2adb3",
+    "semantic_hash": "642fb8d3df31dda46a96e7b855a2adb3"
+  },
+  "tests/Delima.Launcher.Tests/ThemeBuilderTests.cs": {
+    "mtime": 1787535131.6693017,
+    "seen": 1787547816.091763,
+    "ast_hash": "41cbba43a655239411f59ea929011661",
+    "semantic_hash": "41cbba43a655239411f59ea929011661"
+  },
+  "tests/Delima.Win32.Tests/BrowserPolicyConfiguratorTests.cs": {
+    "mtime": 1787489878.2155244,
+    "seen": 1787547816.091764,
+    "ast_hash": "b3a4132c9f3b3bbf2449b9f5ad57f59e",
+    "semantic_hash": "b3a4132c9f3b3bbf2449b9f5ad57f59e"
+  },
+  "tests/Delima.Win32.Tests/BrowserSessionTests.cs": {
+    "mtime": 1787535131.6694336,
+    "seen": 1787547816.091765,
+    "ast_hash": "c3a5c2fdbef35f0dfc8cca1d7c40d021",
+    "semantic_hash": "c3a5c2fdbef35f0dfc8cca1d7c40d021"
+  },
+  "tests/Delima.Win32.Tests/ChromePolicyConfiguratorTests.cs": {
+    "mtime": 1787290683.8635786,
+    "seen": 1787547816.091766,
+    "ast_hash": "4e1dbbe58746261c3f5b40871d041d32",
+    "semantic_hash": "4e1dbbe58746261c3f5b40871d041d32"
+  },
+  "tests/Delima.Win32.Tests/Delima.Win32.Tests.csproj": {
+    "mtime": 1787285763.6383045,
+    "seen": 1787547816.091767,
+    "ast_hash": "b15dc39a1a39410ec1d310825e9b0b51",
+    "semantic_hash": "b15dc39a1a39410ec1d310825e9b0b51"
+  },
+  "tests/Delima.Win32.Tests/DpapiCredentialStoreTests.cs": {
+    "mtime": 1787466655.515505,
+    "seen": 1787547816.091768,
+    "ast_hash": "b7bda9f16499760fb39835456daacd2c",
+    "semantic_hash": "b7bda9f16499760fb39835456daacd2c"
+  },
+  "tests/Delima.Win32.Tests/FailureTaxonomyTests.cs": {
+    "mtime": 1787489878.216291,
+    "seen": 1787547816.091769,
+    "ast_hash": "a6d570fd289c3dbb69da2b97ef22cc40",
+    "semantic_hash": "a6d570fd289c3dbb69da2b97ef22cc40"
+  },
+  "tests/Delima.Win32.Tests/IdleTrackerTests.cs": {
+    "mtime": 1787290683.8636718,
+    "seen": 1787547816.0917702,
+    "ast_hash": "d9567e60cf31105463005a256fc22881",
+    "semantic_hash": "d9567e60cf31105463005a256fc22881"
+  },
+  "tests/Delima.Win32.Tests/InjectionEngineTests.cs": {
+    "mtime": 1787323168.539428,
+    "seen": 1787547816.091771,
+    "ast_hash": "089ce8f32673efdfe64fa68886f35002",
+    "semantic_hash": "089ce8f32673efdfe64fa68886f35002"
+  },
+  "tests/Delima.Win32.Tests/LaunchAtLogonTests.cs": {
+    "mtime": 1787290683.8637745,
+    "seen": 1787547816.0917718,
+    "ast_hash": "eae9270b948223599688bc4bba857469",
+    "semantic_hash": "eae9270b948223599688bc4bba857469"
+  },
+  "tests/Delima.Win32.Tests/NativeMethodsTests.cs": {
+    "mtime": 1787112485.778566,
+    "seen": 1787547816.091773,
+    "ast_hash": "a1b6e0cccba1e34167a044d130991f29",
+    "semantic_hash": "a1b6e0cccba1e34167a044d130991f29"
+  },
+  "tests/Delima.Win32.Tests/ProvisionEngineTests.cs": {
+    "mtime": 1787535131.6695595,
+    "seen": 1787547816.091773,
+    "ast_hash": "069ab7fbb0e1ff6a9bac57f8b4cfd850",
+    "semantic_hash": "069ab7fbb0e1ff6a9bac57f8b4cfd850"
+  },
+  "tests/Delima.Win32.Tests/RouteCLoginOrchestratorTests.cs": {
+    "mtime": 1787489878.2165766,
+    "seen": 1787547816.091774,
+    "ast_hash": "07533595d6b3559f900a34027d5570e8",
+    "semantic_hash": "07533595d6b3559f900a34027d5570e8"
+  },
+  "tests/Delima.Win32.Tests/ShortcutHelperTests.cs": {
+    "mtime": 1787535131.669643,
+    "seen": 1787547816.091775,
+    "ast_hash": "fe5689ffc0094cabf286366653359e68",
+    "semantic_hash": "fe5689ffc0094cabf286366653359e68"
+  },
+  "tests/Delima.Win32.Tests/StoreAclConfiguratorTests.cs": {
+    "mtime": 1787546892.6585324,
+    "seen": 1787547816.091776,
+    "ast_hash": "6b8b4620865736c77243d220abb3e2b6",
+    "semantic_hash": "6b8b4620865736c77243d220abb3e2b6"
+  },
+  ".github/workflows/release.yml": {
+    "mtime": 1787541402.2449512,
+    "seen": 1787547816.091777,
+    "ast_hash": "8d131a230238688b153a9a9bb2938d70",
+    "semantic_hash": "8d131a230238688b153a9a9bb2938d70"
+  },
+  "InjectionSpike/README.md": {
+    "mtime": 1787294266.9355047,
+    "seen": 1787547816.091778,
+    "ast_hash": "6c9c0b18c4407063fc9e0ef10e90f3f9",
+    "semantic_hash": "6c9c0b18c4407063fc9e0ef10e90f3f9"
+  },
+  "InjectionSpike/testpage.html": {
+    "mtime": 1787019738.036409,
+    "seen": 1787547816.091778,
+    "ast_hash": "b087b392530ad2fd15f466e98ebc7ba9",
+    "semantic_hash": "b087b392530ad2fd15f466e98ebc7ba9"
+  },
+  "Normal_SSO/PRD_Normal_SSO.md": {
+    "mtime": 1787019738.036847,
+    "seen": 1787547816.091779,
+    "ast_hash": "d3a948fa150e23d9fa9a423622d88db5",
+    "semantic_hash": "d3a948fa150e23d9fa9a423622d88db5"
+  },
+  "Normal_SSO/Stitch_UI_Build_Guide.md": {
+    "mtime": 1787019735.853946,
+    "seen": 1787547816.0917802,
+    "ast_hash": "52e89e0d6149aede7e799c04a9f4b7f5",
+    "semantic_hash": "52e89e0d6149aede7e799c04a9f4b7f5"
+  },
+  "Normal_SSO/Technical_Architecture_Normal_SSO.md": {
+    "mtime": 1787133486.6069534,
+    "seen": 1787547816.0917811,
+    "ast_hash": "52d92490f752027679179f6c9f355698",
+    "semantic_hash": "52d92490f752027679179f6c9f355698"
+  },
+  "PRD_Gap_Analysis.md": {
+    "mtime": 1787019738.0372663,
+    "seen": 1787547816.0917819,
+    "ast_hash": "fdd1c526b7892a431f4fb7f6af7274c6",
+    "semantic_hash": "fdd1c526b7892a431f4fb7f6af7274c6"
+  },
+  "README.md": {
+    "mtime": 1787539675.3762684,
+    "seen": 1787547816.0917828,
+    "ast_hash": "d9e0ffc488fcb2f47c9e56d6683ec496",
+    "semantic_hash": "d9e0ffc488fcb2f47c9e56d6683ec496"
+  },
+  "Visual_SSO/AI_Build_Guide.md": {
+    "mtime": 1787535131.6541781,
+    "seen": 1787547816.091784,
+    "ast_hash": "52e711ffb9508dca81d82b7c15cb5fca",
+    "semantic_hash": "52e711ffb9508dca81d82b7c15cb5fca"
+  },
+  "Visual_SSO/Build_And_Release.md": {
+    "mtime": 1787546892.657755,
+    "seen": 1787547816.091785,
+    "ast_hash": "ac92020bf95edba7175a8d1dc98727c7",
+    "semantic_hash": "ac92020bf95edba7175a8d1dc98727c7"
+  },
+  "Visual_SSO/Build_Machine_Setup.md": {
+    "mtime": 1787457342.0672948,
+    "seen": 1787547816.091785,
+    "ast_hash": "94da53946c84dbaa082f8abec78e4de4",
+    "semantic_hash": "94da53946c84dbaa082f8abec78e4de4"
+  },
+  "Visual_SSO/Build_Prompts.md": {
+    "mtime": 1787490922.096458,
+    "seen": 1787547816.091786,
+    "ast_hash": "ebaec61270c530c47c314bb23a35e287",
+    "semantic_hash": "ebaec61270c530c47c314bb23a35e287"
+  },
+  "Visual_SSO/E2E_First_Run.md": {
+    "mtime": 1787471151.148807,
+    "seen": 1787547816.091787,
+    "ast_hash": "23169a1ef84e4753647809fc28e853dd",
+    "semantic_hash": "23169a1ef84e4753647809fc28e853dd"
+  },
+  "Visual_SSO/PRD_Visual_SSO_v2.md": {
+    "mtime": 1787457342.06815,
+    "seen": 1787547816.091788,
+    "ast_hash": "5e2901e8c65dc547726eb48a9b0a7779",
+    "semantic_hash": "5e2901e8c65dc547726eb48a9b0a7779"
+  },
+  "Visual_SSO/T0.2_URL_Confirmation.md": {
+    "mtime": 1787457342.0683963,
+    "seen": 1787547816.091789,
+    "ast_hash": "cb4640548f0df72f5e6ae75c9928435f",
+    "semantic_hash": "cb4640548f0df72f5e6ae75c9928435f"
+  },
+  "Visual_SSO/T0.3_Injection_Test_Protocol.md": {
+    "mtime": 1787019738.0400262,
+    "seen": 1787547816.091789,
+    "ast_hash": "4d11c878fcd01b10e8f728e74e6ed2a8",
+    "semantic_hash": "4d11c878fcd01b10e8f728e74e6ed2a8"
+  },
+  "Visual_SSO/T0.3_Tutorial_Step_By_Step.md": {
+    "mtime": 1787535131.6543016,
+    "seen": 1787547816.09179,
+    "ast_hash": "13c2f8a490f06584c0059be15bfae931",
+    "semantic_hash": "13c2f8a490f06584c0059be15bfae931"
+  },
+  "Visual_SSO/T0.4_UIA_Verification.md": {
+    "mtime": 1787535131.6544614,
+    "seen": 1787547816.0917912,
+    "ast_hash": "c478bd85b07b77a6ffc1d41743639e7d",
+    "semantic_hash": "c478bd85b07b77a6ffc1d41743639e7d"
+  },
+  "Visual_SSO/Technical_Architecture_Visual_SSO.md": {
+    "mtime": 1787489878.2069688,
+    "seen": 1787547816.0917919,
+    "ast_hash": "45221ec3aa9e0bb394772ec1d243f368",
+    "semantic_hash": "45221ec3aa9e0bb394772ec1d243f368"
+  },
+  "Visual_SSO/mockups/DELIMa_Admin_Wizard_Mockups.html": {
+    "mtime": 1787535197.154298,
+    "seen": 1787547816.0917928,
+    "ast_hash": "2d009bff605506999716ccad14d09229",
+    "semantic_hash": "2d009bff605506999716ccad14d09229"
+  },
+  "Visual_SSO/mockups/DELIMa_Screen_Mockups.html": {
+    "mtime": 1787535200.62315,
+    "seen": 1787547816.091794,
+    "ast_hash": "36bd35f8cb0da91610881a6f431fcf31",
+    "semantic_hash": "36bd35f8cb0da91610881a6f431fcf31"
+  },
+  "docs/APPLOCKER_KIOSK_HARDENING.md": {
+    "mtime": 1787290683.846436,
+    "seen": 1787547816.091795,
+    "ast_hash": "e9291a761bcf3a00cd6d0b1cda16efe7",
+    "semantic_hash": "e9291a761bcf3a00cd6d0b1cda16efe7"
+  },
+  "docs/assets/screenshots/README.md": {
+    "mtime": 1787539522.98378,
+    "seen": 1787547816.091796,
+    "ast_hash": "b346094712a00db02ec6fc4af4648c49",
+    "semantic_hash": "b346094712a00db02ec6fc4af4648c49"
+  },
+  "docs/index.html": {
+    "mtime": 1787540812.9328387,
+    "seen": 1787547816.0917969,
+    "ast_hash": "101c737808ceaa4853968aa6814c4483",
+    "semantic_hash": "101c737808ceaa4853968aa6814c4483"
+  },
+  "index.html": {
+    "mtime": 1787538521.427852,
+    "seen": 1787547816.0917969,
+    "ast_hash": "7eeb4c7e4fed925b65b77c3da22be3a9",
+    "semantic_hash": "7eeb4c7e4fed925b65b77c3da22be3a9"
+  },
+  "spike-results/uia_chrome_20260823_225959_summary.txt": {
+    "mtime": 1787535131.6574137,
+    "seen": 1787547816.091798,
+    "ast_hash": "8f460250a8eb58c6156cd270b676432a",
+    "semantic_hash": "8f460250a8eb58c6156cd270b676432a"
+  },
+  "spike-results/uia_edge_20260823_230600_summary.txt": {
+    "mtime": 1787535131.659789,
+    "seen": 1787547816.091799,
+    "ast_hash": "130d7d4679ef77458fd2f61f67618dac",
+    "semantic_hash": "130d7d4679ef77458fd2f61f67618dac"
+  },
+  "src/Delima.Launcher/Assets/Fonts/OFL-Baloo2.txt": {
+    "mtime": 1787112485.761026,
+    "seen": 1787547816.0918,
+    "ast_hash": "142dd11f1d21f09ff78c383cd2125743",
+    "semantic_hash": "142dd11f1d21f09ff78c383cd2125743"
+  },
+  "src/Delima.Launcher/Assets/Fonts/OFL-Nunito.txt": {
+    "mtime": 1787112485.7613063,
+    "seen": 1787547816.0918012,
+    "ast_hash": "1be2e7edc99bc4a3d9d56d68c48b5f39",
+    "semantic_hash": "1be2e7edc99bc4a3d9d56d68c48b5f39"
+  },
+  "docs/Logo Delima auto-login.jpg": {
+    "mtime": 1787457342.0690618,
+    "seen": 1787547816.0918021,
+    "ast_hash": "1f23d956350b0ceac60089b0f92fddb1",
+    "semantic_hash": "1f23d956350b0ceac60089b0f92fddb1"
+  },
+  "docs/assets/screenshots/langkah-01-keperluan.png": {
+    "mtime": 1787539371.262914,
+    "seen": 1787547816.0918028,
+    "ast_hash": "0af0f28f5fa7e1bfe8a87a5a2dd13b83",
+    "semantic_hash": "0af0f28f5fa7e1bfe8a87a5a2dd13b83"
+  },
+  "docs/assets/screenshots/langkah-05-admin-identiti.png": {
+    "mtime": 1787538728.278813,
+    "seen": 1787547816.0918028,
+    "ast_hash": "eb585cd766d4b5d27b6b1318210a1d1d",
+    "semantic_hash": "eb585cd766d4b5d27b6b1318210a1d1d"
+  },
+  "docs/assets/screenshots/langkah-06-admin-import-roster.png": {
+    "mtime": 1787538728.281968,
+    "seen": 1787547816.0918038,
+    "ast_hash": "58c16addc31498b9e060a473070982be",
+    "semantic_hash": "58c16addc31498b9e060a473070982be"
+  },
+  "docs/assets/screenshots/langkah-07-admin-import-katalaluan.png": {
+    "mtime": 1787538728.28656,
+    "seen": 1787547816.091805,
+    "ast_hash": "67f2460401405502b7b5e8d616d9a3a8",
+    "semantic_hash": "67f2460401405502b7b5e8d616d9a3a8"
+  },
+  "docs/assets/screenshots/langkah-08-admin-avatar-pin.png": {
+    "mtime": 1787538728.289919,
+    "seen": 1787547816.091806,
+    "ast_hash": "024417a1ff94015ca50ea175ecc7b058",
+    "semantic_hash": "024417a1ff94015ca50ea175ecc7b058"
+  },
+  "docs/assets/screenshots/langkah-09-admin-destinasi.png": {
+    "mtime": 1787539009.6209836,
+    "seen": 1787547816.091807,
+    "ast_hash": "35ce9966175b9dbacac2c1238dc7a9bd",
+    "semantic_hash": "35ce9966175b9dbacac2c1238dc7a9bd"
+  },
+  "docs/assets/screenshots/langkah-09-admin-export-usb.png": {
+    "mtime": 1787539009.6185558,
+    "seen": 1787547816.091808,
+    "ast_hash": "a93b3a2b4ec5bc30224643679e0f0b00",
+    "semantic_hash": "a93b3a2b4ec5bc30224643679e0f0b00"
+  },
+  "docs/assets/screenshots/langkah-12-log-masuk-murid.png": {
+    "mtime": 1787539452.069374,
+    "seen": 1787547816.091808,
+    "ast_hash": "6fa195ed30765174e6c0b50cb3581f47",
+    "semantic_hash": "6fa195ed30765174e6c0b50cb3581f47"
+  },
+  "docs/assets/screenshots/langkah-13-mod-guru-override.png": {
+    "mtime": 1787539452.0731022,
+    "seen": 1787547816.091809,
+    "ast_hash": "2a038641d56f2f8adfe74bfedc350c10",
+    "semantic_hash": "2a038641d56f2f8adfe74bfedc350c10"
+  },
+  "docs/icon.png": {
+    "mtime": 1787540808.4163117,
+    "seen": 1787547816.09181,
+    "ast_hash": "ca7445fa3404d2ecac0523b7e3cb5921",
+    "semantic_hash": "ca7445fa3404d2ecac0523b7e3cb5921"
+  },
+  "icon.png": {
+    "mtime": 1787535131.6555734,
+    "seen": 1787547816.0918112,
+    "ast_hash": "ca7445fa3404d2ecac0523b7e3cb5921",
+    "semantic_hash": "ca7445fa3404d2ecac0523b7e3cb5921"
+  },
+  "installer/assets/avatars/anjing.svg": {
+    "mtime": 1787457342.0755248,
+    "seen": 1787547816.0918121,
+    "ast_hash": "f10e94385e06b2c1437975cf52c14976",
+    "semantic_hash": "f10e94385e06b2c1437975cf52c14976"
+  },
+  "installer/assets/avatars/ant.svg": {
+    "mtime": 1787457342.0757933,
+    "seen": 1787547816.091813,
+    "ast_hash": "07bfd21f5adb087b9a173c284d155f15",
+    "semantic_hash": "07bfd21f5adb087b9a173c284d155f15"
+  },
+  "installer/assets/avatars/awan.svg": {
+    "mtime": 1787290683.8470778,
+    "seen": 1787547816.091813,
+    "ast_hash": "667739745a0cca9185b979c766a6dde1",
+    "semantic_hash": "667739745a0cca9185b979c766a6dde1"
+  },
+  "installer/assets/avatars/ayam.svg": {
+    "mtime": 1787457342.0759656,
+    "seen": 1787547816.0918138,
+    "ast_hash": "2f41472ef76a24d20ade422f6aeed605",
+    "semantic_hash": "2f41472ef76a24d20ade422f6aeed605"
+  },
+  "installer/assets/avatars/bintang.svg": {
+    "mtime": 1787290683.8471782,
+    "seen": 1787547816.091815,
+    "ast_hash": "52190136e76f2c8a1504582418c438c7",
+    "semantic_hash": "52190136e76f2c8a1504582418c438c7"
+  },
+  "installer/assets/avatars/biri_biri.svg": {
+    "mtime": 1787457342.076142,
+    "seen": 1787547816.091816,
+    "ast_hash": "143eba814f34ed3eff22e0a127d89f39",
+    "semantic_hash": "143eba814f34ed3eff22e0a127d89f39"
+  },
+  "installer/assets/avatars/bison.svg": {
+    "mtime": 1787457342.076295,
+    "seen": 1787547816.091817,
+    "ast_hash": "874782c4771ab1610b92fdcb1aca41dd",
+    "semantic_hash": "874782c4771ab1610b92fdcb1aca41dd"
+  },
+  "installer/assets/avatars/bizon.svg": {
+    "mtime": 1787457342.0764296,
+    "seen": 1787547816.091818,
+    "ast_hash": "874782c4771ab1610b92fdcb1aca41dd",
+    "semantic_hash": "874782c4771ab1610b92fdcb1aca41dd"
+  },
+  "installer/assets/avatars/bola.svg": {
+    "mtime": 1787290683.8472607,
+    "seen": 1787547816.091819,
+    "ast_hash": "0ed3992e02f013c93bd105a189990790",
+    "semantic_hash": "0ed3992e02f013c93bd105a189990790"
+  },
+  "installer/assets/avatars/buaya.svg": {
+    "mtime": 1787457342.0765507,
+    "seen": 1787547816.091819,
+    "ast_hash": "7fc6c19f848c3b4c62e380a27175ab30",
+    "semantic_hash": "7fc6c19f848c3b4c62e380a27175ab30"
+  },
+  "installer/assets/avatars/buku.svg": {
+    "mtime": 1787290683.847335,
+    "seen": 1787547816.09182,
+    "ast_hash": "23c8445c2ba197a7c70f8493ae731c3c",
+    "semantic_hash": "23c8445c2ba197a7c70f8493ae731c3c"
+  },
+  "installer/assets/avatars/bulan.svg": {
+    "mtime": 1787290683.8474123,
+    "seen": 1787547816.091821,
+    "ast_hash": "2a810ce6f3ffca1728ae53697cd88489",
+    "semantic_hash": "2a810ce6f3ffca1728ae53697cd88489"
+  },
+  "installer/assets/avatars/bunga.svg": {
+    "mtime": 1787290683.8474953,
+    "seen": 1787547816.0918221,
+    "ast_hash": "fc94c7076efbc083c610616dfdae9e4b",
+    "semantic_hash": "fc94c7076efbc083c610616dfdae9e4b"
+  },
+  "installer/assets/avatars/burung.svg": {
+    "mtime": 1787290683.8475828,
+    "seen": 1787547816.091823,
+    "ast_hash": "f8dfb9dd318eb3f16d4ad6535eda15f7",
+    "semantic_hash": "f8dfb9dd318eb3f16d4ad6535eda15f7"
+  },
+  "installer/assets/avatars/cat.svg": {
+    "mtime": 1787457342.0767152,
+    "seen": 1787547816.091824,
+    "ast_hash": "395bd7e09675abeb37b37bb5a4d52386",
+    "semantic_hash": "395bd7e09675abeb37b37bb5a4d52386"
+  },
+  "installer/assets/avatars/chicken.svg": {
+    "mtime": 1787457342.076857,
+    "seen": 1787547816.091825,
+    "ast_hash": "2f41472ef76a24d20ade422f6aeed605",
+    "semantic_hash": "2f41472ef76a24d20ade422f6aeed605"
+  },
+  "installer/assets/avatars/crocodile.svg": {
+    "mtime": 1787457342.0769944,
+    "seen": 1787547816.091825,
+    "ast_hash": "7fc6c19f848c3b4c62e380a27175ab30",
+    "semantic_hash": "7fc6c19f848c3b4c62e380a27175ab30"
+  },
+  "installer/assets/avatars/dog.svg": {
+    "mtime": 1787457342.0771358,
+    "seen": 1787547816.091826,
+    "ast_hash": "f10e94385e06b2c1437975cf52c14976",
+    "semantic_hash": "f10e94385e06b2c1437975cf52c14976"
+  },
+  "installer/assets/avatars/doraemon.svg": {
+    "mtime": 1787457342.0773048,
+    "seen": 1787547816.091827,
+    "ast_hash": "cbe8f4bf62333a285da562f23e6b6595",
+    "semantic_hash": "cbe8f4bf62333a285da562f23e6b6595"
+  },
+  "installer/assets/avatars/duck.svg": {
+    "mtime": 1787457342.0774496,
+    "seen": 1787547816.0918279,
+    "ast_hash": "53027cec46f00b3909836ea2555d80f0",
+    "semantic_hash": "53027cec46f00b3909836ea2555d80f0"
+  },
+  "installer/assets/avatars/eagle.svg": {
+    "mtime": 1787457342.0776439,
+    "seen": 1787547816.091829,
+    "ast_hash": "d69997bd596fd915846dbcf986fc13cc",
+    "semantic_hash": "d69997bd596fd915846dbcf986fc13cc"
+  },
+  "installer/assets/avatars/elephant.svg": {
+    "mtime": 1787457342.07796,
+    "seen": 1787547816.09183,
+    "ast_hash": "cc8d9ae5f6e8887b437790c1777a7ff2",
+    "semantic_hash": "cc8d9ae5f6e8887b437790c1777a7ff2"
+  },
+  "installer/assets/avatars/epal.svg": {
+    "mtime": 1787290683.8476655,
+    "seen": 1787547816.091831,
+    "ast_hash": "cd59d67b009818663aa76cb92daceb63",
+    "semantic_hash": "cd59d67b009818663aa76cb92daceb63"
+  },
+  "installer/assets/avatars/fox.svg": {
+    "mtime": 1787457342.0781198,
+    "seen": 1787547816.0918322,
+    "ast_hash": "b8c58a2b65cabdd68a6161b7292113a0",
+    "semantic_hash": "b8c58a2b65cabdd68a6161b7292113a0"
+  },
+  "installer/assets/avatars/gajah.svg": {
+    "mtime": 1787457342.07834,
+    "seen": 1787547816.0918322,
+    "ast_hash": "cc8d9ae5f6e8887b437790c1777a7ff2",
+    "semantic_hash": "cc8d9ae5f6e8887b437790c1777a7ff2"
+  },
+  "installer/assets/avatars/giraffe.svg": {
+    "mtime": 1787457342.0785139,
+    "seen": 1787547816.091834,
+    "ast_hash": "18d2aa56eeadfae83e7b0f67bb938222",
+    "semantic_hash": "18d2aa56eeadfae83e7b0f67bb938222"
+  },
+  "installer/assets/avatars/harimau_bintang.svg": {
+    "mtime": 1787457342.0786717,
+    "seen": 1787547816.091834,
+    "ast_hash": "cf4783a4e8e3696d2c40e0d059e32377",
+    "semantic_hash": "cf4783a4e8e3696d2c40e0d059e32377"
+  },
+  "installer/assets/avatars/helang.svg": {
+    "mtime": 1787457342.078846,
+    "seen": 1787547816.0918348,
+    "ast_hash": "d69997bd596fd915846dbcf986fc13cc",
+    "semantic_hash": "d69997bd596fd915846dbcf986fc13cc"
+  },
+  "installer/assets/avatars/ikan.svg": {
+    "mtime": 1787290683.8478172,
+    "seen": 1787547816.091836,
+    "ast_hash": "058b8834a96b42d9d5d49300e8b53c1c",
+    "semantic_hash": "058b8834a96b42d9d5d49300e8b53c1c"
+  },
+  "installer/assets/avatars/itik.svg": {
+    "mtime": 1787457342.0789917,
+    "seen": 1787547816.091837,
+    "ast_hash": "53027cec46f00b3909836ea2555d80f0",
+    "semantic_hash": "53027cec46f00b3909836ea2555d80f0"
+  },
+  "installer/assets/avatars/kereta.svg": {
+    "mtime": 1787290683.8479095,
+    "seen": 1787547816.091838,
+    "ast_hash": "79eaa24c027371c68a2fa53f31680a3f",
+    "semantic_hash": "79eaa24c027371c68a2fa53f31680a3f"
+  },
+  "installer/assets/avatars/koala.svg": {
+    "mtime": 1787457342.0791943,
+    "seen": 1787547816.091839,
+    "ast_hash": "a1c237416f6402fe4fdae088996c175c",
+    "semantic_hash": "a1c237416f6402fe4fdae088996c175c"
+  },
+  "installer/assets/avatars/kucing.svg": {
+    "mtime": 1787457342.0794086,
+    "seen": 1787547816.09184,
+    "ast_hash": "395bd7e09675abeb37b37bb5a4d52386",
+    "semantic_hash": "395bd7e09675abeb37b37bb5a4d52386"
+  },
+  "installer/assets/avatars/kuda_belang.svg": {
+    "mtime": 1787457342.0795505,
+    "seen": 1787547816.091841,
+    "ast_hash": "fb454a468a04eac519fd4bdcf9ff4fda",
+    "semantic_hash": "fb454a468a04eac519fd4bdcf9ff4fda"
+  },
+  "installer/assets/avatars/leopard.svg": {
+    "mtime": 1787457342.079675,
+    "seen": 1787547816.091842,
+    "ast_hash": "cf4783a4e8e3696d2c40e0d059e32377",
+    "semantic_hash": "cf4783a4e8e3696d2c40e0d059e32377"
+  },
+  "installer/assets/avatars/matahari.svg": {
+    "mtime": 1787290683.8480842,
+    "seen": 1787547816.091842,
+    "ast_hash": "5ab10fb9e60e61cf2af7bff32be1ad64",
+    "semantic_hash": "5ab10fb9e60e61cf2af7bff32be1ad64"
+  },
+  "installer/assets/avatars/memerang.svg": {
+    "mtime": 1787457342.0798163,
+    "seen": 1787547816.0918431,
+    "ast_hash": "d6b1b95cb140b8cd27a4c5bddc7cd089",
+    "semantic_hash": "d6b1b95cb140b8cd27a4c5bddc7cd089"
+  },
+  "installer/assets/avatars/mouse.svg": {
+    "mtime": 1787457342.0799544,
+    "seen": 1787547816.091844,
+    "ast_hash": "40023d9c9e17304cd8b84ba616461d76",
+    "semantic_hash": "40023d9c9e17304cd8b84ba616461d76"
+  },
+  "installer/assets/avatars/musang.svg": {
+    "mtime": 1787457342.0800886,
+    "seen": 1787547816.091845,
+    "ast_hash": "b8c58a2b65cabdd68a6161b7292113a0",
+    "semantic_hash": "b8c58a2b65cabdd68a6161b7292113a0"
+  },
+  "installer/assets/avatars/otter.svg": {
+    "mtime": 1787457342.0802507,
+    "seen": 1787547816.091846,
+    "ast_hash": "d6b1b95cb140b8cd27a4c5bddc7cd089",
+    "semantic_hash": "d6b1b95cb140b8cd27a4c5bddc7cd089"
+  },
+  "installer/assets/avatars/penguin.svg": {
+    "mtime": 1787457342.0804038,
+    "seen": 1787547816.091847,
+    "ast_hash": "45187603e828872822b3594045e0cf31",
+    "semantic_hash": "45187603e828872822b3594045e0cf31"
+  },
+  "installer/assets/avatars/pensel.svg": {
+    "mtime": 1787290683.8481836,
+    "seen": 1787547816.091848,
+    "ast_hash": "c0ddfc0e8cae04aa8b4e9b5811fb1b09",
+    "semantic_hash": "c0ddfc0e8cae04aa8b4e9b5811fb1b09"
+  },
+  "installer/assets/avatars/pikachu.svg": {
+    "mtime": 1787457342.0805893,
+    "seen": 1787547816.0918489,
+    "ast_hash": "2b23eefa8c85b8a92e1825e29ff48a26",
+    "semantic_hash": "2b23eefa8c85b8a92e1825e29ff48a26"
+  },
+  "installer/assets/avatars/pokok.svg": {
+    "mtime": 1787290683.8482952,
+    "seen": 1787547816.0918489,
+    "ast_hash": "d76ea76024867901a4008770a0474107",
+    "semantic_hash": "d76ea76024867901a4008770a0474107"
+  },
+  "installer/assets/avatars/raccoon.svg": {
+    "mtime": 1787457342.0807712,
+    "seen": 1787547816.09185,
+    "ast_hash": "43111053439090b61f55e08fc3c27a90",
+    "semantic_hash": "43111053439090b61f55e08fc3c27a90"
+  },
+  "installer/assets/avatars/rakun.svg": {
+    "mtime": 1787457342.0809689,
+    "seen": 1787547816.091851,
+    "ast_hash": "43111053439090b61f55e08fc3c27a90",
+    "semantic_hash": "43111053439090b61f55e08fc3c27a90"
+  },
+  "installer/assets/avatars/rumah.svg": {
+    "mtime": 1787290683.8483863,
+    "seen": 1787547816.091852,
+    "ast_hash": "58a020572383b8229433aec71571dc9f",
+    "semantic_hash": "58a020572383b8229433aec71571dc9f"
+  },
+  "installer/assets/avatars/semut.svg": {
+    "mtime": 1787457342.0811825,
+    "seen": 1787547816.0918531,
+    "ast_hash": "07bfd21f5adb087b9a173c284d155f15",
+    "semantic_hash": "07bfd21f5adb087b9a173c284d155f15"
+  },
+  "installer/assets/avatars/sheep.svg": {
+    "mtime": 1787457342.0814998,
+    "seen": 1787547816.091854,
+    "ast_hash": "143eba814f34ed3eff22e0a127d89f39",
+    "semantic_hash": "143eba814f34ed3eff22e0a127d89f39"
+  },
+  "installer/assets/avatars/sloth.svg": {
+    "mtime": 1787457342.0818021,
+    "seen": 1787547816.091854,
+    "ast_hash": "b0fe499f0176c5dd984ce54529463ca9",
+    "semantic_hash": "b0fe499f0176c5dd984ce54529463ca9"
+  },
+  "installer/assets/avatars/tikus.svg": {
+    "mtime": 1787457342.082016,
+    "seen": 1787547816.091855,
+    "ast_hash": "40023d9c9e17304cd8b84ba616461d76",
+    "semantic_hash": "40023d9c9e17304cd8b84ba616461d76"
+  },
+  "installer/assets/avatars/zebra.svg": {
+    "mtime": 1787457342.082214,
+    "seen": 1787547816.0918558,
+    "ast_hash": "fb454a468a04eac519fd4bdcf9ff4fda",
+    "semantic_hash": "fb454a468a04eac519fd4bdcf9ff4fda"
+  },
+  "installer/assets/avatars/zirafah.svg": {
+    "mtime": 1787457342.082407,
+    "seen": 1787547816.091857,
+    "ast_hash": "18d2aa56eeadfae83e7b0f67bb938222",
+    "semantic_hash": "18d2aa56eeadfae83e7b0f67bb938222"
+  },
+  "src/Delima.Admin/Assets/donation_qr.png": {
+    "mtime": 1787535131.6599762,
+    "seen": 1787547816.091858,
+    "ast_hash": "4b8dc6c2db89e52cbc739e20f1c22016",
+    "semantic_hash": "4b8dc6c2db89e52cbc739e20f1c22016"
+  }
+}
