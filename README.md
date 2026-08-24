@@ -112,7 +112,7 @@ For young children who cannot easily locate special characters like `@` or `-` o
 * ⚡ **Accurate Win32 Replay Engine (`SendInput`)**: Hardware-level keystroke injection tested at 100% accuracy on real school lab hardware (scoring 100/100 across test batches), handling complex reserved symbols effortlessly.
 * 👁️ **UI Automation (`IsPassword`) Verification**: Proactively verifies that the active browser element is an authentic password field before typing credentials, preventing accidental exposure in plaintext fields.
 * 🛑 **Topmost Focus-Stealing Guard**: A transparent barrier overlays the screen during the brief injection window to ensure background keystroke leakage cannot occur if focus shifts.
-* 🧙 **7-Step Admin Wizard (`Delima.Admin`)**: A guided GUI for ICT Coordinators (Guru Penyelaras ICT) to import APDM CSV rosters, match passwords, configure school crest and colors, and export encrypted USB provisioning bundles.
+* 🧙 **7-Step Admin Wizard (`Delima.Admin`)**: A guided GUI for ICT Coordinators (Guru Penyelaras ICT) to import CSV rosters, match passwords, configure school crest and colors, and export encrypted USB provisioning bundles.
 * 🚀 **Rapid Lab Provisioning (`Delima.Provision`)**: Deploy the encrypted bundle across 20–40 lab PCs from a single USB drive in under 90 minutes.
 * 🏫 **Kiosk Lockdown & Mod Guru**: Optional full-screen kiosk guard to prevent young pupils from roaming the Windows desktop, accompanied by an instant 4-digit PIN override for teachers (`Mod Guru`).
 
@@ -141,7 +141,7 @@ Delima-AutoLogin/
 ├── src/
 │   ├── Delima.Admin/          # 7-Step setup wizard for School ICT Coordinators (WPF)
 │   ├── Delima.Core/           # Domain models, AES-GCM crypto, DPAPI store, audit log
-│   ├── Delima.Import/         # APDM roster CSV parser, validator & dry-run engine
+│   ├── Delima.Import/         # Student roster CSV parser, validator & dry-run engine
 │   ├── Delima.Launcher/       # Student-facing kiosk launcher with visual PIN & Mod Guru (WPF)
 │   ├── Delima.Provision/      # Pendrive-based lab workstation provisioning tool
 │   └── Delima.Win32/          # Native P/Invoke, SendInput injection & UI Automation verifier
@@ -230,7 +230,7 @@ The compiled installer will be output to `dist/DELIMaLauncher-Setup-2.0.0.exe`.
 The ICT Coordinator runs `Delima.Admin.exe` to configure the school environment:
 
 1. **Maklumat Sekolah**: Enter the school name, MOE school code (e.g. `BBA8230`), and select branding colors/crest.
-2. **Import Roster**: Select the standard APDM student roster CSV export (`contoh_roster.csv`).
+2. **Import Roster**: Select the student roster CSV export (`contoh_roster.csv`).
 3. **Import Kata Laluan**: Provide the class DELIMa password list (`contoh_kata_laluan.csv`).
 4. **Tetapan Mod Guru**: Set the 4-digit teacher override master PIN.
 5. **Eksport Bundle**: Export the encrypted package (`delima-bundle.bin` + `key.dat`) directly to a USB pendrive.
@@ -276,7 +276,7 @@ DELIMa Smart Launcher was designed specifically to prioritize pupil privacy and 
 - [x] Win32 `SendInput` hardware injection spike passed (100/100 runs)
 - [x] UI Automation (`IsPassword`) field validation passed (49/49 runs)
 - [x] Topmost focus-stealing overlay barrier implementation
-- [x] 7-Step Admin Setup Wizard (`Delima.Admin`) with APDM CSV reconciliation
+- [x] 7-Step Admin Setup Wizard (`Delima.Admin`) with CSV roster reconciliation
 - [x] Multi-school visual theming and 20 animal avatars
 - [x] Inno Setup single-installer script & CI/CD pipeline
 - [ ] Measure Microsoft Edge window title strings in live lab environments

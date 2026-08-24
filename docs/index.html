@@ -39,7 +39,7 @@
       <div class="header-actions">
         <div class="search-box-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="guideSearchInput" class="search-input" placeholder="Cari langkah, APDM, USB, AppLocker...">
+          <input type="text" id="guideSearchInput" class="search-input" placeholder="Cari langkah, CSV, USB, AppLocker...">
         </div>
 
         <button id="viewModeToggleBtn" class="btn-ctrl" title="Tukar antara mod langkah demi langkah atau paparan penuh">
@@ -81,9 +81,11 @@
     <div class="hero-inner">
       <div class="hero-left">
         <h1 class="hero-title">Panduan Persediaan <span class="highlight">DELIMa Smart Launcher</span></h1>
-        <p class="hero-desc">
-          Selamat datang, <strong>Penyelaras ICT & Guru Makmal Komputer</strong>! Panduan interaktif ini akan membimbing anda langkah demi langkah bermula daripada memuat turun fail pemasang (*installer*), mengkonfigurasi senarai murid APDM, menjana pakej tersulit USB, sehinggalah murid Tahap 1 dapat log masuk ke DELIMa sepantas 10 saat tanpa menaip emel panjang!
-        </p>
+        <div class="header-desc">
+        <p>
+          Selamat datang, <strong>Penyelaras ICT & Guru Makmal Komputer</strong>! Panduan interaktif ini akan membimbing anda langkah demi langkah bermula daripada memuat turun fail pemasang (*installer*), mengkonfigurasi senarai murid, menjana pakej tersulit USB, sehinggalah murid Tahap 1 dapat log masuk ke DELIMa sepantas 10 saat tanpa menaip emel panjang!
+        </p> 
+        </div>
         <div class="hero-badges">
           <span class="hero-pill"><i>🔒</i> 100% Zero-Cloud (Privasi Tempatan)</span>
           <span class="hero-pill"><i>⚡</i> Automasi Log Masuk Tanpa Ralat</span>
@@ -177,7 +179,7 @@
           </a>
           <a href="#step-6" class="nav-step-item" data-step="6">
             <span class="nav-step-num">06</span>
-            <span class="nav-step-title">Import Roster APDM (.csv)</span>
+            <span class="nav-step-title">Import Roster Murid (.csv)</span>
             <span class="nav-step-check">✓</span>
           </a>
           <a href="#step-7" class="nav-step-item" data-step="7">
@@ -294,9 +296,9 @@
               <li class="substep-item">
                 <span class="substep-number">D</span>
                 <div class="substep-content">
-                  <div class="substep-title">Fail Data Murid APDM & Kata Laluan DELIMa</div>
+                  <div class="substep-title">Fail Data Murid & Kata Laluan DELIMa</div>
                   <div class="substep-desc">
-                    Fail CSV senarai nama murid dieksport daripada portal APDM KPM serta senarai kata laluan DELIMa murid yang disediakan oleh pihak sekolah.
+                    Fail CSV senarai nama murid sekolah serta senarai kata laluan DELIMa murid yang disediakan oleh pihak sekolah.
                   </div>
                 </div>
               </li>
@@ -356,7 +358,7 @@
                 </li>
                 <li class="checklist-item" data-chk-id="chk-1-3">
                   <div class="custom-checkbox">✓</div>
-                  <span>Fail CSV senarai nama murid APDM dan kata laluan sedia untuk diproses.</span>
+                  <span>Fail CSV senarai nama murid dan kata laluan sedia untuk diproses.</span>
                 </li>
               </ul>
             </div>
@@ -838,7 +840,7 @@
       </div>
 
       <!-- ====================================================================
-           LANGKAH 06: Import Roster APDM (.csv)
+           LANGKAH 06: Import Roster Murid (.csv)
            ==================================================================== -->
       <div id="step-card-6" class="step-container" data-step="6">
         <article class="step-card">
@@ -847,15 +849,15 @@
               <div class="step-badge-circle">06</div>
               <div>
                 <div class="step-meta-phase">Fasa 3: Konfigurasi Delima.Admin</div>
-                <h2 class="step-title">Import Senarai Murid APDM & Pemetaan Lajur</h2>
+                <h2 class="step-title">Import Senarai Murid & Pemetaan Lajur</h2>
               </div>
             </div>
-            <span class="step-target-tag">📂 Fail CSV APDM</span>
+            <span class="step-target-tag">📂 Fail CSV Roster</span>
           </div>
 
           <div class="step-card-body">
             <p class="instruction-lead">
-              Muat naik fail CSV senarai murid daripada APDM dan sahkan pemetaan lajur data.
+              Muat naik fail CSV senarai murid dan sahkan pemetaan lajur data.
             </p>
 
             <ul class="substep-list">
@@ -898,12 +900,12 @@
             <div class="csv-tester-card">
               <div class="csv-tester-header">
                 <div class="csv-tester-title">
-                  <span>🧪 Penguji Format CSV APDM Segera</span>
+                  <span>🧪 Penguji Format CSV Roster Segera</span>
                 </div>
                 <span style="font-size: 0.72rem; color: var(--text-muted);">Uji sebelum import</span>
               </div>
               <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
-                Tampal baris tajuk (*header*) fail CSV APDM anda di bawah untuk mengesahkan padanan lajur:
+                Tampal baris tajuk (*header*) fail CSV anda di bawah untuk mengesahkan padanan lajur:
               </p>
               <textarea id="csvInputArea" class="csv-textarea" placeholder="Contoh: BIL,NAMA MURID,KELAS,TAHUN,ID DELIMA,NO KAD PENGENALAN"></textarea>
               <button id="btnValidateCsv" class="csv-tester-btn">Uji Keserasian Format CSV</button>
@@ -934,7 +936,7 @@
                 </div>
               </div>
               <div class="mockup-caption">
-                <span>Rajah 6.1: Antaramuka pemetaan lajur pintar APDM CSV.</span>
+                <span>Rajah 6.1: Antaramuka pemetaan lajur pintar CSV.</span>
                 <span style="font-size: 0.72rem; color: var(--primary);">Resolusi Disyorkan: 1366x768</span>
               </div>
             </div>
@@ -1812,7 +1814,7 @@ Start-Service -Name "AppIDSvc"</code></pre>
                 <div class="substep-content">
                   <div class="substep-title">Bagaimana jika ada murid baharu berpindah masuk ke kelas?</div>
                   <div class="substep-desc">
-                    Buka <code>Delima.Admin.exe</code> pada PC Guru, import fail senarai CSV APDM terkini (atau tambah rekod murid baharu), jana pakej <code>school.dlmpack</code> baharu ke Pendrive USB, dan jalankan <code>Delima.Provision.exe</code> pada PC makmal. Data lama akan digantikan secara lancar.
+                    Buka <code>Delima.Admin.exe</code> pada PC Guru, import fail senarai CSV terkini (atau tambah rekod murid baharu), jana pakej <code>school.dlmpack</code> baharu ke Pendrive USB, dan jalankan <code>Delima.Provision.exe</code> pada PC makmal. Data lama akan digantikan secara lancar.
                   </div>
                 </div>
               </div>

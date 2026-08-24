@@ -32,13 +32,13 @@ public class ImporterTests
         => new MemoryStream((encoding ?? Encoding.UTF8).GetBytes(content));
 
     // ---------------------------------------------------------------------------
-    // 1. Messy APDM fixture — real-world-shaped file from embedded resource
+    // 1. Realistic messy roster fixture — real-world-shaped file from embedded resource
     //    Covers: duplicate IDs, malformed IDs, missing fields, unknown class,
     //    blank rows, m-/bare/full-email IDs, diacritics.
     // ---------------------------------------------------------------------------
 
     [Fact]
-    public void Importer_RealisticApdmFixture_ProducesCorrectDryRunReport()
+    public void Importer_RealisticRosterFixture_ProducesCorrectDryRunReport()
     {
         var mapping = new ColumnMapping
         {
@@ -49,8 +49,8 @@ public class ImporterTests
             DelimaIdColumn   = "ID PENGGUNA DELIMA"
         };
 
-        using var stream = FixtureCsv("apdm_realistic_messy.csv");
-        var report = RosterImporter.AnalyzeDryRun(stream, "apdm_realistic_messy.csv", mapping);
+        using var stream = FixtureCsv("roster_realistic_messy.csv");
+        var report = RosterImporter.AnalyzeDryRun(stream, "roster_realistic_messy.csv", mapping);
 
         string summary = report.GenerateSummaryText();
         _output.WriteLine("=== DRY RUN VALIDATION REPORT ===");
@@ -180,7 +180,7 @@ public class ImporterTests
     }
 
     // ---------------------------------------------------------------------------
-    // 6. Auto-detection of common APDM header patterns
+    // 6. Auto-detection of common MOE / school header patterns
     // ---------------------------------------------------------------------------
 
     [Fact]
@@ -207,13 +207,30 @@ public class ImporterTests
     // ---------------------------------------------------------------------------
 
     [Theory]
-    [InlineData("12345678",                  "12345678", "m-12345678")]
-    [InlineData("m-12345678",                "12345678", "m-12345678")]
-    [InlineData("M-12345678",                "12345678", "m-12345678")]
-    [InlineData("m-12345678@moe-dl.edu.my",  "12345678", "m-12345678")]
-    [InlineData("m-1234",                    null, null)]           // too short
-    [InlineData("m-abcdefgh",                null, null)]           // non-numeric
-    [InlineData("",                          null, null)]
+    [InlineData("12345678",                                       "12345678", "m-12345678")]
+    [InlineData("m-12345678",                                     "12345678", "m-12345678")]
+    [InlineData("M-12345678",                                     "12345678", "m-12345678")]
+    [InlineData("m-12345678@moe-dl.edu.my",                       "12345678", "m-12345678")]
+    [InlineData("12345678.0",                                     "12345678", "m-12345678")]
+    [InlineData("m-231001057145@moe-dl.edu.my",                   "231001057145", "m-231001057145")]
+    [InlineData("m-241001379158@moe-dl.edu.my",                   "241001379158", "m-241001379158")]
+    [InlineData("m-251003197706@moe-dl.edu.my",                   "251003197706", "m-251003197706")]
+    [InlineData("m-1234567890123456@moe-dl.edu.my",               "1234567890123456", "m-1234567890123456")]
+    [InlineData("m-12345678901234567890@moe-dl.edu.my",           "12345678901234567890", "m-12345678901234567890")]
+    [InlineData("12345678901234567890",                           "12345678901234567890", "m-12345678901234567890")]
+    [InlineData("231001057145",                                   "231001057145", "m-231001057145")]
+    [InlineData("armelldelisyasoberi.abdulrahman@moe-dl.edu.my",  "armelldelisyasoberi.abdulrahman", "armelldelisyasoberi.abdulrahman")]
+    [InlineData("nurfaiqahnafisah.muhamadiqbal@moe-dl.edu.my",   "nurfaiqahnafisah.muhamadiqbal", "nurfaiqahnafisah.muhamadiqbal")]
+    [InlineData("qurratulain.muhamadiqbal@moe-dl.edu.my",        "qurratulain.muhamadiqbal", "qurratulain.muhamadiqbal")]
+    [InlineData("aqrakhalish.jaslizam@moe-dl.edu.my",             "aqrakhalish.jaslizam", "aqrakhalish.jaslizam")]
+    [InlineData("armelldelisyasoberi.abdulrahman",                "armelldelisyasoberi.abdulrahman", "armelldelisyasoberi.abdulrahman")]
+    [InlineData("g-12345678@moe-dl.edu.my",                       "g-12345678", "g-12345678")]
+    [InlineData("d-12345678@moe-dl.edu.my",                       "d-12345678", "d-12345678")]
+    [InlineData("m-1234",                                         null, null)]           // too short
+    [InlineData("m-abcdefgh",                                     null, null)]           // non-numeric m- prefix
+    [InlineData("AHMAD AIDIL BIN MOHD NOOR",                      null, null)]           // name in ID column
+    [InlineData("invalid-id",                                     null, null)]
+    [InlineData("",                                               null, null)]
     public void RosterImporter_NormalizeDelimaId_AllForms(
         string raw, string? expectedDigits, string? expectedLocal)
     {
@@ -361,7 +378,7 @@ public class ImporterTests
         string messyCsv =
             "KEMENTERIAN PENDIDIKAN MALAYSIA\n" +
             "SEKOLAH KEBANGSAAN SERI BINTANG UTARA\n" +
-            "SENARAI NAMA MURID APDM 2026\n" +
+            "SENARAI NAMA MURID SESI 2026\n" +
             "\n" +
             "Bil,Nama Murid,Kelas,Tahun,ID DELIMa\n" +
             "1,Muhammad Danial,1 Cemerlang,1,m-12345678\n" +

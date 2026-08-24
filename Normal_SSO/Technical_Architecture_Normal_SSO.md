@@ -54,7 +54,7 @@ The only genuinely sensitive asset is the roster: names and email addresses of m
      └────────────────────────┘      └──────────────────────────┘
 
      ┌────────────────────────┐
-     │  Admin CLI (Node)      │  APDM CSV ──► validate ──► roster.json
+     │  Admin CLI (Node)      │  Roster CSV ──► validate ──► roster.json
      │  run by ICT, offline   │              (build-time, not runtime)
      └────────────────────────┘
 ```
@@ -562,7 +562,7 @@ No pupil-level logging. No analytics SDK. No error-reporting service that would 
 
 ### 8.1 CSV Input
 
-APDM/DELIMa exports vary. The CLI accepts a flexible header mapping and validates hard:
+Roster/DELIMa exports vary. The CLI accepts a flexible header mapping and validates hard:
 
 ```
 nama,kelas,emel,avatar
@@ -573,7 +573,7 @@ Nur Aishah Binti Ahmad,2 Cemerlang,m-12345678@moe-dl.edu.my,kucing
 
 ```bash
 npx delima-roster build \
-  --csv ./apdm-export.csv \
+  --csv ./roster-export.csv \
   --school SKS24 \
   --out ./public/roster.json
 ```

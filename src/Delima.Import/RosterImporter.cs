@@ -4,13 +4,17 @@ using Delima.Core.Roster;
 namespace Delima.Import;
 
 /// <summary>
-/// Implements APDM roster import, column mapping validation, dry-run analysis, and idempotent roster updates.
+/// Implements student roster import, column mapping validation, dry-run analysis, and idempotent roster updates.
 /// Conforms to PRD §6 Step 3 and Technical Architecture §11.
 /// </summary>
 public static partial class RosterImporter
 {
-    private static readonly Regex DelimaIdRegex = new(
-        @"^(?:[mgd]\s*-?\s*)?(\d{8})(?:@.*)?$",
+    private static readonly Regex NumericDelimaRegex = new(
+        @"^(?:([mgdp])\s*-?\s*)?(\d{6,20})$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex EmailLocalPartRegex = new(
+        @"^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex GradeExtractRegex = new(
@@ -31,11 +35,68 @@ public static partial class RosterImporter
             trimmed = trimmed[..^2];
         }
 
-        var match = DelimaIdRegex.Match(trimmed);
+        // If it contains an @ domain (e.g. m-231001057145@moe-dl.edu.my or name.surname@moe-dl.edu.my)
+        if (trimmed.Contains('@'))
+        {
+            var parts = trimmed.Split('@');
+            if (parts.Length != 2 || string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
+                return (null, null);
+
+            string localPart = parts[0].Trim();
+
+            // 1. Try numeric format in localPart (e.g. m-12345678, m-231001057145, 12345678, g-12345678)
+            var numMatch = NumericDelimaRegex.Match(localPart);
+            if (numMatch.Success)
+            {
+                string prefix = numMatch.Groups[1].Value;
+                string digits = numMatch.Groups[2].Value;
+                if (string.IsNullOrEmpty(prefix) || prefix == "m")
+                {
+                    return (digits, $"m-{digits}");
+                }
+                return ($"{prefix}-{digits}", $"{prefix}-{digits}");
+            }
+
+            // Reject explicit m-/g-/d- prefixes that fail numeric format (e.g. "m-abcdefgh")
+            if (localPart.StartsWith("m-", StringComparison.Ordinal) ||
+                localPart.StartsWith("g-", StringComparison.Ordinal) ||
+                localPart.StartsWith("d-", StringComparison.Ordinal))
+            {
+                return (null, null);
+            }
+
+            // 2. Name-based email local part (e.g. armelldelisyasoberi.abdulrahman)
+            if (EmailLocalPartRegex.IsMatch(localPart) && localPart.Length >= 3)
+            {
+                return (localPart, localPart);
+            }
+
+            return (null, null);
+        }
+
+        // Not containing @:
+        // 1. Try numeric format (e.g. "12345678", "231001057145", "m-12345678", "m-231001057145", "g-12345678")
+        var match = NumericDelimaRegex.Match(trimmed);
         if (match.Success)
         {
-            string digits = match.Groups[1].Value;
-            return (digits, $"m-{digits}");
+            string prefix = match.Groups[1].Value;
+            string digits = match.Groups[2].Value;
+            if (string.IsNullOrEmpty(prefix) || prefix == "m")
+            {
+                return (digits, $"m-{digits}");
+            }
+            return ($"{prefix}-{digits}", $"{prefix}-{digits}");
+        }
+
+        // 2. Name-based username containing dot (e.g. "armelldelisyasoberi.abdulrahman")
+        if (trimmed.Contains('.') && EmailLocalPartRegex.IsMatch(trimmed) && trimmed.Length >= 3)
+        {
+            if (!trimmed.StartsWith("m-", StringComparison.Ordinal) &&
+                !trimmed.StartsWith("g-", StringComparison.Ordinal) &&
+                !trimmed.StartsWith("d-", StringComparison.Ordinal))
+            {
+                return (trimmed, trimmed);
+            }
         }
 
         return (null, null);
@@ -159,7 +220,7 @@ public static partial class RosterImporter
                 continue;
             }
 
-            // 3. DELIMa ID — required and must parse to 8 digits
+            // 3. DELIMa ID — required and must normalize to valid DELIMa format (8-16 digits or name-based email)
             if (string.IsNullOrWhiteSpace(rawDelima))
             {
                 report.Rejects.Add(new ImportReject
@@ -181,7 +242,7 @@ public static partial class RosterImporter
                     RowNumber = row.RowNumber,
                     StudentName = rawName,
                     RawId = rawDelima,
-                    Reason = $"Malformed ID DELIMa: '{rawDelima}'. Expected 8 digits or m-XXXXXXXX.",
+                    Reason = $"Malformed ID DELIMa: '{rawDelima}'. Sila pastikan format ID DELIMa atau e-mel sah (cth: m-XXXXXXXX, 12-digit, atau nama@moe-dl.edu.my).",
                     Field = TargetField.DelimaId
                 });
                 continue;
@@ -351,7 +412,7 @@ public static partial class RosterImporter
 
     private static string ExtractDigitsFromId(string emailOrId)
     {
-        var match = DelimaIdRegex.Match(emailOrId.Trim());
-        return match.Success ? match.Groups[1].Value : emailOrId;
+        var (digits, _) = NormalizeDelimaId(emailOrId);
+        return digits ?? emailOrId.Trim();
     }
 }

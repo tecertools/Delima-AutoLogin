@@ -51,7 +51,7 @@
             <!-- WinUI 3 Warning InfoBar -->
             <Border Style="{StaticResource InfoBarWarning}" Margin="0,4,0,12">
                 <CheckBox IsChecked="{Binding HasAgreedNoRecovery, Mode=TwoWay}" VerticalContentAlignment="Center" Cursor="Hand">
-                    <TextBlock Text="Saya faham bahawa jika kata laluan ini hilang, tiada cara untuk memulihkannya — saya perlu mengimport semula fail APDM." 
+                    <TextBlock Text="Saya faham bahawa jika kata laluan ini hilang, tiada cara untuk memulihkannya — saya perlu mengimport semula fail senarai murid." 
                                TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{StaticResource AmberTextBrush}" FontSize="12.5" Margin="8,0,0,0" />
                 </CheckBox>
             </Border>

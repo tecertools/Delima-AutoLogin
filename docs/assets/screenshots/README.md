@@ -22,7 +22,7 @@ Laman tutorial telah diprogramkan untuk mengesan dan memaparkan imej-imej ini se
 | **03** | ⚠️ **Diperlukan** | `langkah-03-pemasangan-admin.png` | Skrin pemasang Inno Setup — Pemilihan komponen "Alat Pentadbir" | 1280 × 720 px |
 | **04** | ⚠️ **Diperlukan** | `langkah-04-pemasangan-makmal.png` | Skrin pemasang Inno Setup — Pemilihan komponen "PC Makmal" & Kiosk/Browser Policy | 1280 × 720 px |
 | **05** | ✅ **Selesai** | `langkah-05-admin-identiti.png` | Antaramuka Delima.Admin: Langkah 1 (Identiti Sekolah, Kod, Warna) & Langkah 2 (Kata Laluan) | 1366 × 768 px |
-| **06** | ✅ **Selesai** | `langkah-06-admin-import-roster.png` | Antaramuka Delima.Admin: Langkah 3 (Pemetaan Lajur APDM CSV & Laporan Dry-Run) | 1366 × 768 px |
+| **06** | ✅ **Selesai** | `langkah-06-admin-import-roster.png` | Antaramuka Delima.Admin: Langkah 3 (Pemetaan Lajur Roster CSV & Laporan Dry-Run) | 1366 × 768 px |
 | **07** | ✅ **Selesai** | `langkah-07-admin-import-katalaluan.png` | Antaramuka Delima.Admin: Langkah 4 (Pengesahan Kod Sekolah & Kata Laluan Tersulit) | 1366 × 768 px |
 | **08** | ✅ **Selesai** | `langkah-08-admin-avatar-pin.png` | Antaramuka Delima.Admin: Langkah 5 (Pengagihan Avatar & Templat Helaian Roster Murid) | 1366 × 768 px |
 | **09** | ✅ **Selesai** | `langkah-09-admin-export-usb.png` | Antaramuka Delima.Admin: Langkah 6 & 7 (Eksport Pakej `.dlmpack` ke Pemacu USB) | 1366 × 768 px |

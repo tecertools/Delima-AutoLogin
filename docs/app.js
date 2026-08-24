@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const rawText = csvInputArea.value.trim();
       if (!rawText) {
         csvResultBox.className = 'csv-result-box error';
-        csvResultBox.innerHTML = '⚠️ Sila tampal baris tajuk (header) atau contoh rekod CSV APDM anda di dalam kotak di atas.';
+        csvResultBox.innerHTML = '⚠️ Sila tampal baris tajuk (header) atau contoh rekod fail CSV anda di dalam kotak di atas.';
         return;
       }
 

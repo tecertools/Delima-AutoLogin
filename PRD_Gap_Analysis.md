@@ -141,7 +141,7 @@ Not optional for a school handling minors' accounts, and it's what tells you whe
 
 **Deployment — much reduced.** Manual or scripted install across the lab's PCs, plus the §1.2 provisioning utility. Still needs: per-PC `device_id`, a version check so PCs don't drift, and a documented rollback. Skip MSI/GPO/Intune.
 
-**CSV importer.** Task 1 gives no spec: column mapping, encoding (APDM exports are frequently ANSI, and Malay names carry diacritics), duplicate handling, validation, dry-run, partial-failure reporting. Critically — **define how passwords enter the system in the first place, and who is authorised to run this.** The importer now writes to the master bundle (§1.2), not Firestore.
+**CSV importer.** Task 1 gives no spec: column mapping, encoding (roster exports are frequently ANSI, and Malay names carry diacritics), duplicate handling, validation, dry-run, partial-failure reporting. Critically — **define how passwords enter the system in the first place, and who is authorised to run this.** The importer now writes to the master bundle (§1.2), not Firestore.
 
 **Accessibility for Tahap 1.** Ages 7–9. Minimum 96×96 px touch targets, high contrast, no text-only affordances, audio name playback (a real win for non-readers). Treat the search bar as optional — many pupils can't type their own name, which is the product's entire premise.
 

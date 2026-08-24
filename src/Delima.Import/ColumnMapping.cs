@@ -41,7 +41,7 @@ public sealed class ColumnMapping
     }
 
     /// <summary>
-    /// Suggests best-guess column mappings based on common APDM / MOE export header names.
+    /// Suggests best-guess column mappings based on common MOE / School export header names.
     /// </summary>
     public static ColumnMapping AutoDetect(IReadOnlyList<string> headers)
     {

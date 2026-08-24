@@ -59,7 +59,7 @@ Password entry, by contrast, is not the bottleneck. School-assigned passwords ar
 ### Non-Goals
 
 - Storing, encrypting, or auto-typing pupil passwords.
-- Password reset or account provisioning (remains an APDM/MOE admin function).
+- Password reset or account provisioning (remains a school/MOE admin function).
 - Replacing DELIMa or Classroom — this is a doorway, not a destination.
 - Attendance tracking, usage analytics per pupil, or any pupil-level behavioural data.
 
@@ -71,7 +71,7 @@ Password entry, by contrast, is not the bottleneck. School-assigned passwords ar
 
 **Cikgu Farah, teacher.** Has 40 minutes of lab time and 30 pupils. Needs the whole class signed in fast, and needs to fix a wrong roster entry herself without filing a ticket.
 
-**En. Zul, ICT coordinator.** Maintains the roster from APDM exports. Needs a CSV in, a working page out, and no server to babysit. Will be the one asked "is this safe?" by the headmaster.
+**En. Zul, ICT coordinator.** Maintains the roster from student roster exports. Needs a CSV in, a working page out, and no server to babysit. Will be the one asked "is this safe?" by the headmaster.
 
 ---
 
@@ -309,7 +309,7 @@ This is not a code change — it is a scheduled task, and it needs an owner and 
 
 | Step | Owner | When |
 | :--- | :--- | :--- |
-| Export the new APDM roster | ICT coordinator | First week of the school year |
+| Export the new student roster | ICT coordinator | First week of the school year |
 | Rebuild and redeploy `roster.json` | ICT coordinator | Same day |
 | Clear per-device `Kelas Terakhir` memory in every lab | ICT coordinator | Same day — stale shortcuts point at last year's class |
 | Reprint the per-class fallback sheets | Class teachers | First week |
@@ -324,7 +324,7 @@ The "Senarai dikemas kini" date on Screen 1 is the visible check: if it still re
 | Risk | Impact | Mitigation |
 | :--- | :--- | :--- |
 | Google changes the account-hint URL behaviour | High — core flow degrades | Destination URLs are config, not code. A documented OAuth-based fallback path exists (arch §5.3). Degraded state is a normal Google sign-in page — annoying, not broken. |
-| Roster drifts from APDM reality | Medium — pupil can't find their name | Teacher can add/edit a pupil in under 30 s without ICT. "Last updated" date shown on Screen 1. |
+| Roster drifts from actual student list | Medium — pupil can't find their name | Teacher can add/edit a pupil in under 30 s without ICT. "Last updated" date shown on Screen 1. |
 | Roster of minors exposed publicly | High — PDPA breach; harvestable phishing list | Lab build is network-restricted; home build serves no roster at all. Display masking is explicitly *not* relied upon. Arch §7.2. |
 | Parent's own Gmail already signed in at home → "You need permission" on Classroom | Medium — bookmark abandoned | `Email` hint pre-selects the school account; a persistent "Tukar akaun" link gives one-tap recovery; setup explains the two-accounts point once. Arch §5.3. |
 | Parent mistypes the 8-digit ID during home setup | Medium — silent failure at Google | Inline validation against `m-` + 8 digits, worked example on screen, printed class sheet as paper backing. |
@@ -342,7 +342,7 @@ The "Senarai dikemas kini" date on Screen 1 is the visible check: if it still re
 
 1. ~~Portal host: `d2` or `d3`?~~ **Resolved — DELIMa 3.0 at `d3.delima.edu.my`.** Still worth a single live check on a lab PC before pilot, since it is one config value.
 2. Does the school want one deployment for all 2,000 pupils, or one per grade to keep rosters small and lists short?
-3. **Confirm the largest class on the roll.** The grid is sized for 44 pupils plus one spare card. A class of 45+ would need an extra column or a scroll — worth checking the actual APDM figures before build.
+3. **Confirm the largest class on the roll.** The grid is sized for 44 pupils plus one spare card. A class of 45+ would need an extra column or a scroll — worth checking the actual student figures before build.
 4. **What resolutions are actually in the labs?** The grid table assumes 1366 × 768. Classes over 36 will scroll on a 1024 × 768 machine. One walk through the labs, noting each screen setting, tells you whether that case is real or hypothetical.
 5. Is a shared per-class avatar sheet needed on the wall so pupils can find their icon before touching the mouse?
 6. Should Screen 3 include a third destination (Google Drive, or the school's own site)?

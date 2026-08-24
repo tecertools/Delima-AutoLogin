@@ -69,7 +69,7 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
             {
                 PcName = $"MAKMAL-{i:D2}",
                 IsProvisioned = false,
-                Version = "2.0.1",
+                Version = "2.0.2",
                 StoreDate = "—"
             });
         }

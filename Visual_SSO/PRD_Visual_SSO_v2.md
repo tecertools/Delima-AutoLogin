@@ -19,7 +19,7 @@ v1 was written for one school, one lab, one administrator who was also the autho
 | # | v2 requirement | What it actually changes |
 | :-- | :-- | :--- |
 | 1 | Distribute to other schools | Nothing school-specific may be compiled into the binary. Needs an installer, a branding layer, a versioning story, and code signing. Also converts a personal tool into **shipped software handling minors' credentials at other institutions** — see §2. |
-| 2 | Schools import their own DELIMa emails **and passwords** | Needs a first-class Admin application with a setup wizard, a CSV importer that survives real APDM exports, and a provisioning path to lab PCs. This is the largest new surface in v2. |
+| 2 | Schools import their own DELIMa emails **and passwords** | Needs a first-class Admin application with a setup wizard, a CSV importer that survives real student roster exports, and a provisioning path to lab PCs. This is the largest new surface in v2. |
 | 3 | Keep the UI | Adopted — the `../Normal_SSO/stitch-wireframes/PROMPT.txt` design system is carried over verbatim, **except** that its colours are SK Seksyen 24's crest colours and must become themeable. See §7.1. |
 | 4 | Push to git | Repository initialised; see `../README.md`. |
 
@@ -76,7 +76,7 @@ This document does not recommend one over the other. It records that the cheap o
 
 **Cikgu Farah, class teacher.** 40 minutes of lab time, 30–44 pupils. Needs the class in and working fast, and needs to fix one pupil's problem herself without filing a ticket.
 
-**En. Zul, ICT coordinator (new to v2, and the reason v2 exists).** Installs the software on 20–40 lab PCs. Exports from APDM, holds the password list, runs the import, re-provisions when passwords rotate. **In v1 this person was the author. In v2 they are a stranger at another school who has never seen the code and will not read the source.** Everything En. Zul touches must work from a wizard with no command line, no JSON editing, and no assumed knowledge.
+**En. Zul, ICT coordinator (new to v2, and the reason v2 exists).** Installs the software on 20–40 lab PCs. Exports student rosters, holds the password list, runs the import, re-provisions when passwords rotate. **In v1 this person was the author. In v2 they are a stranger at another school who has never seen the code and will not read the source.** Everything En. Zul touches must work from a wizard with no command line, no JSON editing, and no assumed knowledge.
 
 **Puan Hana, headmaster.** Will be asked to approve. Will ask two questions: *is it safe*, and *who is responsible if it isn't*.
 
@@ -102,7 +102,7 @@ This document does not recommend one over the other. It records that the cheap o
 | Injection success rate | **100/100 at T0.3 (§2.1)** — gross failure ruled out | ≥ 99% | **Still measured at pilot, not at T0.3.** 100 clean runs is consistent with ≥99% but doesn't certify it statistically — T0.3's job was detecting gross, deterministic failure (which `SendKeys` had and `SendInput` didn't), not certifying a reliability figure. See `T0.3_Injection_Test_Protocol.md` §5. |
 | Wrong-pupil sign-ins | 3–5 per lesson *(est.)* | 0 | Audit log + teacher tally |
 | New-school setup time, ICT coordinator, unaided | n/a | ≤ 90 min | Timed with a real coordinator at school #2 |
-| Import rejects on a real APDM export | n/a | ≤ 2% of rows, all with actionable messages | Dry-run report |
+| Import rejects on a real roster export | n/a | ≤ 2% of rows, all with actionable messages | Dry-run report |
 | Support calls per school in first month | n/a | ≤ 2 | Tally |
 
 The 15-minute baseline is inherited from v1 and remains **an estimate, not a measurement**. It should be timed once before the pilot. If the real figure is 6 minutes, the case for v2 over `Normal_SSO` weakens considerably.
@@ -110,7 +110,7 @@ The 15-minute baseline is inherited from v1 and remains **an estimate, not a mea
 ### Non-Goals
 
 - Central cloud roster or credential service. Explicitly rejected (§5.1).
-- Password reset or account provisioning — remains an APDM/MOE admin function.
+- Password reset or account provisioning — remains a school/MOE admin function.
 - Attendance, analytics, or any pupil-level behavioural data leaving the PC.
 - ChromeOS, macOS, or Chromebook support. Windows lab PCs only.
 - Auto-update. v1 upgrade path is a silent reinstall (§8.4).
@@ -143,11 +143,11 @@ One installer, two components. A lab PC installs the Launcher only.
 ### 5.3 The credential path, end to end
 
 ```
-APDM export ─┐
-             ├─► DELIMa Admin ──► school.dlmpack ──► provisioning ──► credentials.dat
-password list┘   (import wizard)   AES-256-GCM,        (USB or         (DPAPI machine
-                                   admin passphrase     network share)   scope, per-PC,
-                                   as the only key)                      useless elsewhere)
+Student roster ─┐
+                ├─► DELIMa Admin ──► school.dlmpack ──► provisioning ──► credentials.dat
+password list  ─┘   (import wizard)   AES-256-GCM,        (USB or         (DPAPI machine
+                                      admin passphrase     network share)   scope, per-PC,
+                                      as the only key)                      useless elsewhere)
 ```
 
 Three properties this shape guarantees:
@@ -191,7 +191,7 @@ Establishes what makes this install *this school's*, so nothing is compiled in.
 - Minimum 12 characters, checked against a common-password list, strength meter shown.
 - Entered twice. **There is no recovery.** The wizard states this plainly, in a box the coordinator must tick.
 - Derives the master key by Argon2id (params in arch §3.2). Never stored.
-- Produces a printable **recovery sheet**: school code, creation date, a key-check value (not the key), and instructions. Explicitly *not* a key escrow — losing the passphrase means re-importing from APDM, which is a bad afternoon, not a disaster.
+- Produces a printable **recovery sheet**: school code, creation date, a key-check value (not the key), and instructions. Explicitly *not* a key escrow — losing the passphrase means re-importing from the student roster, which is a bad afternoon, not a disaster.
 
 ### Step 3 — Import the roster
 
@@ -199,7 +199,7 @@ Pupil names, classes, and DELIMa IDs. **No passwords in this step** — the sepa
 
 Accepts `.csv`, `.xlsx`, `.xls`.
 
-**Column mapping, not fixed headers.** APDM exports differ between states and between years; a fixed header contract would break at the first school. The wizard shows the first 10 rows in a grid and asks the coordinator to point each required field at a column:
+**Column mapping, not fixed headers.** School roster exports differ between states and between years; a fixed header contract would break at the first school. The wizard shows the first 10 rows in a grid and asks the coordinator to point each required field at a column:
 
 | Required | Accepts | Validation |
 | :--- | :--- | :--- |
@@ -211,7 +211,7 @@ Accepts `.csv`, `.xlsx`, `.xls`.
 
 Mappings are remembered per school, so next year's import is one click.
 
-**Encoding.** APDM exports are frequently ANSI (CP1252), sometimes UTF-8 with and without BOM, occasionally UTF-16. The importer sniffs the BOM, then heuristically detects, then **shows the coordinator a preview of names containing diacritics** and asks "does this look right?" — because a mojibake'd `Nurul A'in` is the failure a checksum cannot catch and a human spots instantly.
+**Encoding.** Roster exports are frequently ANSI (CP1252), sometimes UTF-8 with and without BOM, occasionally UTF-16. The importer sniffs the BOM, then heuristically detects, then **shows the coordinator a preview of names containing diacritics** and asks "does this look right?" — because a mojibake'd `Nurul A'in` is the failure a checksum cannot catch and a human spots instantly.
 
 **Validation and dry run.** Nothing is written until the coordinator sees a report:
 
@@ -227,7 +227,7 @@ Mappings are remembered per school, so next year's import is one click.
 
 Rejects export to `rejects_<date>.csv` with an added reason column, so the coordinator fixes the source and re-imports only those rows.
 
-**FR-S3.7:** Import is idempotent and re-runnable. A second import updates matched pupils, adds new ones, and **flags leavers rather than deleting them** — a pupil who vanishes from an export because of an APDM glitch must not silently lose their account mid-term.
+**FR-S3.7:** Import is idempotent and re-runnable. A second import updates matched pupils, adds new ones, and **flags leavers rather than deleting them** — a pupil who vanishes from an export because of a roster glitch must not silently lose their account mid-term.
 
 ### Step 4 — Import passwords
 
@@ -486,7 +486,7 @@ Same failure mode as `Normal_SSO` §9: every January the roster is wrong in five
 
 | Step | Owner | When |
 | :--- | :--- | :--- |
-| Export new APDM roster | ICT coordinator | Week 1 |
+| Export new student roster | ICT coordinator | Week 1 |
 | Re-run wizard Steps 3–5 | ICT coordinator | Same day |
 | Obtain and import new passwords for Tahun 1 | ICT coordinator | Week 1 |
 | Re-provision every lab PC | ICT coordinator | Same day |
@@ -512,7 +512,7 @@ No central service means no central support. Each school owns its install. The a
 | :--- | :--- | :--- | :--- |
 | **0 — De-risk** | T0.1, T0.2, T0.3, T0.4 (§2.1) | 1–2 weeks | Written policy position; confirmed SSO URL; **zero unexplained injection failures across 50 runs on lab hardware, with `SendKeys` corruption reproduced as the control**, and UIA `IsPassword` verification. **T0.2, T0.3, T0.4: all done.** T0.1 handled via §8.7 responsibility statement. All 15 architecture build steps implemented. |
 | **1 — Baseline** | Time 5 real lessons | 1 week | The 15-minute estimate replaced with a measurement |
-| 2 — Credential foundation | Store format, Admin wizard, importer, provisioning | 3 weeks | A second person can import a real APDM export unaided (Built) |
+| 2 — Credential foundation | Store format, Admin wizard, importer, provisioning | 3 weeks | A second person can import a real roster export unaided (Built) |
 | 3 — Client | WPF shell, picture password, injection engine, failure taxonomy | 4 weeks | One class signs in end to end on lab hardware (Built) |
 | 4 — Hardening | Chrome policy, kiosk, audit log, teacher mode | 2 weeks | A curious nine-year-old cannot reach `chrome://settings/passwords` (Built) |
 | 5 — Pilot, own school | 2 classes, 1 lab, 2 weeks | 2 weeks | ≤ 3 min class sign-in; zero wrong-account incidents; injection ≥ 99% |

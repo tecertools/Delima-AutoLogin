@@ -37,7 +37,7 @@ public sealed partial class Step2PassphraseViewModel : ObservableObject
                 SchoolName = _state.School.Name,
                 CreationDate = DateTimeOffset.UtcNow,
                 KeyCheckValue = RecoverySheetInfo.ComputeKeyCheckValue(Passphrase, _state.School.Code),
-                Instructions = "Simpan helaian ini di tempat berkunci selamat. Jika kata laluan pentadbir hilang, bungkusan sekolah mesti diimport semula daripada APDM."
+                Instructions = "Simpan helaian ini di tempat berkunci selamat. Jika kata laluan pentadbir hilang, bungkusan sekolah mesti diimport semula daripada fail senarai murid."
             };
         }
     }

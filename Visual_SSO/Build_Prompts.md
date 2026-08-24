@@ -112,7 +112,7 @@ This is the highest-risk piece in the product. Take it slowly.
 >
 > Required behaviour:
 >
-> - **Column mapping, not fixed headers.** Real APDM exports run 15–30 columns wide with unpredictable names. The five target fields are listed in PRD §6 Step 3.
+> - **Column mapping, not fixed headers.** Real roster exports run 15–30 columns wide with unpredictable names. The five target fields are listed in PRD §6 Step 3.
 > - **Encoding detection** — ANSI, UTF-8 with and without BOM, UTF-16, CRLF and LF line endings. Malay diacritics must survive.
 > - **A dry-run validation report** producing three groups: ready to import, warnings that do not block, and hard rejects. The exact categories are in PRD §6 Step 3.
 > - **Idempotent re-import** per FR-S3.7 — re-importing must flag leavers, not delete them.
@@ -358,7 +358,7 @@ The largest remaining piece, and the one with the most spec behind it. `src/Deli
 > Structural requirements from §6.8:
 >
 > - **Left sidebar step navigator** with per-step state. On first run steps 2 onward are locked until the preceding step completes; **once setup has been completed once, every step unlocks for direct navigation** — Step 3 and Step 4 are re-entered on completely different schedules and forcing a coordinator back through 1–2 to reach 4 in March is a real, remembered annoyance.
-> - **The column mapper is a fixed list of the five target fields**, each with a dropdown of the source file's headers and a best-guess default — not a decision per column, since APDM exports run 15–30 columns wide. A live preview of the first 10 rows re-renders as each dropdown changes.
+> - **The column mapper is a fixed list of the five target fields**, each with a dropdown of the source file's headers and a best-guess default — not a decision per column, since roster exports run 15–30 columns wide. A live preview of the first 10 rows re-renders as each dropdown changes.
 > - **The dry-run report is a full step, not a modal**, with three collapsible sections: ready, warnings (expanded), rejects (expanded).
 > - **Step 4's consent screen** requires typing the school code, not ticking a box. A checkbox gets clicked without reading.
 > - **The password grid reveals per row, not per grid** — passphrase prompt in a popover anchored to the row, auto-re-mask after 10 seconds or on losing focus, and every reveal written to the audit log per §8.

@@ -134,7 +134,7 @@ public sealed class LabChecklistItem
 {
     public string PcName { get; set; } = "";
     public bool IsProvisioned { get; set; }
-    public string Version { get; set; } = "2.0.1";
+    public string Version { get; set; } = "2.0.2";
     public string StoreDate { get; set; } = "—";
     public bool AppLockerVerified { get; set; }
 }

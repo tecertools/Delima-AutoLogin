@@ -64,7 +64,7 @@ DelimaLauncher.sln
 │   └── Delima.Provision/       tiny console/WPF, runs on each lab PC
 ├── tests/
 │   ├── Delima.Core.Tests/      xUnit — crypto, display names, validation
-│   └── Delima.Import.Tests/    real-world APDM export fixtures
+│   └── Delima.Import.Tests/    real-world roster export fixtures
 ├── spike/InjectionSpike/       ← existing, kept as the T0.3 harness
 ├── installer/
 │   ├── DelimaLauncher.iss      Inno Setup script
@@ -528,7 +528,7 @@ The audience is 7–9-year-olds on kiosk hardware; motion should confirm what ha
 
 **Navigation pattern.** A persistent left sidebar lists all 7 steps with their state (`not started` / `in progress` / `done` / `needs attention`, the last for e.g. unresolved reject rows). **On first run, steps 2 onward are locked** until the preceding step completes — there is nothing to map columns *into* before Step 1 sets the school identity, and no roster to attach passwords to before Step 3 completes. **Once a school has completed setup once, every step unlocks for direct navigation** — Step 3 (roster refresh) and Step 4 (password rotation) are re-entered on entirely different schedules (termly vs monthly, PRD §6.3), and forcing a coordinator back through Steps 1–2 to reach Step 4 in March would be a real, remembered annoyance.
 
-**The column mapper (Step 3), concretely.** Not "click a column header and pick its meaning" — with APDM exports running 15–30 columns wide, that puts a decision on every column, most of which are irrelevant. Instead: a **fixed list of the five target fields** (Nama penuh, Kelas, Tahun, ID DELIMa, No. KP/register — PRD §6 Step 3's table), each with a dropdown listing the source file's column headers, defaulting to a best-guess match by header-name similarity. Below the mapping list, a **live preview table** of the first 10 rows re-renders as each dropdown changes, so the coordinator sees actual data flow into place rather than trusting an abstract mapping. Required fields with no mapping yet block the "Seterusnya" button with an inline reason, not a disabled button with no explanation (§6.1's "restraint" principle from the CDS content guidance applies here too: say what's wrong, don't just refuse).
+**The column mapper (Step 3), concretely.** Not "click a column header and pick its meaning" — with roster exports running 15–30 columns wide, that puts a decision on every column, most of which are irrelevant. Instead: a **fixed list of the five target fields** (Nama penuh, Kelas, Tahun, ID DELIMa, No. KP/register — PRD §6 Step 3's table), each with a dropdown listing the source file's column headers, defaulting to a best-guess match by header-name similarity. Below the mapping list, a **live preview table** of the first 10 rows re-renders as each dropdown changes, so the coordinator sees actual data flow into place rather than trusting an abstract mapping. Required fields with no mapping yet block the "Seterusnya" button with an inline reason, not a disabled button with no explanation (§6.1's "restraint" principle from the CDS content guidance applies here too: say what's wrong, don't just refuse).
 
 **The dry-run report (Step 3), concretely.** A full step of its own, not a modal — the numbers matter enough to want back/forward history and a printable record. Three collapsible sections: **Sedia diimport** (the clean count, collapsed by default), **Amaran** (warnings that don't block — duplicate IDs, unknown classes — expanded by default, each row showing the row number and the specific problem), and **Ditolak** (hard rejects — malformed IDs, empty required fields — expanded by default). Two actions: **Import & Sahkan** (primary, proceeds with the valid rows; warnings are accepted as-is with the documented resolution — e.g. "first occurrence kept" for duplicates) and **Muat Naik Fail Lain** (secondary, returns to file selection). This maps directly to the console-style report already specified in PRD §6 Step 3 — the report here is that same content, laid out as a screen instead of a text block.
 
@@ -640,7 +640,7 @@ Silent mode `--quiet --pack <path> --passphrase-stdin` for the PowerShell route,
 | Crypto | Known-answer tests; round-trip; **tamper tests** — flip one byte in header, ciphertext, and tag; assert authentication failure in all three. |
 | Zeroing | Allocate, use, dispose, scan the pinned region for residue. |
 | Display names | Fixture set covering Malay, Chinese and Indian conventions, plus collisions at 3 card widths. Shared with `Normal_SSO`. |
-| Importer | **Real APDM exports** — ANSI, UTF-8 BOM/no-BOM, UTF-16, CRLF/LF, diacritics, blank rows, duplicate IDs, `m-` prefixed and bare IDs. Fixtures are the deliverable here, not the tests. |
+| Importer | **Real roster exports** — ANSI, UTF-8 BOM/no-BOM, UTF-16, CRLF/LF, diacritics, blank rows, duplicate IDs, `m-` prefixed and bare IDs. Fixtures are the deliverable here, not the tests. |
 | Injection | The spike, on **representative lab hardware**, ≥ 50 runs per method. Never on a developer machine, never over RDP. |
 | **UIA field detection (T0.4)** | Recommended hardening, not blocking. See §11.1. |
 | **Title settle and sequence gating** | Assert no injection occurs on a transient title; assert the password step refuses to fire without a preceding verified identifier state (§4.2). |

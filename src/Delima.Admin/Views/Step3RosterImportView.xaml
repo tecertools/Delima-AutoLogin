@@ -16,7 +16,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,0,10">
             <TextBlock Text="Import Senarai Murid" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Import maklumat nama, kelas dan ID DELIMa murid daripada fail APDM." Style="{StaticResource StepSubHeading}" />
+            <TextBlock Text="Import maklumat nama, kelas dan ID DELIMa murid daripada fail senarai murid (CSV/Excel)." Style="{StaticResource StepSubHeading}" />
 
             <!-- Sub-Step Segmented Navigation (WinUI 3 Segmented Control) -->
             <Border Background="#F1F3F5" CornerRadius="6" Padding="3" HorizontalAlignment="Left" Margin="0,0,0,16">
@@ -38,7 +38,7 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Fail Roster APDM (.csv, .xlsx, .xls, .tsv)" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="0" Text="Fail Roster Murid (.csv, .xlsx, .xls, .tsv)" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Content="📥 Muat Turun Templat (CSV)" Style="{StaticResource SmallButton}" Click="OnDownloadTemplateClick" />
                         </Grid>
                         <Grid>

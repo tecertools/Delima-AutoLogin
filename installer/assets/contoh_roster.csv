@@ -1,11 +1,16 @@
 BIL,NAMA MURID,NO. KAD PENGENALAN / SURAT BERANAK,TAHUN,KELAS,ID PENGGUNA DELIMA,CATATAN
-1,Muhammad Danial Bin Rahim,170101-10-1234,2,2 Cemerlang,m-12345678,Aktif
-2,Nur Aishah Binti Ahmad,170202-10-2345,2,2 Cemerlang,m-12345679,Aktif
-3,Tan Wei Ming,170303-10-3456,2,2 Cemerlang,m-12345680,Aktif
-4,Arjun A/L Kumaran,170404-10-4567,2,2 Cemerlang,m-12345681,Aktif
-5,Nurul A'in Binti Dato' Yusof,170505-10-5678,2,2 Cemerlang,m-12345682,Aktif
-6,Chong Mei Ling,170606-10-6789,2,2 Cemerlang,m-12345683,Aktif
+1,Muhammad Danial Bin Rahim,170101-10-1234,1,1 Amanah,m-12345678,Aktif
+2,Nur Aishah Binti Ahmad,170202-10-2345,1,1 Amanah,m-12345679,Aktif
+3,Tan Wei Ming,170303-10-3456,1,1 Amanah,m-12345680,Aktif
+4,Arjun A/L Kumaran,170404-10-4567,1,1 Amanah,m-12345681,Aktif
+5,Nurul A'in Binti Dato' Yusof,170505-10-5678,1,1 Bestari,m-12345682,Aktif
+6,Chong Mei Ling,170606-10-6789,1,1 Bestari,m-12345683,Aktif
 7,Kavitha D/O Rajan,170707-10-7890,2,2 Cemerlang,m-12345684,Aktif
 8,Wan Nurul Ain Binti Wan Zulkifli,170808-10-8901,2,2 Cemerlang,m-12345685,Aktif
 9,Lee Jia Jun,170909-10-9012,2,2 Cemerlang,m-12345686,Aktif
 10,Dayang Anak Libau,171010-10-0123,2,2 Cemerlang,m-12345687,Aktif
+11,Ahmad Adam Bin Razak,160101-10-1111,3,3 Dedikasi,m-12345688,Aktif
+12,Siti Sarah Binti Mansor,160202-10-2222,3,3 Dedikasi,m-12345689,Aktif
+13,Goh Jun Hao,160303-10-3333,3,3 Dedikasi,m-12345690,Aktif
+14,Sharifah Nurul Iman Binti Syed Ali,160404-10-4444,3,3 Dedikasi,m-12345691,Aktif
+15,Pravin A/L Muthu,160505-10-5555,3,3 Dedikasi,m-12345692,Aktif
