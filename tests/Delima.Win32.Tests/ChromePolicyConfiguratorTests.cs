@@ -74,6 +74,8 @@ public class ChromePolicyConfiguratorTests : IDisposable
         Assert.Equal("accounts.google.com", allowKey.GetValue("1"));
         Assert.Equal("*.delima.edu.my", allowKey.GetValue("2"));
         Assert.Equal("classroom.google.com", allowKey.GetValue("3"));
+        Assert.Equal("*.moe.gov.my", allowKey.GetValue("4"));
+        Assert.Null(allowKey.GetValue("5")); // ains.moe.gov.my removed — already covered by *.moe.gov.my
 
         // Check Blocklist
         using var blockKey = key.OpenSubKey("URLBlocklist");

@@ -94,7 +94,9 @@ public static class UiaHelper
                     var root = AutomationElement.FromHandle(hwnd);
                     if (root != null)
                     {
-                        var condition = new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button);
+                        var condition = new OrCondition(
+                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
+                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Hyperlink));
                         var buttons = root.FindAll(TreeScope.Descendants, condition);
 
                         foreach (AutomationElement btn in buttons)
@@ -104,7 +106,8 @@ public static class UiaHelper
                                 var name = btn.Current.Name;
                                 if (!string.IsNullOrEmpty(name) &&
                                     (name.Contains(buttonText, StringComparison.OrdinalIgnoreCase) ||
-                                     name.Contains("Log Masuk", StringComparison.OrdinalIgnoreCase)))
+                                     name.Contains("Log Masuk", StringComparison.OrdinalIgnoreCase) ||
+                                     name.Contains("DELIMa", StringComparison.OrdinalIgnoreCase)))
                                 {
                                     if (btn.TryGetCurrentPattern(InvokePattern.Pattern, out var patternObj) &&
                                         patternObj is InvokePattern invokePattern)

@@ -166,7 +166,7 @@ Delima-AutoLogin/
 If you are a School ICT Coordinator or Teacher looking to install DELIMa Smart Launcher:
 
 1. **[📥 Download Latest Installer from GitHub Releases](https://github.com/tecertools/Delima-AutoLogin/releases/latest)**
-2. Run the signed installer package (`DELIMaLauncher-Setup-2.0.0.exe`) on your Admin PC and Lab PCs.
+2. Run the signed installer package (`DELIMaLauncher-Setup-2.2.0.exe`) on your Admin PC and Lab PCs.
 3. Follow the interactive setup guide in [docs/](docs/) or open the [Online Setup Guide](https://tecertools.github.io/Delima-AutoLogin/).
 
 ---
@@ -218,7 +218,7 @@ Compile the Inno Setup installer package:
 & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" /DMyAppVersion=2.0.0 installer/DelimaLauncher.iss
 ```
 
-The compiled installer will be output to `dist/DELIMaLauncher-Setup-2.0.0.exe`.
+The compiled installer will be output to `dist/DELIMaLauncher-Setup-2.2.0.exe`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -348,8 +348,8 @@ Project Link: [https://github.com/tecertools/Delima-AutoLogin](https://github.co
 [license-url]: https://github.com/tecertools/Delima-AutoLogin/blob/main/LICENSE
 [release-shield]: https://img.shields.io/github/v/release/tecertools/Delima-AutoLogin.svg?style=for-the-badge&logo=github&color=blue
 [release-url]: https://github.com/tecertools/Delima-AutoLogin/releases/latest
-[build-shield]: https://img.shields.io/badge/Build%20%26%20Tests-414%20Passing-brightgreen?style=for-the-badge&logo=dotnet
-[build-url]: https://github.com/tecertools/Delima-AutoLogin/actions
+[build-shield]: https://img.shields.io/github/actions/workflow/status/tecertools/Delima-AutoLogin/release.yml?branch=main&style=for-the-badge&logo=dotnet&label=Build%20%26%20Tests
+[build-url]: https://github.com/tecertools/Delima-AutoLogin/actions/workflows/release.yml
 
 [DotNet-shield]: https://img.shields.io/badge/.NET_10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white
 [DotNet-url]: https://dotnet.microsoft.com/

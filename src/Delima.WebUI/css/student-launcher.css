@@ -1,0 +1,517 @@
+/* ==========================================================================
+   DELIMa Windows 11 Web UI — Student Launcher (Kiosk Portal) Styles
+   Designed for Malaysian Primary School Students (Tahap 1 & 2) & Fluent 2
+   ========================================================================== */
+
+.student-launcher-viewport {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-canvas);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Kiosk Top Bar */
+.kiosk-header {
+  height: 68px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--stroke-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-card);
+}
+
+.kiosk-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kiosk-crest {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--delima-green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.kiosk-school-info h2 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 18px;
+}
+
+.kiosk-school-info p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 14px;
+}
+
+.kiosk-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.class-current-pill {
+  background: var(--delima-green-subtle);
+  color: var(--delima-green);
+  border: 1px solid var(--delima-green);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   SCREEN 1: PILIH KELAS (GRADE & CLASS SELECTOR)
+   ========================================================================== */
+.class-select-container {
+  flex: 1;
+  padding: 32px 36px;
+  overflow-y: auto;
+}
+
+.class-section-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.class-section-header h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.class-section-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.grade-group {
+  margin-bottom: 28px;
+}
+
+.grade-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grade-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--stroke-default);
+}
+
+.class-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.class-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--stroke-default);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-fluent);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.class-card:hover {
+  border-color: var(--delima-green);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-flyout);
+  background: var(--bg-layer-hover);
+}
+
+.class-icon-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--delima-green-subtle);
+  color: var(--delima-green);
+  font-size: 22px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.class-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.class-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   SCREEN 2: CARI NAMA (STUDENT CARD GRID)
+   ========================================================================== */
+.student-grid-container {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-search-bar {
+  max-width: 480px;
+  margin: 0 auto 24px;
+  width: 100%;
+}
+
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+  flex: 1;
+}
+
+.student-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--stroke-default);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-fluent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.student-card:hover {
+  border-color: var(--delima-green);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-flyout);
+}
+
+.student-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--delima-green-subtle);
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.student-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 17px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   SCREEN 3: KATA LALUAN GAMBAR (3-SYMBOL PICTURE PASSWORD KEYPAD)
+   ========================================================================== */
+.picture-password-container {
+  flex: 1;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.pupil-target-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--stroke-default);
+  border-radius: var(--radius-lg);
+  padding: 10px 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.pupil-target-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.pupil-target-email {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+}
+
+/* 3-Dot Visual Indicator */
+.password-dots-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.password-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2.5px solid var(--delima-green);
+  background: transparent;
+  transition: all var(--duration-fast) var(--ease-fluent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.password-dot.filled {
+  background: var(--delima-green);
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 10px var(--delima-green);
+}
+
+.password-dot.error {
+  border-color: var(--delima-red);
+  background: var(--delima-red);
+  animation: dotShake 0.4s ease-in-out;
+}
+
+@keyframes dotShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Picture Symbols Grid */
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 12px;
+  max-width: 760px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.symbol-tile {
+  aspect-ratio: 1;
+  background: var(--card-bg);
+  border: 2px solid var(--stroke-default);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-fluent);
+  box-shadow: var(--shadow-card);
+}
+
+.symbol-tile:hover {
+  transform: scale(1.08);
+  border-color: var(--delima-green);
+  box-shadow: var(--shadow-flyout);
+  background: var(--delima-green-subtle);
+}
+
+.symbol-tile:active {
+  transform: scale(0.95);
+}
+
+.symbol-tile .symbol-name {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Keypad Action Buttons */
+.keypad-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+/* ==========================================================================
+   SCREEN 4: DESTINASI PELANCAR (DESTINATION LAUNCHER)
+   ========================================================================== */
+.destination-container {
+  flex: 1;
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.dest-profile-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dest-avatar {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: var(--delima-green-subtle);
+  font-size: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dest-student-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.dest-student-email {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+}
+
+.destination-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1040px;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+  .destination-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dest-card {
+  background: var(--card-bg);
+  border: 2px solid var(--stroke-default);
+  border-radius: var(--radius-xl);
+  padding: 24px 18px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-fluent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+.dest-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-dialog);
+}
+
+.dest-card.delima {
+  border-color: var(--delima-green);
+  background: linear-gradient(180deg, var(--card-bg) 0%, var(--delima-green-subtle) 100%);
+}
+
+.dest-card.classroom {
+  border-color: var(--delima-orange);
+  background: linear-gradient(180deg, var(--card-bg) 0%, rgba(224, 109, 0, 0.08) 100%);
+}
+
+.dest-card.ains {
+  border-color: #6D28D9;
+  background: linear-gradient(180deg, var(--card-bg) 0%, rgba(109, 40, 217, 0.10) 100%);
+}
+
+.dest-card.textbook {
+  border-color: #0078D4;
+  background: linear-gradient(180deg, var(--card-bg) 0%, rgba(0, 120, 212, 0.08) 100%);
+}
+
+.dest-icon {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+
+.dest-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.dest-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   LOADING & INJECTION OVERLAY
+   ========================================================================== */
+.signing-in-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+
+.fluent-spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 5px solid var(--bg-layer-2);
+  border-top-color: var(--delima-green);
+  animation: fluentSpin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes fluentSpin {
+  to { transform: rotate(360deg); }
+}

@@ -163,7 +163,8 @@ public sealed class AdminWizardState
         Destinations =
         [
             new DestinationConfig { Id = "delima", Label = "DELIMa 3.0", Url = "https://d3.delima.edu.my/" },
-            new DestinationConfig { Id = "classroom", Label = "Google Classroom", Url = "https://classroom.google.com/" }
+            new DestinationConfig { Id = "classroom", Label = "Google Classroom", Url = "https://classroom.google.com/" },
+            new DestinationConfig { Id = "ains", Label = "AINS (NILAM)", Url = "https://ains.moe.gov.my/" }
         ],
         PicturePasswordRequired = true,
         IdleResetSeconds = 600,

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ms" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DELIMa Smart Suite — Windows 11 Fluent Web UI</title>
+  <meta name="description" content="Antaramuka Web Windows 11 moden berprestasi tinggi untuk DELIMa Admin Setup Wizard & DELIMa Student Kiosk Launcher.">
+  <link rel="icon" type="image/png" href="../../icon.png">
+
+  <!-- Google Fonts: Segoe UI Variable fallback: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Windows 11 Fluent 2 Design System Stylesheets -->
+  <link rel="stylesheet" href="css/fluent-tokens.css">
+  <link rel="stylesheet" href="css/fluent-controls.css">
+  <link rel="stylesheet" href="css/app-shell.css">
+  <link rel="stylesheet" href="css/admin-wizard.css">
+  <link rel="stylesheet" href="css/student-launcher.css">
+</head>
+<body>
+
+  <!-- Outer Windows 11 Desktop Viewport -->
+  <div class="app-viewport">
+
+    <!-- Windows 11 Main Application Window -->
+    <div class="win11-window" id="mainWindowFrame">
+
+      <!-- Windows 11 Title Bar with Caption Buttons -->
+      <header class="win11-titlebar">
+        <div class="titlebar-left">
+          <div class="app-icon">D3</div>
+          <div class="titlebar-title">
+            <span id="windowTitleText">DELIMa Admin — Wizard Persediaan Sekolah</span>
+            <span class="titlebar-school-tag">SK Seksyen 24 Shah Alam</span>
+          </div>
+        </div>
+
+        <!-- Mode Switcher (Admin Setup vs Student Launcher) -->
+        <div class="titlebar-center">
+          <div class="mode-switcher">
+            <button class="mode-switcher-btn active" id="modeBtnAdmin" onclick="window.app.switchMode('admin')">
+              🛠️ DELIMa Admin
+            </button>
+            <button class="mode-switcher-btn" id="modeBtnStudent" onclick="window.app.switchMode('student')">
+              🚀 Kiosk Murid
+            </button>
+          </div>
+        </div>
+
+        <!-- Titlebar Right: Theme Switcher & Windows 11 Caption Controls -->
+        <div class="titlebar-right">
+          <button class="theme-toggle-btn" id="themeToggleBtn" onclick="window.app.toggleTheme()" title="Tukar Mod Gelap/Cerah">
+            <span id="themeToggleIcon">🌙</span>
+          </button>
+          <button class="caption-btn" id="winBtnMin" title="Minimize">
+            <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+          </button>
+          <button class="caption-btn" id="winBtnMax" title="Maximize">
+            <svg width="10" height="10" viewBox="0 0 10 10"><rect width="9" height="9" x="0.5" y="0.5" fill="none" stroke="currentColor"/></svg>
+          </button>
+          <button class="caption-btn close" id="winBtnClose" title="Close">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M0,0 L10,10 M10,0 L0,10" stroke="currentColor" stroke-width="1.2"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 1: DELIMa Admin Application / Setup Wizard                     -->
+      <!-- ================================================================== -->
+      <main class="app-container" id="adminViewContainer">
+
+        <!-- WinUI 3 Navigation Rail -->
+        <aside class="nav-rail">
+          <div class="nav-brand-card">
+            <div class="brand-crest" id="adminBrandCrest">SK24</div>
+            <div class="brand-info">
+              <h3>DELIMa Admin v2.0</h3>
+              <p>SK Seksyen 24 Shah Alam</p>
+            </div>
+          </div>
+
+          <div class="nav-section-title">Langkah Persediaan</div>
+          <div class="nav-menu" id="adminNavMenu">
+            <!-- Dynamically populated by admin-wizard.js -->
+          </div>
+
+          <div class="nav-footer">
+            <span class="badge badge-neutral">Windows 11 Fluent 2</span>
+            <button class="btn btn-subtle btn-sm" onclick="window.app.showToast('DELIMa Admin v2.0.4 - Bina rasmi', 'info')">
+              ℹ️ Info
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Stage for Wizard Steps -->
+        <section class="main-stage">
+          <div class="stage-header">
+            <div class="stage-title-wrap">
+              <h1 id="adminStageTitle">1. Identiti & Penjenamaan Sekolah</h1>
+              <p id="adminStageSub">Tetapkan nama sekolah, kod APDM, dan palet warna lencana sekolah.</p>
+            </div>
+          </div>
+
+          <div class="stage-content" id="adminStageContent">
+            <!-- Step View HTML injected by admin-wizard.js -->
+          </div>
+
+          <!-- Bottom Actions Strip -->
+          <div class="stage-actions-bar" id="adminActionsBar">
+            <!-- Injected by admin-wizard.js -->
+          </div>
+        </section>
+      </main>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 2: DELIMa Student Launcher (Kiosk Portal)                      -->
+      <!-- ================================================================== -->
+      <main class="app-container" id="studentViewContainer" style="display: none;">
+        <div class="student-launcher-viewport" id="studentLauncherContainer">
+          <!-- Dynamic Kiosk Screens injected by student-launcher.js -->
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Teacher Mode / PIN Modal Dialog -->
+  <div class="modal-overlay" id="teacherPinModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">🔒 Pengesahan Mod Guru</h3>
+        <button class="btn btn-subtle btn-icon" onclick="window.studentLauncher.closeTeacherPinModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px;">Sila masukkan frasa laluan pentadbir untuk membuka menu pentadbir atau menyahkunci murid.</p>
+        <div class="form-group">
+          <label class="form-label">Frasa Laluan Guru / Pentadbir</label>
+          <input type="password" id="teacherPinInput" class="input-text" placeholder="Masukkan kata laluan guru">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="window.studentLauncher.closeTeacherPinModal()">Batal</button>
+        <button class="btn btn-accent" onclick="window.studentLauncher.verifyTeacherPin()">Sahkan & Buka</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Windows 11 Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/data-mock.js"></script>
+  <script src="js/admin-wizard.js"></script>
+  <script src="js/student-launcher.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

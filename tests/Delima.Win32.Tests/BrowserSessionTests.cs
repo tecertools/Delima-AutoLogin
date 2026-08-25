@@ -70,6 +70,8 @@ public class BrowserSessionTests
         // Chrome destination titles
         Assert.Contains("DELIMa - Google Chrome", BrowserTitles.Chrome.Destination);
         Assert.Contains("DELIMa 3.0 - Google Chrome", BrowserTitles.Chrome.Destination);
+        Assert.Contains("Google Classroom - Google Chrome", BrowserTitles.Chrome.Destination);
+        Assert.Contains("AINS - Google Chrome", BrowserTitles.Chrome.Destination);
     }
 
     [Fact]
@@ -88,6 +90,8 @@ public class BrowserSessionTests
         Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
         Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Profile 1 - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
         Assert.Contains("DELIMa - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
+        Assert.Contains("Google Classroom - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
+        Assert.Contains("AINS - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
     }
 
     [Fact]

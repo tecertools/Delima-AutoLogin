@@ -11,7 +11,7 @@ on:
       version:
         description: 'Version tag to release (e.g. 2.0.0)'
         required: false
-        default: '2.0.2'
+        default: '2.2.0'
 
 permissions:
   contents: write
@@ -75,8 +75,9 @@ jobs:
             --accept-package-agreements --accept-source-agreements
           echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
 
-      # 8. Build Inno Setup installer package
+      # 8. Build Inno Setup installer package (tag releases and manual dispatch only)
       - name: Compile Inno Setup installer
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         shell: pwsh
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" /DMyAppVersion=$env:VERSION installer/DelimaLauncher.iss

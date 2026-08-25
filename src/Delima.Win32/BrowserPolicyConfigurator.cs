@@ -53,7 +53,8 @@ public static class BrowserPolicyConfigurator
     [
         "accounts.google.com",
         "*.delima.edu.my",
-        "classroom.google.com"
+        "classroom.google.com",
+        "*.moe.gov.my"
     ];
 
     public static readonly string[] DefaultBlocklist =

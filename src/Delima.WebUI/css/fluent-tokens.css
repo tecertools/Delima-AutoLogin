@@ -1,0 +1,192 @@
+/* ==========================================================================
+   DELIMa Windows 11 Web UI — Fluent 2 Design Tokens
+   Supports: Light Mode & Dark Mode, Mica & Acrylic Materials, Segoe UI Variable
+   ========================================================================== */
+
+:root {
+  /* Font Family Hierarchy */
+  --font-family-base: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica Neue", sans-serif;
+  --font-family-display: "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: "Cascadia Code", "Consolas", "Courier New", monospace;
+
+  /* Typography Scale */
+  --font-size-caption: 11px;
+  --font-size-body: 13px;
+  --font-size-body-strong: 13px;
+  --font-size-subtitle: 16px;
+  --font-size-title: 20px;
+  --font-size-title-large: 26px;
+  --font-size-display: 34px;
+
+  --line-height-caption: 14px;
+  --line-height-body: 18px;
+  --line-height-subtitle: 22px;
+  --line-height-title: 26px;
+  --line-height-title-large: 32px;
+  --line-height-display: 42px;
+
+  /* Border Radii (Windows 11 Specs) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-round: 9999px;
+
+  /* Transitions */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
+  --ease-fluent: cubic-bezier(0.1, 0.9, 0.2, 1.0);
+  --ease-standard: cubic-bezier(0.33, 0, 0.67, 1);
+}
+
+/* ==========================================================================
+   LIGHT THEME TOKENS (Default)
+   ========================================================================== */
+[data-theme="light"], :root {
+  color-scheme: light;
+
+  /* Backgrounds & Materials */
+  --bg-canvas: #F3F3F3;
+  --bg-mica: rgba(243, 243, 243, 0.88);
+  --bg-acrylic: rgba(255, 255, 255, 0.72);
+  --bg-layer-1: #FFFFFF;
+  --bg-layer-2: #F9F9F9;
+  --bg-layer-3: #F3F3F3;
+  --bg-layer-hover: rgba(0, 0, 0, 0.035);
+  --bg-layer-active: rgba(0, 0, 0, 0.06);
+  --bg-layer-selected: rgba(0, 0, 0, 0.05);
+
+  /* Elevation & Card Backgrounds */
+  --card-bg: #FFFFFF;
+  --card-bg-subtle: #FAFAFA;
+  --sidebar-bg: #F8F9FA;
+  --titlebar-bg: #EAEAEA;
+  --toolbar-bg: #FFFFFF;
+
+  /* Stroke & Borders */
+  --stroke-subtle: rgba(0, 0, 0, 0.05);
+  --stroke-default: rgba(0, 0, 0, 0.08);
+  --stroke-strong: rgba(0, 0, 0, 0.16);
+  --stroke-focus: #005FB8;
+
+  /* Text & Foreground */
+  --text-primary: #1C1C1C;
+  --text-secondary: #5C5C5C;
+  --text-tertiary: #8A8A8A;
+  --text-disabled: #A6A6A6;
+  --text-on-accent: #FFFFFF;
+
+  /* Windows 11 Accent Palette (Default: Blue / DELIMa Emerald Override) */
+  --accent-default: #0067C0;
+  --accent-hover: #1975C5;
+  --accent-active: #005BB2;
+  --accent-subtle: #EBF3FC;
+  --accent-tertiary: #CCE4F7;
+
+  /* DELIMa Brand Accents */
+  --delima-green: #007A3D;
+  --delima-green-hover: #008C46;
+  --delima-green-subtle: #E6F5EC;
+  --delima-orange: #E06D00;
+  --delima-red: #D13438;
+
+  /* Status Colors */
+  --status-success-bg: #DFF6DD;
+  --status-success-fg: #107C10;
+  --status-success-border: #9AD99A;
+
+  --status-warning-bg: #FFF4CE;
+  --status-warning-fg: #795B00;
+  --status-warning-border: #F3D270;
+
+  --status-danger-bg: #FDE7E9;
+  --status-danger-fg: #C42B1C;
+  --status-danger-border: #F3A8AF;
+
+  --status-info-bg: #EFF6FC;
+  --status-info-fg: #005A9E;
+  --status-info-border: #B3D7F2;
+
+  /* Fluent Elevation Shadows */
+  --shadow-card: 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 0px 2px rgba(0, 0, 0, 0.06);
+  --shadow-flyout: 0px 8px 16px rgba(0, 0, 0, 0.12), 0px 0px 4px rgba(0, 0, 0, 0.08);
+  --shadow-dialog: 0px 16px 32px rgba(0, 0, 0, 0.18), 0px 0px 8px rgba(0, 0, 0, 0.1);
+  --shadow-window: 0px 20px 50px rgba(0, 0, 0, 0.22);
+}
+
+/* ==========================================================================
+   DARK THEME TOKENS (Windows 11 Dark Mica)
+   ========================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Backgrounds & Materials */
+  --bg-canvas: #202020;
+  --bg-mica: rgba(32, 32, 32, 0.88);
+  --bg-acrylic: rgba(44, 44, 44, 0.75);
+  --bg-layer-1: #2B2B2B;
+  --bg-layer-2: #323232;
+  --bg-layer-3: #383838;
+  --bg-layer-hover: rgba(255, 255, 255, 0.05);
+  --bg-layer-active: rgba(255, 255, 255, 0.08);
+  --bg-layer-selected: rgba(255, 255, 255, 0.07);
+
+  /* Elevation & Card Backgrounds */
+  --card-bg: #2B2B2B;
+  --card-bg-subtle: #262626;
+  --sidebar-bg: #242424;
+  --titlebar-bg: #1F1F1F;
+  --toolbar-bg: #2B2B2B;
+
+  /* Stroke & Borders */
+  --stroke-subtle: rgba(255, 255, 255, 0.05);
+  --stroke-default: rgba(255, 255, 255, 0.08);
+  --stroke-strong: rgba(255, 255, 255, 0.16);
+  --stroke-focus: #4CC2FF;
+
+  /* Text & Foreground */
+  --text-primary: #FFFFFF;
+  --text-secondary: #D0D0D0;
+  --text-tertiary: #9E9E9E;
+  --text-disabled: #666666;
+  --text-on-accent: #000000;
+
+  /* Windows 11 Accent Palette (Dark Mode) */
+  --accent-default: #60CDFF;
+  --accent-hover: #70D3FF;
+  --accent-active: #50B8E8;
+  --accent-subtle: rgba(96, 205, 255, 0.15);
+  --accent-tertiary: rgba(96, 205, 255, 0.25);
+
+  /* DELIMa Brand Accents (Dark Mode Adjusted) */
+  --delima-green: #37C278;
+  --delima-green-hover: #48D188;
+  --delima-green-subtle: rgba(55, 194, 120, 0.16);
+  --delima-orange: #FFA043;
+  --delima-red: #FF686B;
+
+  /* Status Colors */
+  --status-success-bg: rgba(16, 124, 16, 0.25);
+  --status-success-fg: #6CCB5F;
+  --status-success-border: rgba(108, 203, 95, 0.4);
+
+  --status-warning-bg: rgba(216, 177, 39, 0.22);
+  --status-warning-fg: #FCE100;
+  --status-warning-border: rgba(252, 225, 0, 0.4);
+
+  --status-danger-bg: rgba(196, 43, 28, 0.25);
+  --status-danger-fg: #FF99A4;
+  --status-danger-border: rgba(255, 153, 164, 0.4);
+
+  --status-info-bg: rgba(0, 120, 212, 0.25);
+  --status-info-fg: #81C7FD;
+  --status-info-border: rgba(129, 199, 253, 0.4);
+
+  /* Fluent Elevation Shadows */
+  --shadow-card: 0px 2px 6px rgba(0, 0, 0, 0.35), 0px 0px 2px rgba(255, 255, 255, 0.05);
+  --shadow-flyout: 0px 8px 24px rgba(0, 0, 0, 0.45), 0px 0px 4px rgba(255, 255, 255, 0.06);
+  --shadow-dialog: 0px 16px 40px rgba(0, 0, 0, 0.55), 0px 0px 8px rgba(255, 255, 255, 0.08);
+  --shadow-window: 0px 20px 60px rgba(0, 0, 0, 0.7);
+}

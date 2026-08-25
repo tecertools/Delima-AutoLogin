@@ -1,0 +1,334 @@
+/* ==========================================================================
+   DELIMa Windows 11 Web UI — Admin Setup Wizard Styles
+   ========================================================================== */
+
+/* Step 1: School Identity & Branding */
+.identity-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+}
+
+.color-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.color-swatch-item {
+  border: 1px solid var(--stroke-default);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  background: var(--card-bg-subtle);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--duration-fast);
+}
+
+.color-swatch-item:hover {
+  border-color: var(--stroke-strong);
+  transform: translateY(-2px);
+}
+
+.color-swatch-item.selected {
+  border-color: var(--delima-green);
+  box-shadow: 0 0 0 2px var(--delima-green);
+}
+
+.swatch-color-box {
+  width: 100%;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  margin-bottom: 6px;
+}
+
+.swatch-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* Live Badge & Theme Preview Card */
+.preview-card-wrap {
+  background: var(--bg-layer-2);
+  border: 1px solid var(--stroke-default);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.preview-kiosk-frame {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--stroke-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.preview-kiosk-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 3px solid var(--delima-green);
+}
+
+.preview-crest {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--delima-green);
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* Step 3: CSV Importer & Validation */
+.csv-dropzone {
+  border: 2px dashed var(--stroke-strong);
+  border-radius: var(--radius-md);
+  background: var(--card-bg-subtle);
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  margin-bottom: 20px;
+}
+
+.csv-dropzone:hover, .csv-dropzone.dragover {
+  border-color: var(--delima-green);
+  background: var(--delima-green-subtle);
+}
+
+.dropzone-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.dropzone-text {
+  font-size: var(--font-size-subtitle);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.dropzone-hint {
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+}
+
+/* CSV Metrics Overview Cards */
+.csv-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: var(--card-bg);
+  border: 1px solid var(--stroke-default);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.metric-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 22px;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Column Mapping Grid */
+.mapping-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 120px;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--stroke-subtle);
+}
+
+.mapping-row:hover {
+  background: var(--bg-layer-hover);
+}
+
+.mapping-target {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.mapping-target.required::after {
+  content: " *";
+  color: var(--status-danger-fg);
+}
+
+/* Step 4: Password Matrix & Visual Password Manager */
+.password-matrix-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.picture-symbols-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-layer-2);
+  border: 1px solid var(--stroke-default);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 14px;
+}
+
+.matrix-row-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--delima-green-subtle);
+  color: var(--delima-green);
+  font-weight: 700;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.masked-pass {
+  font-family: var(--font-family-mono);
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+}
+
+/* Step 7: USB Provisioning & Lab Export */
+.provision-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.drive-select-card {
+  border: 2px solid var(--delima-green);
+  background: var(--delima-green-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.drive-icon {
+  font-size: 28px;
+}
+
+.drive-details h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.drive-details p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.checklist-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--stroke-subtle);
+}
+
+.checklist-step:last-child {
+  border-bottom: none;
+}
+
+.checklist-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--status-success-bg);
+  color: var(--status-success-fg);
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.checklist-text h5 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.checklist-text p {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+/* Animated Progress Bar */
+.fluent-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-layer-2);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin: 14px 0;
+}
+
+.fluent-progress-fill {
+  height: 100%;
+  background: var(--delima-green);
+  border-radius: 999px;
+  transition: width var(--duration-normal) var(--ease-fluent);
+}
