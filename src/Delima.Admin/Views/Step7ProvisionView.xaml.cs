@@ -36,6 +36,48 @@ public partial class Step7ProvisionView : UserControl
         }
     }
 
+    private void OnRefreshUsbClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step7ProvisionViewModel vm)
+        {
+            vm.RefreshUsbDrives();
+        }
+    }
+
+    private void OnSaveToSelectedUsbClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step7ProvisionViewModel vm)
+        {
+            if (vm.SelectedUsbDrive == null)
+            {
+                MessageBox.Show("Sila pilih pemacu USB terlebih dahulu.", "Tiada USB Dipilih", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                vm.SaveBundleToUsb(vm.SelectedUsbDrive);
+                MessageBox.Show(
+                    $"Pakej persediaan makmal berjaya disimpan ke pendrive:\n{vm.LastExportedDirectory}\n\nAnda kini boleh mencucuk pendrive ini pada setiap PC makmal dan menjalankan '1_Sediakan_Makmal.exe'.",
+                    "Pakej USB Berjaya Disediakan",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ralat semasa menyimpan ke pemacu USB: {ex.Message}", "Ralat Simpan", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
+
+    private void OnOpenExportedFolderClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step7ProvisionViewModel vm)
+        {
+            vm.OpenExportedFolder();
+        }
+    }
+
     private void OnSaveBundleFileClick(object sender, RoutedEventArgs e)
     {
         var dlg = new SaveFileDialog

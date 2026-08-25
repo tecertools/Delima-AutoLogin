@@ -75,6 +75,30 @@ public partial class Step3RosterImportView : UserControl
         }
     }
 
+    private void OnRunDryRunClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step3RosterImportViewModel vm)
+        {
+            vm.RunDryRunAnalysis();
+        }
+    }
+
+    private void OnClearFileClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step3RosterImportViewModel vm)
+        {
+            vm.ClearFile();
+        }
+    }
+
+    private void OnBackToMappingClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step3RosterImportViewModel vm)
+        {
+            vm.GoToMappingView();
+        }
+    }
+
     private void OnExportRejectsClick(object sender, RoutedEventArgs e)
     {
         var dlg = new SaveFileDialog
@@ -91,3 +115,4 @@ public partial class Step3RosterImportView : UserControl
         }
     }
 }
+

@@ -14,14 +14,27 @@
             <!-- Destinations Card -->
             <Border Style="{StaticResource SettingsCard}">
                 <StackPanel>
-                    <TextBlock Text="Destinasi Pelancaran" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,8" />
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Destinasi Pelancaran (Portal Pembelajaran)" FontWeight="SemiBold" FontSize="13" />
+                            <TextBlock Text="Portal yang akan dibuka secara automatik selepas murid mengesahkan log masuk." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" />
+                        </StackPanel>
+                        <!-- Quick Add Canva Preset Chip -->
+                        <Button Grid.Column="1" Content="+ Tambah Canva for Education" Style="{StaticResource SmallButton}"
+                                Click="OnAddCanvaPresetClick" ToolTip="Tambah portal Canva for Education ke senarai destinasi"
+                                IsEnabled="{Binding HasCanvaPreset, Converter={StaticResource InverseBoolToVisConv}}" />
+                    </Grid>
 
                     <ItemsControl ItemsSource="{Binding Destinations}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type store:DestinationConfig}">
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="200"/>
                                         <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="10"/>
@@ -39,13 +52,13 @@
                     <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4" Background="#F8F9FA" Padding="10" Margin="0,4,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="10"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="10"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Text="{Binding NewDestLabel, UpdateSourceTrigger=PropertyChanged}" Tag="Nama Portal (cth. Frog VLE)" />
+                            <TextBox Grid.Column="0" Text="{Binding NewDestLabel, UpdateSourceTrigger=PropertyChanged}" Tag="Nama Portal (cth. Canva)" />
                             <TextBox Grid.Column="2" Text="{Binding NewDestUrl, UpdateSourceTrigger=PropertyChanged}" Tag="https://..." />
                             <Button Grid.Column="4" Content="+ Tambah" Style="{StaticResource SmallPrimaryButton}" Click="OnAddDestinationClick" />
                         </Grid>
@@ -72,9 +85,20 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Tempoh Tidak Aktif (saat)" Style="{StaticResource FieldLabel}" />
-                            <TextBox Text="{Binding IdleResetSeconds, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Text="Masa sebelum sesi pelancar tamat dan profil dipadam secara automatik." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
+                            <Grid Margin="0,0,0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Tempoh Sesi Tidak Aktif" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="5m" Style="{StaticResource SmallButton}" Padding="6,1" Margin="0,0,4,0" Click="OnSet5MinIdleClick" ToolTip="5 minit (300 saat)" />
+                                    <Button Content="10m" Style="{StaticResource SmallButton}" Padding="6,1" Margin="0,0,4,0" Click="OnSet10MinIdleClick" ToolTip="10 minit (600 saat)" />
+                                    <Button Content="15m" Style="{StaticResource SmallButton}" Padding="6,1" Click="OnSet15MinIdleClick" ToolTip="15 minit (900 saat)" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBox Text="{Binding IdleResetSeconds, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0" />
+                            <TextBlock Text="Masa (dalam saat) sebelum sesi tamat dan profil dipadam secara automatik." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" Margin="0,3,0,0" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">

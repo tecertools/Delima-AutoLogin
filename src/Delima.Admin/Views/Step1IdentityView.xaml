@@ -5,16 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:Delima.Admin.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="550" d:DesignWidth="700">
+             d:DesignHeight="850" d:DesignWidth="760">
     <UserControl.Resources>
         <conv:HexToBrushConverter x:Key="HexToBrushConv" />
         <conv:BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+        <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisConv" />
+        <conv:NullOrEmptyToVisibilityConverter x:Key="InverseNullOrEmptyToVisConv" Invert="True" />
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Text="Identiti Sekolah" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Tetapkan maklumat rasmi sekolah anda. Maklumat ini diperibadikan untuk makmal anda tanpa sebarang pengkodan kekal." Style="{StaticResource StepSubHeading}" />
+        <StackPanel Margin="0,0,0,16">
+            <TextBlock Text="Identiti Sekolah &amp; Tema" Style="{StaticResource StepHeading}" />
+            <TextBlock Text="Tetapkan maklumat rasmi sekolah dan sesuaikan palet warna jenama yang akan dipaparkan pada pelancar murid." Style="{StaticResource StepSubHeading}" />
 
             <!-- School Identifiers Card -->
             <Border Style="{StaticResource SettingsCard}">
@@ -63,27 +65,79 @@
                 </Grid>
             </Border>
 
-            <!-- School Crest Card -->
-            <Border Style="{StaticResource SettingsCard}">
+            <!-- School Crest Card with Thumbnail & Drag/Drop -->
+            <Border Style="{StaticResource SettingsCard}" AllowDrop="True" DragOver="OnCrestDragOver" Drop="OnCrestDrop">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="56"/>
+                        <ColumnDefinition Width="12"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+
+                    <!-- Crest Thumbnail / Placeholder -->
+                    <Border Grid.Column="0" Width="52" Height="52" CornerRadius="8" Background="#F1F3F5" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True" VerticalAlignment="Center">
+                        <Grid>
+                            <!-- Image if selected -->
+                            <Image Source="{Binding CrestPath}" Stretch="Uniform" Margin="4"
+                                   Visibility="{Binding CrestPath, Converter={StaticResource NullOrEmptyToVisConv}}" />
+                            <!-- Fallback Icon if none selected -->
+                            <TextBlock Text="🏫" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Visibility="{Binding CrestPath, Converter={StaticResource InverseNullOrEmptyToVisConv}}" />
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
                         <TextBlock Text="Lambang / Lencana Sekolah" Style="{StaticResource FieldLabel}" />
-                        <TextBlock Text="{Binding CrestPath, FallbackValue='(Tiada fail dipilih — guna lambang piawai)'}" Foreground="{StaticResource Ink2Brush}" FontSize="12"/>
+                        <TextBlock Text="{Binding CrestPath, FallbackValue='(Tiada fail dipilih — guna lambang rasmi DELIMa)'}" Foreground="{StaticResource Ink2Brush}" FontSize="11.5" TextTrimming="CharacterEllipsis" Margin="0,0,0,2"/>
+                        <TextBlock Text="Format disokong: PNG, JPG, SVG. Anda juga boleh seret dan lepas fail imej ke sini." Foreground="{StaticResource Ink3Brush}" FontSize="11" />
                     </StackPanel>
-                    <Button Grid.Column="1" Content="Muat Naik Lambang…" Style="{StaticResource SmallButton}" Click="OnSelectCrestClick" VerticalAlignment="Center" />
+
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Pilih Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectCrestClick" Margin="0,0,6,0" />
+                        <Button Content="✕ Piawai" Style="{StaticResource DangerButton}" Click="OnClearCrestClick"
+                                ToolTip="Guna lambang piawai DELIMa"
+                                Visibility="{Binding CrestPath, Converter={StaticResource NullOrEmptyToVisConv}}" />
+                    </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- Brand Palette Swatches Section -->
+            <!-- Theme Presets & Palette Card -->
             <Border Style="{StaticResource SettingsCard}" Margin="0,4,0,0">
                 <StackPanel>
-                    <TextBlock Text="Palet Warna Jenama (Pengesahan Kontras Langsung)" Style="{StaticResource FieldLabel}" />
-                    <TextBlock Text="Setiap warna disahkan mematuhi nisbah kontras WCAG sekurang-kurangnya 4.5:1 untuk keterbacaan murid." Foreground="{StaticResource Ink2Brush}" FontSize="12" Margin="0,0,0,12" />
+                    <TextBlock Text="Tema Warna Sekolah" Style="{StaticResource FieldLabel}" />
+                    <TextBlock Text="Pilih daripada palet pratetap sedia ada atau klik mana-mana kotak warna untuk menyesuaikan dengan warna rasmi sekolah anda." Foreground="{StaticResource Ink2Brush}" FontSize="12" Margin="0,0,0,12" />
 
+                    <!-- Quick 1-Click Theme Preset Chips -->
+                    <TextBlock Text="PILIHAN PRATETAP PANTAS" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource Ink3Brush}" Margin="0,0,0,6" />
+                    <ItemsControl ItemsSource="{Binding Presets}" Margin="0,0,0,14">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Tag="{Binding}" Click="OnPresetClick" Margin="0,0,8,6" Cursor="Hand" Padding="0" Background="Transparent" BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border CornerRadius="16" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Background="#FFFFFF" Padding="8,4">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Primary & Accent Indicator Dots -->
+                                                    <Border Width="12" Height="12" CornerRadius="6" Background="{Binding Primary, Converter={StaticResource HexToBrushConv}}" Margin="0,0,3,0" />
+                                                    <Border Width="12" Height="12" CornerRadius="6" Background="{Binding Accent, Converter={StaticResource HexToBrushConv}}" Margin="0,0,6,0" />
+                                                    <TextBlock Text="{Binding Name}" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource InkBrush}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Swatches Grid (8 Colours) -->
+                    <TextBlock Text="WARNA KHUSUS &amp; PENGESAHAN KONTRAS (WCAG 4.5:1)" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource Ink3Brush}" Margin="0,0,0,8" />
                     <ItemsControl ItemsSource="{Binding Swatches}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -92,13 +146,32 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="116" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,10,10" Background="#FAFAFA">
+                                <Border Width="120" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="8" Margin="0,0,10,10" Background="#FAFAFA">
                                     <StackPanel HorizontalAlignment="Center">
-                                        <Border Width="100" Height="26" CornerRadius="4" Background="{Binding HexCode, Converter={StaticResource HexToBrushConv}}" Margin="0,0,0,6" />
-                                        <TextBlock Text="{Binding Label}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                                        <TextBox Text="{Binding HexCode, UpdateSourceTrigger=LostFocus}" FontSize="11" Height="26" HorizontalContentAlignment="Center" Margin="0,0,0,6" Padding="0"/>
-                                        
-                                        <!-- WinUI 3 InfoBadge for Contrast Status -->
+                                        <TextBlock Text="{Binding Label}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+
+                                        <!-- Clickable colour swatch button —— opens native colour picker -->
+                                        <Button Width="100" Height="42" Padding="0"
+                                                Tag="{Binding}"
+                                                Click="OnPickColorClick"
+                                                ToolTip="Klik untuk memilih warna menggunakan penuding warna"
+                                                Cursor="Hand">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="6"
+                                                            Background="{Binding HexCode, Converter={StaticResource HexToBrushConv}}"
+                                                            BorderBrush="{StaticResource LineStrongBrush}"
+                                                            BorderThickness="1">
+                                                        <TextBlock Text="🎨" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6" />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+
+                                        <!-- Read-only hex reference -->
+                                        <TextBlock Text="{Binding HexCode}" FontSize="10" FontFamily="Consolas" Foreground="{StaticResource Ink3Brush}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+
+                                        <!-- Contrast badge -->
                                         <Border CornerRadius="10" Padding="6,2" HorizontalAlignment="Center">
                                             <Border.Style>
                                                 <Style TargetType="Border">
@@ -130,6 +203,119 @@
                     </ItemsControl>
                 </StackPanel>
             </Border>
+
+            <!-- LIVE PREVIEW CARD: MINI STUDENT LAUNCHER MOCKUP -->
+            <Border Style="{StaticResource SettingsCard}" Margin="0,4,0,0" Padding="0" ClipToBounds="True">
+                <StackPanel>
+                    <!-- Preview Header Bar -->
+                    <Border Background="#F8F9FA" Padding="14,10" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="🖥️ Pratonton Langsung Pelancar Murid" FontWeight="SemiBold" FontSize="12.5" Foreground="{StaticResource InkBrush}" />
+                                <TextBlock Text=" (Pembaruan masa nyata)" FontSize="11" Foreground="{StaticResource Ink3Brush}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#EFF6FF" CornerRadius="10" Padding="8,2">
+                                <TextBlock Text="Skrin Kiosk Murid" FontSize="10" FontWeight="Bold" Foreground="#1D4ED8" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Mockup Body (Container with Page Background) -->
+                    <Border Background="#FFFDF7" Padding="16" MinHeight="180">
+                        <StackPanel>
+                            <!-- Mockup Banner (Primary Color) -->
+                            <Border CornerRadius="8" Background="{Binding Swatches[0].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#056839'}" Padding="14,10" Margin="0,0,0,12" Effect="{StaticResource FluentButtonShadow}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Crest / Shield -->
+                                    <Border Grid.Column="0" Width="36" Height="36" CornerRadius="6" Background="#FFFFFF" Margin="0,0,10,0" ClipToBounds="True">
+                                        <Grid>
+                                            <Image Source="{Binding CrestPath}" Stretch="Uniform" Margin="2"
+                                                   Visibility="{Binding CrestPath, Converter={StaticResource NullOrEmptyToVisConv}}" />
+                                            <TextBlock Text="🏫" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Visibility="{Binding CrestPath, Converter={StaticResource InverseNullOrEmptyToVisConv}}" />
+                                        </Grid>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding SchoolCode, FallbackValue='ABC1234'}" FontWeight="Bold" FontSize="12" Foreground="#FFFFFF" Opacity="0.9" />
+                                            <TextBlock Text=" — " Foreground="#FFFFFF" Opacity="0.6" Margin="4,0" />
+                                            <TextBlock Text="{Binding SchoolName, FallbackValue='SK SRI DELIMA'}" FontWeight="Bold" FontSize="13" Foreground="#FFFFFF" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Motto, FallbackValue='Ilmu Pelita Hidup'}" FontSize="10.5" Foreground="#FFFFFF" Opacity="0.8" FontStyle="Italic" />
+                                    </StackPanel>
+
+                                    <Border Grid.Column="2" Background="{Binding Swatches[1].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#F7941D'}" CornerRadius="12" Padding="8,3" VerticalAlignment="Center">
+                                        <TextBlock Text="Mod Murid" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Mockup Class Shortcuts & Sample Student Card Grid -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left: Mini Class Buttons -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Pilihan Kelas" FontSize="10" FontWeight="Bold" Foreground="{StaticResource Ink3Brush}" Margin="0,0,0,4"/>
+                                    <Border Background="{Binding Swatches[2].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#C41118'}" CornerRadius="5" Padding="6,4" Margin="0,0,0,3">
+                                        <TextBlock Text="1 Amanah" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
+                                    </Border>
+                                    <Border Background="{Binding Swatches[3].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#9E2B0E'}" CornerRadius="5" Padding="6,4" Margin="0,0,0,3">
+                                        <TextBlock Text="1 Bijak" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
+                                    </Border>
+                                    <Border Background="{Binding Swatches[4].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#A85200'}" CornerRadius="5" Padding="6,4" Margin="0,0,0,3">
+                                        <TextBlock Text="2 Cekal" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Right: Mini Student Card Preview -->
+                                <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="12,10" VerticalAlignment="Top">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="38"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Avatar -->
+                                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18" Background="#F1F3F5" VerticalAlignment="Center">
+                                            <TextBlock Text="🐱" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock Text="Ahmad Danish" FontWeight="SemiBold" FontSize="12" />
+                                            <Border Background="{Binding Swatches[2].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#C41118'}" CornerRadius="3" Padding="4,1" HorizontalAlignment="Left" Margin="0,2,0,0">
+                                                <TextBlock Text="1 Amanah" FontSize="9" FontWeight="Bold" Foreground="#FFFFFF" />
+                                            </Border>
+                                        </StackPanel>
+
+                                        <!-- Accent Launch Button -->
+                                        <Border Grid.Column="2" Background="{Binding Swatches[1].HexCode, Converter={StaticResource HexToBrushConv}, FallbackValue='#F7941D'}" CornerRadius="6" Padding="10,6" VerticalAlignment="Center">
+                                            <TextBlock Text="Log Masuk ➔" FontSize="10.5" FontWeight="Bold" Foreground="#FFFFFF" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+

@@ -41,7 +41,10 @@
                     <TextBlock Grid.Row="0" Grid.Column="4" Text="Tapis Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
                     <ComboBox Grid.Row="0" Grid.Column="6" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" VerticalAlignment="Center" />
 
-                    <Button Grid.Row="0" Grid.Column="8" Content="🖨️ Cetak Kata Laluan Gambar" Style="{StaticResource SecondaryButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak helaian kata laluan gambar mengikut tahun dan kelas yang dipilih" VerticalAlignment="Center" />
+                    <StackPanel Grid.Row="0" Grid.Column="8" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="↻ Jana Semula Kelas Ini" Style="{StaticResource SmallButton}" Click="OnCycleClassAvatarsClick" ToolTip="Jana semula avatar dan kata laluan gambar bagi semua murid dalam kelas yang ditapis" Margin="0,0,8,0" />
+                        <Button Content="🖨️ Cetak Helaian Murid (A4)" Style="{StaticResource SecondaryButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak helaian kata laluan gambar mengikut tahun dan kelas yang dipilih" />
+                    </StackPanel>
                 </Grid>
             </Border>
 

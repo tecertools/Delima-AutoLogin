@@ -27,6 +27,60 @@ public partial class Step4PasswordImportView : UserControl
         }
     }
 
+    private void OnAcknowledgeConsentClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step4PasswordImportViewModel vm)
+        {
+            vm.AcknowledgeConsent();
+        }
+    }
+
+    private void OnBulkSetPasswordClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not Step4PasswordImportViewModel vm) return;
+
+        int missing = vm.FilteredMissingCount;
+        if (missing == 0)
+        {
+            MessageBox.Show("Semua murid dalam paparan ini telah mempunyai kata laluan.", "Tiada Tindakan Diperlukan", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string defaultPwd = "Moe@" + DateTime.Now.Year;
+        var result = MessageBox.Show(
+            $"Tetapkan kata laluan piawai '{defaultPwd}' untuk {missing} orang murid yang belum mempunyai kata laluan dalam skop ({vm.SelectedYearFilter} - {vm.SelectedClassFilter})?",
+            "Tetapan Kata Laluan Pukal",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            vm.BulkSetDefaultPassword(defaultPwd, onlyMissing: true);
+            MessageBox.Show($"Kata laluan '{defaultPwd}' telah ditetapkan bagi {missing} orang murid.", "Tetapan Berjaya", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    private void OnExportPasswordsClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not Step4PasswordImportViewModel vm) return;
+
+        string yr = vm.SelectedYearFilter?.Replace(" ", "_") ?? "Semua_Tahun";
+        string cls = vm.SelectedClassFilter?.Replace(" ", "_") ?? "Semua_Kelas";
+
+        var dlg = new SaveFileDialog
+        {
+            Filter = "Fail CSV (*.csv)|*.csv",
+            FileName = $"kata_laluan_{yr}_{cls}_{DateTime.Now:yyyyMMdd}.csv",
+            Title = "Eksport Senarai Kata Laluan Murid"
+        };
+
+        if (dlg.ShowDialog() == true)
+        {
+            vm.ExportPasswordsCsv(dlg.FileName);
+            MessageBox.Show($"Senarai kata laluan ({vm.SelectedYearFilter} - {vm.SelectedClassFilter}) berjaya dieksport ke:\n{dlg.FileName}", "Eksport Berjaya", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
     private void OnDownloadPasswordTemplateClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is not Step4PasswordImportViewModel vm) return;

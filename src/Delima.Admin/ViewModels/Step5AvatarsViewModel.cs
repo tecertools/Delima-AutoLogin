@@ -359,6 +359,27 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
 
     public void CycleAvatar(AvatarAssignmentItem item) => RandomizeAvatar(item);
 
+    public void CycleClassAvatars()
+    {
+        var rand = Random.Shared;
+        int total = StandardPicturePasswordIcons.Length;
+
+        foreach (var item in FilteredAvatarItems)
+        {
+            item.Avatar = Guid.NewGuid().ToString("N")[..10];
+            int i1 = rand.Next(total);
+            int i2 = rand.Next(total);
+            while (i2 == i1) i2 = rand.Next(total);
+            int i3 = rand.Next(total);
+            while (i3 == i1 || i3 == i2) i3 = rand.Next(total);
+
+            item.PicturePassword = [StandardPicturePasswordIcons[i1], StandardPicturePasswordIcons[i2], StandardPicturePasswordIcons[i3]];
+            _ = DiceBearService.EnsureCachedAsync(item.DiceBearSeed);
+        }
+
+        SaveToState();
+    }
+
     public void TogglePicturePasswordPolicy(bool isRequired)
     {
         PicturePasswordRequired = isRequired;

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -11,6 +12,19 @@ using Delima.Core.Store;
 using Delima.Import;
 
 namespace Delima.Admin.ViewModels;
+
+public sealed class UsbDriveItem
+{
+    public string RootDirectory { get; init; } = "";
+    public string VolumeLabel { get; init; } = "";
+    public long TotalFreeSpaceBytes { get; init; }
+    public long TotalSizeBytes { get; init; }
+
+    public string FreeSpaceDisplay => $"{TotalFreeSpaceBytes / (1024.0 * 1024 * 1024):F1} GB Bebas";
+    public string DisplayName => string.IsNullOrWhiteSpace(VolumeLabel)
+        ? $"Pendrive ({RootDirectory.TrimEnd('\\')}) — {FreeSpaceDisplay}"
+        : $"{VolumeLabel} ({RootDirectory.TrimEnd('\\')}) — {FreeSpaceDisplay}";
+}
 
 public sealed partial class Step7ProvisionViewModel : ObservableObject
 {
@@ -37,6 +51,18 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
     [ObservableProperty]
     private byte[]? _generatedBundleBytes;
 
+    [ObservableProperty]
+    private string _lastExportedDirectory = "";
+
+    public ObservableCollection<UsbDriveItem> DetectedUsbDrives { get; } = [];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasUsbDriveSelected))]
+    private UsbDriveItem? _selectedUsbDrive;
+
+    public bool HasUsbDriveSelected => SelectedUsbDrive != null;
+    public bool HasAnyUsbDrive => DetectedUsbDrives.Count > 0;
+
     public ObservableCollection<LabChecklistItem> LabChecklist { get; } = [];
 
     public Step7ProvisionViewModel(AdminWizardState state)
@@ -44,6 +70,64 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
         _state = state;
         GenerateDefaultScript();
         InitializeLabChecklist();
+        RefreshUsbDrives();
+    }
+
+    public void RefreshUsbDrives()
+    {
+        DetectedUsbDrives.Clear();
+        try
+        {
+            var drives = DriveInfo.GetDrives()
+                .Where(d => d.DriveType == DriveType.Removable && d.IsReady)
+                .Select(d => new UsbDriveItem
+                {
+                    RootDirectory = d.RootDirectory.FullName,
+                    VolumeLabel = string.IsNullOrWhiteSpace(d.VolumeLabel) ? "USB Drive" : d.VolumeLabel,
+                    TotalFreeSpaceBytes = d.TotalFreeSpace,
+                    TotalSizeBytes = d.TotalSize
+                })
+                .ToList();
+
+            foreach (var d in drives)
+            {
+                DetectedUsbDrives.Add(d);
+            }
+
+            SelectedUsbDrive = DetectedUsbDrives.FirstOrDefault();
+        }
+        catch
+        {
+            // Ignore drive detection errors
+        }
+
+        OnPropertyChanged(nameof(HasAnyUsbDrive));
+        OnPropertyChanged(nameof(HasUsbDriveSelected));
+    }
+
+    public void SaveBundleToUsb(UsbDriveItem? drive = null)
+    {
+        var targetDrive = drive ?? SelectedUsbDrive;
+        if (targetDrive == null) return;
+
+        string targetDir = Path.Combine(targetDrive.RootDirectory, "DELIMa_Makmal");
+        Directory.CreateDirectory(targetDir);
+        string outputPath = Path.Combine(targetDir, "school.dlmpack");
+        SaveBundleToFile(outputPath);
+        LastExportedDirectory = targetDir;
+    }
+
+    public void OpenExportedFolder()
+    {
+        string target = string.IsNullOrWhiteSpace(LastExportedDirectory) ? AppDomain.CurrentDomain.BaseDirectory : LastExportedDirectory;
+        if (Directory.Exists(target))
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = target,
+                UseShellExecute = true
+            });
+        }
     }
 
     private void GenerateDefaultScript()

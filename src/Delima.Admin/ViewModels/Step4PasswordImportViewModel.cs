@@ -226,6 +226,38 @@ public sealed partial class Step4PasswordImportViewModel : ObservableObject
         OnPropertyChanged(nameof(CanProceed));
     }
 
+    public void BulkSetDefaultPassword(string defaultPassword, bool onlyMissing = true)
+    {
+        if (string.IsNullOrWhiteSpace(defaultPassword)) return;
+
+        foreach (var item in FilteredPasswordItems)
+        {
+            if (!onlyMissing || !item.HasPassword)
+            {
+                item.RawPassword = defaultPassword;
+                _state.StudentPasswords[item.StudentId] = defaultPassword;
+            }
+        }
+
+        RecalculateSharedPasswords();
+        NotifyCountersChanged();
+    }
+
+    public void ExportPasswordsCsv(string targetPath)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("ID_Murid,Nama_Penuh,Kelas,Tahun,ID_DELIMa,Kata_Laluan");
+
+        foreach (var item in FilteredPasswordItems)
+        {
+            string name = item.StudentName.Replace("\"", "\"\"");
+            string pwd = (item.RawPassword ?? "").Replace("\"", "\"\"");
+            sb.AppendLine($"\"{item.StudentId}\",\"{name}\",\"{item.ClassName}\",{item.Grade},\"{item.EmailLocal}\",\"{pwd}\"");
+        }
+
+        File.WriteAllText(targetPath, sb.ToString(), System.Text.Encoding.UTF8);
+    }
+
     public void SavePasswordTemplate(string targetPath, string? yearFilter = null, string? classFilter = null)
     {
         string effectiveYear = yearFilter ?? SelectedYearFilter ?? "Semua Tahun";

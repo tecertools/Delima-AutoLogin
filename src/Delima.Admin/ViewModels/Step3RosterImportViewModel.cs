@@ -72,6 +72,9 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
 
     private List<RawImportRow> _rawFileRows = [];
 
+    public string FileName => string.IsNullOrWhiteSpace(FilePath) ? "" : Path.GetFileName(FilePath);
+    public int TotalRawRowCount => _rawFileRows.Count;
+
     public bool HasFileLoaded => !string.IsNullOrWhiteSpace(FilePath) && File.Exists(FilePath);
 
     public bool CanProceedToDryRun => ValidateMapping(out _);
@@ -96,6 +99,26 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
                 return "";
             }
         }
+    }
+
+    public void ClearFile()
+    {
+        FilePath = "";
+        _rawFileRows.Clear();
+        SourceHeaders.Clear();
+        PreviewRows.Clear();
+        DryRunReport = null;
+        ActiveSubView = "Mapping";
+        OnPropertyChanged(nameof(FileName));
+        OnPropertyChanged(nameof(TotalRawRowCount));
+        OnPropertyChanged(nameof(HasFileLoaded));
+        OnPropertyChanged(nameof(CanProceedToDryRun));
+        OnPropertyChanged(nameof(ValidationMessage));
+    }
+
+    public void GoToMappingView()
+    {
+        ActiveSubView = "Mapping";
     }
 
     public Step3RosterImportViewModel(AdminWizardState state)

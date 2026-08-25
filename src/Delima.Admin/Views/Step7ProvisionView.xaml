@@ -91,9 +91,79 @@
             <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,14"
                     Visibility="{Binding SelectedRoute, Converter={StaticResource EqToVisConv}, ConverterParameter=Usb}">
                 <StackPanel>
-                    <TextBlock Text="Penyediaan Lengkap Melalui Pendrive USB" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
-                    <TextBlock Text="Menjana bungkusan sekolah serta menyalin aplikasi persediaan '1_Sediakan_Makmal.exe' ke pendrive anda." FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,12" />
-                    <Button Content="📁 Bina &amp; Simpan Pakej ke Pendrive…" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnSaveBundleFileClick" />
+                    <TextBlock Text="Penyediaan Turnkey Melalui Pendrive USB" FontWeight="SemiBold" FontSize="13.5" Margin="0,0,0,4" />
+                    <TextBlock Text="Menjana bungkusan sekolah disulitkan serta menyalin aplikasi persediaan '1_Sediakan_Makmal.exe' dan ikon avatar terus ke pendrive anda." FontSize="12" Foreground="{StaticResource Ink2Brush}" Margin="0,0,0,12" />
+
+                    <!-- USB Drive Selection Toolbar -->
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,14">
+                        <StackPanel>
+                            <!-- Detected USB State -->
+                            <StackPanel Visibility="{Binding HasAnyUsbDrive, Converter={StaticResource BoolToVisConv}}">
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Pilih Pendrive USB:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="2" ItemsSource="{Binding DetectedUsbDrives}" SelectedItem="{Binding SelectedUsbDrive, Mode=TwoWay}" DisplayMemberPath="DisplayName" VerticalAlignment="Center" />
+                                    <Button Grid.Column="4" Content="↻ Imbas Semula" Style="{StaticResource SmallButton}" Click="OnRefreshUsbClick" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="🚀 Simpan Pakej Lengkap ke Pendrive Ini" Style="{StaticResource PrimaryButton}" Click="OnSaveToSelectedUsbClick" Margin="0,0,10,0" />
+                                    <Button Content="📁 Pilih Folder Manual…" Style="{StaticResource SecondaryButton}" Click="OnSaveBundleFileClick" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- No USB Detected State -->
+                            <StackPanel Visibility="{Binding HasAnyUsbDrive, Converter={StaticResource InverseBoolToVisConv}}">
+                                <TextBlock Text="Tiada pendrive USB dikesan secara automatik. Sila palamkan pendrive atau pilih folder secara manual." Foreground="{StaticResource Ink2Brush}" FontSize="12" Margin="0,0,0,10" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="↻ Imbas Semula USB" Style="{StaticResource SmallPrimaryButton}" Click="OnRefreshUsbClick" Margin="0,0,10,0" />
+                                    <Button Content="📁 Pilih Folder / Pemacu Manual…" Style="{StaticResource SecondaryButton}" Click="OnSaveBundleFileClick" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 3-Step Visual Deployment Guide -->
+                    <TextBlock Text="Langkah Penyediaan di Setiap PC Makmal:" FontWeight="SemiBold" FontSize="12.5" Margin="0,0,0,8" />
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Step 1 -->
+                        <Border Grid.Column="0" Background="#F1F5F9" CornerRadius="6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="1. 🔌 Palamkan Pendrive" FontWeight="Bold" FontSize="11.5" Foreground="{StaticResource InkBrush}" />
+                                <TextBlock Text="Cucuk pendrive pada PC makmal sasaran." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Step 2 -->
+                        <Border Grid.Column="2" Background="#F1F5F9" CornerRadius="6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="2. 🖱️ Klik 1_Sediakan_Makmal" FontWeight="Bold" FontSize="11.5" Foreground="{StaticResource InkBrush}" />
+                                <TextBlock Text="Buka pendrive dan dwi-klik fail persediaan." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Step 3 -->
+                        <Border Grid.Column="4" Background="#F1F5F9" CornerRadius="6" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="3. 🔑 Masukkan Kata Laluan" FontWeight="Bold" FontSize="11.5" Foreground="{StaticResource InkBrush}" />
+                                <TextBlock Text="Isi kata laluan pentadbir &amp; klik 'Sediakan'." FontSize="11" Foreground="{StaticResource Ink2Brush}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </StackPanel>
             </Border>
 
@@ -126,10 +196,17 @@
                 </StackPanel>
             </Border>
 
-            <!-- WinUI 3 Status InfoBar -->
+            <!-- WinUI 3 Status InfoBar with Folder Opener -->
             <Border Style="{StaticResource InfoBarSuccess}" Margin="0,0,0,14"
                     Visibility="{Binding StatusMessage, Converter={StaticResource NullOrEmptyToVisConv}}">
-                <TextBlock Text="{Binding StatusMessage}" FontWeight="SemiBold" Foreground="{StaticResource SuccessTextBrush}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" FontWeight="SemiBold" Foreground="{StaticResource SuccessTextBrush}" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="📂 Buka Folder" Style="{StaticResource SmallButton}" Click="OnOpenExportedFolderClick" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </Grid>
             </Border>
 
             <!-- Lab Checklist DataGrid -->

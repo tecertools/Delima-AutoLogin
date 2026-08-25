@@ -39,6 +39,9 @@ public sealed class SchoolInfo
 
     [JsonPropertyName("domain")]
     public string Domain { get; set; } = "moe-dl.edu.my";
+
+    [JsonPropertyName("crestPath")]
+    public string? CrestPath { get; set; }
 }
 
 public sealed class ThemeInfo

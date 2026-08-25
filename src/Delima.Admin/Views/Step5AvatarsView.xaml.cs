@@ -19,6 +19,14 @@ public partial class Step5AvatarsView : UserControl
         }
     }
 
+    private void OnCycleClassAvatarsClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is Step5AvatarsViewModel vm)
+        {
+            vm.CycleClassAvatars();
+        }
+    }
+
     private void OnPrintAvatarSheetClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is Step5AvatarsViewModel vm)

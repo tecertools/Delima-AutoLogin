@@ -5,77 +5,111 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:Delima.Admin.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="750">
+             d:DesignHeight="800" d:DesignWidth="760">
     <UserControl.Resources>
         <conv:BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+        <conv:BooleanToVisibilityConverter x:Key="InverseBoolToVisConv" Invert="True" />
         <conv:StringEqualityConverter x:Key="StringEqConv" />
         <conv:EqualityToVisibilityConverter x:Key="EqToVisConv" />
         <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisConv" />
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Text="Import Senarai Murid" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Import maklumat nama, kelas dan ID DELIMa murid daripada fail senarai murid (CSV/Excel)." Style="{StaticResource StepSubHeading}" />
+        <StackPanel Margin="0,0,0,16">
+            <TextBlock Text="Import Senarai Murid (Roster)" Style="{StaticResource StepHeading}" />
+            <TextBlock Text="Import maklumat nama, kelas dan ID akaun DELIMa murid daripada fail CSV atau lembaran kerja Excel (APDM/SPS)." Style="{StaticResource StepSubHeading}" />
 
             <!-- Sub-Step Segmented Navigation (WinUI 3 Segmented Control) -->
             <Border Background="#F1F3F5" CornerRadius="6" Padding="3" HorizontalAlignment="Left" Margin="0,0,0,16">
                 <StackPanel Orientation="Horizontal">
                     <RadioButton Content="1. Pemetaan Lajur" Style="{StaticResource SubStepToggleButton}" Margin="0,0,2,0"
                                  IsChecked="{Binding ActiveSubView, Converter={StaticResource StringEqConv}, ConverterParameter=Mapping, Mode=TwoWay}" />
-                    <RadioButton Content="2. Laporan Percubaan" Style="{StaticResource SubStepToggleButton}"
+                    <RadioButton Content="2. Laporan Percubaan (Dry-Run)" Style="{StaticResource SubStepToggleButton}"
                                  IsChecked="{Binding ActiveSubView, Converter={StaticResource StringEqConv}, ConverterParameter=DryRun, Mode=TwoWay}" />
                 </StackPanel>
             </Border>
 
             <!-- SUB-VIEW 3A: COLUMN MAPPING -->
             <StackPanel Visibility="{Binding ActiveSubView, Converter={StaticResource EqToVisConv}, ConverterParameter=Mapping}">
-                <!-- File Picker & Drop Zone Card -->
-                <Border Style="{StaticResource SettingsCard}" AllowDrop="True" DragOver="OnFileDragOver" Drop="OnFileDrop">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Fail Roster Murid (.csv, .xlsx, .xls, .tsv)" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Content="📥 Muat Turun Templat (CSV)" Style="{StaticResource SmallButton}" Click="OnDownloadTemplateClick" />
-                        </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Text="{Binding FilePath, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Center" />
-                            <Button Grid.Column="2" Content="Pilih Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" />
-                        </Grid>
+                
+                <!-- 1. EMPTY STATE: PROMINENT DASHED DROPZONE -->
+                <Border Style="{StaticResource SettingsCard}" AllowDrop="True" DragOver="OnFileDragOver" Drop="OnFileDrop"
+                        Background="#FAFBFC" Padding="24,20" Margin="0,0,0,10"
+                        Visibility="{Binding HasFileLoaded, Converter={StaticResource InverseBoolToVisConv}}">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="📥" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,6" Opacity="0.8" />
+                        <TextBlock Text="Seret &amp; Lepas Fail Senarai Murid ke Sini" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                        <TextBlock Text="Menyokong fail CSV (.csv), Excel (.xlsx, .xls) atau teks (.tsv, .txt) yang dieksport dari APDM / SPS." 
+                                   Foreground="{StaticResource Ink2Brush}" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,16" />
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="📁 Pilih Fail Dari Komputer…" Style="{StaticResource PrimaryButton}" Click="OnSelectFileClick" Margin="0,0,10,0" />
+                            <Button Content="📥 Muat Turun Templat (CSV)" Style="{StaticResource SecondaryButton}" Click="OnDownloadTemplateClick" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
-                <!-- Encoding Sniffer Status -->
-                <Border Style="{StaticResource InfoBarSuccess}" Margin="0,0,0,12"
+                <!-- 2. LOADED FILE SUMMARY CARD -->
+                <Border Style="{StaticResource SettingsCard}" AllowDrop="True" DragOver="OnFileDragOver" Drop="OnFileDrop" Margin="0,0,0,10"
                         Visibility="{Binding HasFileLoaded, Converter={StaticResource BoolToVisConv}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Pengekodan &amp; Nama Khas: " FontWeight="SemiBold" Foreground="{StaticResource SuccessTextBrush}" FontSize="12.5"/>
-                        <TextBlock Grid.Column="1" Text="{Binding DiacriticPreview}" Foreground="{StaticResource SuccessTextBrush}" FontWeight="Normal" FontSize="12.5" Margin="4,0,0,0"/>
+
+                        <!-- File Icon & Details -->
+                        <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8" Background="#EFF6FF" BorderBrush="#93C5FD" BorderThickness="1" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <TextBlock Text="📄" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding FileName}" FontWeight="Bold" FontSize="13.5" TextTrimming="CharacterEllipsis" MaxWidth="380" />
+                                <Border Background="{StaticResource SuccessBgBrush}" CornerRadius="10" Padding="8,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding TotalRawRowCount, StringFormat='{}{0} rekod dijumpai'}" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource SuccessTextBrush}" />
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <Border Background="#F1F3F5" CornerRadius="4" Padding="6,1" Margin="0,0,6,0">
+                                    <TextBlock Text="{Binding DetectedEncoding, StringFormat='Pengekodan: {0}'}" FontSize="10.5" Foreground="{StaticResource Ink2Brush}" FontFamily="Consolas, monospace" />
+                                </Border>
+                                <TextBlock Text="{Binding DiacriticPreview, StringFormat='Contoh: {0}'}" FontSize="11" Foreground="{StaticResource Ink3Brush}" TextTrimming="CharacterEllipsis" MaxWidth="300" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Tukar Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" Margin="0,0,6,0" />
+                            <Button Content="✕ Batal" Style="{StaticResource DangerButton}" Click="OnClearFileClick" ToolTip="Padam fail ini" />
+                        </StackPanel>
                     </Grid>
                 </Border>
 
-                <!-- 5 Target Fields Mapping (SettingsCard) -->
+                <!-- 3. TARGET FIELDS MAPPING CARD -->
                 <Border Style="{StaticResource SettingsCard}"
                         Visibility="{Binding HasFileLoaded, Converter={StaticResource BoolToVisConv}}">
                     <StackPanel>
-                        <TextBlock Text="Padankan 5 Lajur Sasaran" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,12" />
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Padankan 5 Lajur Sasaran" FontWeight="SemiBold" FontSize="13" />
+                                <TextBlock Text="Lajur telah dipadankan secara automatik mengikut kepala jadual fail anda." FontSize="11.5" Foreground="{StaticResource Ink2Brush}" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
+                                <TextBlock Text="✓ Dipadankan Automatik" FontSize="10" FontWeight="Bold" Foreground="#047857" />
+                            </Border>
+                        </Grid>
 
                         <!-- Row 1: Nama Penuh -->
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="190"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -88,7 +122,7 @@
                         <!-- Row 2: Kelas -->
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="190"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -101,7 +135,7 @@
                         <!-- Row 3: Tahun -->
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="190"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -114,7 +148,7 @@
                         <!-- Row 4: ID DELIMa -->
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="190"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -125,20 +159,27 @@
                         </Grid>
 
                         <!-- Row 5: No. KP / Daftar -->
-                        <Grid Margin="0,0,0,4">
+                        <Grid Margin="0,0,0,14">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="190"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="No. KP / No. Daftar (Kunci Gabung)" FontWeight="SemiBold" VerticalAlignment="Center" />
                             <ComboBox Grid.Column="1" ItemsSource="{Binding SourceHeaders}" SelectedItem="{Binding SelectedRegisterNoCol, Mode=TwoWay}" SelectionChanged="OnMappingSelectionChanged" />
                         </Grid>
+
+                        <!-- Direct Dry-Run Trigger Button -->
+                        <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+                            <Button Content="▶ Jalankan Analisis Percubaan (Dry-Run) ➔" Style="{StaticResource PrimaryButton}"
+                                    HorizontalAlignment="Right" Click="OnRunDryRunClick"
+                                    IsEnabled="{Binding CanProceedToDryRun}" />
+                        </Border>
                     </StackPanel>
                 </Border>
 
-                <!-- Live Preview DataGrid -->
+                <!-- 4. LIVE PREVIEW DATAGRID -->
                 <StackPanel Margin="0,4,0,10" Visibility="{Binding HasFileLoaded, Converter={StaticResource BoolToVisConv}}">
-                    <TextBlock Text="Pratonton Langsung (10 Baris Pertama)" Style="{StaticResource FieldLabel}" />
+                    <TextBlock Text="Pratonton Langsung Data Roster (10 Baris Pertama)" Style="{StaticResource FieldLabel}" />
                     <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" ClipToBounds="True">
                         <DataGrid ItemsSource="{Binding PreviewRows}" MaxHeight="220" AutoGenerateColumns="False">
                             <DataGrid.Columns>
@@ -155,24 +196,55 @@
 
             <!-- SUB-VIEW 3B: DRY RUN REPORT -->
             <StackPanel Visibility="{Binding ActiveSubView, Converter={StaticResource EqToVisConv}, ConverterParameter=DryRun}">
-                <!-- Ready to Import Card -->
-                <Border Style="{StaticResource SettingsCard}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                            <TextBlock Text="Sedia Diimport (Murid Sah)" FontWeight="SemiBold" FontSize="13" />
-                            <TextBlock Text="Rekod murid yang lengkap dan melepasi semakan integriti." Foreground="{StaticResource Ink2Brush}" FontSize="12" />
+                
+                <!-- Navigation Bar back to Mapping -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="← Kembali ke Pemetaan Lajur" Style="{StaticResource SecondaryButton}" Click="OnBackToMappingClick" />
+                </Grid>
+
+                <!-- 3 METRIC TILES ROW -->
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Tile 1: Ready to Import (Green) -->
+                    <Border Grid.Column="0" Style="{StaticResource SettingsCard}" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="🟢 Sedia Diimport" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource SuccessTextBrush}" />
+                            <TextBlock Text="{Binding DryRunReport.ValidCount, FallbackValue='0'}" FontWeight="Bold" FontSize="26" Foreground="{StaticResource SuccessTextBrush}" Margin="0,4,0,2" />
+                            <TextBlock Text="Murid sah melepasi semakan" FontSize="11" Foreground="{StaticResource Ink2Brush}" />
                         </StackPanel>
-                        <Border Grid.Column="1" Background="{StaticResource SuccessBgBrush}" CornerRadius="12" Padding="12,4">
-                            <TextBlock Text="{Binding DryRunReport.ValidCount, FallbackValue='0'}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource SuccessTextBrush}" />
-                        </Border>
-                    </Grid>
-                </Border>
+                    </Border>
 
-                <!-- Warnings Card -->
+                    <!-- Tile 2: Warnings (Amber) -->
+                    <Border Grid.Column="2" Style="{StaticResource SettingsCard}" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="🟡 Amaran (Dibaiki)" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource AmberTextBrush}" />
+                            <TextBlock Text="{Binding DryRunReport.Warnings.Count, FallbackValue='0'}" FontWeight="Bold" FontSize="26" Foreground="{StaticResource AmberTextBrush}" Margin="0,4,0,2" />
+                            <TextBlock Text="Nama / kelas diubah suai" FontSize="11" Foreground="{StaticResource Ink2Brush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tile 3: Rejects (Red) -->
+                    <Border Grid.Column="4" Style="{StaticResource SettingsCard}" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="🔴 Ditolak (Ralat)" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource DangerTextBrush}" />
+                            <TextBlock Text="{Binding DryRunReport.Rejects.Count, FallbackValue='0'}" FontWeight="Bold" FontSize="26" Foreground="{StaticResource DangerTextBrush}" Margin="0,4,0,2" />
+                            <TextBlock Text="Data tidak sah / tiada nama" FontSize="11" Foreground="{StaticResource Ink2Brush}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Rejects Card (if any) -->
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel>
                         <Grid Margin="0,0,0,8">
@@ -180,66 +252,62 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Amaran (Tidak Menghalang)" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Background="{StaticResource AmberBgBrush}" CornerRadius="12" Padding="10,3">
-                                <TextBlock Text="{Binding DryRunReport.Warnings.Count, FallbackValue='0'}" FontWeight="Bold" FontSize="13" Foreground="{StaticResource AmberTextBrush}" />
-                            </Border>
+                            <TextBlock Grid.Column="0" Text="Rekod Ditolak (Ralat Format)" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="📥 Eksport CSV Ditolak" Style="{StaticResource SmallButton}" Click="OnExportRejectsClick" />
                         </Grid>
-                        <ItemsControl ItemsSource="{Binding DryRunReport.Warnings}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,3">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="70"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Baris {0}'}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Message}" Foreground="{StaticResource InkBrush}" FontWeight="SemiBold" />
-                                        <TextBlock Grid.Column="2" Text="{Binding Resolution, StringFormat='→ {0}'}" Foreground="{StaticResource Ink2Brush}" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
+                        
+                        <TextBlock Text="Tiada rekod ditolak. Semua data murid sah!" Foreground="{StaticResource SuccessTextBrush}" FontWeight="SemiBold" FontSize="12"
+                                   Visibility="{Binding DryRunReport.Rejects.Count, Converter={StaticResource NullOrEmptyToVisConv}, FallbackValue=Collapsed}" Margin="0,4,0,4" />
 
-                <!-- Rejects Card -->
-                <Border Style="{StaticResource SettingsCard}">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="12"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Ditolak (Ralat Format / Tidak Sah)" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Background="{StaticResource DangerBgBrush}" CornerRadius="12" Padding="10,3">
-                                <TextBlock Text="{Binding DryRunReport.Rejects.Count, FallbackValue='0'}" FontWeight="Bold" FontSize="13" Foreground="{StaticResource DangerTextBrush}" />
-                            </Border>
-                            <Button Grid.Column="3" Content="Eksport CSV Ditolak" Style="{StaticResource SmallButton}" Click="OnExportRejectsClick" />
-                        </Grid>
                         <ItemsControl ItemsSource="{Binding DryRunReport.Rejects}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,3">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="70"/>
-                                            <ColumnDefinition Width="180"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Baris {0}'}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding StudentName}" FontWeight="SemiBold" />
-                                        <TextBlock Grid.Column="2" Text="{Binding Reason}" Foreground="{StaticResource DangerTextBrush}" />
-                                    </Grid>
+                                    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="4,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="65"/>
+                                                <ColumnDefinition Width="180"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Baris {0}'}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding StudentName}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                            <Border Grid.Column="2" Background="#FEE2E2" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding Reason}" Foreground="{StaticResource DangerTextBrush}" FontSize="11.5" FontWeight="SemiBold" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </StackPanel>
                 </Border>
 
-                <!-- Summary Statistics -->
+                <!-- Warnings Card (if any) -->
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <TextBlock Text="Amaran Integriti Data (Pembetulan Automatik)" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,8" />
+                        <ItemsControl ItemsSource="{Binding DryRunReport.Warnings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1" Padding="4,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="65"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding RowNumber, StringFormat='Baris {0}'}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Message}" Foreground="{StaticResource InkBrush}" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Resolution, StringFormat='→ {0}'}" Foreground="{StaticResource Ink2Brush}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Summary Statistics Log -->
                 <Border Background="#F8F9FA" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
                     <TextBlock Text="{Binding DryRunSummaryText}" Style="{StaticResource MonoText}" Foreground="{StaticResource Ink2Brush}" />
                 </Border>
@@ -247,3 +315,4 @@
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+

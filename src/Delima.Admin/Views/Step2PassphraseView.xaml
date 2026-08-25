@@ -5,20 +5,35 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:Delima.Admin.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="550" d:DesignWidth="700">
+             d:DesignHeight="700" d:DesignWidth="750">
     <UserControl.Resources>
         <conv:HexToBrushConverter x:Key="HexToBrushConv" />
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+        <conv:BooleanToVisibilityConverter x:Key="InverseBoolToVisConv" Invert="True" />
         <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisConv" />
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Text="Kata Laluan Pentadbir" Style="{StaticResource StepHeading}" />
-            <TextBlock Text="Kunci induk bagi penyulitan semua pakej sekolah ini. Tiada pelayan pemulihan jika hilang." Style="{StaticResource StepSubHeading}" />
+        <StackPanel Margin="0,0,0,16">
+            <TextBlock Text="Kata Laluan Pentadbir &amp; Pemulihan" Style="{StaticResource StepHeading}" />
+            <TextBlock Text="Kunci induk bagi penyulitan semua pakej sekolah ini. Disimpan secara disulitkan sepenuhnya (AES-256-GCM) tanpa sebarang pelayan pemulihan luar." Style="{StaticResource StepSubHeading}" />
 
             <!-- Passphrase Entry Card (SettingsCard) -->
             <Border Style="{StaticResource SettingsCard}">
                 <StackPanel>
+                    <!-- Header with Generator Shortcut -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Kunci Induk Penyulitan" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="🎲 Jana Kata Laluan Mudah Ingat" Style="{StaticResource SmallButton}"
+                                Command="{Binding GenerateMemorablePassphraseCommand}"
+                                ToolTip="Jana kombinasi perkataan BM rawak yang kuat dan mudah diingati"
+                                Cursor="Hand" />
+                    </Grid>
+
                     <Grid Margin="0,0,0,14">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
@@ -26,14 +41,56 @@
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
 
+                        <!-- Input 1: Kata Laluan Pentadbir -->
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Kata Laluan Pentadbir (min. 12 aksara)" Style="{StaticResource FieldLabel}" />
-                            <TextBox Text="{Binding Passphrase, UpdateSourceTrigger=PropertyChanged}" />
+                            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Background="#FFFFFF" Height="34">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Masked Mode -->
+                                    <PasswordBox x:Name="PwdBox" Grid.Column="0" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" Padding="8,0"
+                                                 PasswordChanged="PwdBox_PasswordChanged"
+                                                 Visibility="{Binding IsPasswordVisible, Converter={StaticResource InverseBoolToVisConv}}" />
+                                    <!-- Revealed Mode -->
+                                    <TextBox x:Name="TxtBox" Grid.Column="0" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" Padding="8,0"
+                                             Text="{Binding Passphrase, UpdateSourceTrigger=PropertyChanged}"
+                                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisConv}}" />
+                                    <!-- Toggle Eye Button -->
+                                    <Button Grid.Column="1" Style="{StaticResource SmallButton}" Background="Transparent" BorderThickness="0" Padding="6,2" Margin="0,0,4,0"
+                                            Command="{Binding TogglePasswordVisibilityCommand}" ToolTip="Papar / Sembunyi Kata Laluan" Cursor="Hand">
+                                        <TextBlock Text="{Binding PasswordEyeIcon}" FontSize="11" Foreground="{StaticResource Ink2Brush}" />
+                                    </Button>
+                                </Grid>
+                            </Border>
                         </StackPanel>
 
+                        <!-- Input 2: Sahkan Kata Laluan -->
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Sahkan Kata Laluan" Style="{StaticResource FieldLabel}" />
-                            <TextBox Text="{Binding ConfirmPassphrase, UpdateSourceTrigger=PropertyChanged}" />
+                            <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="6" Background="#FFFFFF" Height="34">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Masked Mode -->
+                                    <PasswordBox x:Name="ConfirmPwdBox" Grid.Column="0" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" Padding="8,0"
+                                                 PasswordChanged="ConfirmPwdBox_PasswordChanged"
+                                                 Visibility="{Binding IsConfirmPasswordVisible, Converter={StaticResource InverseBoolToVisConv}}" />
+                                    <!-- Revealed Mode -->
+                                    <TextBox x:Name="ConfirmTxtBox" Grid.Column="0" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" Padding="8,0"
+                                             Text="{Binding ConfirmPassphrase, UpdateSourceTrigger=PropertyChanged}"
+                                             Visibility="{Binding IsConfirmPasswordVisible, Converter={StaticResource BoolToVisConv}}" />
+                                    <!-- Toggle Eye Button -->
+                                    <Button Grid.Column="1" Style="{StaticResource SmallButton}" Background="Transparent" BorderThickness="0" Padding="6,2" Margin="0,0,4,0"
+                                            Command="{Binding ToggleConfirmPasswordVisibilityCommand}" ToolTip="Papar / Sembunyi Kata Laluan" Cursor="Hand">
+                                        <TextBlock Text="{Binding ConfirmPasswordEyeIcon}" FontSize="11" Foreground="{StaticResource Ink2Brush}" />
+                                    </Button>
+                                </Grid>
+                            </Border>
                         </StackPanel>
                     </Grid>
 
@@ -60,30 +117,63 @@
             <Border Style="{StaticResource SettingsCard}"
                     Visibility="{Binding RecoverySheet, Converter={StaticResource NullOrEmptyToVisConv}}">
                 <StackPanel>
-                    <TextBlock Text="Helaian Pemulihan (Pratonton KCV)" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
-                    <TextBlock Text="Helaian ini mengandungi Key-Check Value (KCV) dan arahan persediaan semula. Kunci induk sebenar tidak akan ditulis pada helaian ini." FontSize="12" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Helaian Pemulihan &amp; Cap Jari KCV" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="📋 Salin KCV" Style="{StaticResource SmallButton}" Margin="0,0,6,0" Click="OnCopyKcvClick" ToolTip="Salin token KCV 8-aksara ke papan keratan" />
+                            <Button Content="📋 Salin Penuh" Style="{StaticResource SmallButton}" Margin="0,0,6,0" Click="OnCopyFullSheetClick" ToolTip="Salin seluruh maklumat helaian pemulihan" />
+                            <Button Content="💾 Simpan Fail (.txt)" Style="{StaticResource SmallPrimaryButton}" Click="OnSaveSheetFileClick" ToolTip="Simpan fail teks helaian pemulihan" />
+                        </StackPanel>
+                    </Grid>
 
+                    <!-- Copy Feedback Toast Notification -->
+                    <Border Background="#DFF6DD" BorderBrush="#107C10" BorderThickness="1" CornerRadius="6" Padding="8,4" Margin="0,0,0,10"
+                            Visibility="{Binding CopyFeedbackMessage, Converter={StaticResource NullOrEmptyToVisConv}}">
+                        <TextBlock Text="{Binding CopyFeedbackMessage}" Foreground="#107C10" FontWeight="SemiBold" FontSize="11.5" HorizontalAlignment="Center" />
+                    </Border>
+
+                    <TextBlock Text="Helaian ini mengandungi Key-Check Value (KCV) dan arahan persediaan semula. Kunci induk sebenar tidak akan ditulis pada helaian ini demi keselamatan." FontSize="12" Foreground="{StaticResource Ink2Brush}" TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                    <!-- KCV Highlight Card -->
+                    <Border Background="#F8F9FA" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="KCV (Fingerprint)" FontWeight="SemiBold" FontSize="11" Foreground="{StaticResource Ink3Brush}" />
+                                <TextBlock Text="Cap Jari Pengesahan" FontSize="10.5" Foreground="{StaticResource Ink2Brush}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Background="#EFF6FF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,10,0">
+                                    <TextBlock Text="{Binding RecoverySheet.KeyCheckValue}" FontFamily="Consolas, monospace" FontSize="15" FontWeight="Bold" Foreground="{StaticResource PrimaryGreenBrush}" />
+                                </Border>
+                                <TextBlock Text="✓ Dipadankan dengan Kod Sekolah" FontSize="11" Foreground="{StaticResource SuccessTextBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Metadata Rows -->
                     <Grid Margin="0,0,0,6">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="140"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Kod Sekolah:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}" />
                         <TextBlock Grid.Column="1" Text="{Binding RecoverySheet.SchoolCode}" FontWeight="Bold" />
                     </Grid>
 
-                    <Grid Margin="0,0,0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="130"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="KCV (Fingerprint):" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}" />
-                        <TextBlock Grid.Column="1" Text="{Binding RecoverySheet.KeyCheckValue}" Style="{StaticResource MonoText}" FontWeight="Bold" Foreground="{StaticResource PrimaryGreenBrush}" />
-                    </Grid>
-
                     <Grid Margin="0,0,0,2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="140"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Tarikh Dicipta:" FontWeight="SemiBold" Foreground="{StaticResource Ink2Brush}" />
@@ -94,3 +184,4 @@
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+

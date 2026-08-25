@@ -82,7 +82,33 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
             Destinations.Add(new DestinationConfig { Id = "ains", Label = "AINS (NILAM)", Url = "https://ains.moe.gov.my/" });
         }
 
-        Destinations.CollectionChanged += (s, e) => OnPropertyChanged(nameof(CanProceed));
+        Destinations.CollectionChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(CanProceed));
+            OnPropertyChanged(nameof(HasCanvaPreset));
+        };
+    }
+
+    public bool HasCanvaPreset => Destinations.Any(d => d.Url.Contains("canva.com", StringComparison.OrdinalIgnoreCase));
+
+    public void AddCanvaPreset()
+    {
+        if (HasCanvaPreset) return;
+
+        Destinations.Add(new DestinationConfig
+        {
+            Id = "canva",
+            Label = "Canva for Education",
+            Url = "https://www.canva.com/education/"
+        });
+
+        OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(HasCanvaPreset));
+    }
+
+    public void SetIdleMinutes(int minutes)
+    {
+        IdleResetSeconds = minutes * 60;
     }
 
     public void AddDestination()
@@ -101,12 +127,14 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
         NewDestLabel = "";
         NewDestUrl = "";
         OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(HasCanvaPreset));
     }
 
     public void RemoveDestination(DestinationConfig item)
     {
         Destinations.Remove(item);
         OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(HasCanvaPreset));
     }
 
     public void SaveToState()

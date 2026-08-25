@@ -4,6 +4,13 @@ using Delima.Admin.Models;
 
 namespace Delima.Admin.ViewModels;
 
+public sealed record ThemePresetItem(
+    string Name,
+    string Primary,
+    string Accent,
+    string[] ClassColours
+);
+
 public sealed partial class Step1IdentityViewModel : ObservableObject
 {
     private readonly AdminWizardState _state;
@@ -31,6 +38,40 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
 
     public ObservableCollection<ColorSwatchItem> Swatches { get; } = [];
 
+    public IReadOnlyList<ThemePresetItem> Presets { get; } =
+    [
+        new ThemePresetItem(
+            "Hijau DELIMa (Piawai)",
+            "#056839",
+            "#F7941D",
+            ["#C41118", "#9E2B0E", "#A85200", "#8A6100", "#056839", "#0A6265"]
+        ),
+        new ThemePresetItem(
+            "Biru Korporat KPM",
+            "#003B73",
+            "#E87722",
+            ["#005A9C", "#0072B2", "#008080", "#2E5B88", "#7D3C98", "#B85C00"]
+        ),
+        new ThemePresetItem(
+            "Merah Mahogani",
+            "#8B1E1E",
+            "#D97706",
+            ["#8B1E1E", "#A04000", "#2E4053", "#117864", "#7D6608", "#6C3483"]
+        ),
+        new ThemePresetItem(
+            "Ungu Moden",
+            "#4A235A",
+            "#16A085",
+            ["#5B2C6F", "#1A5276", "#196F3D", "#935116", "#78281F", "#283747"]
+        ),
+        new ThemePresetItem(
+            "Zamrud & Emas",
+            "#0E6655",
+            "#B7950B",
+            ["#0E6655", "#1B4F72", "#641E16", "#512E5F", "#784212", "#145A32"]
+        )
+    ];
+
     public bool CanProceed => ValidateInternal(out _);
 
     public string ValidationMessage
@@ -49,6 +90,7 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
         _schoolName = state.School.Name;
         _motto = state.School.Motto ?? "";
         _domain = state.School.Domain;
+        _crestPath = state.School.CrestPath;
 
         InitializeSwatches();
     }
@@ -81,6 +123,26 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
             OnPropertyChanged(nameof(ValidationMessage));
         };
         Swatches.Add(swatch);
+    }
+
+    public void ApplyPreset(ThemePresetItem preset)
+    {
+        if (Swatches.Count >= 2)
+        {
+            Swatches[0].HexCode = preset.Primary;
+            Swatches[1].HexCode = preset.Accent;
+            for (int i = 0; i < preset.ClassColours.Length && i + 2 < Swatches.Count; i++)
+            {
+                Swatches[i + 2].HexCode = preset.ClassColours[i];
+            }
+        }
+        OnPropertyChanged(nameof(CanProceed));
+        OnPropertyChanged(nameof(ValidationMessage));
+    }
+
+    public void ClearCrest()
+    {
+        CrestPath = null;
     }
 
     public void UpdateSwatchColor(int index, string newHex)
@@ -129,6 +191,7 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
         _state.School.Name = SchoolName.Trim();
         _state.School.Motto = string.IsNullOrWhiteSpace(Motto) ? null : Motto.Trim();
         _state.School.Domain = Domain.Trim().ToLowerInvariant();
+        _state.School.CrestPath = CrestPath;
 
         if (Swatches.Count >= 2)
         {
@@ -138,3 +201,4 @@ public sealed partial class Step1IdentityViewModel : ObservableObject
         }
     }
 }
+
