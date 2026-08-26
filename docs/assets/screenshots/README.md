@@ -6,10 +6,11 @@ Laman tutorial telah diprogramkan untuk mengesan dan memaparkan imej-imej ini se
 
 ---
 
-## 📊 Status Semasa Tangkapan Skrin (8 / 14 Selesai)
+## 📊 Status Semasa Tangkapan Skrin (10 / 14 Selesai)
 
-- ✅ **Telah Dimuat Naik (8)**: Langkah 01, 05, 06, 07, 08, 09, 12, 13
-- ⏳ **Masih Diperlukan / Missing (6)**: Langkah 02, 03, 04, 10, 11, 14
+- ✅ **Telah Dimuat Naik (10)**: Langkah 01, 03, 04, 05, 06, 07, 08, 09, 12, 13
+- ⏳ **Masih Diperlukan / Missing (4)**: Langkah 02, 10, 11, 14
+- 🎁 **Tangkapan Skrin Tambahan**: `smartscreen-warning.png`, `installer-destination.png`, `installer-license.png`
 
 ---
 
@@ -19,8 +20,8 @@ Laman tutorial telah diprogramkan untuk mengesan dan memaparkan imej-imej ini se
 | :---: | :---: | :--- | :--- | :---: |
 | **01** | ✅ **Selesai** | `langkah-01-keperluan.png` | Gambarajah perkakasan & fail yang diperlukan (PC Admin, PC Makmal, USB, Fail CSV) | 1280 × 720 px |
 | **02** | ⚠️ **Diperlukan** | `langkah-02-muat-turun.png` | Halaman GitHub Releases & butang muat turun `DELIMaLauncher-Setup.exe` | 1280 × 720 px |
-| **03** | ⚠️ **Diperlukan** | `langkah-03-pemasangan-admin.png` | Skrin pemasang Inno Setup — Pemilihan komponen "Alat Pentadbir" | 1280 × 720 px |
-| **04** | ⚠️ **Diperlukan** | `langkah-04-pemasangan-makmal.png` | Skrin pemasang Inno Setup — Pemilihan komponen "PC Makmal" & Kiosk/Browser Policy | 1280 × 720 px |
+| **03** | ✅ **Selesai** | `langkah-03-pemasangan-admin.png` | Skrin pemasang Inno Setup — Pemilihan komponen "Alat Pentadbir" | 1280 × 720 px |
+| **04** | ✅ **Selesai** | `langkah-04-pemasangan-makmal.png` | Skrin pemasang Inno Setup — Pemilihan tugasan "PC Makmal" (Kiosk & Browser Policy) | 1280 × 720 px |
 | **05** | ✅ **Selesai** | `langkah-05-admin-identiti.png` | Antaramuka Delima.Admin: Langkah 1 (Identiti Sekolah, Kod, Warna) & Langkah 2 (Kata Laluan) | 1366 × 768 px |
 | **06** | ✅ **Selesai** | `langkah-06-admin-import-roster.png` | Antaramuka Delima.Admin: Langkah 3 (Pemetaan Lajur Roster CSV & Laporan Dry-Run) | 1366 × 768 px |
 | **07** | ✅ **Selesai** | `langkah-07-admin-import-katalaluan.png` | Antaramuka Delima.Admin: Langkah 4 (Pengesahan Kod Sekolah & Kata Laluan Tersulit) | 1366 × 768 px |
@@ -31,6 +32,9 @@ Laman tutorial telah diprogramkan untuk mengesan dan memaparkan imej-imej ini se
 | **12** | ✅ **Selesai** | `langkah-12-log-masuk-murid.png` | Aliran skrin murid: Pilih Kelas → Pilih Nama/Avatar → 3 PIN Gambar → Log Masuk Berjaya | 1366 × 768 px |
 | **13** | ✅ **Selesai** | `langkah-13-mod-guru-override.png` | Skrin Mod Guru (Tekan F12, masukkan 4-digit PIN Guru & menu bantuan murid) | 1280 × 720 px |
 | **14** | ⚠️ **Diperlukan** | `langkah-14-penyelenggaraan-faq.png` | Panduan kemas kini data murid baharu / pertukaran kata laluan tahunan | 1280 × 720 px |
+| **Extra**| ✅ **Selesai** | `smartscreen-warning.png` | Skrin amaran Windows Defender SmartScreen ("More info" -> "Run anyway") | Dialog Windows |
+| **Extra**| ✅ **Selesai** | `installer-destination.png`| Skrin pemilihan lokasi pemasangan `C:\Program Files\DELIMa Launcher` | Inno Setup |
+| **Extra**| ✅ **Selesai** | `installer-license.png`    | Skrin perjanjian lesen GNU GPLv3 & perakuan tanggungjawab sekolah | Inno Setup |
 
 ---
 
