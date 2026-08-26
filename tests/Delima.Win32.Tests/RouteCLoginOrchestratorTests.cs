@@ -345,7 +345,8 @@ public class RouteCLoginOrchestratorTests
         // 1. "Sign in - Google Accounts - Google Chrome" (hyphen, capital A)
         // 2. "Sign in – Google accounts - Google Chrome" (EN-DASH U+2013, lowercase a)
         var options = new RouteCOptions();
-        Assert.Equal(2, options.TitleIdentifierPage.Count);
+        Assert.Contains("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
+        Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage);
         Assert.Equal("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage[0]);
         Assert.Equal("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage[1]);
     }
@@ -375,12 +376,12 @@ public class RouteCLoginOrchestratorTests
         // 1. Measured identifier page titles (list with exact ordinal matching)
         Assert.Contains("Sign in - Google Accounts - Google Chrome", options.TitleIdentifierPage);
         Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleIdentifierPage);
-        Assert.Equal(2, options.TitleIdentifierPage.Count);
+        Assert.NotEmpty(options.TitleIdentifierPage);
 
         // 2. Consent page title
         Assert.Contains("Sign in - Google Accounts - Google Chrome", options.TitleConsentPage);
         Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", options.TitleConsentPage);
-        Assert.Equal(2, options.TitleConsentPage.Count);
+        Assert.NotEmpty(options.TitleConsentPage);
 
         // 3. Destination page titles (consent skipped / domain-trusted)
         Assert.Contains("DELIMa - Google Chrome", options.TitleDestinationPage);

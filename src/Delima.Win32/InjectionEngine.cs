@@ -72,32 +72,15 @@ public static class InjectionEngine
 {
     /// <summary>
     /// Checks whether an actual window title matches any expected title in the list
-    /// under exact StringComparison.Ordinal equality (§4.2) or resilient normalized equality.
-    /// Loose substring matching remains strictly forbidden.
+    /// under exact StringComparison.Ordinal equality (§4.2). Loose substring matching remains strictly forbidden.
     /// </summary>
     internal static bool MatchesAnyTitle(string? actualTitle, IEnumerable<string> expectedTitles)
     {
         if (string.IsNullOrEmpty(actualTitle)) return false;
 
-        // 1. Fast path: exact StringComparison.Ordinal match (§4.2)
         foreach (var expected in expectedTitles)
         {
             if (string.Equals(actualTitle, expected, StringComparison.Ordinal))
-            {
-                return true;
-            }
-        }
-
-        // 2. Resilient normalization path: handles variations in dashes (\u2013, \u2014 vs -),
-        // zero-width spaces (\u200b), and case-insensitivity while strictly matching the full title structure.
-        var normalizedActual = NormalizeTitle(actualTitle);
-        if (string.IsNullOrEmpty(normalizedActual)) return false;
-
-        foreach (var expected in expectedTitles)
-        {
-            var normalizedExpected = NormalizeTitle(expected);
-            if (!string.IsNullOrEmpty(normalizedExpected) &&
-                string.Equals(normalizedActual, normalizedExpected, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

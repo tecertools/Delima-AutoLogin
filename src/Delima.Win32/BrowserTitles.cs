@@ -10,63 +10,24 @@ public static class BrowserTitles
     {
         public static readonly IReadOnlyList<string> Identifier = new[]
         {
-            // English variants
+            // English variants (T0.4 measured at index 0 and 1)
             "Sign in - Google Accounts - Google Chrome",
             "Sign in \u2013 Google accounts - Google Chrome",
-            "Sign in \u2013 Google Accounts - Google Chrome",
-            "Sign in \u2014 Google accounts - Google Chrome",
-            "Sign in \u2014 Google Accounts - Google Chrome",
-            "Sign in - Google Accounts",
-            "Sign in \u2013 Google accounts",
-            "Sign in \u2013 Google Accounts",
             "Sign in - Google Accounts - Chrome",
 
             // Malay (Bahasa Melayu) variants
             "Log masuk - Akaun Google - Google Chrome",
             "Log masuk \u2013 Akaun Google - Google Chrome",
             "Log masuk \u2014 Akaun Google - Google Chrome",
-            "Log masuk - Akaun Google",
-            "Log masuk \u2013 Akaun Google",
-            "Log masuk \u2014 Akaun Google",
             "Log Masuk - Akaun Google - Google Chrome",
             "Log Masuk \u2013 Akaun Google - Google Chrome",
             "Log Masuk \u2014 Akaun Google - Google Chrome",
-            "Log Masuk - Akaun Google",
-            "Log Masuk \u2013 Akaun Google",
             "Log masuk - Google Accounts - Google Chrome",
             "Log masuk \u2013 Google Accounts - Google Chrome",
             "Log masuk - Akaun Google - Chrome"
         };
 
-        public static readonly IReadOnlyList<string> Consent = new[]
-        {
-            // English variants
-            "Sign in - Google Accounts - Google Chrome",
-            "Sign in \u2013 Google accounts - Google Chrome",
-            "Sign in \u2013 Google Accounts - Google Chrome",
-            "Sign in \u2014 Google accounts - Google Chrome",
-            "Sign in \u2014 Google Accounts - Google Chrome",
-            "Sign in - Google Accounts",
-            "Sign in \u2013 Google accounts",
-            "Sign in \u2013 Google Accounts",
-            "Sign in - Google Accounts - Chrome",
-
-            // Malay (Bahasa Melayu) variants
-            "Log masuk - Akaun Google - Google Chrome",
-            "Log masuk \u2013 Akaun Google - Google Chrome",
-            "Log masuk \u2014 Akaun Google - Google Chrome",
-            "Log masuk - Akaun Google",
-            "Log masuk \u2013 Akaun Google",
-            "Log masuk \u2014 Akaun Google",
-            "Log Masuk - Akaun Google - Google Chrome",
-            "Log Masuk \u2013 Akaun Google - Google Chrome",
-            "Log Masuk \u2014 Akaun Google - Google Chrome",
-            "Log Masuk - Akaun Google",
-            "Log Masuk \u2013 Akaun Google",
-            "Log masuk - Google Accounts - Google Chrome",
-            "Log masuk \u2013 Google Accounts - Google Chrome",
-            "Log masuk - Akaun Google - Chrome"
-        };
+        public static readonly IReadOnlyList<string> Consent = Identifier;
 
         public static readonly IReadOnlyList<string> Destination = new[]
         {
@@ -100,9 +61,6 @@ public static class BrowserTitles
             "Sign in \u2013 Google accounts - Personal - Microsoft\u200b Edge",
             "Sign in \u2013 Google accounts - Profile 1 - Microsoft\u200b Edge",
             "Sign in \u2013 Google accounts - Microsoft\u200b Edge",
-            "Sign in \u2013 Google Accounts - Personal - Microsoft\u200b Edge",
-            "Sign in \u2013 Google Accounts - Profile 1 - Microsoft\u200b Edge",
-            "Sign in \u2013 Google Accounts - Microsoft\u200b Edge",
             "Sign in \u2014 Google Accounts - Personal - Microsoft\u200b Edge",
             "Sign in \u2014 Google Accounts - Microsoft\u200b Edge",
             "Sign in - Google Accounts - InPrivate - Microsoft\u200b Edge",
@@ -115,15 +73,9 @@ public static class BrowserTitles
             "Sign in \u2013 Google accounts - Personal - Microsoft Edge",
             "Sign in \u2013 Google accounts - Profile 1 - Microsoft Edge",
             "Sign in \u2013 Google accounts - Microsoft Edge",
-            "Sign in \u2013 Google Accounts - Personal - Microsoft Edge",
-            "Sign in \u2013 Google Accounts - Profile 1 - Microsoft Edge",
-            "Sign in \u2013 Google Accounts - Microsoft Edge",
             "Sign in \u2014 Google Accounts - Personal - Microsoft Edge",
             "Sign in \u2014 Google Accounts - Microsoft Edge",
             "Sign in - Google Accounts - InPrivate - Microsoft Edge",
-            "Sign in - Google Accounts",
-            "Sign in \u2013 Google accounts",
-            "Sign in \u2013 Google Accounts",
 
             // Edge Malay (with zero-width space \u200b)
             "Log masuk - Akaun Google - Personal - Microsoft\u200b Edge",
@@ -157,10 +109,7 @@ public static class BrowserTitles
             "Log Masuk - Akaun Google - Microsoft Edge",
             "Log Masuk \u2013 Akaun Google - Personal - Microsoft Edge",
             "Log Masuk \u2013 Akaun Google - Microsoft Edge",
-            "Log masuk - Akaun Google - InPrivate - Microsoft Edge",
-            "Log masuk - Akaun Google",
-            "Log masuk \u2013 Akaun Google",
-            "Log Masuk - Akaun Google"
+            "Log masuk - Akaun Google - InPrivate - Microsoft Edge"
         };
 
         public static readonly IReadOnlyList<string> Consent = Identifier;
