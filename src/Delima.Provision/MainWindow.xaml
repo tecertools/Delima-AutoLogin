@@ -132,8 +132,21 @@
                                       IsChecked="{Binding CreateDesktopShortcut}"/>
                             <CheckBox Content="Mulakan secara automatik semasa murid log masuk (Mod Kiosk)" 
                                       IsChecked="{Binding EnableKioskStartup}"/>
-                            <CheckBox Content="Kuatkuasakan dasar keselamatan pelayar makmal (sekat popup simpan kata laluan &amp; DevTools)" 
+                            <CheckBox Content="Kuatkuasakan sekatan pelayar makmal (Kiosk: sekat semua URL luar selain DELIMa di seluruh PC)" 
                                       IsChecked="{Binding ApplyBrowserPolicies}"/>
+
+                            <!-- Utility Unblock Action -->
+                            <Button Content="🔓 Nyahkan Sekatan Pelayar (Padam Dasar Makmal)"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,8,0,0"
+                                    Padding="10,4"
+                                    FontSize="11.5"
+                                    Background="Transparent"
+                                    Foreground="{StaticResource PrimaryGreenBrush}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource LineBrush}"
+                                    Cursor="Hand"
+                                    Command="{Binding RemoveBrowserPoliciesCommand}"/>
                         </StackPanel>
                     </Border>
 

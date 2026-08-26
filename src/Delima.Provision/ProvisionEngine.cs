@@ -60,6 +60,28 @@ public static class ProvisionEngine
             return new ProvisionResult { Success = true, ExitCode = ExitSuccess };
         }
 
+        if (options.RemoveBrowserPolicies)
+        {
+            outWriter.WriteLine("Memadamkan dasar sekatan pelayar Google Chrome dan Microsoft Edge...");
+            var chromeRes = BrowserPolicyConfigurator.RemovePolicies(BrowserKind.Chrome);
+            var edgeRes = BrowserPolicyConfigurator.RemovePolicies(BrowserKind.Edge);
+
+            if (chromeRes.Success && edgeRes.Success)
+            {
+                outWriter.WriteLine("[BERJAYA] Semua sekatan dasar pelayar (Chrome & Edge) telah berjaya dipadamkan dari PC ini.");
+                return new ProvisionResult { Success = true, ExitCode = ExitSuccess };
+            }
+
+            string err = $"{chromeRes.ErrorMessage} {edgeRes.ErrorMessage}".Trim();
+            errWriter.WriteLine($"[RALAT] Gagal memadamkan dasar pelayar: {err}");
+            return new ProvisionResult
+            {
+                Success = false,
+                ExitCode = ExitAuthenticationFailed,
+                ErrorMessage = err
+            };
+        }
+
         // ====================================================================
         // Step 1: Read school.dlmpack from USB, local path, or UNC path
         // ====================================================================

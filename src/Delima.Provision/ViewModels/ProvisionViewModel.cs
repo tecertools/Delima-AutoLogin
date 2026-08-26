@@ -31,10 +31,10 @@ public sealed partial class ProvisionViewModel : ObservableObject
     private bool _createDesktopShortcut = true;
 
     [ObservableProperty]
-    private bool _enableKioskStartup = true; // Checked by default per user approval
+    private bool _enableKioskStartup = false;
 
     [ObservableProperty]
-    private bool _applyBrowserPolicies = true;
+    private bool _applyBrowserPolicies = false; // Strictly opt-in per PRD §8.3
 
     [ObservableProperty]
     private string _selectedBrowser = "Google Chrome (Disyorkan)";
@@ -92,7 +92,7 @@ public sealed partial class ProvisionViewModel : ObservableObject
     {
         InstallLauncher = _options.InstallLauncher;
         CreateDesktopShortcut = _options.CreateDesktopShortcut;
-        EnableKioskStartup = _options.EnableKioskStartup || true; // Default true per user choice
+        EnableKioskStartup = _options.EnableKioskStartup;
         ApplyBrowserPolicies = _options.ApplyBrowserPolicies;
         SelectedBrowser = _options.PreferredBrowser switch
         {
@@ -286,6 +286,42 @@ public sealed partial class ProvisionViewModel : ObservableObject
         {
             MessageBox.Show(
                 $"Gagal melancarkan aplikasi: {ex.Message}",
+                "Ralat",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveBrowserPolicies()
+    {
+        try
+        {
+            var chromeRes = Delima.Win32.BrowserPolicyConfigurator.RemovePolicies(Delima.Win32.BrowserKind.Chrome);
+            var edgeRes = Delima.Win32.BrowserPolicyConfigurator.RemovePolicies(Delima.Win32.BrowserKind.Edge);
+
+            if (chromeRes.Success && edgeRes.Success)
+            {
+                MessageBox.Show(
+                    "Semua sekatan dasar pelayar Google Chrome dan Microsoft Edge telah berjaya dipadamkan.\n\nPelayar kini boleh melayari semua laman web seperti biasa.",
+                    "Sekatan Pelayar Dipadamkan",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            else
+            {
+                string err = $"{chromeRes.ErrorMessage} {edgeRes.ErrorMessage}".Trim();
+                MessageBox.Show(
+                    $"Gagal memadamkan sebahagian dasar pelayar: {err}\n\nPastikan anda menjalankan aplikasi ini sebagai Pentadbir (Administrator).",
+                    "Amaran",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Ralat memadamkan dasar pelayar: {ex.Message}",
                 "Ralat",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

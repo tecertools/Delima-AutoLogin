@@ -20,7 +20,8 @@ public sealed class ProvisionOptions
     public bool InstallLauncher { get; set; } = true;
     public bool CreateDesktopShortcut { get; set; } = true;
     public bool EnableKioskStartup { get; set; } = false;
-    public bool ApplyBrowserPolicies { get; set; } = true;
+    public bool ApplyBrowserPolicies { get; set; } = false; // Strictly opt-in per PRD §8.3
+    public bool RemoveBrowserPolicies { get; set; } = false;
     public string PreferredBrowser { get; set; } = "chrome"; // "chrome", "edge", "auto"
     public string? LauncherSourcePath { get; set; }
     public string? InstallDestinationPath { get; set; }
@@ -81,9 +82,21 @@ public sealed class ProvisionOptions
             {
                 options.EnableKioskStartup = true;
             }
+            else if (arg.Equals("--apply-policy", StringComparison.OrdinalIgnoreCase) ||
+                     arg.Equals("--policy", StringComparison.OrdinalIgnoreCase))
+            {
+                options.ApplyBrowserPolicies = true;
+            }
             else if (arg.Equals("--no-policy", StringComparison.OrdinalIgnoreCase))
             {
                 options.ApplyBrowserPolicies = false;
+            }
+            else if (arg.Equals("--remove-policy", StringComparison.OrdinalIgnoreCase) ||
+                     arg.Equals("--remove-policies", StringComparison.OrdinalIgnoreCase) ||
+                     arg.Equals("--clean-policies", StringComparison.OrdinalIgnoreCase) ||
+                     arg.Equals("--unblock-browser", StringComparison.OrdinalIgnoreCase))
+            {
+                options.RemoveBrowserPolicies = true;
             }
             else if ((arg.Equals("--browser", StringComparison.OrdinalIgnoreCase) ||
                       arg.Equals("-b", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
@@ -141,6 +154,8 @@ public sealed class ProvisionOptions
               --no-install                Jangan pasang/salin Delima.Launcher.exe ke Program Files
               --no-shortcut               Jangan cipta pintasan pada Desktop
               --kiosk                     Daftar autostart semasa log masuk (Mod Kiosk)
+              --apply-policy              Kuatkuasakan sekatan pelayar makmal (sekat semua URL luar di seluruh PC)
+              --remove-policy             Padam sekatan pelayar makmal (nyahkan dasar sekatan HKLM Chrome & Edge)
               --no-policy                 Jangan kuatkuasakan dasar keselamatan pelayar makmal
               --checklist, -c <laluan>    Laluan ke fail senarai semak makmal (lab_checklist.csv)
               --pupil-account, -a <nama>  Nama akaun murid Windows untuk ACL (lalai: Murid)
@@ -153,6 +168,9 @@ public sealed class ProvisionOptions
 
               # Mod baris perintah menggunakan Google Chrome:
               Delima.Provision.exe --pack E:\school.dlmpack --browser chrome
+
+              # Buka sekatan pelayar (unblock browser):
+              Delima.Provision.exe --remove-policy
 
               # Skrip PDQ / GPO senyap melalui stdin:
               type pass.txt | Delima.Provision.exe --quiet --pack "\\share\dlm\school.dlmpack" --passphrase-stdin
