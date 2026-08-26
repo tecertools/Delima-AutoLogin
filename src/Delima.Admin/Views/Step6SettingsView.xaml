@@ -26,7 +26,7 @@
                         <!-- Quick Add Canva Preset Chip -->
                         <Button Grid.Column="1" Content="+ Tambah Canva for Education" Style="{StaticResource SmallButton}"
                                 Click="OnAddCanvaPresetClick" ToolTip="Tambah portal Canva for Education ke senarai destinasi"
-                                IsEnabled="{Binding HasCanvaPreset, Converter={StaticResource InverseBoolToVisConv}}" />
+                                IsEnabled="{Binding HasCanvaPreset, Converter={StaticResource InverseBoolConv}}" />
                     </Grid>
 
                     <ItemsControl ItemsSource="{Binding Destinations}">

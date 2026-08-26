@@ -49,6 +49,18 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         _ = StartLoginFlowAsync(email, credential, options);
     }
 
+    private static void RunOnDispatcher(Action action)
+    {
+        if (System.Windows.Application.Current?.Dispatcher is { } dispatcher && !dispatcher.CheckAccess())
+        {
+            dispatcher.Invoke(action);
+        }
+        else
+        {
+            action();
+        }
+    }
+
     private async Task StartLoginFlowAsync(string email, ICredential credential, RouteCOptions? options)
     {
         try
@@ -61,35 +73,41 @@ public sealed partial class SedangMasukViewModel : ObservableObject
                 onStateChanged: UpdateStateMessage,
                 cancellationToken: _cts.Token);
 
-            IsBusy = false;
+            RunOnDispatcher(() => IsBusy = false);
 
             if (result.Success && result.Session != null)
             {
-                _onSuccess(result.Session);
+                RunOnDispatcher(() => _onSuccess(result.Session));
             }
             else if (result.ErrorCode == FailureCodes.E03_InjectionAborted || _cts.IsCancellationRequested)
             {
-                _onCancel();
+                RunOnDispatcher(_onCancel);
             }
             else
             {
-                _onFailure(result);
+                RunOnDispatcher(() => _onFailure(result));
             }
         }
         catch (OperationCanceledException)
         {
-            IsBusy = false;
-            _onCancel();
+            RunOnDispatcher(() =>
+            {
+                IsBusy = false;
+                _onCancel();
+            });
         }
         catch (Exception ex)
         {
-            IsBusy = false;
-            var failureResult = RouteCResult.Failure(
-                FailureCodes.E02_WindowNotVerified,
-                FailureCodes.GetPupilMessageBm(FailureCodes.E02_WindowNotVerified),
-                FailureCodes.GetTeacherAction(FailureCodes.E02_WindowNotVerified) + $": {ex.Message}",
-                null, 0, TimeSpan.Zero);
-            _onFailure(failureResult);
+            RunOnDispatcher(() =>
+            {
+                IsBusy = false;
+                var failureResult = RouteCResult.Failure(
+                    FailureCodes.E02_WindowNotVerified,
+                    FailureCodes.GetPupilMessageBm(FailureCodes.E02_WindowNotVerified),
+                    FailureCodes.GetTeacherAction(FailureCodes.E02_WindowNotVerified) + $": {ex.Message}",
+                    null, 0, TimeSpan.Zero);
+                _onFailure(failureResult);
+            });
         }
     }
 
@@ -110,7 +128,8 @@ public sealed partial class SedangMasukViewModel : ObservableObject
 
     private void UpdateStateMessage(LoginFlowState state)
     {
-        StatusMessage = GetStateMessage(state);
+        string msg = GetStateMessage(state);
+        RunOnDispatcher(() => StatusMessage = msg);
     }
 
     [RelayCommand]

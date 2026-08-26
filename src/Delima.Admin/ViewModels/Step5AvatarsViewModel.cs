@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Admin.Models;
 using Delima.Core.Audit;
@@ -32,6 +33,7 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DiceBearSeed))]
     [NotifyPropertyChangedFor(nameof(AvatarUrl))]
     private string _avatar = "";
 
@@ -46,9 +48,15 @@ public sealed partial class AvatarAssignmentItem : ObservableObject
     public string DiceBearSeed => DiceBearService.ResolveSeed(Avatar, StudentId);
 
     /// <summary>
-    /// Full HTTPS URL to the student's Critters avatar PNG.
+    /// Local file:// URI (with instant offline fallback) or HTTPS URL to the student's avatar PNG.
     /// </summary>
-    public string AvatarUrl => DiceBearService.GetAvatarUrl(DiceBearSeed);
+    public string AvatarUrl => DiceBearService.GetLocalOrRemoteUri(DiceBearSeed);
+
+    public void RefreshAvatar()
+    {
+        OnPropertyChanged(nameof(DiceBearSeed));
+        OnPropertyChanged(nameof(AvatarUrl));
+    }
 
     public string PicturePasswordDisplay => string.Join(" ➔ ", PicturePassword.Select(GetPictureIconEmoji));
 
@@ -179,6 +187,12 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
     private bool _picturePasswordRequired = true;
 
     public bool ShowWarning => !PicturePasswordRequired;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    private bool _isBusy;
+
+    public bool IsNotBusy => !IsBusy;
 
     public bool CanProceed => true;
 
@@ -347,13 +361,27 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         UpdateFilteredAvatarItems();
 
         var seeds = AvatarItems.Select(a => a.DiceBearSeed).ToList();
-        _ = DiceBearService.PreCacheBatchAsync(seeds);
+        _ = Task.Run(async () =>
+        {
+            await DiceBearService.PreCacheBatchAsync(seeds).ConfigureAwait(false);
+            System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in AvatarItems)
+                {
+                    item.RefreshAvatar();
+                }
+            });
+        });
     }
 
     public void RandomizeAvatar(AvatarAssignmentItem item)
     {
         item.Avatar = Guid.NewGuid().ToString("N")[..10];
-        _ = DiceBearService.EnsureCachedAsync(item.DiceBearSeed);
+        _ = Task.Run(async () =>
+        {
+            await DiceBearService.EnsureCachedAsync(item.DiceBearSeed).ConfigureAwait(false);
+            System.Windows.Application.Current?.Dispatcher.Invoke(item.RefreshAvatar);
+        });
         SaveToState();
     }
 
@@ -364,7 +392,8 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         var rand = Random.Shared;
         int total = StandardPicturePasswordIcons.Length;
 
-        foreach (var item in FilteredAvatarItems)
+        var itemsToCycle = FilteredAvatarItems.ToList();
+        foreach (var item in itemsToCycle)
         {
             item.Avatar = Guid.NewGuid().ToString("N")[..10];
             int i1 = rand.Next(total);
@@ -374,8 +403,20 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
             while (i3 == i1 || i3 == i2) i3 = rand.Next(total);
 
             item.PicturePassword = [StandardPicturePasswordIcons[i1], StandardPicturePasswordIcons[i2], StandardPicturePasswordIcons[i3]];
-            _ = DiceBearService.EnsureCachedAsync(item.DiceBearSeed);
         }
+
+        var seeds = itemsToCycle.Select(a => a.DiceBearSeed).ToList();
+        _ = Task.Run(async () =>
+        {
+            await DiceBearService.PreCacheBatchAsync(seeds).ConfigureAwait(false);
+            System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in itemsToCycle)
+                {
+                    item.RefreshAvatar();
+                }
+            });
+        });
 
         SaveToState();
     }
@@ -651,6 +692,20 @@ public sealed partial class Step5AvatarsViewModel : ObservableObject
         });
 
         return fullPath;
+    }
+
+    public async Task<string> PrintAvatarSheetAsync(string? yearOrClassFilter = null, string? classFilter = null)
+    {
+        IsBusy = true;
+        try
+        {
+            string result = await Task.Run(() => PrintAvatarSheet(yearOrClassFilter, classFilter));
+            return result;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
 

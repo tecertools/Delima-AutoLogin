@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Delima.Admin.Models;
 using Delima.Import;
@@ -69,6 +70,15 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isRejectsSectionExpanded = true;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    private bool _isBusy;
+
+    [ObservableProperty]
+    private string _busyMessage = "";
+
+    public bool IsNotBusy => !IsBusy;
 
     private List<RawImportRow> _rawFileRows = [];
 
@@ -173,6 +183,67 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
         // Extract a few preview names with diacritics
         ExtractDiacriticPreview();
         UpdatePreview();
+    }
+
+    public async Task LoadFileAsync(string path)
+    {
+        if (!File.Exists(path)) return;
+
+        IsBusy = true;
+        BusyMessage = "Membaca dan menganalisis fail roster…";
+        try
+        {
+            string fileName = Path.GetFileName(path);
+
+            var (headers, rows, encodingName) = await Task.Run(() =>
+            {
+                using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var (hdr, rws, _) = DataFileReader.ReadFile(stream, fileName);
+
+                string encName = "Excel (Unicode)";
+                if (fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    using var encStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var encoding = FileEncodingDetector.DetectEncoding(encStream);
+                    encName = encoding.EncodingName;
+                }
+
+                return (hdr, rws, encName);
+            });
+
+            FilePath = path;
+            _rawFileRows = rows;
+            DetectedEncoding = encodingName;
+
+            SourceHeaders.Clear();
+            GradeOptions.Clear();
+            GradeOptions.Add(DerivedGradeOption);
+
+            foreach (var h in headers)
+            {
+                SourceHeaders.Add(h);
+                GradeOptions.Add(h);
+            }
+
+            // Auto-detect mappings
+            var auto = ColumnMapping.AutoDetect(headers);
+            SelectedFullNameCol = auto.FullNameColumn;
+            SelectedClassNameCol = auto.ClassNameColumn;
+            SelectedGradeCol = auto.GradeColumn ?? DerivedGradeOption;
+            SelectedDelimaIdCol = auto.DelimaIdColumn;
+            SelectedRegisterNoCol = auto.RegisterNoColumn;
+
+            // Extract a few preview names with diacritics
+            ExtractDiacriticPreview();
+            UpdatePreview();
+        }
+        finally
+        {
+            IsBusy = false;
+            BusyMessage = "";
+        }
     }
 
     private void ExtractDiacriticPreview()
@@ -303,6 +374,56 @@ public sealed partial class Step3RosterImportViewModel : ObservableObject
 
         OnPropertyChanged(nameof(CanApplyImport));
         OnPropertyChanged(nameof(ValidationMessage));
+    }
+
+    public async Task RunDryRunAnalysisAsync()
+    {
+        if (!ValidateMapping(out _) || !HasFileLoaded) return;
+        IsBusy = true;
+        BusyMessage = "Menganalisis dan mengesahkan data roster…";
+        try
+        {
+            var mapping = new ColumnMapping
+            {
+                FullNameColumn = SelectedFullNameCol,
+                ClassNameColumn = SelectedClassNameCol,
+                GradeColumn = SelectedGradeCol == DerivedGradeOption ? null : SelectedGradeCol,
+                DelimaIdColumn = SelectedDelimaIdCol,
+                RegisterNoColumn = SelectedRegisterNoCol
+            };
+
+            string filePath = FilePath;
+            string fileName = Path.GetFileName(filePath);
+
+            var existingRosterStudents = _state.RosterStudents.Count > 0
+                ? _state.RosterStudents.Select(s => new Delima.Core.Roster.Student
+                {
+                    Id = s.Id,
+                    Name = s.FullName,
+                    ClassId = s.ClassName,
+                    EmailLocal = s.EmailLocal,
+                    DisplayName = s.DisplayName
+                }).ToList()
+                : null;
+
+            var report = await Task.Run(() =>
+            {
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                return RosterImporter.AnalyzeDryRun(stream, fileName, mapping, existingRosterStudents);
+            });
+
+            DryRunReport = report;
+            _state.LastDryRunReport = report;
+            ActiveSubView = "DryRun";
+
+            OnPropertyChanged(nameof(CanApplyImport));
+            OnPropertyChanged(nameof(ValidationMessage));
+        }
+        finally
+        {
+            IsBusy = false;
+            BusyMessage = "";
+        }
     }
 
     public void ExportRejectsCsv(string targetPath)

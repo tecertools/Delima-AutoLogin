@@ -27,13 +27,13 @@ public partial class Step5AvatarsView : UserControl
         }
     }
 
-    private void OnPrintAvatarSheetClick(object sender, RoutedEventArgs e)
+    private async void OnPrintAvatarSheetClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is Step5AvatarsViewModel vm)
         {
             try
             {
-                string path = vm.PrintAvatarSheet();
+                string path = await vm.PrintAvatarSheetAsync();
                 MessageBox.Show($"Helaian kata laluan gambar ({vm.SelectedYearFilter} - {vm.SelectedClassFilter}) telah dibuka di pelayar untuk dicetak.\n\nLokasi fail:\n{path}",
                     "Cetak Kata Laluan Gambar", MessageBoxButton.OK, MessageBoxImage.Information);
             }

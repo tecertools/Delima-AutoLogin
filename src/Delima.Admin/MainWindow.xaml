@@ -13,7 +13,7 @@
         Icon="icon.ico"
         Height="700" Width="1100" MinHeight="600" MinWidth="920"
         WindowStartupLocation="CenterScreen"
-        WindowBackdropType="Auto"
+        WindowBackdropType="None"
         Background="{StaticResource StageBgBrush}">
 
     <Window.Resources>
@@ -145,7 +145,7 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <TextBlock Text="{Binding Status, Converter={StaticResource StepNumConv}, FallbackValue='1'}"
+                                                    <TextBlock Text="{Binding Converter={StaticResource StepNumConv}, FallbackValue='1'}"
                                                                FontSize="10" FontWeight="Bold"
                                                                Foreground="{Binding Status, Converter={StaticResource StepStatusToTextBrushConv}}"
                                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>

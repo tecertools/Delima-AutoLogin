@@ -10,7 +10,7 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        WindowBackdropType="Acrylic"
+        WindowBackdropType="None"
         Topmost="True"
         ShowInTaskbar="False"
         WindowStartupLocation="Manual"

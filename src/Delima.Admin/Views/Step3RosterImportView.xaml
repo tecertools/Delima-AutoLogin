@@ -12,6 +12,7 @@
         <conv:StringEqualityConverter x:Key="StringEqConv" />
         <conv:EqualityToVisibilityConverter x:Key="EqToVisConv" />
         <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisConv" />
+        <conv:InverseBooleanConverter x:Key="InverseBoolConv" />
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -43,8 +44,10 @@
                                    Foreground="{StaticResource Ink2Brush}" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,16" />
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="📁 Pilih Fail Dari Komputer…" Style="{StaticResource PrimaryButton}" Click="OnSelectFileClick" Margin="0,0,10,0" />
-                            <Button Content="📥 Muat Turun Templat (CSV)" Style="{StaticResource SecondaryButton}" Click="OnDownloadTemplateClick" />
+                            <Button Content="📁 Pilih Fail Dari Komputer…" Style="{StaticResource PrimaryButton}" Click="OnSelectFileClick" Margin="0,0,10,0"
+                                    IsEnabled="{Binding IsNotBusy}" />
+                            <Button Content="📥 Muat Turun Templat (CSV)" Style="{StaticResource SecondaryButton}" Click="OnDownloadTemplateClick"
+                                    IsEnabled="{Binding IsNotBusy}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -82,8 +85,10 @@
 
                         <!-- Action Buttons -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Content="Tukar Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" Margin="0,0,6,0" />
-                            <Button Content="✕ Batal" Style="{StaticResource DangerButton}" Click="OnClearFileClick" ToolTip="Padam fail ini" />
+                            <Button Content="Tukar Fail…" Style="{StaticResource SecondaryButton}" Click="OnSelectFileClick" Margin="0,0,6,0"
+                                    IsEnabled="{Binding IsNotBusy}" />
+                            <Button Content="✕ Batal" Style="{StaticResource DangerButton}" Click="OnClearFileClick" ToolTip="Padam fail ini"
+                                    IsEnabled="{Binding IsNotBusy}" />
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -174,6 +179,33 @@
                                     HorizontalAlignment="Right" Click="OnRunDryRunClick"
                                     IsEnabled="{Binding CanProceedToDryRun}" />
                         </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Busy InfoBar -->
+                <Border Style="{StaticResource InfoBarBusy}" Margin="0,0,0,10"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConv}}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="15" Height="15" Margin="0,0,10,0"
+                                 Stroke="{StaticResource InfoTextBrush}" StrokeThickness="2.5"
+                                 StrokeDashArray="3 2"
+                                 RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <RotateTransform />
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                From="0" To="360" Duration="0:0:0.9" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                        <TextBlock Text="{Binding BusyMessage}" Foreground="{StaticResource InfoTextBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </StackPanel>
                 </Border>
 

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -47,6 +48,18 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isSuccess;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    private bool _isBusy;
+
+    [ObservableProperty]
+    private string _busyMessage = "";
+
+    [ObservableProperty]
+    private string _errorMessage = "";
+
+    public bool IsNotBusy => !IsBusy;
 
     [ObservableProperty]
     private byte[]? _generatedBundleBytes;
@@ -115,6 +128,84 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
         string outputPath = Path.Combine(targetDir, "school.dlmpack");
         SaveBundleToFile(outputPath);
         LastExportedDirectory = targetDir;
+    }
+
+    public async Task<bool> SaveBundleToUsbAsync(UsbDriveItem? drive = null)
+    {
+        var targetDrive = drive ?? SelectedUsbDrive;
+        if (targetDrive == null) return false;
+
+        IsBusy = true;
+        BusyMessage = "Membina bungkusan dan menyalin fail ke pendrive…";
+        ErrorMessage = "";
+        StatusMessage = "";
+        try
+        {
+            await Task.Run(() => SaveBundleToUsb(targetDrive));
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ralat semasa menyimpan ke pemacu USB: {ex.Message}";
+            return false;
+        }
+        finally
+        {
+            IsBusy = false;
+            BusyMessage = "";
+        }
+    }
+
+    public async Task<bool> SaveBundleToFileAsync(string outputPath)
+    {
+        IsBusy = true;
+        BusyMessage = "Membina bungkusan dan menyimpan fail…";
+        ErrorMessage = "";
+        StatusMessage = "";
+        try
+        {
+            await Task.Run(() => SaveBundleToFile(outputPath));
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ralat semasa menyimpan fail: {ex.Message}";
+            return false;
+        }
+        finally
+        {
+            IsBusy = false;
+            BusyMessage = "";
+        }
+    }
+
+    public async Task<bool> SaveToNetworkAsync(string networkPath)
+    {
+        IsBusy = true;
+        BusyMessage = "Menyalin bungkusan ke laluan rangkaian…";
+        ErrorMessage = "";
+        StatusMessage = "";
+        try
+        {
+            await Task.Run(() =>
+            {
+                if (!Directory.Exists(networkPath))
+                    Directory.CreateDirectory(networkPath);
+                string targetFile = Path.Combine(networkPath, "school.dlmpack");
+                SaveBundleToFile(targetFile);
+            });
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ralat menyimpan ke laluan rangkaian: {ex.Message}";
+            return false;
+        }
+        finally
+        {
+            IsBusy = false;
+            BusyMessage = "";
+        }
     }
 
     public void OpenExportedFolder()

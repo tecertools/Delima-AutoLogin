@@ -12,7 +12,7 @@ public partial class Step3RosterImportView : UserControl
         InitializeComponent();
     }
 
-    private void OnSelectFileClick(object sender, RoutedEventArgs e)
+    private async void OnSelectFileClick(object sender, RoutedEventArgs e)
     {
         var dlg = new OpenFileDialog
         {
@@ -22,7 +22,7 @@ public partial class Step3RosterImportView : UserControl
 
         if (dlg.ShowDialog() == true && DataContext is Step3RosterImportViewModel vm)
         {
-            vm.LoadFile(dlg.FileName);
+            await vm.LoadFileAsync(dlg.FileName);
         }
     }
 
@@ -55,14 +55,14 @@ public partial class Step3RosterImportView : UserControl
         }
     }
 
-    private void OnFileDrop(object sender, DragEventArgs e)
+    private async void OnFileDrop(object sender, DragEventArgs e)
     {
         if (e.Data.GetDataPresent(DataFormats.FileDrop))
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files != null && files.Length > 0 && DataContext is Step3RosterImportViewModel vm)
             {
-                vm.LoadFile(files[0]);
+                await vm.LoadFileAsync(files[0]);
             }
         }
     }
@@ -75,11 +75,11 @@ public partial class Step3RosterImportView : UserControl
         }
     }
 
-    private void OnRunDryRunClick(object sender, RoutedEventArgs e)
+    private async void OnRunDryRunClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is Step3RosterImportViewModel vm)
         {
-            vm.RunDryRunAnalysis();
+            await vm.RunDryRunAnalysisAsync();
         }
     }
 

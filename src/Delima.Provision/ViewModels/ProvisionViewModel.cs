@@ -202,7 +202,7 @@ public sealed partial class ProvisionViewModel : ObservableObject
                     execOptions,
                     progressCallback: (step, desc) =>
                     {
-                        Application.Current.Dispatcher.Invoke(() =>
+                        Application.Current?.Dispatcher?.Invoke(() =>
                         {
                             CurrentStepDescription = desc;
                             ProgressPercentage = step switch
@@ -295,6 +295,6 @@ public sealed partial class ProvisionViewModel : ObservableObject
     [RelayCommand]
     private void CloseApplication()
     {
-        Application.Current.Shutdown();
+        Application.Current?.Shutdown();
     }
 }

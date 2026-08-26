@@ -12,7 +12,7 @@
         Width="1366" Height="768"
         MinWidth="1024" MinHeight="600"
         WindowStartupLocation="CenterScreen"
-        WindowBackdropType="Auto"
+        WindowBackdropType="None"
         Background="{DynamicResource PageBackgroundBrush}"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">

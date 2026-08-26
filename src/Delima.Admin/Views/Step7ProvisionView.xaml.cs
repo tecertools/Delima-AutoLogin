@@ -44,7 +44,7 @@ public partial class Step7ProvisionView : UserControl
         }
     }
 
-    private void OnSaveToSelectedUsbClick(object sender, RoutedEventArgs e)
+    private async void OnSaveToSelectedUsbClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is Step7ProvisionViewModel vm)
         {
@@ -54,18 +54,14 @@ public partial class Step7ProvisionView : UserControl
                 return;
             }
 
-            try
+            bool ok = await vm.SaveBundleToUsbAsync(vm.SelectedUsbDrive);
+            if (ok)
             {
-                vm.SaveBundleToUsb(vm.SelectedUsbDrive);
                 MessageBox.Show(
                     $"Pakej persediaan makmal berjaya disimpan ke pendrive:\n{vm.LastExportedDirectory}\n\nAnda kini boleh mencucuk pendrive ini pada setiap PC makmal dan menjalankan '1_Sediakan_Makmal.exe'.",
                     "Pakej USB Berjaya Disediakan",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ralat semasa menyimpan ke pemacu USB: {ex.Message}", "Ralat Simpan", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -78,7 +74,7 @@ public partial class Step7ProvisionView : UserControl
         }
     }
 
-    private void OnSaveBundleFileClick(object sender, RoutedEventArgs e)
+    private async void OnSaveBundleFileClick(object sender, RoutedEventArgs e)
     {
         var dlg = new SaveFileDialog
         {
@@ -89,29 +85,15 @@ public partial class Step7ProvisionView : UserControl
 
         if (dlg.ShowDialog() == true && DataContext is Step7ProvisionViewModel vm)
         {
-            vm.SaveBundleToFile(dlg.FileName);
+            await vm.SaveBundleToFileAsync(dlg.FileName);
         }
     }
 
-    private void OnSaveToNetworkClick(object sender, RoutedEventArgs e)
+    private async void OnSaveToNetworkClick(object sender, RoutedEventArgs e)
     {
         if (DataContext is Step7ProvisionViewModel vm)
         {
-            try
-            {
-                string targetDir = vm.NetworkSharePath;
-                if (!System.IO.Directory.Exists(targetDir))
-                {
-                    System.IO.Directory.CreateDirectory(targetDir);
-                }
-                string targetFile = System.IO.Path.Combine(targetDir, "school.dlmpack");
-                vm.SaveBundleToFile(targetFile);
-            }
-            catch (Exception ex)
-            {
-                vm.StatusMessage = $"Ralat menyimpan ke laluan rangkaian: {ex.Message}";
-                vm.IsSuccess = false;
-            }
+            await vm.SaveToNetworkAsync(vm.NetworkSharePath);
         }
     }
 

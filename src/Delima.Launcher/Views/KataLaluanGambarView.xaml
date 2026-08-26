@@ -361,7 +361,6 @@
                     VerticalAlignment="Center"
                     MaxWidth="840">
                 <ItemsControl ItemsSource="{Binding ShuffledIcons}"
-                              IsEnabled="{Binding IsLockedOut, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
                               Focusable="False">
                     <ItemsControl.Style>
                         <Style TargetType="{x:Type ItemsControl}">

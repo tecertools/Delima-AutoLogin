@@ -41,7 +41,10 @@ public sealed class AvatarSeedToImageConverter : IValueConverter
             img.CacheOption = BitmapCacheOption.OnLoad;
             img.CreateOptions = BitmapCreateOptions.DelayCreation;
             img.EndInit();
-            img.Freeze();
+            if (img.CanFreeze)
+            {
+                img.Freeze();
+            }
             return img;
         }
         catch
@@ -68,7 +71,10 @@ public sealed class AvatarSeedToImageConverter : IValueConverter
             img.CacheOption = BitmapCacheOption.OnLoad;
             img.CreateOptions = BitmapCreateOptions.DelayCreation;
             img.EndInit();
-            img.Freeze();
+            if (img.CanFreeze)
+            {
+                img.Freeze();
+            }
             return img;
         }
         catch

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Delima.Provision.ViewModels"
+        xmlns:conv="clr-namespace:Delima.Provision.Converters"
         mc:Ignorable="d"
         Title="Penyediaan PC Makmal — DELIMa Smart Launcher"
         Height="730" Width="630"
@@ -12,7 +13,8 @@
         Background="{StaticResource StageBgBrush}">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBooleanConverter x:Key="InverseBool" />
     </Window.Resources>
 
     <Grid Margin="24">
@@ -148,7 +150,7 @@
                     <Button Content="🚀 Sediakan Komputer Ini Sekarang" 
                             Style="{StaticResource PrimaryButton}" 
                             Height="46" FontSize="15" Margin="0,8,0,0"
-                            IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"
                             Command="{Binding ExecuteProvisioningCommand}"/>
                 </StackPanel>
 
