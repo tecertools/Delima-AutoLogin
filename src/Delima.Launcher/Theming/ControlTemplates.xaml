@@ -228,6 +228,7 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="8"
                 MinHeight="56"
+                MinWidth="200"
                 SnapsToDevicePixels="True">
             <Grid HorizontalAlignment="Right" Width="40" Margin="0,0,12,0">
                 <Path x:Name="arrow"
@@ -258,6 +259,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Padding" Value="16,10" />
         <Setter Property="MinHeight" Value="48" />
+        <Setter Property="MinWidth" Value="200" />
         <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
         <Setter Property="FontSize" Value="17" />
         <Setter Property="FontWeight" Value="SemiBold" />
@@ -305,6 +307,7 @@
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Height" Value="56" />
         <Setter Property="MinHeight" Value="56" />
+        <Setter Property="MinWidth" Value="200" />
         <Setter Property="Padding" Value="18,0,48,0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
@@ -315,12 +318,14 @@
                     <Grid x:Name="templateRoot"
                           Height="{TemplateBinding Height}"
                           MinHeight="{TemplateBinding MinHeight}"
+                          MinWidth="{TemplateBinding MinWidth}"
                           SnapsToDevicePixels="True">
                         <ToggleButton x:Name="toggleButton"
                                       Background="{TemplateBinding Background}"
                                       BorderBrush="{TemplateBinding BorderBrush}"
                                       BorderThickness="{TemplateBinding BorderThickness}"
                                       MinHeight="{TemplateBinding MinHeight}"
+                                      MinWidth="{TemplateBinding MinWidth}"
                                       Height="{TemplateBinding Height}"
                                       IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                       Template="{StaticResource ComboBoxToggleButtonTemplate}" />
@@ -348,7 +353,7 @@
                                     CornerRadius="10"
                                     Margin="0,4,0,10"
                                     Padding="4"
-                                    MinWidth="{Binding ActualWidth, ElementName=templateRoot}"
+                                    MinWidth="200"
                                     Effect="{StaticResource PopupShadow}">
                                 <ScrollViewer x:Name="DropDownScrollViewer">
                                     <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">

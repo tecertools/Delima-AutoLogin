@@ -31,6 +31,11 @@ public partial class MainWindow : FluentWindow
             ResizeMode = ResizeMode.NoResize;
             Topmost = false;
 
+            if (AppTitleBar != null)
+            {
+                AppTitleBar.Visibility = Visibility.Collapsed;
+            }
+
             try
             {
                 _kioskGuard = new KioskGuard();
@@ -39,6 +44,13 @@ public partial class MainWindow : FluentWindow
             catch
             {
                 // Suppress hook failures in test or non-elevated environments
+            }
+        }
+        else
+        {
+            if (AppTitleBar != null)
+            {
+                AppTitleBar.Visibility = Visibility.Visible;
             }
         }
     }

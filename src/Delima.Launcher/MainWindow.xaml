@@ -10,7 +10,7 @@
         Title="DELIMa Smart Launcher"
         Icon="icon.ico"
         Width="1366" Height="768"
-        MinWidth="1024" MinHeight="600"
+        MinWidth="960" MinHeight="560"
         WindowStartupLocation="CenterScreen"
         WindowBackdropType="None"
         Background="{DynamicResource PageBackgroundBrush}"
@@ -46,6 +46,19 @@
     </Window.Resources>
 
     <Grid>
-        <ContentControl Content="{Binding CurrentView}" Focusable="False" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0"
+                     x:Name="AppTitleBar"
+                     Title="DELIMa Smart Launcher"
+                     Icon="icon.ico"
+                     ShowMinimize="True"
+                     ShowMaximize="True"
+                     ShowClose="True" />
+
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}" Focusable="False" />
     </Grid>
 </ui:FluentWindow>

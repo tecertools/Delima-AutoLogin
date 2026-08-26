@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Title="DELIMa Admin — Wizard Persediaan Sekolah"
         Icon="icon.ico"
-        Height="700" Width="1100" MinHeight="600" MinWidth="920"
+        Height="700" Width="1100" MinHeight="560" MinWidth="860"
         WindowStartupLocation="CenterScreen"
         WindowBackdropType="None"
         Background="{StaticResource StageBgBrush}">
@@ -50,17 +50,31 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid Margin="16">
-        <!-- Main Application Card Frame (Windows 11 Fluent Layer) -->
-        <Border Background="{StaticResource CardBgBrush}" CornerRadius="8" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True" Effect="{StaticResource FluentCardShadow}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="250" MinWidth="220"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <!-- LEFT SIDEBAR (WinUI 3 NavigationView Style) -->
-                <Border Grid.Column="0" Background="{StaticResource SidebarBgBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+        <!-- Windows 11 TitleBar with Caption Controls -->
+        <ui:TitleBar Grid.Row="0"
+                     Title="DELIMa Admin — Wizard Persediaan Sekolah"
+                     Icon="icon.ico"
+                     ShowMinimize="True"
+                     ShowMaximize="True"
+                     ShowClose="True" />
+
+        <Grid Grid.Row="1" Margin="16,4,16,16">
+            <!-- Main Application Card Frame (Windows 11 Fluent Layer) -->
+            <Border Background="{StaticResource CardBgBrush}" CornerRadius="8" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True" Effect="{StaticResource FluentCardShadow}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="230" MinWidth="190"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- LEFT SIDEBAR (WinUI 3 NavigationView Style) -->
+                    <Border Grid.Column="0" Background="{StaticResource SidebarBgBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -204,12 +218,12 @@
                     </Grid.RowDefinitions>
 
                     <!-- Dynamic Step View Host -->
-                    <Border Grid.Row="0" Padding="32,28,32,20" Background="#FFFFFF">
+                    <Border Grid.Row="0" Padding="24,20,24,16" Background="#FFFFFF">
                         <ContentControl Content="{Binding CurrentStepViewModel}" />
                     </Border>
 
                     <!-- Bottom Action Bar with Inline Status & Navigation -->
-                    <Border Grid.Row="1" Background="#FBFBFB" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="28,14">
+                    <Border Grid.Row="1" Background="#FBFBFB" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="20,12">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -220,10 +234,11 @@
 
                             <!-- Inline Blocked Reason -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
-                                        Visibility="{Binding BlockedReason, Converter={StaticResource NullOrEmptyToVisConv}}">
+                                        Visibility="{Binding BlockedReason, Converter={StaticResource NullOrEmptyToVisConv}}"
+                                        Margin="0,0,10,0">
                                 <TextBlock Text="⚠️ " FontSize="12" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding BlockedReason}" Foreground="{StaticResource DangerTextBrush}" FontWeight="SemiBold" FontSize="12.5" VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" MaxWidth="500" />
+                                           TextTrimming="CharacterEllipsis" />
                             </StackPanel>
 
                             <!-- Back Button -->
@@ -238,9 +253,10 @@
                 </Grid>
             </Grid>
         </Border>
+    </Grid>
 
-        <!-- DONATION MODAL (WinUI 3 ContentDialog Style) -->
-        <Grid Background="#40000000" Visibility="{Binding IsDonationModalOpen, Converter={StaticResource BoolToVisConv}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <!-- DONATION MODAL (WinUI 3 ContentDialog Style) -->
+    <Grid Grid.RowSpan="2" Background="#40000000" Visibility="{Binding IsDonationModalOpen, Converter={StaticResource BoolToVisConv}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Border Width="400" Background="#FFFFFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center" Effect="{StaticResource FluentPopupShadow}">
                 <StackPanel HorizontalAlignment="Center">
                     <TextBlock Text="Sumbangan &amp; Sokongan" FontFamily="{StaticResource DisplayFontFamily}" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,4" />

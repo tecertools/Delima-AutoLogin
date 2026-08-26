@@ -119,23 +119,23 @@
                                             IsEnabled="{Binding IsNotBusy}" />
                                 </Grid>
 
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Content="🚀 Simpan Pakej Lengkap ke Pendrive Ini" Style="{StaticResource PrimaryButton}" Click="OnSaveToSelectedUsbClick" Margin="0,0,10,0"
+                                <WrapPanel Orientation="Horizontal">
+                                    <Button Content="🚀 Simpan Pakej Lengkap ke Pendrive Ini" Style="{StaticResource PrimaryButton}" Click="OnSaveToSelectedUsbClick" Margin="0,0,10,6"
                                             IsEnabled="{Binding IsNotBusy}" />
-                                    <Button Content="📁 Pilih Folder Manual…" Style="{StaticResource SecondaryButton}" Click="OnSaveBundleFileClick"
+                                    <Button Content="📁 Pilih Folder Manual…" Style="{StaticResource SecondaryButton}" Click="OnSaveBundleFileClick" Margin="0,0,0,6"
                                             IsEnabled="{Binding IsNotBusy}" />
-                                </StackPanel>
+                                </WrapPanel>
                             </StackPanel>
 
                             <!-- No USB Detected State -->
                             <StackPanel Visibility="{Binding HasAnyUsbDrive, Converter={StaticResource InverseBoolToVisConv}}">
                                 <TextBlock Text="Tiada pendrive USB dikesan secara automatik. Sila palamkan pendrive atau pilih folder secara manual." Foreground="{StaticResource Ink2Brush}" FontSize="12" Margin="0,0,0,10" />
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Content="↻ Imbas Semula USB" Style="{StaticResource SmallPrimaryButton}" Click="OnRefreshUsbClick" Margin="0,0,10,0"
+                                <WrapPanel Orientation="Horizontal">
+                                    <Button Content="↻ Imbas Semula USB" Style="{StaticResource SmallPrimaryButton}" Click="OnRefreshUsbClick" Margin="0,0,10,6"
                                             IsEnabled="{Binding IsNotBusy}" />
-                                    <Button Content="📁 Pilih Folder / Pemacu Manual…" Style="{StaticResource SecondaryButton}" Click="OnSaveBundleFileClick"
+                                    <Button Content="📁 Pilih Folder / Pemacu Manual…" Style="{StaticResource SecondaryButton}" Click="OnSaveBundleFileClick" Margin="0,0,0,6"
                                             IsEnabled="{Binding IsNotBusy}" />
-                                </StackPanel>
+                                </WrapPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>

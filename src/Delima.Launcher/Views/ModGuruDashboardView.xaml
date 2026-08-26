@@ -137,7 +137,7 @@
         </Border>
 
         <!-- MAIN CONTENT (2 COLUMNS: NAV TABS + DETAILS PANEL) -->
-        <Grid Grid.Row="1" Margin="32,20,32,16">
+        <Grid Grid.Row="1" Margin="32,20,32,16" MaxWidth="1300" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="260" />
                 <ColumnDefinition Width="20" />
@@ -152,11 +152,12 @@
                     CornerRadius="8"
                     Padding="12,16"
                     Effect="{StaticResource CardShadow}">
-                <StackPanel>
-                    <TextBlock Text="Pilihan Kawalan"
-                               Style="{DynamicResource SectionHeadingStyle}"
-                               FontSize="14"
-                               Margin="8,0,0,12" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <TextBlock Text="Pilihan Kawalan"
+                                   Style="{DynamicResource SectionHeadingStyle}"
+                                   FontSize="14"
+                                   Margin="8,0,0,12" />
 
                     <!-- Tab 1: Kata Laluan -->
                     <Button Command="{Binding SelectTabCommand}"
@@ -258,6 +259,7 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
+                </ScrollViewer>
             </Border>
 
             <!-- RIGHT DETAILS PANE (Windows 11 Surface Card) -->

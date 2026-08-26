@@ -9,13 +9,14 @@
              d:DesignHeight="768" d:DesignWidth="1366"
              Background="{DynamicResource PageBackgroundBrush}">
 
-    <Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <!-- Centered Failure Card Container (520px width, 20px Radius) -->
         <Border Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
                 CornerRadius="20"
                 Width="540"
+                Margin="20"
                 Padding="40,48"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
@@ -110,5 +111,5 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

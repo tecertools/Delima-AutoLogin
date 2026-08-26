@@ -185,15 +185,18 @@
         </Border>
 
         <!-- MAIN BODY -->
-        <Grid Grid.Row="1" Margin="24,12,24,6">
-            <Grid.RowDefinitions>
-                <!-- Title & Subtitle & Dots -->
-                <RowDefinition Height="Auto" />
-                <!-- 16-Icon Grid -->
-                <RowDefinition Height="*" />
-                <!-- Attempts / Lockout Notice -->
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="24,12,24,6" MaxWidth="880" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <!-- Title & Subtitle & Dots -->
+                    <RowDefinition Height="Auto" />
+                    <!-- 16-Icon Grid -->
+                    <RowDefinition Height="*" />
+                    <!-- Attempts / Lockout Notice -->
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
             <!-- Headings and 3 Progress Dots with Windows 11 Shake Animation -->
             <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,8" RenderTransformOrigin="0.5,0.5">
@@ -410,6 +413,7 @@
                         HorizontalAlignment="Right" />
             </Grid>
         </Grid>
+        </ScrollViewer>
 
         <!-- FOOTER -->
         <Border Grid.Row="2"

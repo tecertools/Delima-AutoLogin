@@ -18,38 +18,26 @@
             <TextBlock Text="Avatar visual &amp; 3-simbol kata laluan gambar dijana unik bagi setiap murid mengikut tahun dan kelas." Style="{StaticResource StepSubHeading}" />
 
             <!-- Filter & Action Toolbar Card -->
-            <Border Style="{StaticResource SettingsCard}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="6"/>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="14"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="6"/>
-                        <ColumnDefinition Width="170"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource SettingsCard}" Padding="16,12">
+                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Filters Section -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,8">
+                        <TextBlock Text="Tapis Tahun:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <ComboBox ItemsSource="{Binding YearNames}" SelectedItem="{Binding SelectedYearFilter, Mode=TwoWay}" MinWidth="110" Width="130" VerticalAlignment="Center" Margin="0,0,14,0" />
 
-                    <!-- Row 0: Filters and Print Action -->
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Tapis Tahun:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
-                    <ComboBox Grid.Row="0" Grid.Column="2" ItemsSource="{Binding YearNames}" SelectedItem="{Binding SelectedYearFilter, Mode=TwoWay}" VerticalAlignment="Center" />
+                        <TextBlock Text="Tapis Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <ComboBox ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" MinWidth="130" Width="150" VerticalAlignment="Center" />
+                    </StackPanel>
 
-                    <TextBlock Grid.Row="0" Grid.Column="4" Text="Tapis Kelas:" Style="{StaticResource FieldLabel}" VerticalAlignment="Center" Margin="0" />
-                    <ComboBox Grid.Row="0" Grid.Column="6" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter, Mode=TwoWay}" VerticalAlignment="Center" />
-
-                    <StackPanel Grid.Row="0" Grid.Column="8" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Action Buttons Section -->
+                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
                         <Button Content="↻ Jana Semula Kelas Ini" Style="{StaticResource SmallButton}" Click="OnCycleClassAvatarsClick" ToolTip="Jana semula avatar dan kata laluan gambar bagi semua murid dalam kelas yang ditapis" Margin="0,0,8,0"
                                 IsEnabled="{Binding IsNotBusy}" />
                         <Button Content="🖨️ Cetak Helaian Murid (A4)" Style="{StaticResource SecondaryButton}" Click="OnPrintAvatarSheetClick" ToolTip="Cetak helaian kata laluan gambar mengikut tahun dan kelas yang dipilih"
-                                IsEnabled="{Binding IsNotBusy}" />
+                                IsEnabled="{Binding IsNotBusy}" Margin="0,0,8,0" />
+                        
                         <!-- Busy indicator shown while generating HTML -->
-                        <StackPanel Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center"
+                        <StackPanel Orientation="Horizontal" Margin="4,0,0,0" VerticalAlignment="Center"
                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConv}}">
                             <Ellipse Width="14" Height="14" Margin="0,0,6,0"
                                      Stroke="{StaticResource InfoTextBrush}" StrokeThickness="2.5"
@@ -68,8 +56,8 @@
                             </Ellipse>
                             <TextBlock Text="Menjana…" Foreground="{StaticResource InfoTextBrush}" FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center" />
                         </StackPanel>
-                    </StackPanel>
-                </Grid>
+                    </WrapPanel>
+                </WrapPanel>
             </Border>
 
             <!-- Avatar List Container -->
@@ -93,12 +81,12 @@
                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                Stretch="UniformToFill" />
                                     </Border>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,8,0">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="{Binding StudentName}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" MaxWidth="280" />
                                             <TextBlock Text="{Binding ClassName, StringFormat=' ({0})'}" Foreground="{StaticResource Ink3Brush}" FontSize="12" Margin="4,0,0,0"/>
                                         </StackPanel>
-                                        <TextBlock Text="{Binding EmailLocal}" Foreground="{StaticResource Ink3Brush}" FontSize="11" FontFamily="Consolas, monospace" Margin="0,1,0,0"/>
+                                        <TextBlock Text="{Binding EmailLocal}" Foreground="{StaticResource Ink3Brush}" FontSize="11" FontFamily="Consolas, monospace" TextTrimming="CharacterEllipsis" MaxWidth="280" Margin="0,1,0,0"/>
                                     </StackPanel>
 
                                     <!-- Picture Password Preview Tag -->
