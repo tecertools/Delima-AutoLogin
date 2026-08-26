@@ -184,8 +184,8 @@ public class BrowserSession : IDisposable
         psi.ArgumentList.Add("--disable-popup-blocking");
         psi.ArgumentList.Add("--disable-prompt-on-repost");
         psi.ArgumentList.Add("--disable-search-engine-choice-screen");
-        psi.ArgumentList.Add("--lang=ms-MY");
-        psi.ArgumentList.Add("--accept-lang=ms-MY,ms,en-US,en");
+        psi.ArgumentList.Add("--lang=en-US");
+        psi.ArgumentList.Add("--accept-lang=en-US,en");
         psi.ArgumentList.Add("--password-store=basic");
         psi.ArgumentList.Add("--new-window");
         psi.ArgumentList.Add(url);
@@ -198,7 +198,7 @@ public class BrowserSession : IDisposable
 
     /// <summary>
     /// Pre-populates the throwaway profile directory with Preferences and Local State
-    /// to disable translation prompts, PWA app install banners, and set accepted language to Malay.
+    /// to disable translation prompts, PWA app install banners, and force English (en-US) locale.
     /// </summary>
     private static void SeedProfilePreferences(string profileDir)
     {
@@ -216,8 +216,8 @@ public class BrowserSession : IDisposable
               "translate_blocked_languages": ["ms", "zsm", "en", "id", "en-US", "ms-MY"],
               "translate_site_blocklist": ["d3.delima.edu.my", "delima.edu.my", "accounts.google.com"],
               "intl": {
-                "accept_languages": "ms-MY,ms,en-US,en",
-                "selected_languages": "ms-MY,ms,en-US,en"
+                "accept_languages": "en-US,en",
+                "selected_languages": "en-US,en"
               },
               "app_banners": {
                 "pwa_install_prompts_enabled": false
@@ -251,7 +251,7 @@ public class BrowserSession : IDisposable
                 "enabled": false
               },
               "intl": {
-                "app_locale": "ms"
+                "app_locale": "en-US"
               },
               "browser": {
                 "enabled_labs_experiments": [],
