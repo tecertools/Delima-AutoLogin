@@ -56,41 +56,52 @@ public class BrowserSessionTests
     }
 
     [Fact]
-    public void BrowserTitles_Chrome_Contains_Empirical_T04_Strings()
+    public void BrowserTitles_Chrome_Contains_Empirical_T04_And_Malay_Strings()
     {
-        // Chrome identifier titles (both hyphen and en-dash variants per T0.4)
-        Assert.Equal(2, BrowserTitles.Chrome.Identifier.Count);
+        // Chrome identifier titles (both hyphen, en-dash, and Malay variants)
+        Assert.NotEmpty(BrowserTitles.Chrome.Identifier);
         Assert.Contains("Sign in - Google Accounts - Google Chrome", BrowserTitles.Chrome.Identifier);
         Assert.Contains("Sign in \u2013 Google accounts - Google Chrome", BrowserTitles.Chrome.Identifier);
+        Assert.Contains("Log masuk - Akaun Google - Google Chrome", BrowserTitles.Chrome.Identifier);
+        Assert.Contains("Log masuk \u2013 Akaun Google - Google Chrome", BrowserTitles.Chrome.Identifier);
 
         // Chrome consent titles
-        Assert.Equal(2, BrowserTitles.Chrome.Consent.Count);
+        Assert.NotEmpty(BrowserTitles.Chrome.Consent);
         Assert.Contains("Sign in - Google Accounts - Google Chrome", BrowserTitles.Chrome.Consent);
+        Assert.Contains("Log masuk - Akaun Google - Google Chrome", BrowserTitles.Chrome.Consent);
 
         // Chrome destination titles
         Assert.Contains("DELIMa - Google Chrome", BrowserTitles.Chrome.Destination);
         Assert.Contains("DELIMa 3.0 - Google Chrome", BrowserTitles.Chrome.Destination);
         Assert.Contains("Google Classroom - Google Chrome", BrowserTitles.Chrome.Destination);
+        Assert.Contains("Kelas - Google Classroom - Google Chrome", BrowserTitles.Chrome.Destination);
         Assert.Contains("AINS - Google Chrome", BrowserTitles.Chrome.Destination);
     }
 
     [Fact]
-    public void BrowserTitles_Edge_Contains_Empirical_Part6_Strings()
+    public void BrowserTitles_Edge_Contains_Empirical_Part6_And_Malay_Strings()
     {
-        // §4.4.1 & Part 6: Empirically measured Edge title lists containing \u200b
+        // §4.4.1 & Part 6: Empirically measured Edge title lists containing \u200b and standard spaces, English and Malay
         Assert.NotEmpty(BrowserTitles.Edge.Identifier);
         Assert.Contains("Sign in - Google Accounts - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
+        Assert.Contains("Sign in - Google Accounts - Personal - Microsoft Edge", BrowserTitles.Edge.Identifier);
         Assert.Contains("Sign in - Google Accounts - Profile 1 - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
         Assert.Contains("Sign in - Google Accounts - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
+        Assert.Contains("Sign in - Google Accounts - Microsoft Edge", BrowserTitles.Edge.Identifier);
+        Assert.Contains("Log masuk - Akaun Google - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Identifier);
+        Assert.Contains("Log masuk - Akaun Google - Personal - Microsoft Edge", BrowserTitles.Edge.Identifier);
 
         Assert.NotEmpty(BrowserTitles.Edge.Consent);
         Assert.Contains("Sign in - Google Accounts - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Consent);
+        Assert.Contains("Log masuk - Akaun Google - Personal - Microsoft Edge", BrowserTitles.Edge.Consent);
 
         Assert.NotEmpty(BrowserTitles.Edge.Destination);
         Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
+        Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Personal - Microsoft Edge", BrowserTitles.Edge.Destination);
         Assert.Contains("DELIMa 3.0 Digital Educational Learning Initiative Malaysia - Profile 1 - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
         Assert.Contains("DELIMa - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
         Assert.Contains("Google Classroom - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
+        Assert.Contains("Kelas - Google Classroom - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
         Assert.Contains("AINS - Personal - Microsoft\u200b Edge", BrowserTitles.Edge.Destination);
     }
 
@@ -103,18 +114,22 @@ public class BrowserSessionTests
         Assert.NotEmpty(edgeOptions.TitleConsentPage);
         Assert.NotEmpty(edgeOptions.TitleDestinationPage);
 
-        // Matches measured exact strings
+        // Matches measured exact strings (both \u200b and standard space, English and Malay)
         Assert.True(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Personal - Microsoft\u200b Edge", edgeOptions.TitleIdentifierPage));
-        // Does not match chrome title or string without \u200b
-        Assert.False(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Microsoft Edge", edgeOptions.TitleIdentifierPage));
+        Assert.True(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Personal - Microsoft Edge", edgeOptions.TitleIdentifierPage));
+        Assert.True(InjectionEngine.MatchesAnyTitle("Log masuk - Akaun Google - Personal - Microsoft\u200b Edge", edgeOptions.TitleIdentifierPage));
+        Assert.True(InjectionEngine.MatchesAnyTitle("Log masuk - Akaun Google - Personal - Microsoft Edge", edgeOptions.TitleIdentifierPage));
+
+        // Does not match chrome title or non-login Edge title
         Assert.False(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Google Chrome", edgeOptions.TitleIdentifierPage));
+        Assert.False(InjectionEngine.MatchesAnyTitle("Google Search - Microsoft Edge", edgeOptions.TitleIdentifierPage));
     }
 
     [Fact]
     public void SubstringMatching_IsForbidden_Per_Section42()
     {
         // §4.2 Requirement: Substring matching is forbidden because it caused T0.3's 47 false ready-states.
-        // Exact Ordinal matching against per-browser lists only.
+        // Exact and normalized matching against per-browser lists only.
         var chromeOptions = new RouteCOptions { TargetBrowser = BrowserKind.Chrome };
 
         const string pagePortionOnly = "Sign in - Google Accounts";
@@ -123,6 +138,7 @@ public class BrowserSessionTests
         Assert.False(InjectionEngine.MatchesAnyTitle(pagePortionOnly, chromeOptions.TitleIdentifierPage));
         Assert.False(InjectionEngine.MatchesAnyTitle(wrongSuffix, chromeOptions.TitleIdentifierPage));
         Assert.True(InjectionEngine.MatchesAnyTitle("Sign in - Google Accounts - Google Chrome", chromeOptions.TitleIdentifierPage));
+        Assert.True(InjectionEngine.MatchesAnyTitle("Log masuk - Akaun Google - Google Chrome", chromeOptions.TitleIdentifierPage));
     }
 
     [Fact]

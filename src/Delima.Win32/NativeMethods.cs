@@ -134,6 +134,31 @@ internal static class NativeMethods
         return pid;
     }
 
+    /// <summary>
+    /// Finds a visible top-level window belonging to the specified PID with the expected class name.
+    /// </summary>
+    internal static IntPtr FindWindowForProcess(int targetPid, string expectedClassName = "Chrome_WidgetWin_1")
+    {
+        IntPtr foundHwnd = IntPtr.Zero;
+        EnumWindows((hWnd, _) =>
+        {
+            if (!IsWindowVisible(hWnd)) return true;
+            GetWindowThreadProcessId(hWnd, out var pid);
+            if (pid == (uint)targetPid)
+            {
+                var sb = new StringBuilder(256);
+                if (GetClassName(hWnd, sb, sb.Capacity) > 0 &&
+                    string.Equals(sb.ToString(), expectedClassName, StringComparison.Ordinal))
+                {
+                    foundHwnd = hWnd;
+                    return false; // Found, stop enumeration
+                }
+            }
+            return true;
+        }, IntPtr.Zero);
+        return foundHwnd;
+    }
+
     // ---------- SendInput ----------
 
     internal const uint INPUT_KEYBOARD = 1;

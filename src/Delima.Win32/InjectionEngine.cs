@@ -72,11 +72,14 @@ public static class InjectionEngine
 {
     /// <summary>
     /// Checks whether an actual window title matches any expected title in the list
-    /// under exact StringComparison.Ordinal equality (§4.2).
+    /// under exact StringComparison.Ordinal equality (§4.2) or resilient normalized equality.
+    /// Loose substring matching remains strictly forbidden.
     /// </summary>
     internal static bool MatchesAnyTitle(string? actualTitle, IEnumerable<string> expectedTitles)
     {
         if (string.IsNullOrEmpty(actualTitle)) return false;
+
+        // 1. Fast path: exact StringComparison.Ordinal match (§4.2)
         foreach (var expected in expectedTitles)
         {
             if (string.Equals(actualTitle, expected, StringComparison.Ordinal))
@@ -84,7 +87,40 @@ public static class InjectionEngine
                 return true;
             }
         }
+
+        // 2. Resilient normalization path: handles variations in dashes (\u2013, \u2014 vs -),
+        // zero-width spaces (\u200b), and case-insensitivity while strictly matching the full title structure.
+        var normalizedActual = NormalizeTitle(actualTitle);
+        if (string.IsNullOrEmpty(normalizedActual)) return false;
+
+        foreach (var expected in expectedTitles)
+        {
+            var normalizedExpected = NormalizeTitle(expected);
+            if (!string.IsNullOrEmpty(normalizedExpected) &&
+                string.Equals(normalizedActual, normalizedExpected, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    /// <summary>
+    /// Strips zero-width formatting characters and standardizes unicode dashes for robust title matching.
+    /// </summary>
+    public static string NormalizeTitle(string title)
+    {
+        if (string.IsNullOrEmpty(title)) return string.Empty;
+        return title
+            .Replace("\u200b", "")
+            .Replace("\u200c", "")
+            .Replace("\u200d", "")
+            .Replace("\ufeff", "")
+            .Replace("\u2013", "-")
+            .Replace("\u2014", "-")
+            .Replace("\u2015", "-")
+            .Trim();
     }
 
     /// <summary>
@@ -397,6 +433,19 @@ public static class InjectionEngine
         while (sw.Elapsed < timeout)
         {
             if (cancellationToken.IsCancellationRequested) return false;
+
+            if (session.Process.HasExited) return false;
+
+            // If the foreground window belongs to another process, attempt to bring the browser to the foreground
+            var currentPid = NativeMethods.GetForegroundProcessId();
+            if (currentPid != (uint)session.Process.Id)
+            {
+                var browserHwnd = NativeMethods.FindWindowForProcess(session.Process.Id, expectedClassName);
+                if (browserHwnd != IntPtr.Zero)
+                {
+                    NativeMethods.SetForegroundWindow(browserHwnd);
+                }
+            }
 
             if (IsWindowVerified(session, titlePredicate, expectedClassName))
             {

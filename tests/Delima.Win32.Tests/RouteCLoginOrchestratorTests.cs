@@ -740,14 +740,65 @@ public class RouteCLoginOrchestratorTests
 
     [Theory]
     [InlineData("Sign in - Google Accounts - Google Chrome", true)]
+    [InlineData("Sign in \u2013 Google accounts - Google Chrome", true)]
     [InlineData("Log masuk - Akaun Google", true)]
+    [InlineData("Log masuk \u2013 Akaun Google - Google Chrome", true)]
+    [InlineData("Log Masuk - Akaun Google - Personal - Microsoft Edge", true)]
     [InlineData("Google Accounts", true)]
     [InlineData("DELIMa - Google Chrome", false)]
     [InlineData("DELIMa 3.0", false)]
+    [InlineData("AINS - Google Chrome", false)]
     public void UiaHelper_IsGoogleSignInTitle_Detects_Navigated_States(string title, bool expectedNavigated)
     {
         bool result = UiaHelper.IsGoogleSignInTitle(title);
         Assert.Equal(expectedNavigated, result);
+    }
+
+    [Theory]
+    [InlineData("Log masuk - Akaun Google - Google Chrome", true)]
+    [InlineData("Log masuk \u2013 Akaun Google - Google Chrome", true)]
+    [InlineData("Log masuk \u2014 Akaun Google - Google Chrome", true)]
+    [InlineData("Log Masuk - Akaun Google - Google Chrome", true)]
+    [InlineData("Sign in - Google Accounts - Google Chrome", true)]
+    [InlineData("Sign in \u2013 Google accounts - Google Chrome", true)]
+    [InlineData("DELIMa - Google Chrome", false)]
+    [InlineData("Sign in - Google Accounts", false)] // Suffix required for Chrome identifier
+    public void InjectionEngine_MatchesAnyTitle_Chrome_Identifier_Handles_English_And_Malay(string title, bool expectedMatch)
+    {
+        bool result = InjectionEngine.MatchesAnyTitle(title, BrowserTitles.Chrome.Identifier);
+        Assert.Equal(expectedMatch, result);
+    }
+
+    [Theory]
+    [InlineData("Laman tidak dapat dicapai", FailureCodes.E13_NetworkUnreachable)]
+    [InlineData("Tiada sambungan internet - Google Chrome", FailureCodes.E13_NetworkUnreachable)]
+    [InlineData("Ralat privasi", FailureCodes.E13_NetworkUnreachable)]
+    [InlineData("Sahkan aktiviti luar biasa", FailureCodes.E06_GoogleCaptcha)]
+    [InlineData("Pengesahan 2 Langkah - Google Chrome", FailureCodes.E07_TwoFactorPrompt)]
+    [InlineData("Sahkan diri anda", FailureCodes.E07_TwoFactorPrompt)]
+    [InlineData("Akaun dinyahdayakan", FailureCodes.E08_AccountSuspended)]
+    [InlineData("Akaun digantung", FailureCodes.E08_AccountSuspended)]
+    [InlineData("Kata laluan tamat tempoh", FailureCodes.E08_AccountSuspended)]
+    [InlineData("Log masuk - Akaun Google", null)]
+    public void RouteCLoginOrchestrator_ClassifyKnownBrowserError_Detects_Malay_Errors(string title, string? expectedCode)
+    {
+        string? result = RouteCLoginOrchestrator.ClassifyKnownBrowserError(title);
+        Assert.Equal(expectedCode, result);
+    }
+
+    [Theory]
+    [InlineData("Hi Ali - Google Chrome", true)]
+    [InlineData("Hai Siti - Google Chrome", true)]
+    [InlineData("Salam Ahmad - Google Chrome", true)]
+    [InlineData("Welcome - Google Chrome", true)]
+    [InlineData("Selamat datang - Google Chrome", true)]
+    [InlineData("Log masuk - Akaun Google - Google Chrome", false)]
+    [InlineData("Sign in - Google Accounts - Google Chrome", false)]
+    public void RouteCLoginOrchestrator_IsPasswordPageTitle_Detects_Malay_And_English_Greetings(string title, bool expectedPasswordPage)
+    {
+        var options = new RouteCOptions { TargetBrowser = BrowserKind.Chrome };
+        bool result = RouteCLoginOrchestrator.IsPasswordPageTitle(title, null, options);
+        Assert.Equal(expectedPasswordPage, result);
     }
 }
 

@@ -134,9 +134,11 @@ public static class UiaHelper
     internal static bool IsGoogleSignInTitle(string? title)
     {
         if (string.IsNullOrWhiteSpace(title)) return false;
-        return title.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
-               title.Contains("Google Accounts", StringComparison.OrdinalIgnoreCase) ||
-               title.Contains("Log masuk - Akaun Google", StringComparison.OrdinalIgnoreCase);
+        var norm = InjectionEngine.NormalizeTitle(title);
+        return norm.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
+               norm.Contains("Google Accounts", StringComparison.OrdinalIgnoreCase) ||
+               norm.Contains("Log masuk", StringComparison.OrdinalIgnoreCase) ||
+               norm.Contains("Akaun Google", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -167,9 +169,17 @@ public static class UiaHelper
                     if (session != null)
                     {
                         var fgPid = NativeMethods.GetForegroundProcessId();
-                        if (fgPid != (uint)session.Process.Id && session.Process.MainWindowHandle != IntPtr.Zero)
+                        if (fgPid != (uint)session.Process.Id)
                         {
-                            NativeMethods.SetForegroundWindow(session.Process.MainWindowHandle);
+                            var browserHwnd = NativeMethods.FindWindowForProcess(session.Process.Id);
+                            if (browserHwnd != IntPtr.Zero)
+                            {
+                                NativeMethods.SetForegroundWindow(browserHwnd);
+                            }
+                            else if (session.Process.MainWindowHandle != IntPtr.Zero)
+                            {
+                                NativeMethods.SetForegroundWindow(session.Process.MainWindowHandle);
+                            }
                         }
                     }
 

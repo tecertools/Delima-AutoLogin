@@ -444,7 +444,7 @@ public static class RouteCLoginOrchestrator
                     credential.PasswordSpan,
                     title =>
                     {
-                        var matches = !string.IsNullOrWhiteSpace(title) && !effectiveOptions.TitleIdentifierPage.Any(idTitle => string.Equals(title, idTitle, StringComparison.Ordinal));
+                        var matches = !string.IsNullOrWhiteSpace(title) && !InjectionEngine.MatchesAnyTitle(title, effectiveOptions.TitleIdentifierPage);
                         if (matches)
                         {
                             capturedPasswordTitle = title;
@@ -593,37 +593,46 @@ public static class RouteCLoginOrchestrator
     {
         if (string.IsNullOrWhiteSpace(title)) return null;
 
-        // E13: Network unreachable
+        // E13: Network unreachable (English & Malay)
         if (title.StartsWith("No internet", StringComparison.OrdinalIgnoreCase) ||
             title.StartsWith("Site can't be reached", StringComparison.OrdinalIgnoreCase) ||
+            title.StartsWith("Laman tidak dapat dicapai", StringComparison.OrdinalIgnoreCase) ||
+            title.StartsWith("Tiada sambungan internet", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("ERR_INTERNET_DISCONNECTED", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("ERR_NAME_NOT_RESOLVED", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("ERR_CONNECTION_REFUSED", StringComparison.OrdinalIgnoreCase) ||
-            title.StartsWith("Privacy error", StringComparison.OrdinalIgnoreCase))
+            title.StartsWith("Privacy error", StringComparison.OrdinalIgnoreCase) ||
+            title.StartsWith("Ralat privasi", StringComparison.OrdinalIgnoreCase))
         {
             return FailureCodes.E13_NetworkUnreachable;
         }
 
-        // E06: Google CAPTCHA / unusual activity
+        // E06: Google CAPTCHA / unusual activity (English & Malay)
         if (title.Contains("unusual activity", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("aktiviti luar biasa", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("Captcha", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("robot", StringComparison.OrdinalIgnoreCase))
         {
             return FailureCodes.E06_GoogleCaptcha;
         }
 
-        // E07: 2SV prompt
+        // E07: 2SV prompt (English & Malay)
         if (title.Contains("2-Step Verification", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Pengesahan 2 Langkah", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("Verify it's you", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Sahkan diri anda", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("2-Step", StringComparison.OrdinalIgnoreCase))
         {
             return FailureCodes.E07_TwoFactorPrompt;
         }
 
-        // E08: Account suspended / password expired
+        // E08: Account suspended / password expired (English & Malay)
         if (title.Contains("Account disabled", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Akaun dinyahdayakan", StringComparison.OrdinalIgnoreCase) ||
             title.Contains("Account suspended", StringComparison.OrdinalIgnoreCase) ||
-            title.Contains("Password expired", StringComparison.OrdinalIgnoreCase))
+            title.Contains("Akaun digantung", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Password expired", StringComparison.OrdinalIgnoreCase) ||
+            title.Contains("Kata laluan tamat tempoh", StringComparison.OrdinalIgnoreCase))
         {
             return FailureCodes.E08_AccountSuspended;
         }
@@ -653,7 +662,7 @@ public static class RouteCLoginOrchestrator
             var currentTitle = getTitle();
             // If the title has changed from all identifier titles and window is non-empty, transition observed
             if (!string.IsNullOrEmpty(currentTitle) &&
-                !identifierTitles.Any(idTitle => string.Equals(currentTitle, idTitle, StringComparison.Ordinal)))
+                !InjectionEngine.MatchesAnyTitle(currentTitle, identifierTitles))
             {
                 return true;
             }
@@ -769,9 +778,12 @@ public static class RouteCLoginOrchestrator
             return true;
         }
 
-        // Common Google password page title formats
-        if (currentTitle.StartsWith("Hi ", StringComparison.Ordinal) ||
-            currentTitle.StartsWith("Welcome", StringComparison.Ordinal))
+        // Common Google password page title formats (English & Malay)
+        if (currentTitle.StartsWith("Hi ", StringComparison.OrdinalIgnoreCase) ||
+            currentTitle.StartsWith("Hai ", StringComparison.OrdinalIgnoreCase) ||
+            currentTitle.StartsWith("Salam ", StringComparison.OrdinalIgnoreCase) ||
+            currentTitle.StartsWith("Welcome", StringComparison.OrdinalIgnoreCase) ||
+            currentTitle.StartsWith("Selamat datang", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
