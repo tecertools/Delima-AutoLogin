@@ -84,7 +84,7 @@ public sealed partial class PilihDestinasiViewModel : ObservableObject
 
     public static IReadOnlyList<DestinationConfig> GetDefaultDestinations() =>
     [
-        new DestinationConfig { Id = "delima", Label = "DELIMa 3.0 Portal", Url = "https://d3.delima.edu.my/landing" },
+        new DestinationConfig { Id = "delima", Label = "DELIMa 3.0", Url = "https://d3.delima.edu.my/landing" },
         new DestinationConfig { Id = "classroom", Label = "Google Classroom", Url = "https://classroom.google.com/" },
         new DestinationConfig { Id = "ains", Label = "AINS (NILAM)", Url = "https://ains.moe.gov.my/" },
         new DestinationConfig { Id = "canva", Label = "Canva for Education", Url = "https://www.canva.com/education/" }

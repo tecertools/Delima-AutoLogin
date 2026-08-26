@@ -280,7 +280,7 @@
                                FontSize="26"
                                TextAlignment="Center"
                                Margin="0,0,0,6" />
-                    <TextBlock Text="Sila pilih portal pembelajaran yang ingin anda buka hari ini."
+                    <TextBlock Text="Sila pilih aplikasi pembelajaran yang ingin anda buka hari ini."
                                Style="{StaticResource HelperTextStyle}"
                                FontSize="14.5"
                                TextAlignment="Center" />
@@ -326,7 +326,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Text="🔒 Sesi Disulitkan • Log masuk automatik dengan profil terpencil (Kiosk Lab Mode)"
+                           Text="🔒 Selamat &amp; Terpelihara • Log masuk automatik dengan profil terpencil (Kiosk Lab Mode)"
                            FontFamily="{DynamicResource NunitoFont}"
                            FontSize="11.5"
                            Foreground="{DynamicResource SecondaryTextBrush}"

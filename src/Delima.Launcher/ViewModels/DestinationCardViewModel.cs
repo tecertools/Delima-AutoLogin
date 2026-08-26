@@ -47,9 +47,9 @@ public sealed partial class DestinationCardViewModel : ObservableObject
         }
         if (text.Contains("delima") || text.Contains("d3") || text.Contains("moe"))
         {
-            return ("🎓", "Portal pembelajaran digital utama Kementerian Pendidikan", "#1A73E8", "Utama");
+            return ("🎓", "Aplikasi pembelajaran digital utama Kementerian Pendidikan", "#1A73E8", "Utama");
         }
 
-        return ("🌐", "Akses pantas ke portal pembelajaran sekolah", "#2B579A", "Portal");
+        return ("🌐", "Akses pantas ke laman pembelajaran sekolah", "#2B579A", "Laman");
     }
 }
