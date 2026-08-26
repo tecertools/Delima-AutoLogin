@@ -13,6 +13,8 @@ public sealed class BrowserPolicyStatus
     public bool DevToolsDisabled { get; set; }
     public bool PrivateModeDisabled { get; set; }
     public bool BrowserSigninDisabled { get; set; }
+    public bool TranslateDisabled { get; set; }
+    public bool AppInstallDisabled { get; set; }
     public bool UrlAllowlistConfigured { get; set; }
     public bool UrlBlocklistConfigured { get; set; }
     public string Summary { get; set; } = "";
@@ -117,7 +119,19 @@ public static class BrowserPolicyConfigurator
                 status.BrowserSigninDisabled = true;
             }
 
-            // 5. URLAllowlist
+            // 5. TranslateEnabled == 0
+            if (key.GetValue("TranslateEnabled") is int te && te == 0)
+            {
+                status.TranslateDisabled = true;
+            }
+
+            // 6. WebAppInstallByUserEnabled == 0 (Edge)
+            if (kind == BrowserKind.Edge && key.GetValue("WebAppInstallByUserEnabled") is int wa && wa == 0)
+            {
+                status.AppInstallDisabled = true;
+            }
+
+            // 7. URLAllowlist
             using (var allowKey = key.OpenSubKey("URLAllowlist"))
             {
                 if (allowKey != null && allowKey.ValueCount >= DefaultAllowlist.Length)
@@ -126,7 +140,7 @@ public static class BrowserPolicyConfigurator
                 }
             }
 
-            // 6. URLBlocklist
+            // 8. URLBlocklist
             using (var blockKey = key.OpenSubKey("URLBlocklist"))
             {
                 if (blockKey != null && blockKey.ValueCount >= 1)
@@ -140,7 +154,9 @@ public static class BrowserPolicyConfigurator
                                     status.PrivateModeDisabled &&
                                     status.BrowserSigninDisabled &&
                                     status.UrlAllowlistConfigured &&
-                                    status.UrlBlocklistConfigured;
+                                    status.UrlBlocklistConfigured &&
+                                    status.TranslateDisabled &&
+                                    (kind != BrowserKind.Edge || status.AppInstallDisabled);
 
             status.Summary = status.IsFullyApplied
                 ? $"Dasar {browserName} Perusahaan aktif dan lengkap."
@@ -193,6 +209,15 @@ public static class BrowserPolicyConfigurator
             key.SetValue("DeveloperToolsAvailability", 2, RegistryValueKind.DWord);
             key.SetValue(privateModeValue, 1, RegistryValueKind.DWord);
             key.SetValue("BrowserSignin", 0, RegistryValueKind.DWord);
+            key.SetValue("TranslateEnabled", 0, RegistryValueKind.DWord);
+
+            if (kind == BrowserKind.Edge)
+            {
+                key.SetValue("WebAppInstallByUserEnabled", 0, RegistryValueKind.DWord);
+                key.SetValue("WebWidgetAllowed", 0, RegistryValueKind.DWord);
+                key.SetValue("EdgeShoppingAssistantEnabled", 0, RegistryValueKind.DWord);
+                key.SetValue("ShowTranslate", 0, RegistryValueKind.DWord);
+            }
 
             // URLAllowlist subkey
             using (var allowKey = key.CreateSubKey("URLAllowlist", writable: true))
@@ -286,6 +311,11 @@ public static class BrowserPolicyConfigurator
             key.DeleteValue("DeveloperToolsAvailability", throwOnMissingValue: false);
             key.DeleteValue(privateModeValue, throwOnMissingValue: false);
             key.DeleteValue("BrowserSignin", throwOnMissingValue: false);
+            key.DeleteValue("TranslateEnabled", throwOnMissingValue: false);
+            key.DeleteValue("WebAppInstallByUserEnabled", throwOnMissingValue: false);
+            key.DeleteValue("WebWidgetAllowed", throwOnMissingValue: false);
+            key.DeleteValue("EdgeShoppingAssistantEnabled", throwOnMissingValue: false);
+            key.DeleteValue("ShowTranslate", throwOnMissingValue: false);
 
             key.DeleteSubKeyTree("URLAllowlist", throwOnMissingSubKey: false);
             key.DeleteSubKeyTree("URLBlocklist", throwOnMissingSubKey: false);

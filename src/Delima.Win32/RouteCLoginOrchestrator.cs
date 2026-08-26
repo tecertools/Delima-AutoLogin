@@ -85,9 +85,9 @@ public sealed record RouteCOptions
     }
 
     /// <summary>
-    /// Settle delay duration in milliseconds after window verification (800 ms default to ensure input autofocus).
+    /// Settle delay duration in milliseconds after window verification (1200 ms default to ensure input autofocus on slow PCs).
     /// </summary>
-    public int InjectionSettleMs { get; init; } = 800;
+    public int InjectionSettleMs { get; init; } = 1200;
 
     /// <summary>
     /// Consecutive 100 ms polls a title must hold stably before initiating injection (§4.2).
@@ -102,15 +102,15 @@ public sealed record RouteCOptions
 
     /// <summary>
     /// Timeout when waiting for a specific page title to appear and settle.
-    /// Default is 30 seconds per §3.2.
+    /// Default is 60 seconds (raised for slow loading PCs).
     /// </summary>
-    public TimeSpan WindowWaitTimeout { get; init; } = TimeSpan.FromSeconds(30);
+    public TimeSpan WindowWaitTimeout { get; init; } = TimeSpan.FromSeconds(60);
 
     /// <summary>
     /// Timeout when waiting for the browser to transition out of the identifier page.
-    /// Default is 15 seconds.
+    /// Default is 30 seconds (raised for slow loading PCs).
     /// </summary>
-    public TimeSpan TransitionTimeout { get; init; } = TimeSpan.FromSeconds(15);
+    public TimeSpan TransitionTimeout { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
     /// Expected Chromium window class name. Default is "Chrome_WidgetWin_1".
@@ -331,7 +331,7 @@ public static class RouteCLoginOrchestrator
                 {
                     try
                     {
-                        UiaHelper.TryInvokeButtonInForeground(effectiveOptions.LandingButtonText, effectiveOptions.WindowWaitTimeout, landingToken);
+                        UiaHelper.TryInvokeButtonInForeground(effectiveOptions.LandingButtonText, effectiveOptions.WindowWaitTimeout, session, landingToken);
                     }
                     catch
                     {
@@ -345,14 +345,19 @@ public static class RouteCLoginOrchestrator
             // ====================================================================
             onStateChanged?.Invoke(LoginFlowState.WaitingForIdentifierPage);
 
+            var emailOptions = injectionOptions with
+            {
+                SendEnter = effectiveOptions.SendEnterAfterEmail,
+                OnWindowVerified = () => onStateChanged?.Invoke(LoginFlowState.InjectingIdentifier)
+            };
+
             var emailResult = await Task.Run(() =>
             {
-                onStateChanged?.Invoke(LoginFlowState.InjectingIdentifier);
                 return InjectionEngine.Inject(
                     session,
                     email.AsSpan(),
                     effectiveOptions.TitleIdentifierPage,
-                    injectionOptions with { SendEnter = effectiveOptions.SendEnterAfterEmail },
+                    emailOptions,
                     cancellationToken);
             }, cancellationToken);
 
@@ -423,11 +428,10 @@ public static class RouteCLoginOrchestrator
             string? capturedPasswordTitle = null;
             var passwordResult = await Task.Run(() =>
             {
-                onStateChanged?.Invoke(LoginFlowState.InjectingPassword);
-
                 var passwordOptions = injectionOptions with
                 {
                     SendEnter = effectiveOptions.SendEnterAfterPassword,
+                    OnWindowVerified = () => onStateChanged?.Invoke(LoginFlowState.InjectingPassword),
                     PreInjectionCheck = effectiveOptions.CheckUiaPasswordElement && OperatingSystem.IsWindows()
                         ? () => UiaHelper.IsFocusedElementPassword()
                         : null

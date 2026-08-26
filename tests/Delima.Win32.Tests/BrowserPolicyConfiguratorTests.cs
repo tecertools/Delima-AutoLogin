@@ -43,6 +43,8 @@ public class BrowserPolicyConfiguratorTests : IDisposable
         Assert.Equal(1, key.GetValue("InPrivateModeAvailability")); // Edge value name
         Assert.Null(key.GetValue("IncognitoModeAvailability"));     // Chrome value name absent
         Assert.Equal(0, key.GetValue("BrowserSignin"));
+        Assert.Equal(0, key.GetValue("TranslateEnabled"));
+        Assert.Equal(0, key.GetValue("WebAppInstallByUserEnabled"));
 
         var status = BrowserPolicyConfigurator.CheckPolicyStatus(
             kind: BrowserKind.Edge,
@@ -51,6 +53,8 @@ public class BrowserPolicyConfiguratorTests : IDisposable
 
         Assert.True(status.IsFullyApplied);
         Assert.True(status.PrivateModeDisabled);
+        Assert.True(status.TranslateDisabled);
+        Assert.True(status.AppInstallDisabled);
     }
 
     [Fact]
@@ -72,6 +76,7 @@ public class BrowserPolicyConfiguratorTests : IDisposable
         Assert.Equal(1, key.GetValue("IncognitoModeAvailability")); // Chrome value name
         Assert.Null(key.GetValue("InPrivateModeAvailability"));     // Edge value name absent
         Assert.Equal(0, key.GetValue("BrowserSignin"));
+        Assert.Equal(0, key.GetValue("TranslateEnabled"));
 
         var status = BrowserPolicyConfigurator.CheckPolicyStatus(
             kind: BrowserKind.Chrome,
@@ -80,6 +85,7 @@ public class BrowserPolicyConfiguratorTests : IDisposable
 
         Assert.True(status.IsFullyApplied);
         Assert.True(status.PrivateModeDisabled);
+        Assert.True(status.TranslateDisabled);
     }
 
     [Fact]

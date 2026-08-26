@@ -160,6 +160,8 @@ public class BrowserSession : IDisposable
         var profileDir = Path.Combine(Path.GetTempPath(), "delima_session_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(profileDir);
 
+        SeedProfilePreferences(profileDir);
+
         var psi = new ProcessStartInfo(browserPath)
         {
             UseShellExecute = false
@@ -175,7 +177,15 @@ public class BrowserSession : IDisposable
         {
             psi.ArgumentList.Add("--force-renderer-accessibility");
         }
-        psi.ArgumentList.Add("--disable-features=PasswordManagerOnboarding,AutofillServerCommunication");
+        psi.ArgumentList.Add("--disable-features=Translate,TranslateUI,AppBanners,InstallPrompt,PwaInstallPrompt,WebAppInstallation,WebAppManifest,PasswordManagerOnboarding,AutofillServerCommunication,OptimizationGuideModelDownloading,OptimizationHintsUI,EdgeShowSmartScreenWarning,msEdgeWebWidget,msEdgeShoppingAssistant,msEdgeSidebarV2,msHubs,msPromotions");
+        psi.ArgumentList.Add("--disable-translate");
+        psi.ArgumentList.Add("--disable-infobars");
+        psi.ArgumentList.Add("--disable-notifications");
+        psi.ArgumentList.Add("--disable-popup-blocking");
+        psi.ArgumentList.Add("--disable-prompt-on-repost");
+        psi.ArgumentList.Add("--disable-search-engine-choice-screen");
+        psi.ArgumentList.Add("--lang=ms-MY");
+        psi.ArgumentList.Add("--accept-lang=ms-MY,ms,en-US,en");
         psi.ArgumentList.Add("--password-store=basic");
         psi.ArgumentList.Add("--new-window");
         psi.ArgumentList.Add(url);
@@ -184,6 +194,77 @@ public class BrowserSession : IDisposable
                    ?? throw new InvalidOperationException($"Process.Start returned null for '{browserPath}'");
 
         return new BrowserSession(proc, profileDir, kind, browserPath);
+    }
+
+    /// <summary>
+    /// Pre-populates the throwaway profile directory with Preferences and Local State
+    /// to disable translation prompts, PWA app install banners, and set accepted language to Malay.
+    /// </summary>
+    private static void SeedProfilePreferences(string profileDir)
+    {
+        try
+        {
+            var defaultDir = Path.Combine(profileDir, "Default");
+            Directory.CreateDirectory(defaultDir);
+
+            var preferencesJson = """
+            {
+              "translate": {
+                "enabled": false,
+                "blocked_languages": ["ms", "zsm", "en", "id", "en-US", "ms-MY"]
+              },
+              "translate_blocked_languages": ["ms", "zsm", "en", "id", "en-US", "ms-MY"],
+              "translate_site_blocklist": ["d3.delima.edu.my", "delima.edu.my", "accounts.google.com"],
+              "intl": {
+                "accept_languages": "ms-MY,ms,en-US,en",
+                "selected_languages": "ms-MY,ms,en-US,en"
+              },
+              "app_banners": {
+                "pwa_install_prompts_enabled": false
+              },
+              "profile": {
+                "password_manager_enabled": false,
+                "default_content_setting_values": {
+                  "notifications": 2,
+                  "automatic_downloads": 1
+                }
+              },
+              "browser": {
+                "show_hub_popup_on_first_add": false,
+                "has_seen_welcome_page": true,
+                "check_default_browser": false
+              },
+              "edge": {
+                "smartscreen_enabled": false,
+                "shopping_assistant_enabled": false,
+                "sidebar": {
+                  "sidebar_search_open_in_sidebar": false
+                }
+              }
+            }
+            """;
+            File.WriteAllText(Path.Combine(defaultDir, "Preferences"), preferencesJson);
+
+            var localStateJson = """
+            {
+              "translate": {
+                "enabled": false
+              },
+              "intl": {
+                "app_locale": "ms"
+              },
+              "browser": {
+                "enabled_labs_experiments": [],
+                "has_seen_welcome_page": true
+              }
+            }
+            """;
+            File.WriteAllText(Path.Combine(profileDir, "Local State"), localStateJson);
+        }
+        catch
+        {
+            // Non-critical best-effort pre-configuration
+        }
     }
 
     /// <summary>

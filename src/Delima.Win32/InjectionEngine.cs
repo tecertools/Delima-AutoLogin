@@ -10,9 +10,9 @@ public sealed record InjectionOptions
 {
     /// <summary>
     /// Timeout when waiting for the Chrome window to appear, verify, and settle.
-    /// Default is 30,000 ms (30 seconds) per Technical Architecture §3.2 and Appendix B.
+    /// Default is 60,000 ms (60 seconds) for resilient operation on low-spec PCs.
     /// </summary>
-    public TimeSpan WindowWaitTimeout { get; init; } = TimeSpan.FromSeconds(30);
+    public TimeSpan WindowWaitTimeout { get; init; } = TimeSpan.FromSeconds(60);
 
     /// <summary>
     /// Consecutive 100 ms polls a title must hold stably before initiating injection per §4.2 and Appendix B.
@@ -27,10 +27,10 @@ public sealed record InjectionOptions
     public int PollIntervalMs { get; init; } = 100;
 
     /// <summary>
-    /// Settle delay duration in milliseconds (700 ms default per T0.4 latency findings).
+    /// Settle delay duration in milliseconds (1200 ms default for reliable input autofocus on slow PCs).
     /// Maintained for configuration compatibility.
     /// </summary>
-    public int InjectionSettleMs { get; init; } = 700;
+    public int InjectionSettleMs { get; init; } = 1200;
 
     /// <summary>
     /// Gap between individual keystrokes in milliseconds.
@@ -56,6 +56,11 @@ public sealed record InjectionOptions
     /// If it returns false, injection aborts immediately with E02 and zero keystrokes.
     /// </summary>
     public Func<bool>? PreInjectionCheck { get; init; }
+
+    /// <summary>
+    /// Optional callback invoked immediately after the window title settles stably and verified.
+    /// </summary>
+    public Action? OnWindowVerified { get; init; }
 }
 
 /// <summary>
@@ -226,6 +231,8 @@ public static class InjectionEngine
         {
             return InjectionResult.WindowTimeout(sw.Elapsed);
         }
+
+        options.OnWindowVerified?.Invoke();
 
         // 3. Pre-injection field check (e.g. UIA IsPassword validation for T0.4)
         if (options.PreInjectionCheck != null)

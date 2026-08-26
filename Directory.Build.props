@@ -1,10 +1,11 @@
 <Project>
   <PropertyGroup>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <Company>tecertools Digital Solutions</Company>
     <Product>DELIMa Smart Launcher</Product>
     <Copyright>© 2026 tecertools Digital Solutions</Copyright>
     <NeutralLanguage>ms-MY</NeutralLanguage>
     <ApplicationIcon>$(MSBuildThisFileDirectory)icon.ico</ApplicationIcon>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 </Project>

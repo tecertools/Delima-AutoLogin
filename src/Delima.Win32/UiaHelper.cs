@@ -67,59 +67,170 @@ public static class UiaHelper
         }
     }
 
+    private static readonly string[] RejectedButtonKeywords =
+    [
+        "install",
+        "pasang",
+        "app available",
+        "muat turun",
+        "download",
+        "translate",
+        "terjemah",
+        "close",
+        "tutup",
+        "batal",
+        "cancel",
+        "dismiss",
+        "abaikan",
+        "settings",
+        "tetapan",
+        "search",
+        "cari",
+        "extensions",
+        "sambungan",
+        "reload",
+        "muat semula",
+        "back",
+        "kembali"
+    ];
+
     /// <summary>
-    /// Attempts to find and click a button by accessible name (e.g., "Log Masuk ke DELIMa") in the foreground window using UI Automation.
-    /// Returns true if button was found and invoked; false otherwise.
+    /// Checks whether an element accessible name indicates a login action while filtering out browser toolbar / install buttons.
     /// </summary>
-    public static bool TryInvokeButtonInForeground(string buttonText, TimeSpan timeout, CancellationToken cancellationToken = default)
+    internal static bool IsLoginButton(string? name, string? buttonText)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+
+        var lower = name.ToLowerInvariant();
+        foreach (var rejected in RejectedButtonKeywords)
+        {
+            if (lower.Contains(rejected)) return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(buttonText) &&
+            name.Contains(buttonText, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (name.Contains("Log Masuk ke DELIMa", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Log Masuk", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Log masuk", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Log In", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Login", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Masuk ke", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(name.Trim(), "Masuk", StringComparison.OrdinalIgnoreCase) ||
+            (name.Contains("Sign in", StringComparison.OrdinalIgnoreCase) && !name.Contains("Google", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether the given title indicates that navigation to Google Sign-in has already occurred.
+    /// </summary>
+    internal static bool IsGoogleSignInTitle(string? title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return false;
+        return title.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
+               title.Contains("Google Accounts", StringComparison.OrdinalIgnoreCase) ||
+               title.Contains("Log masuk - Akaun Google", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Attempts to find and click a login button by accessible name (e.g., "Log Masuk ke DELIMa") in the foreground window using UI Automation.
+    /// Restricts search to web Document to avoid browser toolbar buttons and retries across client-side JS hydration delays.
+    /// </summary>
+    public static bool TryInvokeButtonInForeground(
+        string buttonText,
+        TimeSpan timeout,
+        BrowserSession? session = null,
+        CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsWindows()) return false;
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
         while (sw.Elapsed < timeout && !cancellationToken.IsCancellationRequested)
         {
+            if (session != null && session.Process.HasExited)
+            {
+                return false;
+            }
+
             try
             {
                 var hwnd = NativeMethods.GetForegroundWindow();
                 if (hwnd != IntPtr.Zero)
                 {
+                    if (session != null)
+                    {
+                        var fgPid = NativeMethods.GetForegroundProcessId();
+                        if (fgPid != (uint)session.Process.Id && session.Process.MainWindowHandle != IntPtr.Zero)
+                        {
+                            NativeMethods.SetForegroundWindow(session.Process.MainWindowHandle);
+                        }
+                    }
+
                     var title = NativeMethods.GetForegroundTitle();
                     // Don't search if window has already transitioned to Google Sign-in or beyond
-                    if (title.Contains("Sign in", StringComparison.OrdinalIgnoreCase) ||
-                        title.Contains("Google Accounts", StringComparison.OrdinalIgnoreCase))
+                    if (IsGoogleSignInTitle(title))
                     {
-                        return false;
+                        return true;
                     }
 
                     var root = AutomationElement.FromHandle(hwnd);
                     if (root != null)
                     {
+                        // Prefer searching within the web Document element so browser chrome/toolbar controls are excluded
+                        var docCondition = new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Document);
+                        var doc = root.FindFirst(TreeScope.Descendants, docCondition);
+                        var searchContainer = doc ?? root;
+
                         var condition = new OrCondition(
                             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
                             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Hyperlink));
-                        var buttons = root.FindAll(TreeScope.Descendants, condition);
+                        var buttons = searchContainer.FindAll(TreeScope.Descendants, condition);
 
                         foreach (AutomationElement btn in buttons)
                         {
+                            if (cancellationToken.IsCancellationRequested) return false;
+
                             try
                             {
                                 var name = btn.Current.Name;
-                                if (!string.IsNullOrEmpty(name) &&
-                                    (name.Contains(buttonText, StringComparison.OrdinalIgnoreCase) ||
-                                     name.Contains("Log Masuk", StringComparison.OrdinalIgnoreCase) ||
-                                     name.Contains("DELIMa", StringComparison.OrdinalIgnoreCase)))
+                                if (IsLoginButton(name, buttonText))
                                 {
+                                    bool invoked = false;
                                     if (btn.TryGetCurrentPattern(InvokePattern.Pattern, out var patternObj) &&
                                         patternObj is InvokePattern invokePattern)
                                     {
                                         invokePattern.Invoke();
-                                        return true;
+                                        invoked = true;
                                     }
 
-                                    btn.SetFocus();
-                                    Thread.Sleep(50);
-                                    NativeMethods.SendEnter();
-                                    return true;
+                                    if (!invoked)
+                                    {
+                                        btn.SetFocus();
+                                        Thread.Sleep(50);
+                                        NativeMethods.SendEnter();
+                                    }
+
+                                    // Wait up to 2.5 seconds checking if navigation triggered
+                                    var waitNavSw = System.Diagnostics.Stopwatch.StartNew();
+                                    while (waitNavSw.Elapsed < TimeSpan.FromMilliseconds(2500) && !cancellationToken.IsCancellationRequested)
+                                    {
+                                        Thread.Sleep(100);
+                                        var currentTitle = NativeMethods.GetForegroundTitle();
+                                        if (IsGoogleSignInTitle(currentTitle))
+                                        {
+                                            return true;
+                                        }
+                                    }
+
+                                    // If navigation hasn't completed yet, continue outer poll to retry
+                                    break;
                                 }
                             }
                             catch
@@ -137,7 +248,7 @@ public static class UiaHelper
 
             try
             {
-                Thread.Sleep(200);
+                Thread.Sleep(250);
             }
             catch
             {
@@ -147,4 +258,10 @@ public static class UiaHelper
 
         return false;
     }
+
+    /// <summary>
+    /// Backward-compatible overload without BrowserSession argument.
+    /// </summary>
+    public static bool TryInvokeButtonInForeground(string buttonText, TimeSpan timeout, CancellationToken cancellationToken) =>
+        TryInvokeButtonInForeground(buttonText, timeout, session: null, cancellationToken);
 }

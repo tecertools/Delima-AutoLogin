@@ -698,6 +698,9 @@ public class RouteCLoginOrchestratorTests
         Assert.True(options.SendEnterAfterEmail);
         Assert.True(options.AutoClickLandingButton);
         Assert.Equal("Log Masuk ke DELIMa", options.LandingButtonText);
+        Assert.Equal(TimeSpan.FromSeconds(60), options.WindowWaitTimeout);
+        Assert.Equal(TimeSpan.FromSeconds(30), options.TransitionTimeout);
+        Assert.Equal(1200, options.InjectionSettleMs);
     }
 
     [Fact]
@@ -708,6 +711,43 @@ public class RouteCLoginOrchestratorTests
 
         var result = UiaHelper.TryInvokeButtonInForeground("Log Masuk ke DELIMa", TimeSpan.FromSeconds(5), cts.Token);
         Assert.False(result);
+    }
+
+    [Theory]
+    [InlineData("Log Masuk ke DELIMa", true)]
+    [InlineData("Log Masuk", true)]
+    [InlineData("LOG MASUK", true)]
+    [InlineData("Log In", true)]
+    [InlineData("Login", true)]
+    [InlineData("Masuk ke DELIMa", true)]
+    [InlineData("Masuk", true)]
+    [InlineData("App available. Install DELIMa", false)]
+    [InlineData("Install DELIMa", false)]
+    [InlineData("Pasang DELIMa", false)]
+    [InlineData("Translate this page", false)]
+    [InlineData("Terjemah halaman", false)]
+    [InlineData("DELIMa", false)]
+    [InlineData("DELIMa - Google Chrome", false)]
+    [InlineData("Close", false)]
+    [InlineData("Tutup", false)]
+    [InlineData("Settings", false)]
+    [InlineData("Cari", false)]
+    public void UiaHelper_IsLoginButton_Matches_Valid_Login_And_Rejects_Install_And_Translate(string buttonName, bool expectedMatch)
+    {
+        bool result = UiaHelper.IsLoginButton(buttonName, "Log Masuk ke DELIMa");
+        Assert.Equal(expectedMatch, result);
+    }
+
+    [Theory]
+    [InlineData("Sign in - Google Accounts - Google Chrome", true)]
+    [InlineData("Log masuk - Akaun Google", true)]
+    [InlineData("Google Accounts", true)]
+    [InlineData("DELIMa - Google Chrome", false)]
+    [InlineData("DELIMa 3.0", false)]
+    public void UiaHelper_IsGoogleSignInTitle_Detects_Navigated_States(string title, bool expectedNavigated)
+    {
+        bool result = UiaHelper.IsGoogleSignInTitle(title);
+        Assert.Equal(expectedNavigated, result);
     }
 }
 

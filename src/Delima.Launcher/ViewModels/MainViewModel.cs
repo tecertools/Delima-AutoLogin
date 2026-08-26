@@ -221,8 +221,9 @@ public sealed partial class MainViewModel : ObservableObject
         {
             EntryUrl = entryUrl,
             PreferredBrowser = Config.PreferredBrowser ?? "auto",
-            WindowWaitTimeout = TimeSpan.FromMilliseconds(Config.WindowWaitTimeoutMs > 0 ? Config.WindowWaitTimeoutMs : 30000),
-            InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 800,
+            WindowWaitTimeout = TimeSpan.FromMilliseconds(Config.WindowWaitTimeoutMs > 0 ? Config.WindowWaitTimeoutMs : 60000),
+            TransitionTimeout = TimeSpan.FromSeconds(30),
+            InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 1200,
             PerCharDelayMs = 15,
             SendEnterAfterEmail = true,
             SendEnterAfterPassword = true,

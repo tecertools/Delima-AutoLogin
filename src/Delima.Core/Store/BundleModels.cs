@@ -68,10 +68,10 @@ public sealed class AppConfig
     public int IdleResetSeconds { get; set; } = 600;
 
     [JsonPropertyName("injection_settle_ms")]
-    public int InjectionSettleMs { get; set; } = 700;
+    public int InjectionSettleMs { get; set; } = 1200;
 
     [JsonPropertyName("window_wait_timeout_ms")]
-    public int WindowWaitTimeoutMs { get; set; } = 30000;
+    public int WindowWaitTimeoutMs { get; set; } = 60000;
 
     [JsonPropertyName("store_max_age_days")]
     public int StoreMaxAgeDays { get; set; } = 30;

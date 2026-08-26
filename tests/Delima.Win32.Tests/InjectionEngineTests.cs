@@ -13,10 +13,10 @@ public class InjectionEngineTests
     {
         var options = new InjectionOptions();
 
-        Assert.Equal(TimeSpan.FromSeconds(30), options.WindowWaitTimeout);
+        Assert.Equal(TimeSpan.FromSeconds(60), options.WindowWaitTimeout);
         Assert.Equal(3, options.TitleSettlePolls);
         Assert.Equal(100, options.PollIntervalMs);
-        Assert.Equal(700, options.InjectionSettleMs);
+        Assert.Equal(1200, options.InjectionSettleMs);
         Assert.Equal(0, options.PerCharDelayMs);
         Assert.False(options.SendEnter);
         Assert.Equal("Chrome_WidgetWin_1", options.ExpectedClassName);
