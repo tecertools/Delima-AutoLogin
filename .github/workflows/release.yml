@@ -53,7 +53,9 @@ jobs:
           } else {
             $tag = $env:GITHUB_REF -replace '^refs/tags/v', ''
             if ($tag -like "refs/*" -or [string]::IsNullOrWhiteSpace($tag)) {
-              $tag = "2.0.0"
+              [xml]$props = Get-Content Directory.Build.props
+              $tag = $props.Project.PropertyGroup.Version
+              if ([string]::IsNullOrWhiteSpace($tag)) { $tag = "2.3.0" }
             }
           }
           Write-Output "VERSION=$tag" >> $env:GITHUB_ENV
