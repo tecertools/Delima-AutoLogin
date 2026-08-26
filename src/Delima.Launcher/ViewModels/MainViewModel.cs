@@ -187,7 +187,8 @@ public sealed partial class MainViewModel : ObservableObject
                 credential = new SecurePasswordBuffer("StandardPassword123!"u8);
             }
 
-            NavigateToSedangMasuk(student, credential);
+            var currentClass = LastClass ?? Classes.FirstOrDefault() ?? new ClassInfo { Id = "1", Name = "Kelas", Grade = 1 };
+            NavigateToPilihDestinasi(student, currentClass, credential);
         }
         catch (Exception ex)
         {
@@ -196,10 +197,29 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    public void NavigateToSedangMasuk(Student student, ICredential credential)
+    public void NavigateToPilihDestinasi(Student student, ClassInfo classInfo, ICredential credential)
     {
+        CloseResetBar();
+
+        CurrentView = new PilihDestinasiViewModel(
+            School,
+            classInfo,
+            student,
+            credential,
+            Config.Destinations,
+            onDestinationSelected: destination => NavigateToSedangMasuk(student, credential, destination),
+            onBackRequested: () => NavigateToCariNama(classInfo),
+            onTeacherModeRequested: OnTeacherModeRequested
+        );
+    }
+
+    public void NavigateToSedangMasuk(Student student, ICredential credential, DestinationConfig? destination = null)
+    {
+        string entryUrl = NormalizeDestinationUrl(destination?.Url);
+
         var routeCOptions = new RouteCOptions
         {
+            EntryUrl = entryUrl,
             PreferredBrowser = Config.PreferredBrowser ?? "auto",
             WindowWaitTimeout = TimeSpan.FromMilliseconds(Config.WindowWaitTimeoutMs > 0 ? Config.WindowWaitTimeoutMs : 30000),
             InjectionSettleMs = Config.InjectionSettleMs > 0 ? Config.InjectionSettleMs : 800,
@@ -216,8 +236,26 @@ public sealed partial class MainViewModel : ObservableObject
             onSuccess: session => OnInjectionSucceeded(student, session),
             onFailure: result => OnInjectionFailed(student, result),
             onCancel: () => NavigateToPilihKelas(),
-            options: routeCOptions
+            options: routeCOptions,
+            destination: destination
         );
+    }
+
+    private static string NormalizeDestinationUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return "https://d3.delima.edu.my/landing";
+        }
+
+        string trimmed = url.Trim();
+        if (trimmed.Equals("https://d3.delima.edu.my", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.Equals("https://d3.delima.edu.my/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "https://d3.delima.edu.my/landing";
+        }
+
+        return trimmed;
     }
 
     private void OnInjectionSucceeded(Student student, BrowserSession session)

@@ -16,8 +16,10 @@ public sealed partial class SedangMasukViewModel : ObservableObject
     public Student Student { get; }
     public School School { get; }
 
+    public DestinationConfig? Destination { get; }
+
     [ObservableProperty]
-    private string _statusMessage = "Sedang membuka DELIMa...";
+    private string _statusMessage;
 
     [ObservableProperty]
     private bool _isBusy = true;
@@ -34,13 +36,16 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         Action<RouteCResult> onFailure,
         Action onCancel,
         string? customEmail = null,
-        RouteCOptions? options = null)
+        RouteCOptions? options = null,
+        DestinationConfig? destination = null)
     {
         School = school;
         Student = student;
+        Destination = destination;
         _onSuccess = onSuccess;
         _onFailure = onFailure;
         _onCancel = onCancel;
+        _statusMessage = $"Sedang membuka {destination?.Label ?? "DELIMa"}...";
 
         string email = customEmail ?? (student.EmailLocal.Contains('@')
             ? student.EmailLocal
@@ -111,9 +116,9 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         }
     }
 
-    public static string GetStateMessage(LoginFlowState state) => state switch
+    public static string GetStateMessage(LoginFlowState state, string? destinationLabel = null) => state switch
     {
-        LoginFlowState.LaunchingBrowser => "Sedang membuka DELIMa...",
+        LoginFlowState.LaunchingBrowser => $"Sedang membuka {destinationLabel ?? "DELIMa"}...",
         LoginFlowState.WaitingForIdentifierPage => "Menunggu skrin masuk...",
         LoginFlowState.InjectingIdentifier => "Mengisi maklumat...",
         LoginFlowState.WaitingForTransition => "Menyambung...",
@@ -128,7 +133,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
 
     private void UpdateStateMessage(LoginFlowState state)
     {
-        string msg = GetStateMessage(state);
+        string msg = GetStateMessage(state, Destination?.Label);
         RunOnDispatcher(() => StatusMessage = msg);
     }
 

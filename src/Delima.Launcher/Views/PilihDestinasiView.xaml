@@ -1,0 +1,344 @@
+<UserControl x:Class="Delima.Launcher.Views.PilihDestinasiView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Delima.Launcher.ViewModels"
+             xmlns:theming="clr-namespace:Delima.Launcher.Theming"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=vm:PilihDestinasiViewModel}"
+             d:DesignHeight="768" d:DesignWidth="1366"
+             Background="{DynamicResource PageBackgroundBrush}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+        <theming:AvatarSeedToImageConverter x:Key="AvatarConverter" />
+
+        <!-- Destination Card Button Style (Fluent Elevation + Micro-interactions) -->
+        <Style x:Key="DestinationCardButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualDefault}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="MinWidth" Value="280" />
+            <Setter Property="MaxWidth" Value="340" />
+            <Setter Property="MinHeight" Value="150" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Effect" Value="{StaticResource CardShadow}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="cardBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12"
+                                Padding="18,16"
+                                RenderTransformOrigin="0.5,0.5"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="cardBorder" Property="Background" Value="{DynamicResource SoftSurfaceBrush}" />
+                                <Setter TargetName="cardBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                <Setter TargetName="cardBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.03" ScaleY="1.03" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="cardBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.10" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="cardBorder" Property="Background" Value="#F5ECC0" />
+                                <Setter TargetName="cardBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="cardBorder" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                <Setter TargetName="cardBorder" Property="BorderThickness" Value="2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Destination Item DataTemplate -->
+        <DataTemplate DataType="{x:Type vm:DestinationCardViewModel}">
+            <Button Style="{StaticResource DestinationCardButtonStyle}"
+                    Command="{Binding DataContext.SelectDestinationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding}"
+                    AutomationProperties.Name="{Binding AccessibleName}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Header Row: Icon Badge + Category Badge -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Emoji / Icon Badge with Soft Accent Tint -->
+                        <Border Grid.Column="0"
+                                Width="44" Height="44"
+                                CornerRadius="8"
+                                Background="{DynamicResource SoftSurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="{Binding IconEmoji}"
+                                       FontSize="22"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+
+                        <!-- Category Pill Badge -->
+                        <Border Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource SoftSurfaceBrush}"
+                                CornerRadius="10"
+                                Padding="8,3"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1">
+                            <TextBlock Text="{Binding BadgeText}"
+                                       FontFamily="{DynamicResource NunitoFont}"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Destination Name -->
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding Label}"
+                               FontFamily="{DynamicResource Baloo2Font}"
+                               FontSize="17.5"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               Margin="0,0,0,4"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis" />
+
+                    <!-- Subtitle / Description -->
+                    <TextBlock Grid.Row="2"
+                               Text="{Binding Subtitle}"
+                               FontFamily="{DynamicResource NunitoFont}"
+                               FontSize="12.5"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               TextWrapping="Wrap"
+                               LineHeight="16"
+                               Margin="0,0,0,8" />
+
+                    <!-- Action Link Hint -->
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Buka sekarang"
+                                   FontFamily="{DynamicResource NunitoFont}"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryBrush}" />
+                        <TextBlock Text=" →"
+                                   FontFamily="{DynamicResource NunitoFont}"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" />
+                    </StackPanel>
+                </Grid>
+            </Button>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Topbar (72px) -->
+            <RowDefinition Height="72" />
+            <!-- Main Content Area (*) -->
+            <RowDefinition Height="*" />
+            <!-- Footer (40px) -->
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+
+        <!-- TOPBAR HEADER (Surface Header) -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="32,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: School Badge + Name + Motto -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="42" Height="42"
+                            CornerRadius="8"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Margin="0,0,14,0"
+                            AutomationProperties.Name="Lencana Sekolah">
+                        <TextBlock Text="{Binding SchoolCode}"
+                                   FontFamily="{DynamicResource Baloo2Font}"
+                                   FontWeight="Bold"
+                                   FontSize="13"
+                                   Foreground="#FFFFFF"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SchoolName}"
+                                   FontFamily="{DynamicResource Baloo2Font}"
+                                   FontWeight="SemiBold"
+                                   FontSize="17"
+                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                        <TextBlock Text="{Binding SchoolMotto}"
+                                   FontFamily="{DynamicResource NunitoFont}"
+                                   FontSize="11.5"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   Margin="0,1,0,0" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Right: Pupil Info Badge + Teacher Mode Button -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Pupil Profile Pill -->
+                    <Border Background="{DynamicResource SoftSurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="20"
+                            Padding="10,4,14,4"
+                            Margin="0,0,12,0"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="26" Height="26" CornerRadius="13"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    ClipToBounds="True"
+                                    Margin="0,0,8,0">
+                                <Image Source="{Binding PupilAvatar, Converter={StaticResource AvatarConverter}}"
+                                       Width="26" Height="26"
+                                       Stretch="UniformToFill" />
+                            </Border>
+                            <TextBlock Text="{Binding PupilName}"
+                                       FontFamily="{DynamicResource NunitoFont}"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,6,0" />
+                            <Border Background="{DynamicResource PrimaryBrush}"
+                                    CornerRadius="4"
+                                    Padding="6,1"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding ClassName}"
+                                           FontFamily="{DynamicResource NunitoFont}"
+                                           FontWeight="Bold"
+                                           FontSize="11"
+                                           Foreground="#FFFFFF" />
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Teacher Mode Button -->
+                    <Button Style="{StaticResource OutlineButtonStyle}"
+                            Command="{Binding OpenTeacherModeCommand}"
+                            ToolTip="Buka Mod Guru untuk tetapan dan kawalan"
+                            AutomationProperties.Name="Bantuan Guru">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔒" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBlock Text="Mod Guru" FontFamily="{DynamicResource NunitoFont}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- MAIN CONTENT AREA -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel MaxWidth="1100" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,24,24,16">
+
+                <!-- Heading Banner -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                    <TextBlock Text="{Binding GreetingTitle}"
+                               Style="{StaticResource ScreenHeadingStyle}"
+                               FontSize="26"
+                               TextAlignment="Center"
+                               Margin="0,0,0,6" />
+                    <TextBlock Text="Sila pilih portal pembelajaran yang ingin anda buka hari ini."
+                               Style="{StaticResource HelperTextStyle}"
+                               FontSize="14.5"
+                               TextAlignment="Center" />
+                </StackPanel>
+
+                <!-- Destinations Card Grid -->
+                <ItemsControl ItemsSource="{Binding AvailableDestinations}"
+                              HorizontalAlignment="Center"
+                              Margin="0,0,0,24">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <!-- Back Action -->
+                <StackPanel HorizontalAlignment="Center" Margin="0,8,0,0">
+                    <Button Style="{StaticResource OutlineButtonStyle}"
+                            Command="{Binding BackCommand}"
+                            Padding="20,10"
+                            AutomationProperties.Name="Kembali atau tukar murid">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="←" FontWeight="Bold" Margin="0,0,8,0" VerticalAlignment="Center" />
+                            <TextBlock Text="Bukan Saya / Tukar Murid" FontFamily="{DynamicResource NunitoFont}" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- FOOTER (System Security Badge) -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="32,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="🔒 Sesi Disulitkan • Log masuk automatik dengan profil terpencil (Kiosk Lab Mode)"
+                           FontFamily="{DynamicResource NunitoFont}"
+                           FontSize="11.5"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           VerticalAlignment="Center" />
+
+                <TextBlock Grid.Column="1"
+                           Text="DELIMa Smart Launcher v2.0"
+                           FontFamily="{DynamicResource NunitoFont}"
+                           FontSize="11.5"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -380,6 +380,53 @@ public class LauncherFlowTests
     }
 
     [Fact]
+    public async Task MainViewModel_PicturePasswordSuccess_NavigatesToPilihDestinasi_AndThenToSedangMasuk()
+    {
+        var school = SampleDataService.CreateSampleSchool();
+        var theme = SampleDataService.CreateSampleTheme();
+        var classes = SampleDataService.CreateSampleClasses();
+        var students = SampleDataService.CreateSampleClassStudents("2_cemerlang");
+        var store = new FakeCredentialStore(hasCredential: true);
+
+        var customDestinations = new List<DestinationConfig>
+        {
+            new() { Id = "classroom", Label = "Google Classroom", Url = "https://classroom.google.com/" },
+            new() { Id = "delima", Label = "DELIMa 3.0", Url = "https://d3.delima.edu.my/landing" }
+        };
+
+        var config = new AppConfig { Destinations = customDestinations };
+        var mainVm = new MainViewModel(school, theme, classes, students, classes[0], credentialStore: store, config: config);
+
+        mainVm.NavigateToKataLaluanGambar(students[0], classes[0], Argon2Parameters.FastTest);
+        var kataLaluanVm = (KataLaluanGambarViewModel)mainVm.CurrentView!;
+
+        // Enter correct 3 picture-password icons: kucing, bunga, kereta
+        var icon1 = kataLaluanVm.ShuffledIcons.First(i => i.Id == "kucing");
+        var icon2 = kataLaluanVm.ShuffledIcons.First(i => i.Id == "bunga");
+        var icon3 = kataLaluanVm.ShuffledIcons.First(i => i.Id == "kereta");
+
+        await kataLaluanVm.SelectIconCommand.ExecuteAsync(icon1);
+        await kataLaluanVm.SelectIconCommand.ExecuteAsync(icon2);
+        await kataLaluanVm.SelectIconCommand.ExecuteAsync(icon3);
+
+        // Verification triggers OnPicturePasswordVerified -> navigates to PilihDestinasiViewModel
+        Assert.IsType<PilihDestinasiViewModel>(mainVm.CurrentView);
+        var destinasiVm = (PilihDestinasiViewModel)mainVm.CurrentView;
+        Assert.Equal(2, destinasiVm.AvailableDestinations.Count);
+        Assert.Equal("Google Classroom", destinasiVm.AvailableDestinations[0].Label);
+
+        // Pupil picks Google Classroom
+        var chosenCard = destinasiVm.AvailableDestinations[0];
+        destinasiVm.SelectDestinationCommand.Execute(chosenCard);
+
+        // Should have transitioned to SedangMasukViewModel with Google Classroom
+        Assert.IsType<SedangMasukViewModel>(mainVm.CurrentView);
+        var sedangVm = (SedangMasukViewModel)mainVm.CurrentView;
+        Assert.Equal("Google Classroom", sedangVm.Destination?.Label);
+        Assert.Contains("Google Classroom", sedangVm.StatusMessage);
+    }
+
+    [Fact]
     public void MainWindow_KioskMode_PreventsCloseUnlessForceClosed()
     {
         RunInSta(() =>
