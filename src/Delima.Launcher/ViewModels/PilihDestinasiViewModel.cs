@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Delima.Core.Roster;
 using Delima.Core.Store;
+using ClassInfo = Delima.Core.Roster.ClassInfo;
 
 namespace Delima.Launcher.ViewModels;
 

@@ -4,6 +4,7 @@ using Delima.Core.Store;
 using Delima.Launcher.Services;
 using Delima.Launcher.ViewModels;
 using Xunit;
+using ClassInfo = Delima.Core.Roster.ClassInfo;
 
 namespace Delima.Launcher.Tests;
 
