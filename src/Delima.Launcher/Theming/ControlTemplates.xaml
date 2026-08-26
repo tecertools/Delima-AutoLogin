@@ -227,6 +227,7 @@
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="8"
+                MinHeight="56"
                 SnapsToDevicePixels="True">
             <Grid HorizontalAlignment="Right" Width="40" Margin="0,0,12,0">
                 <Path x:Name="arrow"
@@ -256,7 +257,7 @@
     <Style x:Key="LargeComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Padding" Value="16,10" />
-        <Setter Property="MinHeight" Value="56" />
+        <Setter Property="MinHeight" Value="48" />
         <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
         <Setter Property="FontSize" Value="17" />
         <Setter Property="FontWeight" Value="SemiBold" />
@@ -291,7 +292,7 @@
         </Setter>
     </Style>
 
-    <!-- Custom Retemplated 64px ComboBox -->
+    <!-- Custom Retemplated 56px ComboBox -->
     <Style x:Key="LargeComboBoxStyle" TargetType="{x:Type ComboBox}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualDefault}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource LargeComboBoxItemStyle}" />
@@ -302,7 +303,8 @@
         <Setter Property="FontFamily" Value="{DynamicResource NunitoFont}" />
         <Setter Property="FontSize" Value="17" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="MinHeight" Value="64" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="MinHeight" Value="56" />
         <Setter Property="Padding" Value="18,0,48,0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
@@ -310,11 +312,16 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBox}">
-                    <Grid x:Name="templateRoot" SnapsToDevicePixels="True">
+                    <Grid x:Name="templateRoot"
+                          Height="{TemplateBinding Height}"
+                          MinHeight="{TemplateBinding MinHeight}"
+                          SnapsToDevicePixels="True">
                         <ToggleButton x:Name="toggleButton"
                                       Background="{TemplateBinding Background}"
                                       BorderBrush="{TemplateBinding BorderBrush}"
                                       BorderThickness="{TemplateBinding BorderThickness}"
+                                      MinHeight="{TemplateBinding MinHeight}"
+                                      Height="{TemplateBinding Height}"
                                       IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                       Template="{StaticResource ComboBoxToggleButtonTemplate}" />
                         <ContentPresenter x:Name="contentPresenter"
@@ -330,8 +337,8 @@
                         <Popup x:Name="PART_Popup"
                                AllowsTransparency="True"
                                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                               Margin="1"
                                Placement="Bottom"
+                               PlacementTarget="{Binding ElementName=templateRoot}"
                                PopupAnimation="Slide"
                                MaxHeight="360">
                             <Border x:Name="dropDownBorder"

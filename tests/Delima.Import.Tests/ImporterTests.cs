@@ -490,11 +490,76 @@ public class ImporterTests
     [InlineData("1 Cemerlang", "SATU", 1, "1 Cemerlang", true)]
     [InlineData("2 Amanah", "II", 2, "2 Amanah", true)]
     [InlineData("T3 Bestari", null, 3, "T3 Bestari", true)]
+    [InlineData("AMANAH", "2", 2, "2 AMANAH", true)]
+    [InlineData("AMANAH", "TAHUN 2", 2, "2 AMANAH", true)]
+    [InlineData("Tahun 2 AMANAH", "2", 2, "2 AMANAH", true)]
+    [InlineData("BESTARI", "T3", 3, "3 BESTARI", true)]
     public void RosterImporter_NormalizeClassAndGrade_EnhancedInputs(string rawClass, string? rawGrade, int expectedGrade, string expectedClass, bool expectedKnown)
     {
         var (grade, cleanClass, gradeKnown) = RosterImporter.NormalizeClassAndGrade(rawClass, rawGrade);
         Assert.Equal(expectedGrade, grade);
         Assert.Equal(expectedClass, cleanClass);
         Assert.Equal(expectedKnown, gradeKnown);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 18. APDM export header auto-detection (TINGKATAN/TAHUN as Grade, NAMA KELAS as Class)
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void ColumnMapping_AutoDetect_CorrectlyMapsApdmHeaders()
+    {
+        var headers = new List<string>
+        {
+            "BIL",
+            "NO KAD PENGENALAN / SIJIL LAHIR",
+            "NAMA MURID",
+            "TINGKATAN/TAHUN",
+            "NAMA KELAS",
+            "ID DELIMA"
+        };
+
+        var mapping = ColumnMapping.AutoDetect(headers);
+
+        Assert.Equal("NAMA MURID", mapping.FullNameColumn);
+        Assert.Equal("TINGKATAN/TAHUN", mapping.GradeColumn);
+        Assert.Equal("NAMA KELAS", mapping.ClassNameColumn);
+        Assert.Equal("NO KAD PENGENALAN / SIJIL LAHIR", mapping.RegisterNoColumn);
+        Assert.Equal("ID DELIMA", mapping.DelimaIdColumn);
+        Assert.True(mapping.HasRequiredMappings);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 19. APDM export dry-run preserves distinct classes across different years
+    // ---------------------------------------------------------------------------
+
+    [Fact]
+    public void RosterImporter_ApdmExport_CreatesDistinctClassesPerYear()
+    {
+        const string apdmCsv =
+            "BIL,NAMA MURID,TINGKATAN/TAHUN,NAMA KELAS,ID DELIMA\n" +
+            "1,Murid Satu,TAHUN 2,AMANAH,m-20000001\n" +
+            "2,Murid Dua,TAHUN 2,BESTARI,m-20000002\n" +
+            "3,Murid Tiga,TAHUN 3,AMANAH,m-30000001\n" +
+            "4,Murid Empat,TAHUN 3,BESTARI,m-30000002\n" +
+            "5,Murid Lima,TAHUN 5,CEMERLANG,m-50000001\n";
+
+        using var stream = FromString(apdmCsv);
+        var (headers, _, _) = DataFileReader.ReadCsv(stream);
+        var mapping = ColumnMapping.AutoDetect(headers);
+
+        Assert.Equal("TINGKATAN/TAHUN", mapping.GradeColumn);
+        Assert.Equal("NAMA KELAS", mapping.ClassNameColumn);
+
+        using var stream2 = FromString(apdmCsv);
+        var report = RosterImporter.AnalyzeDryRun(stream2, "apdm.csv", mapping);
+
+        Assert.Equal(5, report.ValidCount);
+        Assert.Equal(5, report.Classes.Count); // 2 AMANAH, 2 BESTARI, 3 AMANAH, 3 BESTARI, 5 CEMERLANG
+        Assert.Contains(report.Classes, c => c.ClassName == "2 AMANAH" && c.Grade == 2);
+        Assert.Contains(report.Classes, c => c.ClassName == "2 BESTARI" && c.Grade == 2);
+        Assert.Contains(report.Classes, c => c.ClassName == "3 AMANAH" && c.Grade == 3);
+        Assert.Contains(report.Classes, c => c.ClassName == "3 BESTARI" && c.Grade == 3);
+        Assert.Contains(report.Classes, c => c.ClassName == "5 CEMERLANG" && c.Grade == 5);
     }
 }

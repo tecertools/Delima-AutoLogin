@@ -78,7 +78,21 @@ public sealed partial class PilihKelasViewModel : ObservableObject
         _hasLastClass = lastClass != null;
         if (lastClass != null)
         {
-            _lastClassDisplayText = $"Tahun {lastClass.Grade} {lastClass.Name}";
+            string name = lastClass.Name.Trim();
+            if (name.StartsWith($"Tahun {lastClass.Grade}", StringComparison.OrdinalIgnoreCase))
+            {
+                _lastClassDisplayText = name;
+            }
+            else if (name.StartsWith($"{lastClass.Grade} ", StringComparison.OrdinalIgnoreCase) ||
+                     name.StartsWith($"{lastClass.Grade}-", StringComparison.OrdinalIgnoreCase) ||
+                     name.StartsWith($"{lastClass.Grade}_", StringComparison.OrdinalIgnoreCase))
+            {
+                _lastClassDisplayText = $"Tahun {name}";
+            }
+            else
+            {
+                _lastClassDisplayText = $"Tahun {lastClass.Grade} {name}";
+            }
         }
 
         // Setup available grades

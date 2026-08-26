@@ -262,8 +262,12 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
             GeneratedAt = DateTimeOffset.UtcNow
         };
 
-        // Convert classes
-        var classGroups = _state.RosterStudents.GroupBy(s => s.ClassName).ToList();
+        // Convert classes grouped by Grade and ClassName
+        var classGroups = _state.RosterStudents
+            .GroupBy(s => new { s.Grade, s.ClassName })
+            .OrderBy(g => g.Key.Grade)
+            .ThenBy(g => g.Key.ClassName)
+            .ToList();
         int colourIdx = 0;
         foreach (var group in classGroups)
         {
@@ -274,8 +278,8 @@ public sealed partial class Step7ProvisionViewModel : ObservableObject
 
             payload.Classes.Add(new ClassInfo
             {
-                Id = group.Key,
-                Name = group.Key,
+                Id = group.Key.ClassName,
+                Name = group.Key.ClassName,
                 Grade = grade,
                 ColourIndex = colourIdx++ % Math.Max(1, _state.Theme.ClassColours.Count)
             });

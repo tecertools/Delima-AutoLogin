@@ -124,6 +124,30 @@ public static partial class RosterImporter
             grade = ParseGradeString(cleanClass);
         }
 
+        // 3. Format cleanClass with grade prefix if grade is known (1-6)
+        if (grade >= 1 && grade <= 6)
+        {
+            // Normalize "Tahun 2 Amanah" / "Darjah 2 Amanah" / "Tingkatan 2 Amanah" -> "2 Amanah"
+            var matchTahunWithClass = Regex.Match(cleanClass, @"^(?:tahun|darjah|tingkatan)\s*(\d)\s*[-:\s_]\s*([^\s].*)$", RegexOptions.IgnoreCase);
+            if (matchTahunWithClass.Success)
+            {
+                string num = matchTahunWithClass.Groups[1].Value;
+                string rest = matchTahunWithClass.Groups[2].Value.Trim();
+                cleanClass = $"{num} {rest}";
+            }
+            else if (!cleanClass.StartsWith($"{grade}", StringComparison.OrdinalIgnoreCase) &&
+                     !cleanClass.StartsWith($"T{grade}", StringComparison.OrdinalIgnoreCase) &&
+                     !cleanClass.StartsWith($"D{grade}", StringComparison.OrdinalIgnoreCase) &&
+                     !cleanClass.StartsWith($"Tahun {grade}", StringComparison.OrdinalIgnoreCase) &&
+                     !cleanClass.StartsWith($"Darjah {grade}", StringComparison.OrdinalIgnoreCase) &&
+                     !cleanClass.StartsWith($"Tingkatan {grade}", StringComparison.OrdinalIgnoreCase) &&
+                     !Regex.IsMatch(cleanClass, @"^\d"))
+            {
+                // Class name is just "AMANAH" without grade prefix -> prepend grade e.g. "2 AMANAH"
+                cleanClass = $"{grade} {cleanClass}";
+            }
+        }
+
         bool gradeKnown = grade >= 1 && grade <= 6;
         return (grade, cleanClass, gradeKnown);
     }
@@ -131,14 +155,18 @@ public static partial class RosterImporter
     private static int ParseGradeString(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return 0;
-        string upper = text.Trim().ToUpperInvariant();
+        string upper = text.Trim().ToUpperInvariant()
+            .Replace("-", " ")
+            .Replace("_", " ")
+            .Replace("/", " ");
+        upper = Regex.Replace(upper, @"\s+", " ").Trim();
 
-        if (upper == "1" || upper == "I" || upper == "SATU" || upper == "ONE" || upper == "T1" || upper == "D1") return 1;
-        if (upper == "2" || upper == "II" || upper == "DUA" || upper == "TWO" || upper == "T2" || upper == "D2") return 2;
-        if (upper == "3" || upper == "III" || upper == "TIGA" || upper == "THREE" || upper == "T3" || upper == "D3") return 3;
-        if (upper == "4" || upper == "IV" || upper == "EMPAT" || upper == "FOUR" || upper == "T4" || upper == "D4") return 4;
-        if (upper == "5" || upper == "V" || upper == "LIMA" || upper == "FIVE" || upper == "T5" || upper == "D5") return 5;
-        if (upper == "6" || upper == "VI" || upper == "ENAM" || upper == "SIX" || upper == "T6" || upper == "D6") return 6;
+        if (upper == "1" || upper == "I" || upper == "SATU" || upper == "ONE" || upper == "T1" || upper == "D1" || upper == "TAHUN 1" || upper == "DARJAH 1" || upper == "TINGKATAN 1" || upper == "YEAR 1" || upper == "GRADE 1" || upper == "STANDARD 1" || upper == "T 1" || upper == "D 1") return 1;
+        if (upper == "2" || upper == "II" || upper == "DUA" || upper == "TWO" || upper == "T2" || upper == "D2" || upper == "TAHUN 2" || upper == "DARJAH 2" || upper == "TINGKATAN 2" || upper == "YEAR 2" || upper == "GRADE 2" || upper == "STANDARD 2" || upper == "T 2" || upper == "D 2") return 2;
+        if (upper == "3" || upper == "III" || upper == "TIGA" || upper == "THREE" || upper == "T3" || upper == "D3" || upper == "TAHUN 3" || upper == "DARJAH 3" || upper == "TINGKATAN 3" || upper == "YEAR 3" || upper == "GRADE 3" || upper == "STANDARD 3" || upper == "T 3" || upper == "D 3") return 3;
+        if (upper == "4" || upper == "IV" || upper == "EMPAT" || upper == "FOUR" || upper == "T4" || upper == "D4" || upper == "TAHUN 4" || upper == "DARJAH 4" || upper == "TINGKATAN 4" || upper == "YEAR 4" || upper == "GRADE 4" || upper == "STANDARD 4" || upper == "T 4" || upper == "D 4") return 4;
+        if (upper == "5" || upper == "V" || upper == "LIMA" || upper == "FIVE" || upper == "T5" || upper == "D5" || upper == "TAHUN 5" || upper == "DARJAH 5" || upper == "TINGKATAN 5" || upper == "YEAR 5" || upper == "GRADE 5" || upper == "STANDARD 5" || upper == "T 5" || upper == "D 5") return 5;
+        if (upper == "6" || upper == "VI" || upper == "ENAM" || upper == "SIX" || upper == "T6" || upper == "D6" || upper == "TAHUN 6" || upper == "DARJAH 6" || upper == "TINGKATAN 6" || upper == "YEAR 6" || upper == "GRADE 6" || upper == "STANDARD 6" || upper == "T 6" || upper == "D 6") return 6;
 
         var match = GradeExtractRegex.Match(text);
         if (match.Success && int.TryParse(match.Groups[1].Value, out int g) && g >= 1 && g <= 6)

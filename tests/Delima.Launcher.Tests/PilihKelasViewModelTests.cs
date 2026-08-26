@@ -23,7 +23,7 @@ public class PilihKelasViewModelTests
         Assert.Equal("Sekolah Kebangsaan Contoh", vm.SchoolName);
         Assert.Equal("Berilmu Berdisiplin", vm.SchoolMotto);
         Assert.True(vm.HasLastClass);
-        Assert.Equal("Tahun 2 2 Cemerlang", vm.LastClassDisplayText);
+        Assert.Equal("Tahun 2 Cemerlang", vm.LastClassDisplayText);
         Assert.Null(vm.SelectedTahun);
         Assert.False(vm.IsKelasDropdownEnabled);
         Assert.False(vm.CanProceed);
