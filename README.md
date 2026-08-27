@@ -166,7 +166,7 @@ Delima-AutoLogin/
 If you are a School ICT Coordinator or Teacher looking to install DELIMa Smart Launcher:
 
 1. **[📥 Download Latest Installer from GitHub Releases](https://github.com/tecertools/Delima-AutoLogin/releases/latest)**
-2. Run the signed installer package (`DELIMaLauncher-Setup-2.2.0.exe`) on your Admin PC and Lab PCs.
+2. Run the signed installer package (`DELIMaLauncher-Setup-2.3.5.exe`) on your Admin PC and Lab PCs.
 3. Follow the interactive setup guide in [docs/](docs/) or open the [Online Setup Guide](https://tecertools.github.io/Delima-AutoLogin/).
 
 ---
@@ -215,10 +215,10 @@ dotnet publish src/Delima.Provision/Delima.Provision.csproj $cfg -o publish/Prov
 Compile the Inno Setup installer package:
 
 ```powershell
-& "C:\Program Files (x86)\Inno Setup 6\iscc.exe" /DMyAppVersion=2.0.0 installer/DelimaLauncher.iss
+& "C:\Program Files (x86)\Inno Setup 6\iscc.exe" /DMyAppVersion=2.3.5 installer/DelimaLauncher.iss
 ```
 
-The compiled installer will be output to `dist/DELIMaLauncher-Setup-2.2.0.exe`.
+The compiled installer will be output to `dist/DELIMaLauncher-Setup-2.3.5.exe`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

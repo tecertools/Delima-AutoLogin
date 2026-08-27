@@ -1589,3 +1589,15 @@ a:hover {
     font-size: 1.6rem;
   }
 }
+
+/* Destination Cards Hover & Transitions */
+.destinations-grid > div {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.destinations-grid > div:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary) !important;
+}
+

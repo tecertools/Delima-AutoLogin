@@ -377,8 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const hasNama = headerLine.includes('NAMA') || headerLine.includes('MURID');
       const hasKelas = headerLine.includes('KELAS');
-      const hasIdDelima = headerLine.includes('DELIMA') || headerLine.includes('ID') || headerLine.includes('EMEL');
-      const hasTahun = headerLine.includes('TAHUN') || headerLine.includes('TINGKATAN');
+      const hasIdDelima = headerLine.includes('DELIMA') || headerLine.includes('ID') || headerLine.includes('EMEL') || headerLine.includes('EMAIL') || headerLine.includes('GOOGLE');
+      const hasTahun = headerLine.includes('TAHUN') || headerLine.includes('TINGKATAN') || headerLine.includes('DARJAH');
 
       if (hasNama && hasKelas && hasIdDelima) {
         csvResultBox.className = 'csv-result-box success';
