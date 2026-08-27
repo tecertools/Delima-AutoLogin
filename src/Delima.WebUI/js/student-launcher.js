@@ -359,6 +359,12 @@ class StudentLauncher {
             <div class="dest-desc">Pangkalan data bahan bacaan & perekodan NILAM KPM</div>
           </div>
 
+          <div class="dest-card canva" onclick="window.studentLauncher.launchDestination('Canva for Education', 'https://www.canva.com/login/')">
+            <div class="dest-icon">🎨</div>
+            <div class="dest-title">Canva for Education</div>
+            <div class="dest-desc">Perekaan grafik & persembahan kreatif murid</div>
+          </div>
+
           <div class="dest-card textbook" onclick="window.studentLauncher.launchDestination('Buku Teks Digital', 'https://textbook.moe.gov.my')">
             <div class="dest-icon">📕</div>
             <div class="dest-title">Buku Teks Digital</div>

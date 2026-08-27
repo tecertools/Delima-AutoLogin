@@ -186,6 +186,30 @@ public class LauncherFlowTests
     }
 
     [Fact]
+    public void MainViewModel_NavigateToSedangMasuk_Configures_LandingButtonText_For_Ains_And_Canva()
+    {
+        var mainVm = new MainViewModel();
+        var student = mainVm.Students[0];
+        using var cred = new SecurePasswordBuffer("TestPassword123!"u8);
+
+        // Ains destination
+        var ainsDest = new DestinationConfig { Id = "ains", Label = "AINS (NILAM)", Url = "https://ains.moe.gov.my/" };
+        mainVm.NavigateToSedangMasuk(student, cred, ainsDest);
+
+        Assert.IsType<SedangMasukViewModel>(mainVm.CurrentView);
+        var sedangMasukVm = (SedangMasukViewModel)mainVm.CurrentView;
+        Assert.Equal("Log Masuk dengan akaun DELIMa", sedangMasukVm.Options.LandingButtonText);
+
+        // Canva destination
+        var canvaDest = new DestinationConfig { Id = "canva", Label = "Canva for Education", Url = "https://www.canva.com/login/" };
+        mainVm.NavigateToSedangMasuk(student, cred, canvaDest);
+
+        Assert.IsType<SedangMasukViewModel>(mainVm.CurrentView);
+        sedangMasukVm = (SedangMasukViewModel)mainVm.CurrentView;
+        Assert.Equal("Continue with Google", sedangMasukVm.Options.LandingButtonText);
+    }
+
+    [Fact]
     public void ConsentPrompt_ExactText_Matches_Architecture_Spec()
     {
         // §4.5 & PRD §7.4: Identity check prompt on floating reset bar

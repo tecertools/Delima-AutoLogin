@@ -114,11 +114,16 @@ public static class UiaHelper
         }
 
         if (name.Contains("Log Masuk ke DELIMa", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Log Masuk dengan akaun DELIMa", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("Log Masuk", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("Log masuk", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("Log In", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("Login", StringComparison.OrdinalIgnoreCase) ||
             name.Contains("Masuk ke", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Continue with Google", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Log masuk dengan Google", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Teruskan dengan Google", StringComparison.OrdinalIgnoreCase) ||
+            name.Contains("Sign in with Google", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(name.Trim(), "Masuk", StringComparison.OrdinalIgnoreCase) ||
             (name.Contains("Sign in", StringComparison.OrdinalIgnoreCase) && !name.Contains("Google", StringComparison.OrdinalIgnoreCase)))
         {
@@ -200,7 +205,10 @@ public static class UiaHelper
 
                         var condition = new OrCondition(
                             new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
-                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Hyperlink));
+                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Hyperlink),
+                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Text),
+                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Group),
+                            new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Custom));
                         var buttons = searchContainer.FindAll(TreeScope.Descendants, condition);
 
                         foreach (AutomationElement btn in buttons)

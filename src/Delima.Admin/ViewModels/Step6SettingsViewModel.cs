@@ -99,7 +99,7 @@ public sealed partial class Step6SettingsViewModel : ObservableObject
         {
             Id = "canva",
             Label = "Canva for Education",
-            Url = "https://www.canva.com/education/"
+            Url = "https://www.canva.com/login/"
         });
 
         OnPropertyChanged(nameof(CanProceed));

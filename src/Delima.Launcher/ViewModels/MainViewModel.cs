@@ -217,6 +217,21 @@ public sealed partial class MainViewModel : ObservableObject
     {
         string entryUrl = NormalizeDestinationUrl(destination?.Url);
 
+        string landingButtonText = "Log Masuk ke DELIMa";
+        if (destination != null)
+        {
+            if (destination.Id.Equals("ains", StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(destination.Url) && destination.Url.Contains("ains.moe.gov.my", StringComparison.OrdinalIgnoreCase)))
+            {
+                landingButtonText = "Log Masuk dengan akaun DELIMa";
+            }
+            else if (destination.Id.Equals("canva", StringComparison.OrdinalIgnoreCase) ||
+                     (!string.IsNullOrEmpty(destination.Url) && destination.Url.Contains("canva.com", StringComparison.OrdinalIgnoreCase)))
+            {
+                landingButtonText = "Continue with Google";
+            }
+        }
+
         var routeCOptions = new RouteCOptions
         {
             EntryUrl = entryUrl,
@@ -227,7 +242,8 @@ public sealed partial class MainViewModel : ObservableObject
             PerCharDelayMs = 15,
             SendEnterAfterEmail = true,
             SendEnterAfterPassword = true,
-            AutoClickLandingButton = true
+            AutoClickLandingButton = true,
+            LandingButtonText = landingButtonText
         };
 
         CurrentView = new SedangMasukViewModel(

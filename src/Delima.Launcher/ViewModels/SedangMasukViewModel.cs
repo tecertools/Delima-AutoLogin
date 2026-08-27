@@ -17,6 +17,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
     public School School { get; }
 
     public DestinationConfig? Destination { get; }
+    public RouteCOptions Options { get; }
 
     [ObservableProperty]
     private string _statusMessage;
@@ -42,6 +43,7 @@ public sealed partial class SedangMasukViewModel : ObservableObject
         School = school;
         Student = student;
         Destination = destination;
+        Options = options ?? new RouteCOptions();
         _onSuccess = onSuccess;
         _onFailure = onFailure;
         _onCancel = onCancel;

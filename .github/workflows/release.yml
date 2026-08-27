@@ -11,7 +11,7 @@ on:
       version:
         description: 'Version tag to release (e.g. 2.0.0)'
         required: false
-        default: '2.3.4'
+        default: '2.3.5'
 
 permissions:
   contents: write
@@ -55,7 +55,7 @@ jobs:
             if ($tag -like "refs/*" -or [string]::IsNullOrWhiteSpace($tag)) {
               [xml]$props = Get-Content Directory.Build.props
               $tag = $props.Project.PropertyGroup.Version
-              if ([string]::IsNullOrWhiteSpace($tag)) { $tag = "2.3.4" }
+              if ([string]::IsNullOrWhiteSpace($tag)) { $tag = "2.3.5" }
             }
           }
           Write-Output "VERSION=$tag" >> $env:GITHUB_ENV

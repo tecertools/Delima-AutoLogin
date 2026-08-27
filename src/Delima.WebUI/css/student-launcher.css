@@ -468,6 +468,11 @@
   background: linear-gradient(180deg, var(--card-bg) 0%, rgba(109, 40, 217, 0.10) 100%);
 }
 
+.dest-card.canva {
+  border-color: #00C4CC;
+  background: linear-gradient(180deg, var(--card-bg) 0%, rgba(0, 196, 204, 0.10) 100%);
+}
+
 .dest-card.textbook {
   border-color: #0078D4;
   background: linear-gradient(180deg, var(--card-bg) 0%, rgba(0, 120, 212, 0.08) 100%);

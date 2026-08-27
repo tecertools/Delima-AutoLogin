@@ -140,7 +140,7 @@ public class PilihDestinasiViewModelTests
     [InlineData("delima", "DELIMa 3.0", "https://d3.delima.edu.my", "🎓", "Utama")]
     [InlineData("classroom", "Google Classroom", "https://classroom.google.com", "📚", "Google")]
     [InlineData("ains", "AINS NILAM", "https://ains.moe.gov.my", "📖", "KPM")]
-    [InlineData("canva", "Canva for Education", "https://www.canva.com/education/", "🎨", "Kreatif")]
+    [InlineData("canva", "Canva for Education", "https://www.canva.com/login/", "🎨", "Kreatif")]
     [InlineData("textbook", "Buku Teks Digital", "https://textbook.moe.gov.my", "📕", "KPM")]
     [InlineData("custom", "Laman Sekolah", "https://sekolah.edu.my", "🌐", "Laman")]
     public void DestinationCardViewModel_Infers_Metadata_Correctly(string id, string label, string url, string expectedIcon, string expectedBadge)
